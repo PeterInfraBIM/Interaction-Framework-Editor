@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML file is used to create a Swing container using the SwiXml rendering 
+	engine. org.jvnet.substance.SubstanceLookAndFeel com.jgoodies.looks.plastic.PlasticXPLookAndFeel 
+	org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel a03.swing.plaf/A03LookAndFeel -->
+<panel bundle="nl.visi.interaction_framework.editor.locale.Editor"
+	id="rolesPanel" plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel"
+	layout="BorderLayout">
+	<splitpane constraints="BorderLayout.CENTER"
+		ContinuousLayout="true" DividerLocation="220"
+		OneTouchExpandable="true" Orientation="JSplitPane.VERTICAL_SPLIT">
+		<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+			<scrollpane>
+				<gridbagconstraints
+					Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Weightx="1.0"
+					Weighty="1.0" />
+				<table id="tbl_Elements"
+					SelectionMode="ListSelectionModel.SINGLE_SELECTION" />
+			</scrollpane>
+			<panel Layout="GridBagLayout">
+				<gridbagconstraints
+					Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1"
+					Weightx="1.0" />
+				<button id="btn_NewElement" Action="newElement"
+					Text="lbl_NewRole">
+					<gridbagconstraints
+						Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+						Insets="2,0,2,2" />
+				</button>
+				<button id="btn_DeleteElement" Action="deleteElement"
+					Enabled="false" Text="lbl_Remove">
+					<gridbagconstraints
+						Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
+						Insets="2,0,2,2" Weightx="1.0" />
+				</button>
+			</panel>
+		</panel>
+		<splitpane ContinuousLayout="true" DividerLocation="280"
+			OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT">
+			<scrollpane Border="TitledBorder(lbl_Attributes)">
+				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+					<label Text="lbl_Id">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_Id" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<label Text="lbl_Description">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_Description" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<label Text="lbl_StartDate">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="2"
+							Insets="2,2,2,2" />
+					</label>
+					<panel id="startDatePanel" Layout="BorderLayout">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</panel>
+					<label Text="lbl_EndDate">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="3"
+							Insets="2,2,2,2" />
+					</label>
+					<panel id="endDatePanel" Layout="BorderLayout">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="3"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</panel>
+					<label Text="lbl_State">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="4"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_State" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="4"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<label Text="lbl_Language">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="5"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_Language" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="5"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<label Text="lbl_Category">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="6"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_Category" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="6"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<label Text="lbl_HelpInfo">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="7"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_HelpInfo" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="7"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<label Text="lbl_Code">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="8"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_Code" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="8"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<panel Border="TitledBorder(lbl_Responsibility)"
+						Layout="GridBagLayout">
+						<gridbagconstraints
+							Fill="GridBagConstraints.BOTH" Gridwidth="2" Gridx="0" Gridy="9"
+							Insets="2,2,2,2" />
+						<label Text="lbl_Scope">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+								Insets="2,2,2,2" />
+						</label>
+						<textfield id="tfd_ResponsibilityScope" enabled="false">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
+								Insets="2,2,2,2" Weightx="1.0" />
+						</textfield>
+						<label Text="lbl_Task">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
+								Insets="2,2,2,2" />
+						</label>
+						<textfield id="tfd_ResponsibilityTask" enabled="false">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
+								Insets="2,2,2,2" Weightx="1.0" />
+						</textfield>
+						<label Text="lbl_SupportTask">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="2"
+								Insets="2,2,2,2" />
+						</label>
+						<textfield id="tfd_ResponsibilitySupportTask"
+							enabled="false">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
+								Insets="2,2,2,2" Weightx="1.0" />
+						</textfield>
+						<label Text="lbl_Feedback">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="3"
+								Insets="2,2,2,2" />
+						</label>
+						<textfield id="tfd_ResponsibilityFeedback"
+							enabled="false">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="3"
+								Insets="2,2,2,2" Weightx="1.0" />
+						</textfield>
+					</panel>
+					<panel>
+						<gridbagconstraints
+							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="10" GridWidth="2"
+							Weighty="1.0" />
+					</panel>
+				</panel>
+			</scrollpane>
+			<scrollpane Border="TitledBorder(lbl_Relations)">
+				<tabbedpane id="transactionTabs"
+					Border="EmptyBorder(4,4,4,4)"
+					Titles="lbl_Transactions,lbl_Messages">
+					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+						<scrollpane>
+							<gridbagconstraints
+								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+								Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+							<table id="tbl_Transactions"
+								SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+								PreferredScrollableViewportSize="200,50" />
+						</scrollpane>
+					</panel>
+					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+						<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+							<gridbagconstraints
+								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+								Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+							<scrollpane>
+								<gridbagconstraints
+									Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+									Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+								<table id="tbl_Messages"
+									SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+									PreferredScrollableViewportSize="200,50" />
+							</scrollpane>
+						</panel>
+						<tabbedpane Titles="lbl_Conditions">
+							<gridbagconstraints
+								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="1"
+								Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+							<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+								<scrollpane>
+									<gridbagconstraints
+										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+										Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+									<table id="tbl_Conditions"
+										SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+										PreferredScrollableViewportSize="200,50" />
+								</scrollpane>
+							</panel>
+						</tabbedpane>
+					</panel>
+				</tabbedpane>
+			</scrollpane>
+		</splitpane>
+	</splitpane>
+</panel>
