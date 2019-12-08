@@ -1,0 +1,34 @@
+10
+
+dir
+4054
+svn://svn.e-bouw.org/Interaction%20Framework%20Editor/1.2/src/nl/visi
+svn://svn.e-bouw.org
+
+
+
+2012-06-21T14:59:12.790750Z
+4054
+svn
+
+
+svn:special svn:externals svn:needs-lock
+
+
+
+
+
+
+
+
+
+
+
+d57476bb-5ef9-114a-8978-8712f750d4b2
+
+interaction_framework
+dir
+
+interaction_schema
+dir
+

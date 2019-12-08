@@ -1,0 +1,77 @@
+
+<!--
+		==============================================================================
+		Build script for the Interaction framework editor Peter Willems Copyright 2010
+		==============================================================================
+	-->
+
+<project name="Interaction framework editor" default="deploy" basedir=".">
+
+	<target name="init">
+		<!-- Create the time stamp -->
+		<tstamp />
+
+		<property name="sourceDir" value="src" />
+		<property name="outputDir" value="classes" />
+		<property name="deployDir" value="deploy" />
+		<property name="libraryDir" value="lib" />
+		<property name="classPathJars" value="\
+			lib/looks-2.3.1.jar \
+			lib/jdom.jar \
+			lib/swixml.jar \
+			lib/jcalendar-1.3.2.jar \
+			lib/jxl.jar" />
+
+		<path id="project.class.path">
+			<pathelement location="${libraryDir}/jcalendar-1.3.2.jar" />
+			<pathelement location="${libraryDir}/jdom.jar" />
+			<pathelement location="${libraryDir}/looks-2.3.1.jar" />
+			<pathelement location="${libraryDir}/swixml.jar" />
+			<pathelement location="${libraryDir}/jxl.jar" />
+		</path>
+	</target>
+
+	<target name="clean" depends="init">
+		<delete dir="${outputDir}" />
+		<delete dir="${deployDir}" />
+	</target>
+
+	<target name="prepare" depends="clean">
+		<mkdir dir="${outputDir}" />
+		<mkdir dir="${deployDir}" />
+	</target>
+
+	<target name="compile" depends="prepare">
+		<javac srcdir="${sourceDir}" destdir="${outputDir}" classpathref="project.class.path" />
+	</target>
+
+	<target name="archive" depends="compile" description="build the Java archive file">
+		<mkdir dir="${deployDir}/lib" />
+		<jar jarfile="${deployDir}/interaction-framework-editor.jar" update="no" compress="false">
+			<fileset dir="${outputDir}" />
+			<fileset dir="${sourceDir}">
+				<include name="nl/visi/interaction_framework/editor/icons/*.gif" />
+				<include name="nl/visi/interaction_framework/editor/locale/*.properties" />
+				<include name="nl/visi/interaction_framework/editor/swixml/*.xml" />
+			</fileset>
+			<manifest>
+				<attribute name="Built-By" value="TNO - Peter Willems" />
+				<attribute name="Class-Path" value="${classPathJars}" />
+				<attribute name="Main-Class" value="nl.visi.interaction_framework.editor.Editor" />
+				<!--				<attribute name="SplashScreen-Image" value="nl/coinsweb/cbim/navigator/icons/CoinsSplash.gif" />  -->
+			</manifest>
+		</jar>
+	</target>
+
+	<target name="deploy" depends="archive">
+		<copy todir="${deployDir}/lib">
+			<fileset dir="${libraryDir}" />
+			<fileset dir=".">
+				<include name="_3.xsd" />
+			</fileset>
+		</copy>
+		<zip destfile="${deployDir}/Interaction_Framework_Editor_${DSTAMP}.zip" compress="true" update="false">
+			<fileset dir="${deployDir}" />
+		</zip>
+	</target>
+</project>

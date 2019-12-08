@@ -1,0 +1,55 @@
+package nl.visi.interaction_framework.editor;
+
+import java.io.File;
+
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
+import com.jgoodies.looks.plastic.PlasticLookAndFeel;
+import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
+import com.jgoodies.looks.plastic.theme.Silver;
+
+public class Editor {
+	public static String INTERACTION_SCHEMA_NAME = "_3.xsd";
+	public static File INTERACTION_SCHEMA = new File("lib" + File.separator + INTERACTION_SCHEMA_NAME);
+	public static File INTERACTION_FRAMEWORK = new File("_7.xml");
+
+	private static final Store store = new Store();
+	private static final Loader loader = new Loader();
+	private static MainFrameControl mainFrame;
+
+	public static Store getStore() {
+		return store;
+	}
+
+	public static Loader getLoader() {
+		return loader;
+	}
+
+	public static MainFrameControl getMainFrameControl() {
+		return mainFrame;
+	}
+
+	public Editor() {
+		try {
+			PlasticLookAndFeel laf = new PlasticXPLookAndFeel();
+			PlasticLookAndFeel.setCurrentTheme(new Silver());
+			PlasticLookAndFeel.setTabStyle(PlasticLookAndFeel.TAB_STYLE_METAL_VALUE);
+			UIManager.setLookAndFeel(laf);
+			// loader.load(INTERACTION_SCHEMA, INTERACTION_FRAMEWORK);
+			mainFrame = new MainFrameControl();
+			mainFrame.show();
+		} catch (Exception e) {
+			JOptionPane.showMessageDialog(null, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		new Editor();
+	}
+
+}

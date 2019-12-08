@@ -1,0 +1,15 @@
+K 10
+svn:ignore
+V 168
+_7.xml
+another_test.xml
+bin
+classes
+deploy
+raamwerk-van-N302-Beheer-en-Onderhoudsfase.xml
+test7.xml
+testje.xml
+v2_2Example_framework2.xml
+v2_2Example_framework2_pw.xml
+
+END
