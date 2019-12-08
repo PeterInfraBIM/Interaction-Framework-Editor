@@ -35,7 +35,7 @@ import nl.visi.interaction_schema.SimpleElementTypeTypeRef;
 import nl.visi.interaction_schema.UserDefinedTypeType;
 
 public class ComplexElementsPanelControl12 extends PanelControl12<ComplexElementTypeType> {
-	private static final String COMPLEX_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/ComplexElementsPanel.xml";
+	private static final String COMPLEX_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/ComplexElementsPanel12.xml";
 
 	private JPanel startDatePanel, endDatePanel;
 	private JTable tbl_SubComplexElements, tbl_SimpleElements;

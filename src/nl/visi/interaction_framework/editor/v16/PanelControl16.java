@@ -287,11 +287,11 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 			gcal.setTime(new Date());
 			XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
 
-			Method setDateLamu = element.getClass().getMethod("setDateLamu",
+			Method setDateLaMu = element.getClass().getMethod("setDateLaMu",
 					new Class[] { XMLGregorianCalendar.class });
-			setDateLamu.invoke(element, xgcal);
-			Method setUserLamu = element.getClass().getMethod("setUserLamu", new Class[] { String.class });
-			setUserLamu.invoke(element, user);
+			setDateLaMu.invoke(element, xgcal);
+			Method setUserLaMu = element.getClass().getMethod("setUserLaMu", new Class[] { String.class });
+			setUserLaMu.invoke(element, user);
 		} catch (DatatypeConfigurationException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {

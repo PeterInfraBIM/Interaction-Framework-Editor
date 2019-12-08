@@ -342,7 +342,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private enum MessagesTableColumns {
-		Id, Type, Transaction, Message;
+		Type, Id, Role, Transaction, Message;
 
 		@Override
 		public String toString() {
@@ -367,20 +367,18 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			MessageInTransactionTypeType mitt = get(rowIndex);
+			Boolean initiatorToExecutor = mitt.isInitiatorToExecutor();
+			if (initiatorToExecutor == null) {
+				initiatorToExecutor = false;
+			}
+			RoleTypeType initiator = getInitiator(mitt);
+			RoleTypeType executor = getExecutor(mitt);
 			switch (MessagesTableColumns.values()[columnIndex]) {
-			case Id:
-				return mitt.getId();
 			case Type:
-				Boolean initiatorToExecutor = mitt.isInitiatorToExecutor();
-				if (initiatorToExecutor == null) {
-					initiatorToExecutor = false;
-				}
-				RoleTypeType initiator = getInitiator(mitt);
 				if (initiator != null) {
 					if (selectedElement.equals(initiator)) {
 						return initiatorToExecutor ? "out" : "in";
 					} else {
-						RoleTypeType executor = getExecutor(mitt);
 						if (executor != null) {
 							if (selectedElement.equals(executor)) {
 								return initiatorToExecutor ? "in" : "out";
@@ -389,6 +387,22 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					}
 				}
 				return null;
+			case Id:
+				return mitt.getId();
+			case Role:
+				if (getValueAt(rowIndex, MessagesTableColumns.Type.ordinal()).equals("in")) {
+					if (initiatorToExecutor) {
+						return initiator != null ? initiator.getId() : null;
+					} else {
+						return executor != null ? executor.getId() : null;
+					}
+				} else {
+					if (!initiatorToExecutor) {
+						return initiator != null ? initiator.getId() : null;
+					} else {
+						return executor != null ? executor.getId() : null;
+					}
+				}
 			case Transaction:
 				Transaction transaction = mitt.getTransaction();
 				TransactionTypeType transactionType = transaction.getTransactionType();
@@ -419,6 +433,20 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					transactionType = (TransactionTypeType) transactionValue.getTransactionTypeRef().getIdref();
 				}
 				return transactionType;
+			}
+		}
+		return null;
+	}
+
+	private MessageTypeType getMessage(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			Message messageValue = mitt.getMessage();
+			if (messageValue != null) {
+				MessageTypeType messageType = messageValue.getMessageType();
+				if (messageType == null) {
+					messageType = (MessageTypeType) messageValue.getMessageTypeRef().getIdref();
+				}
+				return messageType;
 			}
 		}
 		return null;
@@ -455,7 +483,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private enum ConditionsTableColumns {
-		Type, Id, Transaction, Message;
+		Type, Id, Role, Transaction, Message;
 
 		@Override
 		public String toString() {
@@ -480,31 +508,47 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			ConditionRule conditionRule = get(rowIndex);
+			MessageInTransactionTypeType mitt = conditionRule.getMitt();
 			switch (ConditionsTableColumns.values()[columnIndex]) {
 			case Type:
 				return conditionRule.getType().name();
 			case Id:
 				return conditionRule.getId();
-			case Transaction:
-				if (conditionRule.getMitt() != null) {
-					Transaction transaction = conditionRule.getMitt().getTransaction();
-					if (transaction != null) {
-						TransactionTypeType transactionType = transaction.getTransactionType();
-						if (transactionType == null) {
-							transactionType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
+			case Role:
+				if (mitt != null) {
+					RoleTypeType initiator = getInitiator(mitt);
+					RoleTypeType executor = getExecutor(mitt);
+					Boolean initiatorToExecutor = mitt.isInitiatorToExecutor();
+					if (initiatorToExecutor == null) {
+						initiatorToExecutor = false;
+					}
+					if (initiatorToExecutor) {
+						if (selectedElement.equals(initiator)) {
+							return executor != null ? executor.getId() : null;
+						} else {
+							return initiator != null ? initiator.getId() : null;
 						}
+					} else {
+						if (selectedElement.equals(executor)) {
+							return initiator != null ? initiator.getId() : null;
+						} else {
+							return executor != null ? executor.getId() : null;
+						}
+					}
+				}
+				break;
+			case Transaction:
+				if (mitt != null) {
+					TransactionTypeType transactionType = getTransaction(mitt);
+					if (transactionType != null) {
 						return transactionType.getId();
 					}
 				}
 				break;
 			case Message:
-				if (conditionRule.getMitt() != null) {
-					Message message = conditionRule.getMitt().getMessage();
-					if (message != null) {
-						MessageTypeType messageType = message.getMessageType();
-						if (messageType == null) {
-							messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-						}
+				if (mitt != null) {
+					MessageTypeType messageType = getMessage(mitt);
+					if (messageType != null) {
 						return messageType.getId();
 					}
 				}

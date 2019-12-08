@@ -4,14 +4,18 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
@@ -21,6 +25,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.v16.PanelControl16;
 import nl.visi.interaction_framework.editor.v16.Store16;
+import nl.visi.interaction_framework.editor.v16.PanelControl16.Fields;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.ComplexElements;
@@ -37,7 +42,7 @@ import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
 import nl.visi.schemas._20160331.UserDefinedTypeType;
 
 public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElementTypeType> {
-	private static final String COMPLEX_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/ComplexElementsPanel.xml";
+	private static final String COMPLEX_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/ComplexElementsPanel16.xml";
 
 	private JPanel startDatePanel, endDatePanel;
 	private JTable tbl_SubComplexElements, tbl_SimpleElements;
@@ -45,6 +50,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	private SimpleElementsTableModel simpleElementsTableModel;
 	private JComboBox<String> cbx_ComplexElements, cbx_SimpleElements;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddSimpleElement, btn_RemoveSimpleElement;
+	private JTextField tfd_MinOccurs, tfd_MaxOccurs;
 
 	private enum ComplexElementsTableColumns {
 		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
@@ -204,11 +210,14 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 
 	public ComplexElementsPanelControl16() throws Exception {
 		super(COMPLEX_ELEMENTS_PANEL);
+
 		initComplexElementsTable();
 		initSubComplexElementsTable();
 		initSimpleElementsTable();
 		initStartDateField();
 		initEndDateField();
+		initMinOccurs();
+		initMaxOccurs();
 	}
 
 	private void initEndDateField() {
@@ -259,6 +268,53 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			}
 		});
 		startDateField.setEnabled(false);
+	}
+
+	private void initMinOccurs() {
+		tfd_MinOccurs.getDocument().addDocumentListener(new DocumentAdapter16() {
+			@Override
+			protected synchronized void update(DocumentEvent e) {
+				if (inSelection)
+					return;
+
+				if (tfd_MinOccurs.getText().equals("")) {
+					selectedElement.setMinOccurs(null);
+				} else {
+					try {
+						int intValue = Integer.parseInt(tfd_MinOccurs.getText());
+						selectedElement.setMinOccurs(BigInteger.valueOf(intValue));
+						updateLaMu(selectedElement, user);
+						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+					} catch (NumberFormatException exception) {
+						JOptionPane.showMessageDialog(panel, exception.getMessage(),
+								getBundle().getString("lbl_ValidationError"), JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
+	}
+
+	private void initMaxOccurs() {
+		tfd_MaxOccurs.getDocument().addDocumentListener(new DocumentAdapter16() {
+			@Override
+			protected synchronized void update(DocumentEvent e) {
+				if (inSelection)
+					return;
+				if (tfd_MaxOccurs.getText().equals("")) {
+					selectedElement.setMaxOccurs(null);
+				} else {
+					try {
+						int intValue = Integer.parseInt(tfd_MaxOccurs.getText());
+						selectedElement.setMaxOccurs(BigInteger.valueOf(intValue));
+						updateLaMu(selectedElement, user);
+						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+					} catch (NumberFormatException exception) {
+						JOptionPane.showMessageDialog(panel, exception.getMessage(),
+								getBundle().getString("lbl_ValidationError"), JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
 	}
 
 	@SuppressWarnings("serial")
@@ -357,6 +413,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
+		tfd_MaxOccurs.setEnabled(rowSelected);
+		tfd_MinOccurs.setEnabled(rowSelected);
 		tbl_SubComplexElements.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
 		tbl_SimpleElements.setEnabled(rowSelected);
@@ -377,6 +435,10 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
+			tfd_MaxOccurs
+					.setText(selectedElement.getMaxOccurs() != null ? selectedElement.getMaxOccurs().toString() : null);
+			tfd_MinOccurs
+					.setText(selectedElement.getMinOccurs() != null ? selectedElement.getMinOccurs().toString() : null);
 
 			subComplexElementsTableModel.clear();
 			ComplexElementTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
@@ -429,6 +491,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
+			tfd_MaxOccurs.setText("");
+			tfd_MinOccurs.setText("");
 			subComplexElementsTableModel.clear();
 			cbx_ComplexElements.removeAllItems();
 			simpleElementsTableModel.clear();
