@@ -196,10 +196,11 @@
 					</panel>
 				</panel>
 			</scrollpane>
-			<scrollpane Border="TitledBorder(lbl_Relations)">
-				<tabbedpane id="transactionTabs"
+			<scrollpane
+				Border="TitledBorder(lbl_Relations)">
+				<tabbedpane id="relationsTabs"
 					Border="EmptyBorder(4,4,4,4)"
-					Titles="lbl_Transactions,lbl_Messages">
+					Titles="lbl_Transactions,lbl_Messages,lbl_SequenceDiagram">
 					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 						<scrollpane>
 							<gridbagconstraints
@@ -240,6 +241,8 @@
 							</panel>
 						</tabbedpane>
 					</panel>
+					<panel id="canvas" Border="EmptyBorder(4,4,4,4)"
+						Layout="BorderLayout" />
 				</tabbedpane>
 			</scrollpane>
 		</splitpane>

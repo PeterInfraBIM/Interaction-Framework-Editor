@@ -1,14 +1,27 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.BasicStroke;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -37,13 +50,232 @@ import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private static final String ROLES_PANEL = "nl/visi/interaction_framework/editor/swixml/RolesPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel;
+	private JTabbedPane relationsTabs;
+	private JPanel startDatePanel, endDatePanel, canvas;
 	private JTable tbl_Transactions, tbl_Messages, tbl_Conditions;
 	private JTextField tfd_ResponsibilityScope, tfd_ResponsibilityTask, tfd_ResponsibilitySupportTask,
 			tfd_ResponsibilityFeedback;
 	private TransactionsTableModel transactionsTableModel;
 	private MessagesTableModel messagesTableModel;
 	private ConditionsTableModel conditionsTableModel;
+	private JScrollPane scrollPane;
+	private Canvas drawingPlane;
+
+	@SuppressWarnings("serial")
+	public class Canvas extends JPanel {
+		private Dimension preferredSize;
+		private final List<Transaction> transactions;
+		private Map<String, Transaction> transactionMap = new HashMap<>();
+		private Map<String, MessageItem> messageItemMap = new HashMap<>();
+		private final List<MessageItem> messages;
+		private RoleTypeType currentRole;
+		private int offsetLeft = 200;
+		private int yInitStart = 200;
+		private int yHeight = 0;
+
+		private class Transaction {
+			private int x, y;
+			private TransactionTypeType transactionType;
+
+			Transaction(TransactionTypeType transactionType, int x, int y) {
+				this.transactionType = transactionType;
+				this.x = x;
+				this.y = y;
+				transactionMap.put(transactionType.getId(), this);
+			}
+
+			void paint(Graphics g) {
+				Graphics2D g2 = (Graphics2D) g;
+				String label = transactionType.getId();
+				if (label != null) {
+//					g2.drawRect(x, y, 50, 100);
+					g2.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
+					int stringWidth = g2.getFontMetrics().stringWidth(label);
+					g2.translate((float) x, (float) y);
+					g2.rotate(Math.toRadians(-90));
+					g2.drawString(label, -stringWidth, -5);
+					g2.rotate(-Math.toRadians(-90));
+					g2.translate(-(float) x, -(float) y);
+
+					Stroke saveStroke = g2.getStroke();
+					float dash[] = { 5.0f };
+					g2.setStroke(
+							new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
+					g2.drawLine(x, y + 25, x, getHeight() - 10);
+					g2.setStroke(saveStroke);
+				}
+			}
+		}
+
+		private class MessageItem {
+			private MessageInTransactionTypeType mitt;
+			private MessageTypeType messageType;
+			private TransactionTypeType transactionType;
+			private RoleTypeType initiator;
+			private RoleTypeType executor;
+			private boolean initiatorToExecutor;
+			private String label;
+			private Condition condition;
+			private int index = 0;
+
+			public MessageItem(MessageInTransactionTypeType mitt) {
+				this.mitt = mitt;
+				initiator = RolesPanelControl16.getInitiator(mitt);
+				executor = RolesPanelControl16.getExecutor(mitt);
+				this.initiatorToExecutor = mitt.isInitiatorToExecutor();
+				this.messageType = RolesPanelControl16.getMessage(mitt);
+				this.transactionType = RolesPanelControl16.getTransaction(mitt);
+				label = this.messageType.getId();
+				condition = new Condition(mitt);
+				this.index = messageItemMap.size();
+				messageItemMap.put(mitt.getId(), this);
+			}
+
+			public Transaction getTransaction() {
+				return transactionMap.get(transactionType.getId());
+			}
+
+			public boolean isIn() {
+				if (initiator != null) {
+					if (selectedElement.equals(initiator)) {
+						return !initiatorToExecutor;
+					}
+					if (executor != null) {
+						if (selectedElement.equals(executor)) {
+							return initiatorToExecutor;
+						}
+					}
+				}
+				return false;
+			}
+
+			@SuppressWarnings("unused")
+			public boolean isOut() {
+				return !isIn();
+			}
+		}
+
+		public Canvas() {
+			preferredSize = new Dimension(getWidth(), getHeight());
+			setSize(getPreferredSize());
+			transactions = new ArrayList<RolesPanelControl16.Canvas.Transaction>();
+			messages = new ArrayList<RolesPanelControl16.Canvas.MessageItem>();
+		}
+
+		@Override
+		public void paintComponent(Graphics g) {
+			super.paintComponent(g);
+			Graphics2D g2d = (Graphics2D) g;
+			if (selectedElement == null) {
+				reset(g2d);
+				return;
+			}
+
+			boolean newDrawing = selectedElement != currentRole;
+			reset(g2d);
+
+			if (newDrawing) {
+				int transactionsRowCount = transactionsTableModel.getRowCount();
+				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
+				for (int index = 0; index < transactionsRowCount; index++) {
+					TransactionTypeType transactionTypeType = transactionsTableModel.get(index);
+					transactions.add(new Transaction(transactionTypeType,
+							offsetLeft + transactionWidth * (index + 1) - transactionWidth / 2, 25));
+				}
+				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
+					MessageInTransactionTypeType mitt = messagesTableModel.get(index);
+					MessageTypeType messageType = getMessage(mitt);
+					if (messageType != null) {
+						messages.add(new MessageItem(mitt));
+					}
+				}
+			}
+
+			String title = selectedElement.getDescription();
+			if (title == null || title.length() == 0) {
+				title = selectedElement.getId();
+			}
+			int titleWidth = g2d.getFontMetrics().stringWidth(title);
+			g2d.drawString(title, (getWidth() - titleWidth) / 2, 18);
+
+			for (Transaction transaction : transactions) {
+				transaction.paint(g2d);
+			}
+
+			int lineNumber = 0;
+			for (MessageItem messageItem : messages) {
+				Transaction transaction = messageItem.getTransaction();
+				titleWidth = g2d.getFontMetrics().stringWidth(messageItem.label);
+				int lineX = 20;
+				int lineY = lineNumber * 12 + yInitStart;
+				g2d.drawString(messageItem.label, lineX, lineY);
+				g2d.drawLine(lineX, lineY, transaction.x, lineY);
+				if (messageItem.isIn()) {
+					int[] xPoints = { transaction.x, transaction.x - 7, transaction.x - 7 };
+					int[] yPoints = { lineY, lineY - 4, lineY + 4 };
+					g2d.fillPolygon(xPoints, yPoints, 3);
+				} else {
+					int[] xPoints = { transaction.x - 10, transaction.x - 3, transaction.x - 3 };
+					int[] yPoints = { lineY, lineY - 4, lineY + 4 };
+					g2d.fillPolygon(xPoints, yPoints, 3);
+				}
+				if (messageItem.isIn()) {
+					List<MessageInTransactionTypeType> actions = messageItem.condition.getActions();
+					if (actions != null) {
+						for (MessageInTransactionTypeType action : actions) {
+							Transaction actionTransaction = transactionMap
+									.get(RolesPanelControl16.getTransaction(action).getId());
+							MessageItem actionMessage = messageItemMap.get(action.getId());
+							g2d.drawLine(transaction.x, lineY, transaction.x + 4, lineY);
+							g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x + 4, lineY);
+							g2d.drawLine(actionTransaction.x + 4, lineY, actionTransaction.x + 4,
+									actionMessage.index * 12 + yInitStart);
+							g2d.drawLine(actionTransaction.x + 4, actionMessage.index * 12 + yInitStart,
+									actionTransaction.x, actionMessage.index * 12 + yInitStart);
+						}
+					} else {
+					}
+				}
+				lineNumber++;
+				yHeight = lineY;
+			}
+
+			int height = preferredSize.height;
+			int width = preferredSize.width;
+			preferredSize = new Dimension(width, yInitStart + yHeight + 20);
+
+			if (height != preferredSize.height || width != preferredSize.width) {
+				setSize(getPreferredSize());
+				canvas.invalidate();
+				canvas.repaint();
+			}
+
+		}
+
+		@Override
+		public Dimension getPreferredSize() {
+			return preferredSize;
+		}
+
+		private void reset(Graphics g) {
+			g.clearRect(0, 0, getWidth(), getHeight());
+			g.setColor(Color.WHITE);
+			g.fillRect(0, 0, getWidth(), getHeight());
+			g.setColor(Color.BLACK);
+
+			if (selectedElement != currentRole) {
+				transactions.clear();
+				messages.clear();
+				transactionMap.clear();
+				messageItemMap.clear();
+				currentRole = selectedElement;
+			}
+		}
+
+		public void setCurrentRole(Object object) {
+			this.currentRole = null;
+		}
+	}
 
 	private enum RoleTableColumns {
 		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
@@ -342,7 +574,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private enum MessagesTableColumns {
-		Type, Id, Role, Transaction, Message;
+		Type, Id, Role, Transaction, Message, Navigate;
 
 		@Override
 		public String toString() {
@@ -422,9 +654,15 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			}
 			return null;
 		}
+
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return (columnIndex == MessagesTableColumns.Navigate.ordinal()) ? true : false;
+		}
+
 	}
 
-	private TransactionTypeType getTransaction(MessageInTransactionTypeType mitt) {
+	private static TransactionTypeType getTransaction(MessageInTransactionTypeType mitt) {
 		if (mitt != null) {
 			Transaction transactionValue = mitt.getTransaction();
 			if (transactionValue != null) {
@@ -438,7 +676,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		return null;
 	}
 
-	private MessageTypeType getMessage(MessageInTransactionTypeType mitt) {
+	private static MessageTypeType getMessage(MessageInTransactionTypeType mitt) {
 		if (mitt != null) {
 			Message messageValue = mitt.getMessage();
 			if (messageValue != null) {
@@ -452,7 +690,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		return null;
 	}
 
-	private RoleTypeType getInitiator(MessageInTransactionTypeType mitt) {
+	private static RoleTypeType getInitiator(MessageInTransactionTypeType mitt) {
 		TransactionTypeType transactionType = getTransaction(mitt);
 		if (transactionType != null) {
 			Initiator initiatorValue = transactionType.getInitiator();
@@ -467,7 +705,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		return null;
 	}
 
-	private RoleTypeType getExecutor(MessageInTransactionTypeType mitt) {
+	private static RoleTypeType getExecutor(MessageInTransactionTypeType mitt) {
 		TransactionTypeType transactionType = getTransaction(mitt);
 		if (transactionType != null) {
 			Executor executorValue = transactionType.getExecutor();
@@ -561,6 +799,17 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	public RolesPanelControl16() throws Exception {
 		super(ROLES_PANEL);
+
+		relationsTabs.addChangeListener(new ChangeListener() {
+
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				if (relationsTabs.getSelectedComponent().equals(canvas)) {
+					drawingPlane.setCurrentRole(null);
+				}
+			}
+		});
+
 		initRolesTable();
 		initTransactionsTable();
 		initMessagesTable();
@@ -571,6 +820,10 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		initResponsibilityTask();
 		initResponsibilitySupportTask();
 		initResponsibilityFeedback();
+
+		drawingPlane = new Canvas();
+		scrollPane = new JScrollPane(drawingPlane);
+		canvas.add(scrollPane, BorderLayout.CENTER);
 	}
 
 	private void initResponsibilityFeedback() {
@@ -698,22 +951,24 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		});
 	}
 
+	@SuppressWarnings("serial")
 	private void initMessagesTable() {
 		messagesTableModel = new MessagesTableModel();
 		tbl_Messages.setModel(messagesTableModel);
 		tbl_Messages.setFillsViewportHeight(true);
-//		tbl_Messages.getColumnModel().getColumn(MessagesTableColumns.Id.ordinal()).setMaxWidth(50);
-//		TableColumn navigateColumn = tbl_Messages.getColumnModel()
-//				.getColumn(MessagesTableColumns.Navigate.ordinal());
-//		navigateColumn.setMaxWidth(50);
-//		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
-//		navigateColumn.setCellEditor(new NavigatorEditor() {
-//			@Override
-//			protected void navigate() {
-//				int row = tbl_Transactions.getSelectedRow();
-//				Editor16.getMainFrameControl().navigate(transactionsTableModel.get(row));
-//			}
-//		});
+		tbl_Messages.getColumnModel().getColumn(MessagesTableColumns.Type.ordinal()).setMaxWidth(50);
+		TableColumn navigateColumn = tbl_Messages.getColumnModel().getColumn(MessagesTableColumns.Navigate.ordinal());
+		navigateColumn.setMaxWidth(50);
+		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
+		navigateColumn.setCellEditor(new NavigatorEditor() {
+			@Override
+			protected void navigate() {
+				int row = tbl_Messages.getSelectedRow();
+				MessageTypeType message = getMessage(messagesTableModel.get(row));
+				Editor16.getMainFrameControl().navigate(message);
+			}
+		});
+
 		tbl_Messages.getSelectionModel().addListSelectionListener(messageTableSelectionListener);
 	}
 
@@ -810,6 +1065,9 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		tfd_ResponsibilityFeedback.setEnabled(rowSelected);
 
 		tbl_Transactions.setEnabled(rowSelected);
+		tbl_Messages.setEnabled(rowSelected);
+		canvas.repaint();
+
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
 			tfd_Id.setText(selectedElement.getId());
