@@ -32,7 +32,7 @@ import nl.visi.schemas._20160331.PersonTypeType;
 import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi.schemas._20160331.TransactionPhaseTypeType;
 
-class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
+public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	private static final String MISCELLANEOUS_PANEL = "nl/visi/interaction_framework/editor/swixml/MiscellaneousPanel.xml";
 	private JTable tbl_ComplexElements;
 	private JPanel startDatePanel, endDatePanel, relationsPanel;
@@ -504,8 +504,10 @@ class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			if (selectedElement instanceof ProjectTypeType) {
 				ProjectTypeType projectType = (ProjectTypeType) selectedElement;
 				tfd_Description.setText(projectType.getDescription());
-				startDateField.setDate(projectType.getStartDate().toGregorianCalendar().getTime());
-				endDateField.setDate(projectType.getEndDate().toGregorianCalendar().getTime());
+				XMLGregorianCalendar startDate = projectType.getStartDate();
+				startDateField.setDate(startDate != null ? startDate.toGregorianCalendar().getTime() : null);
+				XMLGregorianCalendar endDate = projectType.getEndDate();
+				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(projectType.getState());
 				tfd_Language.setText(projectType.getLanguage());
 				tfd_Category.setText(projectType.getCategory());
@@ -518,8 +520,10 @@ class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			} else if (selectedElement instanceof PersonTypeType) {
 				PersonTypeType personType = (PersonTypeType) selectedElement;
 				tfd_Description.setText(personType.getDescription());
-				startDateField.setDate(personType.getStartDate().toGregorianCalendar().getTime());
-				endDateField.setDate(personType.getEndDate().toGregorianCalendar().getTime());
+				XMLGregorianCalendar startDate = personType.getStartDate();
+				startDateField.setDate(startDate != null ? startDate.toGregorianCalendar().getTime() : null);
+				XMLGregorianCalendar endDate = personType.getEndDate();
+				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(personType.getState());
 				tfd_Language.setText(personType.getLanguage());
 				tfd_Category.setText(personType.getCategory());
@@ -532,8 +536,10 @@ class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			} else if (selectedElement instanceof OrganisationTypeType) {
 				OrganisationTypeType organisationType = (OrganisationTypeType) selectedElement;
 				tfd_Description.setText(organisationType.getDescription());
-				startDateField.setDate(organisationType.getStartDate().toGregorianCalendar().getTime());
-				endDateField.setDate(organisationType.getEndDate().toGregorianCalendar().getTime());
+				XMLGregorianCalendar startDate = organisationType.getStartDate();
+				startDateField.setDate(startDate != null ? startDate.toGregorianCalendar().getTime() : null);
+				XMLGregorianCalendar endDate = organisationType.getEndDate();
+				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(organisationType.getState());
 				tfd_Language.setText(organisationType.getLanguage());
 				tfd_Category.setText(organisationType.getCategory());
@@ -545,9 +551,10 @@ class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				}
 			} else if (selectedElement instanceof GroupTypeType) {
 				tfd_Description.setText(((GroupTypeType) selectedElement).getDescription());
-				startDateField
-						.setDate(((GroupTypeType) selectedElement).getStartDate().toGregorianCalendar().getTime());
-				endDateField.setDate(((GroupTypeType) selectedElement).getEndDate().toGregorianCalendar().getTime());
+				XMLGregorianCalendar startDate = ((GroupTypeType) selectedElement).getStartDate();
+				startDateField.setDate(startDate != null ? startDate.toGregorianCalendar().getTime() : null);
+				XMLGregorianCalendar endDate = ((GroupTypeType) selectedElement).getEndDate();
+				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(((GroupTypeType) selectedElement).getState());
 				tfd_Language.setText(((GroupTypeType) selectedElement).getLanguage());
 				tfd_Category.setText(((GroupTypeType) selectedElement).getCategory());
@@ -555,8 +562,10 @@ class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			} else if (selectedElement instanceof AppendixTypeType) {
 				AppendixTypeType appendixType = (AppendixTypeType) selectedElement;
 				tfd_Description.setText(appendixType.getDescription());
-				startDateField.setDate(appendixType.getStartDate().toGregorianCalendar().getTime());
-				endDateField.setDate(appendixType.getEndDate().toGregorianCalendar().getTime());
+				XMLGregorianCalendar startDate = appendixType.getStartDate();
+				startDateField.setDate(startDate != null ? startDate.toGregorianCalendar().getTime() : null);
+				XMLGregorianCalendar endDate = appendixType.getEndDate();
+				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(appendixType.getState());
 				tfd_Language.setText(appendixType.getLanguage());
 				tfd_Category.setText(appendixType.getCategory());
@@ -569,8 +578,10 @@ class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			} else if (selectedElement instanceof TransactionPhaseTypeType) {
 				TransactionPhaseTypeType transactionPhaseType = (TransactionPhaseTypeType) selectedElement;
 				tfd_Description.setText(transactionPhaseType.getDescription());
-				startDateField.setDate(transactionPhaseType.getStartDate().toGregorianCalendar().getTime());
-				endDateField.setDate(transactionPhaseType.getEndDate().toGregorianCalendar().getTime());
+				XMLGregorianCalendar startDate = transactionPhaseType.getStartDate();
+				startDateField.setDate(startDate != null ? startDate.toGregorianCalendar().getTime() : null);
+				XMLGregorianCalendar endDate = transactionPhaseType.getEndDate();
+				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(transactionPhaseType.getState());
 				tfd_Language.setText(transactionPhaseType.getLanguage());
 				tfd_Category.setText(transactionPhaseType.getCategory());
