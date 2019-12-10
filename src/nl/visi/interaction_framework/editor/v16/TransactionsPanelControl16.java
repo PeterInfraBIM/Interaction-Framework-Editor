@@ -138,29 +138,12 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 			private String getLabel() {
 				if (this == init) {
-					Initiator initiator = selectedElement.getInitiator();
-					if (initiator != null) {
-						RoleTypeType initiatorRole = initiator.getRoleType();
-						if (initiatorRole == null) {
-							initiatorRole = (RoleTypeType) initiator.getRoleTypeRef().getIdref();
-						}
-						if (initiatorRole != null) {
-							return initiatorRole.getId();
-						}
-					}
+					RoleTypeType initiator = getInitiator(selectedElement);
+					return initiator != null ? initiator.getId() : null;
 				} else {
-					Executor executor = selectedElement.getExecutor();
-					if (executor != null) {
-						RoleTypeType executorRole = executor.getRoleType();
-						if (executorRole == null) {
-							executorRole = (RoleTypeType) executor.getRoleTypeRef().getIdref();
-						}
-						if (executorRole != null) {
-							return executorRole.getId();
-						}
-					}
+					RoleTypeType executor = getExecutor(selectedElement);
+					return executor != null ? executor.getId() : null;
 				}
-				return null;
 			}
 		};
 
@@ -174,16 +157,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 			public MessageItem(MessageInTransactionTypeType mitt) {
 				this.mitt = mitt;
-				Message message = mitt.getMessage();
-				if (message != null) {
-					MessageTypeType messageType = message.getMessageType();
-					if (messageType == null) {
-						messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-					}
-					if (messageType != null) {
-						name = messageType.getId();
-					}
-				}
+				MessageTypeType messageType = getMessage(mitt);
+				name = messageType != null ? messageType.getId() : null;
 				this.loop = false;
 				this.incomingConnections = new ArrayList<TransactionsPanelControl16.Canvas.MessageItem>();
 				this.outgoingConnections = new ArrayList<TransactionsPanelControl16.Canvas.MessageItem>();
@@ -330,78 +305,55 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				List<MessageInTransactionTypeType> execGroup = new ArrayList<MessageInTransactionTypeType>();
 				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
 					MessageInTransactionTypeType mitt = messagesTableModel.get(index);
-					Message message = mitt.getMessage();
-					if (message != null) {
-						MessageTypeType messageType = message.getMessageType();
-						if (messageType == null) {
-							messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-						}
-						if (messageType != null) {
-							MessageItem item = new MessageItem(mitt);
-							messages.add(item);
-							item.setStartMitt(TransactionsPanelControl16.this.isStart(mitt, selectedElement));
-							item.setEndMitt(isEndMitt(mitt));
-							Boolean initiatorToExecutor = mitt.isInitiatorToExecutor();
-							item.setInitiatorToExecutor(initiatorToExecutor != null ? initiatorToExecutor : true);
-							item.setIncomingTransactions(incomingTransaction(mitt));
-							item.setOutgoingTransactions(outgoingTransaction(mitt));
-							if (item.isInitiatorToExecutor()) {
-								item.setLoop(isLoop(mitt, execGroup));
-								initGroup.add(mitt);
-								if (!item.isLoop()) {
-									execGroup.clear();
+					MessageTypeType messageType = getMessage(mitt);
+					if (messageType != null) {
+						MessageItem item = new MessageItem(mitt);
+						messages.add(item);
+						item.setStartMitt(TransactionsPanelControl16.this.isStart(mitt, selectedElement));
+						item.setEndMitt(isEndMitt(mitt));
+						Boolean initiatorToExecutor = mitt.isInitiatorToExecutor();
+						item.setInitiatorToExecutor(initiatorToExecutor != null ? initiatorToExecutor : true);
+						item.setIncomingTransactions(incomingTransaction(mitt));
+						item.setOutgoingTransactions(outgoingTransaction(mitt));
+						if (item.isInitiatorToExecutor()) {
+							item.setLoop(isLoop(mitt, execGroup));
+							initGroup.add(mitt);
+							if (!item.isLoop()) {
+								execGroup.clear();
+							}
+							if (index > 0) {
+								MessageInTransactionTypeType prevMsg = null;
+								boolean init2Exec = true;
+								for (int i = index - 1; init2Exec && i >= 0; i--) {
+									prevMsg = messagesTableModel.get(i);
+									init2Exec = prevMsg.isInitiatorToExecutor() != null
+											? prevMsg.isInitiatorToExecutor()
+											: true;
 								}
-								if (index > 0) {
-									MessageInTransactionTypeType prevMsg = null;
-									boolean init2Exec = true;
-									for (int i = index - 1; init2Exec && i >= 0; i--) {
-										prevMsg = messagesTableModel.get(i);
-										init2Exec = prevMsg.isInitiatorToExecutor() != null
-												? prevMsg.isInitiatorToExecutor()
-												: true;
-									}
 
-									// MessageInTransactionTypeType prevMsg =
-									// messagesTableModel
-									// .get(index - 1);
-									// boolean init2Exec = prevMsg
-									// .isInitiatorToExecutor() != null ?
-									// prevMsg
-									// .isInitiatorToExecutor() : true;
-
-									item.setLinked(!init2Exec && successorMap.get(prevMsg) != null
-											&& successorMap.get(prevMsg).contains(mitt));
-									workAround(mitt, item);
+								item.setLinked(!init2Exec && successorMap.get(prevMsg) != null
+										&& successorMap.get(prevMsg).contains(mitt));
+								workAround(mitt, item);
+							}
+						} else {
+							item.setLoop(isLoop(mitt, initGroup));
+							execGroup.add(mitt);
+							if (!item.isLoop()) {
+								initGroup.clear();
+							}
+							if (index > 0) {
+								MessageInTransactionTypeType prevMsg = null;
+								boolean init2Exec = false;
+								for (int i = index - 1; !init2Exec && i >= 0; i--) {
+									prevMsg = messagesTableModel.get(i);
+									init2Exec = prevMsg.isInitiatorToExecutor() != null
+											? prevMsg.isInitiatorToExecutor()
+											: true;
 								}
-							} else {
-								item.setLoop(isLoop(mitt, initGroup));
-								execGroup.add(mitt);
-								if (!item.isLoop()) {
-									initGroup.clear();
-								}
-								if (index > 0) {
-									MessageInTransactionTypeType prevMsg = null;
-									boolean init2Exec = false;
-									for (int i = index - 1; !init2Exec && i >= 0; i--) {
-										prevMsg = messagesTableModel.get(i);
-										init2Exec = prevMsg.isInitiatorToExecutor() != null
-												? prevMsg.isInitiatorToExecutor()
-												: true;
-									}
+								item.setLinked(init2Exec && successorMap.get(prevMsg) != null
+										&& successorMap.get(prevMsg).contains(mitt));
 
-									// MessageInTransactionTypeType prevMsg =
-									// messagesTableModel
-									// .get(index - 1);
-									// boolean init2Exec = prevMsg
-									// .isInitiatorToExecutor() != null ?
-									// prevMsg
-									// .isInitiatorToExecutor() : true;
-
-									item.setLinked(init2Exec && successorMap.get(prevMsg) != null
-											&& successorMap.get(prevMsg).contains(mitt));
-
-									workAround(mitt, item);
-								}
+								workAround(mitt, item);
 							}
 						}
 					}
@@ -730,10 +682,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		private void workAround(MessageInTransactionTypeType mitt, MessageItem item) {
 			if ((item.getIncomingTransactions() == null || item.getIncomingTransactions().size() == 0)
 					&& mitt.getPrevious() != null) {
-				Previous previous = mitt.getPrevious();
-				List<Object> objects = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-				for (Object object : objects) {
-					MessageInTransactionTypeType prevMess = (MessageInTransactionTypeType) getElementType(object);
+				List<MessageInTransactionTypeType> previous = getPrevious(mitt);
+				for (MessageInTransactionTypeType prevMess : previous) {
 					for (MessageItem mi : messages) {
 						if (mi.getMitt().equals(prevMess)) {
 							item.addIncomingConnection(mi);
@@ -746,12 +696,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			if (item.getOutgoingTransactions() == null || item.getOutgoingTransactions().size() == 0) {
 				for (MessageItem mi : messages) {
 					MessageInTransactionTypeType miMitt = mi.getMitt();
-					Previous previous = miMitt.getPrevious();
+					List<MessageInTransactionTypeType> previous = getPrevious(miMitt);
 					if (previous != null) {
-						List<Object> objects = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-						for (Object object : objects) {
-							MessageInTransactionTypeType prevMess = (MessageInTransactionTypeType) getElementType(
-									object);
+						for (MessageInTransactionTypeType prevMess : previous) {
 							if (prevMess.equals(mitt)) {
 								item.addOutgoingConnection(mi);
 								// System.out.println("Outgoing connection between: "
@@ -781,12 +728,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			Iterator<MessageInTransactionTypeType> iterator = group.iterator();
 			while (!loop && iterator.hasNext()) {
 				MessageInTransactionTypeType groupMitt = iterator.next();
-				Previous previous = groupMitt.getPrevious();
+				List<MessageInTransactionTypeType> previous = getPrevious(groupMitt);
 				if (previous != null) {
-					List<Object> previousList = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-					for (Object prevObject : previousList) {
-						MessageInTransactionTypeType prevMitt = (MessageInTransactionTypeType) getElementType(
-								prevObject);
+					for (MessageInTransactionTypeType prevMitt : previous) {
 						if (mitt.equals(prevMitt)) {
 							loop = true;
 							break;
@@ -838,12 +782,10 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			btn_NewElementCondition.setEnabled(selectedMessage);
 			if (selectedMessage) {
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
-				Previous previous = mitt.getPrevious();
+				List<MessageInTransactionTypeType> previous = getPrevious(mitt);
 				if (previous != null) {
-					List<Object> list = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-					for (Object object : list) {
-						previousMessagesTableModel
-								.add(new PreviousMessage((MessageInTransactionTypeType) getElementType(object)));
+					for (MessageInTransactionTypeType prev : previous) {
+						previousMessagesTableModel.add(new PreviousMessage(prev));
 					}
 				}
 				cbx_PreviousMessages.removeAllItems();
@@ -870,46 +812,25 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						: true;
 				RoleTypeType roleType = null;
 				if (initiatorToExecutor) {
-					Initiator initiator = selectedElement.getInitiator();
-					if (initiator != null) {
-						roleType = (RoleTypeType) (initiator.getRoleType() != null ? initiator.getRoleType()
-								: initiator.getRoleTypeRef().getIdref());
-					}
+					roleType = getInitiator(selectedElement);
 				} else {
-					Executor executor = selectedElement.getExecutor();
-					if (executor != null) {
-						roleType = (RoleTypeType) (executor.getRoleType() != null ? executor.getRoleType()
-								: executor.getRoleTypeRef().getIdref());
-					}
+					roleType = getExecutor(selectedElement);
 				}
 				if (roleType != null) {
 					List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
 							.getElements(MessageInTransactionTypeType.class);
 					List<PreviousMessage> cbxPrevs = new ArrayList<PreviousMessage>();
 					for (MessageInTransactionTypeType element : mitts) {
-						Transaction transaction = element.getTransaction();
-						if (transaction != null) {
-							TransactionTypeType transactionType = (TransactionTypeType) (transaction
-									.getTransactionType() != null ? transaction.getTransactionType()
-											: transaction.getTransactionTypeRef().getIdref());
+						TransactionTypeType transactionType = getTransaction(element);
+						if (transactionType != null) {
 							boolean init2Exec = element.isInitiatorToExecutor() != null
 									? element.isInitiatorToExecutor()
 									: true;
 							RoleTypeType roleType2 = null;
 							if (init2Exec) {
-								Executor executor2 = transactionType.getExecutor();
-								if (executor2 != null) {
-									roleType2 = (RoleTypeType) (executor2.getRoleType() != null
-											? executor2.getRoleType()
-											: executor2.getRoleTypeRef().getIdref());
-								}
+								roleType2 = getExecutor(transactionType);
 							} else {
-								Initiator initiator2 = transactionType.getInitiator();
-								if (initiator2 != null) {
-									roleType2 = (RoleTypeType) (initiator2.getRoleType() != null
-											? initiator2.getRoleType()
-											: initiator2.getRoleTypeRef().getIdref());
-								}
+								roleType2 = getInitiator(transactionType);
 							}
 							if (roleType.equals(roleType2)) {
 								PreviousMessage previousMessage = new PreviousMessage(element);
@@ -984,20 +905,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		PreviousMessage(MessageInTransactionTypeType mitt) {
 			super();
 			this.mitt = mitt;
-			Message message = mitt.getMessage();
-			if (message != null) {
-				messageType = message.getMessageType();
-				if (messageType == null) {
-					messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-				}
-			}
-			Transaction transaction = mitt.getTransaction();
-			if (transaction != null) {
-				transactionType = transaction.getTransactionType();
-				if (transactionType == null) {
-					transactionType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
-				}
-			}
+			messageType = Control16.getMessage(mitt);
+			transactionType = Control16.getTransaction(mitt);
 		}
 
 		public MessageInTransactionTypeType getMessageInTransaction() {
@@ -1080,21 +989,11 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			case Main:
 				return isMainTransaction(transaction);
 			case Initiator:
-				Initiator initiator = transaction.getInitiator();
-				if (initiator != null) {
-					RoleTypeType roleType = (RoleTypeType) (initiator.getRoleType() != null ? initiator.getRoleType()
-							: initiator.getRoleTypeRef().getIdref());
-					return roleType.getId();
-				}
-				return null;
+				RoleTypeType initiator = getInitiator(transaction);
+				return initiator != null ? initiator.getId() : null;
 			case Executor:
-				Executor executor = transaction.getExecutor();
-				if (executor != null) {
-					RoleTypeType roleType = (RoleTypeType) (executor.getRoleType() != null ? executor.getRoleType()
-							: executor.getRoleTypeRef().getIdref());
-					return roleType.getId();
-				}
-				return null;
+				RoleTypeType executor = getExecutor(transaction);
+				return executor != null ? executor.getId() : null;
 			case StartDate:
 				return getDate(transaction.getStartDate());
 			case EndDate:
@@ -1150,21 +1049,11 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			case Description:
 				return transaction.getDescription();
 			case Initiator:
-				Initiator initiator = transaction.getInitiator();
-				if (initiator != null) {
-					RoleTypeType roleType = (RoleTypeType) (initiator.getRoleType() != null ? initiator.getRoleType()
-							: initiator.getRoleTypeRef().getIdref());
-					return roleType.getId();
-				}
-				return null;
+				RoleTypeType initiator = getInitiator(transaction);
+				return initiator != null ? initiator.getId() : null;
 			case Executor:
-				Executor executor = transaction.getExecutor();
-				if (executor != null) {
-					RoleTypeType roleType = (RoleTypeType) (executor.getRoleType() != null ? executor.getRoleType()
-							: executor.getRoleTypeRef().getIdref());
-					return roleType.getId();
-				}
-				return null;
+				RoleTypeType executor = getExecutor(transaction);
+				return executor != null ? executor.getId() : null;
 			default:
 				return null;
 			}
@@ -1197,14 +1086,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
 			MessageInTransactionTypeType mitt = get(rowIndex);
-			MessageTypeType messageType = null;
-			Message message = mitt.getMessage();
-			if (message != null) {
-				messageType = message.getMessageType();
-				if (messageType == null) {
-					messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-				}
-			}
+			MessageTypeType messageType = getMessage(mitt);
 			if (messageType == null)
 				return null;
 
@@ -1430,15 +1312,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			public String toString() {
 				if (userObject instanceof MessageInTransactionTypeType) {
 					MessageInTransactionTypeType mitt = (MessageInTransactionTypeType) userObject;
-					Message message = mitt.getMessage();
-					if (message != null) {
-						MessageTypeType messageType = message.getMessageType();
-						if (messageType == null) {
-							messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-						}
-						if (messageType != null) {
-							return messageType.getId();
-						}
+					MessageTypeType messageType = getMessage(mitt);
+					if (messageType != null) {
+						return messageType.getId();
 					}
 					return "";
 				} else
@@ -1479,14 +1355,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						}
 					}
 				}
-
-				// JFrame treeFrame = new JFrame("MITT Tree " +
-				// selectedElement.getId());
-				// treeFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-				// JTree mittTree = new JTree(mittTreeModel);
-				// treeFrame.add(new JScrollPane(mittTree));
-				// treeFrame.pack();
-				// treeFrame.setVisible(true);
 
 				elements.clear();
 				MittNode currentNode = root;
@@ -1951,7 +1819,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						}
 					}
 				}
-				break;			
+				break;
 			case State:
 				return messageInTransactionTypeConditionType.getState();
 			default:
@@ -2935,30 +2803,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		}
 
 		return incomingTransactions;
-	}
-
-	private TransactionTypeType getTransaction(MessageInTransactionTypeType mitt) {
-		TransactionTypeType mittTransactionType = null;
-		Transaction transaction = mitt.getTransaction();
-		if (transaction != null) {
-			mittTransactionType = transaction.getTransactionType();
-			if (mittTransactionType == null) {
-				mittTransactionType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
-			}
-		}
-		return mittTransactionType;
-	}
-
-	private MessageTypeType getMessage(MessageInTransactionTypeType mitt) {
-		MessageTypeType mittMessageType = null;
-		Message message = mitt.getMessage();
-		if (message != null) {
-			mittMessageType = message.getMessageType();
-			if (mittMessageType == null) {
-				mittMessageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-			}
-		}
-		return mittMessageType;
 	}
 
 	public Canvas getDrawingPlane() {

@@ -16,7 +16,22 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import org.swixml.SwingEngine;
 
 import nl.visi.schemas._20160331.ElementType;
+import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType;
+import nl.visi.schemas._20160331.MessageInTransactionTypeConditionTypeRef;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType;
+import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
+import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.ObjectFactory;
+import nl.visi.schemas._20160331.RoleTypeType;
+import nl.visi.schemas._20160331.TransactionTypeType;
+import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendAfter;
+import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendBefore;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Conditions;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
+import nl.visi.schemas._20160331.TransactionTypeType.Executor;
+import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 
 abstract class Control16 {
 	public static final String RESOURCE_BUNDLE = "nl.visi.interaction_framework.editor.locale.Editor";
@@ -136,6 +151,169 @@ abstract class Control16 {
 
 	public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
 		propertyChangeSupport.removePropertyChangeListener(propertyName, listener);
+	}
+
+	protected static TransactionTypeType getTransaction(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			Transaction transactionValue = mitt.getTransaction();
+			if (transactionValue != null) {
+				TransactionTypeType transactionType = transactionValue.getTransactionType();
+				if (transactionType == null) {
+					transactionType = (TransactionTypeType) transactionValue.getTransactionTypeRef().getIdref();
+				}
+				return transactionType;
+			}
+		}
+		return null;
+	}
+
+	protected static MessageTypeType getMessage(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			Message messageValue = mitt.getMessage();
+			if (messageValue != null) {
+				MessageTypeType messageType = messageValue.getMessageType();
+				if (messageType == null) {
+					messageType = (MessageTypeType) messageValue.getMessageTypeRef().getIdref();
+				}
+				return messageType;
+			}
+		}
+		return null;
+	}
+
+	protected static RoleTypeType getExecutor(MessageInTransactionTypeType mitt) {
+		TransactionTypeType transactionType = getTransaction(mitt);
+		return getExecutor(transactionType);
+
+	}
+
+	protected static RoleTypeType getExecutor(TransactionTypeType transactionType) {
+		if (transactionType != null) {
+			Executor executorValue = transactionType.getExecutor();
+			if (executorValue != null) {
+				RoleTypeType roleType = executorValue.getRoleType();
+				if (roleType == null) {
+					roleType = (RoleTypeType) executorValue.getRoleTypeRef().getIdref();
+				}
+				return roleType;
+			}
+		}
+		return null;
+	}
+
+	protected static RoleTypeType getInitiator(TransactionTypeType transactionType) {
+		if (transactionType != null) {
+			Initiator initiatorValue = transactionType.getInitiator();
+			if (initiatorValue != null) {
+				RoleTypeType roleType = initiatorValue.getRoleType();
+				if (roleType == null) {
+					roleType = (RoleTypeType) initiatorValue.getRoleTypeRef().getIdref();
+				}
+				return roleType;
+			}
+		}
+		return null;
+	}
+
+	protected static RoleTypeType getInitiator(MessageInTransactionTypeType mitt) {
+		TransactionTypeType transactionType = getTransaction(mitt);
+		return getInitiator(transactionType);
+	}
+
+	protected static List<MessageInTransactionTypeType> getPrevious(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			Previous previous = mitt.getPrevious();
+			if (previous != null) {
+				List<MessageInTransactionTypeType> prevs = new ArrayList<>();
+				List<Object> previousList = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+				for (Object object : previousList) {
+					MessageInTransactionTypeType prev = null;
+					if (object instanceof MessageInTransactionTypeType) {
+						prev = (MessageInTransactionTypeType) object;
+					} else {
+						prev = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object).getIdref();
+					}
+					prevs.add(prev);
+				}
+				return prevs;
+			}
+		}
+		return null;
+	}
+
+	protected static List<MessageInTransactionTypeConditionType> getConditions(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			Conditions conditions = mitt.getConditions();
+			if (conditions != null) {
+				List<MessageInTransactionTypeConditionType> conds = new ArrayList<>();
+				List<Object> conditionsList = conditions
+						.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
+				for (Object object : conditionsList) {
+					MessageInTransactionTypeConditionType cond = null;
+					if (object instanceof MessageInTransactionTypeConditionType) {
+						cond = (MessageInTransactionTypeConditionType) object;
+					} else {
+						cond = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) object)
+								.getIdref();
+					}
+					conds.add(cond);
+				}
+				return conds;
+			}
+		}
+		return null;
+	}
+	
+	protected static List<MessageInTransactionTypeType> getSendAfters(MessageInTransactionTypeType mitt) {
+		List<MessageInTransactionTypeConditionType> conditions = getConditions(mitt);
+		if (conditions != null) {
+			for (MessageInTransactionTypeConditionType condition : conditions) {
+				SendAfter sendAfterValue = condition.getSendAfter();
+				if (sendAfterValue != null) {
+					List<MessageInTransactionTypeType> sendAfters = new ArrayList<>();
+					List<Object> sendAftersList = sendAfterValue
+							.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+					for (Object sendAfterObject : sendAftersList) {
+						MessageInTransactionTypeType sendAfter = null;
+						if (sendAfterObject instanceof MessageInTransactionTypeType) {
+							sendAfter = (MessageInTransactionTypeType) sendAfterObject;
+						} else {
+							sendAfter = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) sendAfterObject)
+									.getIdref();
+						}
+						sendAfters.add(sendAfter);
+					}
+					return sendAfters;
+				}
+			}
+		}
+		return null;
+	}
+	
+	protected static List<MessageInTransactionTypeType> getSendBefores(MessageInTransactionTypeType mitt) {
+		List<MessageInTransactionTypeConditionType> conditions = getConditions(mitt);
+		if (conditions != null) {
+			for (MessageInTransactionTypeConditionType condition : conditions) {
+				SendBefore sendBeforeValue = condition.getSendBefore();
+				if (sendBeforeValue != null) {
+					List<MessageInTransactionTypeType> sendBefores = new ArrayList<>();
+					List<Object> sendBeforesList = sendBeforeValue
+							.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+					for (Object sendBeforeObject : sendBeforesList) {
+						MessageInTransactionTypeType sendBefore = null;
+						if (sendBeforeObject instanceof MessageInTransactionTypeType) {
+							sendBefore = (MessageInTransactionTypeType) sendBeforeObject;
+						} else {
+							sendBefore = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) sendBeforeObject)
+									.getIdref();
+						}
+						sendBefores.add(sendBefore);
+					}
+					return sendBefores;
+				}
+			}
+		}
+		return null;
 	}
 
 }

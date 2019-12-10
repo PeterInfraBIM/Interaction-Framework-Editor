@@ -31,21 +31,10 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.schemas._20160331.ElementType;
-import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType;
-import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendAfter;
-import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendBefore;
-import nl.visi.schemas._20160331.MessageInTransactionTypeConditionTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Conditions;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
-import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
-import nl.visi.schemas._20160331.TransactionTypeType.Executor;
-import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 
 class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private static final String ROLES_PANEL = "nl/visi/interaction_framework/editor/swixml/RolesPanel16.xml";
@@ -76,6 +65,54 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		private class Transaction {
 			private int x, y;
 			private TransactionTypeType transactionType;
+			// private int routeCount = 0;
+
+			class Interval {
+				public int lowerBound;
+				public int upperBound;
+
+				public Interval(int lowerBound, int upperBound) {
+					this.lowerBound = lowerBound;
+					this.upperBound = upperBound;
+				}
+			}
+
+			private List<List<Interval>> routes = new ArrayList<>();
+
+			public int addInterval(int lowerBound, int upperBound) {
+				int index = 0;
+				boolean found = true;
+				for (List<Interval> level : routes) {
+					for (Interval interval : level) {
+						if (lowerBound >= interval.lowerBound && lowerBound <= interval.upperBound) {
+							found = false;
+							break;
+						}
+						if (upperBound >= interval.lowerBound && upperBound <= interval.upperBound) {
+							found = false;
+							break;
+						}
+						if (lowerBound <= interval.lowerBound && upperBound >= interval.upperBound) {
+							found = false;
+							break;
+						}
+						if (lowerBound >= interval.lowerBound && upperBound <= interval.upperBound) {
+							found = false;
+							break;
+						}
+					}
+					if (found) {
+						level.add(new Interval(lowerBound, upperBound));
+						return index;
+					}
+					found = true;
+					index++;
+				}
+				ArrayList<Interval> intervalList = new ArrayList<Interval>();
+				intervalList.add(new Interval(lowerBound, upperBound));
+				routes.add(intervalList);
+				return routes.size() - 1;
+			}
 
 			Transaction(TransactionTypeType transactionType, int x, int y) {
 				this.transactionType = transactionType;
@@ -88,7 +125,6 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				Graphics2D g2 = (Graphics2D) g;
 				String label = transactionType.getId();
 				if (label != null) {
-//					g2.drawRect(x, y, 50, 100);
 					g2.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
 					int stringWidth = g2.getFontMetrics().stringWidth(label);
 					g2.translate((float) x, (float) y);
@@ -120,11 +156,11 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 			public MessageItem(MessageInTransactionTypeType mitt) {
 				this.mitt = mitt;
-				initiator = RolesPanelControl16.getInitiator(mitt);
-				executor = RolesPanelControl16.getExecutor(mitt);
+				initiator = Control16.getInitiator(mitt);
+				executor = Control16.getExecutor(mitt);
 				this.initiatorToExecutor = mitt.isInitiatorToExecutor();
-				this.messageType = RolesPanelControl16.getMessage(mitt);
-				this.transactionType = RolesPanelControl16.getTransaction(mitt);
+				this.messageType = Control16.getMessage(mitt);
+				this.transactionType = Control16.getTransaction(mitt);
 				label = this.messageType.getId();
 				condition = new Condition(mitt);
 				this.index = messageItemMap.size();
@@ -228,43 +264,65 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 							MessageItem actionMessage = messageItemMap.get(action.getId());
 							int actionY = actionMessage.index * 12 + yInitStart;
 							boolean sameTransaction = transaction == actionTransaction;
+							int disp = 0;
 							if (sameTransaction) {
+								// disp = 3 * transaction.routeCount++;
 								if (lineY < actionY) {
-									g2d.drawArc(transaction.x - 4, lineY, 8, 8, 90, -90);
-									g2d.drawLine(actionTransaction.x + 4, lineY + 4, actionTransaction.x + 4,
-											actionY - 4);
-									g2d.drawArc(transaction.x - 4, actionY - 8, 8, 8, 0, -90);
+									disp = 4 * transaction.addInterval(lineY + 4, actionY - 4);
+									g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
+									g2d.drawArc(transaction.x - 4 + disp, lineY, 8, 8, 90, -90);
+									g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
+											actionTransaction.x + 4 + disp, actionY - 4);
+									g2d.drawArc(actionTransaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
+									g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
 								} else {
-									g2d.drawArc(transaction.x - 4, lineY - 8, 8, 8, -90, 90);
-									g2d.drawLine(transaction.x + 4, lineY - 4, actionTransaction.x + 4, actionY + 4);
-									g2d.drawArc(transaction.x - 4, actionY, 8, 8, 0, 90);
+									disp = 4 * transaction.addInterval(lineY - 4, actionY + 4);
+									g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
+									g2d.drawArc(transaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
+									g2d.drawLine(transaction.x + 4 + disp, lineY - 4, actionTransaction.x + 4 + disp,
+											actionY + 4);
+									g2d.drawArc(actionTransaction.x - 4 + disp, actionY, 8, 8, 0, 90);
+									g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
 								}
 							} else {
 								if (lineY < actionY) {
 									if (transaction.x > actionTransaction.x) {
-										g2d.drawArc(transaction.x - 4, lineY, 8, 8, 90, -90);
-										g2d.drawLine(transaction.x + 4, lineY + 4, transaction.x + 4, actionY - 4);
-										g2d.drawArc(transaction.x - 4, actionY - 8, 8, 8, 0, -90);
-										g2d.drawLine(transaction.x, actionY, actionTransaction.x, actionY);
-									} else {
-										g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x, lineY);
-										g2d.drawArc(actionTransaction.x - 4, lineY, 8, 8, 90, -90);
-										g2d.drawLine(actionTransaction.x + 4, lineY + 4, actionTransaction.x + 4,
+										disp = 4 * transaction.addInterval(lineY + 4, actionY - 4);
+										// disp = 3 * transaction.routeCount++;
+										g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
+										g2d.drawArc(transaction.x - 4 + disp, lineY, 8, 8, 90, -90);
+										g2d.drawLine(transaction.x + 4 + disp, lineY + 4, transaction.x + 4 + disp,
 												actionY - 4);
-										g2d.drawArc(actionTransaction.x - 4, actionY - 8, 8, 8, 0, -90);
+										g2d.drawArc(transaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
+										g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
+									} else {
+										disp = 4 * actionTransaction.addInterval(lineY + 4, actionY - 4);
+										// disp = 3 * actionTransaction.routeCount++;
+										g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x + disp, lineY);
+										g2d.drawArc(actionTransaction.x - 4 + disp, lineY, 8, 8, 90, -90);
+										g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
+												actionTransaction.x + 4 + disp, actionY - 4);
+										g2d.drawArc(actionTransaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
 									}
 								} else if (lineY > actionY) {
 									if (transaction.x > actionTransaction.x) {
-										g2d.drawArc(transaction.x - 4, lineY - 8, 8, 8, -90, 90);
-										g2d.drawLine(transaction.x + 4, lineY - 4, transaction.x + 4, actionY + 4);
-										g2d.drawArc(transaction.x - 4, actionY, 8, 8, 0, 90);
-										g2d.drawLine(transaction.x, actionY, actionTransaction.x, actionY);
-									} else {
-										g2d.drawLine(transaction.x, lineY, actionTransaction.x, lineY);
-										g2d.drawArc(actionTransaction.x - 4, lineY - 8, 8, 8, -90, 90);
-										g2d.drawLine(actionTransaction.x + 4, lineY - 4, actionTransaction.x + 4,
+										disp = 4 * transaction.addInterval(lineY - 4, actionY + 4);
+										// disp = 3 * transaction.routeCount++;
+										g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
+										g2d.drawArc(transaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
+										g2d.drawLine(transaction.x + 4 + disp, lineY - 4, transaction.x + 4 + disp,
 												actionY + 4);
-										g2d.drawArc(actionTransaction.x - 4, actionY, 8, 8, 0, 90);
+										g2d.drawArc(transaction.x - 4 + disp, actionY, 8, 8, 0, 90);
+										g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
+									} else {
+										disp = 4 * actionTransaction.addInterval(lineY - 4, actionY + 4);
+										// disp = 3 * actionTransaction.routeCount++;
+										g2d.drawLine(transaction.x, lineY, actionTransaction.x + disp, lineY);
+										g2d.drawArc(actionTransaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
+										g2d.drawLine(actionTransaction.x + 4 + disp, lineY - 4,
+												actionTransaction.x + 4 + disp, actionY + 4);
+										g2d.drawArc(actionTransaction.x - 4 + disp, actionY, 8, 8, 0, 90);
+										g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
 									}
 								}
 							}
@@ -309,6 +367,10 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			g.setColor(Color.WHITE);
 			g.fillRect(0, 0, getWidth(), getHeight());
 			g.setColor(Color.BLACK);
+
+			for (Transaction transaction : transactions) {
+				transaction.routes.clear();
+			}
 
 			if (selectedElement != currentRole) {
 				transactions.clear();
@@ -403,12 +465,8 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			case Description:
 				return transaction.getDescription();
 			case Initiator:
-				Initiator initiator = transaction.getInitiator();
-				if (initiator != null) {
-					RoleTypeType roleType = initiator.getRoleType();
-					if (roleType == null) {
-						roleType = (RoleTypeType) initiator.getRoleTypeRef().getIdref();
-					}
+				RoleTypeType roleType = getInitiator(transaction);
+				if (roleType != null) {
 					if (selectedElement.equals(roleType)) {
 						return true;
 					} else {
@@ -492,98 +550,15 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		}
 
 		public List<MessageInTransactionTypeType> getTriggers() {
-			if (mitt != null) {
-				Previous previous = mitt.getPrevious();
-				if (previous != null) {
-					List<MessageInTransactionTypeType> prevs = new ArrayList<>();
-					List<Object> previousList = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-					for (Object object : previousList) {
-						MessageInTransactionTypeType prev = null;
-						if (object instanceof MessageInTransactionTypeType) {
-							prev = (MessageInTransactionTypeType) object;
-						} else {
-							prev = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object).getIdref();
-						}
-						prevs.add(prev);
-					}
-					return prevs;
-				}
-			}
-			return null;
+			return getPrevious(mitt);
 		}
 
 		public List<MessageInTransactionTypeType> getSendAfters() {
-			if (mitt != null) {
-				Conditions conditions = mitt.getConditions();
-				if (conditions != null) {
-					List<Object> conditionsList = conditions
-							.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
-					for (Object conditionObject : conditionsList) {
-						MessageInTransactionTypeConditionType condition = null;
-						if (conditionObject instanceof MessageInTransactionTypeConditionType) {
-							condition = (MessageInTransactionTypeConditionType) conditionObject;
-						} else {
-							condition = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) conditionObject)
-									.getIdref();
-						}
-						SendAfter sendAfterValue = condition.getSendAfter();
-						if (sendAfterValue != null) {
-							List<MessageInTransactionTypeType> sendAfters = new ArrayList<>();
-							List<Object> sendAftersList = sendAfterValue
-									.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-							for (Object sendAfterObject : sendAftersList) {
-								MessageInTransactionTypeType sendAfter = null;
-								if (sendAfterObject instanceof MessageInTransactionTypeType) {
-									sendAfter = (MessageInTransactionTypeType) sendAfterObject;
-								} else {
-									sendAfter = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) sendAfterObject)
-											.getIdref();
-								}
-								sendAfters.add(sendAfter);
-							}
-							return sendAfters;
-						}
-					}
-				}
-			}
-			return null;
+			return Control16.getSendAfters(mitt);
 		}
 
 		public List<MessageInTransactionTypeType> getSendBefores() {
-			if (mitt != null) {
-				Conditions conditions = mitt.getConditions();
-				if (conditions != null) {
-					List<Object> conditionsList = conditions
-							.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
-					for (Object conditionObject : conditionsList) {
-						MessageInTransactionTypeConditionType condition = null;
-						if (conditionObject instanceof MessageInTransactionTypeConditionType) {
-							condition = (MessageInTransactionTypeConditionType) conditionObject;
-						} else {
-							condition = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) conditionObject)
-									.getIdref();
-						}
-						SendBefore sendBeforeValue = condition.getSendBefore();
-						if (sendBeforeValue != null) {
-							List<MessageInTransactionTypeType> sendBefores = new ArrayList<>();
-							List<Object> sendBeforesList = sendBeforeValue
-									.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-							for (Object sendBeforeObject : sendBeforesList) {
-								MessageInTransactionTypeType sendBefore = null;
-								if (sendBeforeObject instanceof MessageInTransactionTypeType) {
-									sendBefore = (MessageInTransactionTypeType) sendBeforeObject;
-								} else {
-									sendBefore = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) sendBeforeObject)
-											.getIdref();
-								}
-								sendBefores.add(sendBefore);
-							}
-							return sendBefores;
-						}
-					}
-				}
-			}
-			return null;
+			return Control16.getSendBefores(mitt);
 		}
 
 		public List<MessageInTransactionTypeType> getActions() {
@@ -593,18 +568,9 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
 						.getElements(MessageInTransactionTypeType.class);
 				for (MessageInTransactionTypeType mittElement : allMitts) {
-					Previous previousValue = mittElement.getPrevious();
-					if (previousValue != null) {
-						List<Object> mittObjects = previousValue
-								.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-						for (Object mittObject : mittObjects) {
-							MessageInTransactionTypeType prev = null;
-							if (mittObject instanceof MessageInTransactionTypeType) {
-								prev = (MessageInTransactionTypeType) mittObject;
-							} else {
-								prev = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) mittObject)
-										.getIdref();
-							}
+					List<MessageInTransactionTypeType> previous = getPrevious(mittElement);
+					if (previous != null) {
+						for (MessageInTransactionTypeType prev : previous) {
 							if (prev.getId().equals(mitt.getId())) {
 								if (actions == null) {
 									actions = new ArrayList<>();
@@ -683,18 +649,10 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					}
 				}
 			case Transaction:
-				Transaction transaction = mitt.getTransaction();
-				TransactionTypeType transactionType = transaction.getTransactionType();
-				if (transactionType == null) {
-					transactionType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
-				}
+				TransactionTypeType transactionType = getTransaction(mitt);
 				return transactionType != null ? transactionType.getId() : null;
 			case Message:
-				Message message = mitt.getMessage();
-				MessageTypeType messageType = message.getMessageType();
-				if (messageType == null) {
-					messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
-				}
+				MessageTypeType messageType = getMessage(mitt);
 				return messageType != null ? messageType.getId() : null;
 			default:
 				break;
@@ -707,64 +665,6 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			return (columnIndex == MessagesTableColumns.Navigate.ordinal()) ? true : false;
 		}
 
-	}
-
-	private static TransactionTypeType getTransaction(MessageInTransactionTypeType mitt) {
-		if (mitt != null) {
-			Transaction transactionValue = mitt.getTransaction();
-			if (transactionValue != null) {
-				TransactionTypeType transactionType = transactionValue.getTransactionType();
-				if (transactionType == null) {
-					transactionType = (TransactionTypeType) transactionValue.getTransactionTypeRef().getIdref();
-				}
-				return transactionType;
-			}
-		}
-		return null;
-	}
-
-	private static MessageTypeType getMessage(MessageInTransactionTypeType mitt) {
-		if (mitt != null) {
-			Message messageValue = mitt.getMessage();
-			if (messageValue != null) {
-				MessageTypeType messageType = messageValue.getMessageType();
-				if (messageType == null) {
-					messageType = (MessageTypeType) messageValue.getMessageTypeRef().getIdref();
-				}
-				return messageType;
-			}
-		}
-		return null;
-	}
-
-	private static RoleTypeType getInitiator(MessageInTransactionTypeType mitt) {
-		TransactionTypeType transactionType = getTransaction(mitt);
-		if (transactionType != null) {
-			Initiator initiatorValue = transactionType.getInitiator();
-			if (initiatorValue != null) {
-				RoleTypeType roleType = initiatorValue.getRoleType();
-				if (roleType == null) {
-					roleType = (RoleTypeType) initiatorValue.getRoleTypeRef().getIdref();
-				}
-				return roleType;
-			}
-		}
-		return null;
-	}
-
-	private static RoleTypeType getExecutor(MessageInTransactionTypeType mitt) {
-		TransactionTypeType transactionType = getTransaction(mitt);
-		if (transactionType != null) {
-			Executor executorValue = transactionType.getExecutor();
-			if (executorValue != null) {
-				RoleTypeType roleType = executorValue.getRoleType();
-				if (roleType == null) {
-					roleType = (RoleTypeType) executorValue.getRoleTypeRef().getIdref();
-				}
-				return roleType;
-			}
-		}
-		return null;
 	}
 
 	private enum ConditionsTableColumns {
@@ -823,21 +723,11 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				}
 				break;
 			case Transaction:
-				if (mitt != null) {
-					TransactionTypeType transactionType = getTransaction(mitt);
-					if (transactionType != null) {
-						return transactionType.getId();
-					}
-				}
-				break;
+				TransactionTypeType transactionType = getTransaction(mitt);
+				return transactionType != null ? transactionType.getId() : null;
 			case Message:
-				if (mitt != null) {
-					MessageTypeType messageType = getMessage(mitt);
-					if (messageType != null) {
-						return messageType.getId();
-					}
-				}
-				break;
+				MessageTypeType messageType = getMessage(mitt);
+				return messageType != null ? messageType.getId() : null;
 			}
 
 			return null;
@@ -1138,29 +1028,17 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			tfd_ResponsibilityFeedback.setText(selectedElement.getResponsibilityFeedback());
 
 			transactionsTableModel.clear();
-			List<TransactionTypeType> elements = Editor16.getStore16().getElements(TransactionTypeType.class);
-			for (TransactionTypeType transaction : elements) {
-				Initiator initiator = transaction.getInitiator();
-				if (initiator != null) {
-					RoleTypeType roleType = initiator.getRoleType();
-					if (roleType == null) {
-						roleType = (RoleTypeType) initiator.getRoleTypeRef().getIdref();
-					}
-					if (selectedElement.equals(roleType)) {
-						transactionsTableModel.add(transaction);
-						continue;
-					}
+			List<TransactionTypeType> transactions = Editor16.getStore16().getElements(TransactionTypeType.class);
+			for (TransactionTypeType transaction : transactions) {
+				RoleTypeType initiator = getInitiator(transaction);
+				if (selectedElement.equals(initiator)) {
+					transactionsTableModel.add(transaction);
+					continue;
 				}
-				Executor executor = transaction.getExecutor();
-				if (executor != null) {
-					RoleTypeType roleType = executor.getRoleType();
-					if (roleType == null) {
-						roleType = (RoleTypeType) executor.getRoleTypeRef().getIdref();
-					}
-					if (selectedElement.equals(roleType)) {
-						transactionsTableModel.add(transaction);
-						continue;
-					}
+				RoleTypeType executor = getExecutor(transaction);
+				if (selectedElement.equals(executor)) {
+					transactionsTableModel.add(transaction);
+					continue;
 				}
 			}
 			fillMessagesTable();
@@ -1192,32 +1070,14 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				.getElements(MessageInTransactionTypeType.class);
 		if (mitts != null) {
 			for (MessageInTransactionTypeType mitt : mitts) {
-				Transaction transaction = mitt.getTransaction();
-				if (transaction != null) {
-					TransactionTypeType transactionType = transaction.getTransactionType();
-					if (transactionType == null) {
-						transactionType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
-						Initiator initiator = transactionType.getInitiator();
-						if (initiator != null) {
-							RoleTypeType roleType = initiator.getRoleType();
-							if (roleType == null) {
-								roleType = (RoleTypeType) initiator.getRoleTypeRef().getIdref();
-							}
-							if (selectedElement.equals(roleType)) {
-								messagesTableModel.add(mitt);
-							}
-						}
-						Executor executor = transactionType.getExecutor();
-						if (executor != null) {
-							RoleTypeType roleType = executor.getRoleType();
-							if (roleType == null) {
-								roleType = (RoleTypeType) executor.getRoleTypeRef().getIdref();
-							}
-							if (selectedElement.equals(roleType)) {
-								messagesTableModel.add(mitt);
-							}
-						}
-					}
+				TransactionTypeType transactionType = getTransaction(mitt);
+				RoleTypeType initiator = getInitiator(transactionType);
+				if (selectedElement.equals(initiator)) {
+					messagesTableModel.add(mitt);
+				}
+				RoleTypeType executor = getExecutor(transactionType);
+				if (selectedElement.equals(executor)) {
+					messagesTableModel.add(mitt);
 				}
 			}
 		}
@@ -1241,26 +1101,14 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 		List<TransactionTypeType> elements = store.getElements(TransactionTypeType.class);
 		for (TransactionTypeType element : elements) {
-			Initiator initiator = element.getInitiator();
-			if (initiator != null) {
-				RoleTypeType role = initiator.getRoleType();
-				if (role == null) {
-					role = (RoleTypeType) initiator.getRoleTypeRef().getIdref();
-				}
-				if (role != null && role.equals(roleType)) {
-					element.setInitiator(null);
-				}
+			RoleTypeType initiator = getInitiator(element);
+			if (initiator != null && initiator.equals(roleType)) {
+				element.setInitiator(null);
 			}
 
-			Executor executor = element.getExecutor();
-			if (executor != null) {
-				RoleTypeType role = executor.getRoleType();
-				if (role == null) {
-					role = (RoleTypeType) executor.getRoleTypeRef().getIdref();
-				}
-				if (role != null && role.equals(roleType)) {
-					element.setExecutor(null);
-				}
+			RoleTypeType executor = getExecutor(element);
+			if (executor != null && executor.equals(roleType)) {
+				element.setExecutor(null);
 			}
 		}
 

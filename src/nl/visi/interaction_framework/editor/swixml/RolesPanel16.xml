@@ -196,8 +196,8 @@
 					</panel>
 				</panel>
 			</scrollpane>
-			<scrollpane
-				Border="TitledBorder(lbl_Relations)">
+			<panel
+				Border="TitledBorder(lbl_Relations)" Layout="BorderLayout">
 				<tabbedpane id="relationsTabs"
 					Border="EmptyBorder(4,4,4,4)"
 					Titles="lbl_Transactions,lbl_Messages,lbl_SequenceDiagram">
@@ -241,10 +241,9 @@
 							</panel>
 						</tabbedpane>
 					</panel>
-					<panel id="canvas" Border="EmptyBorder(4,4,4,4)"
-						Layout="BorderLayout" />
+					<panel id="canvas" Border="EmptyBorder(4,4,4,4)" Layout="BorderLayout" />
 				</tabbedpane>
-			</scrollpane>
+			</panel>
 		</splitpane>
 	</splitpane>
 </panel>
