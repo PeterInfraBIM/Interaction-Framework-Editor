@@ -211,11 +211,11 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				g2d.drawString(messageItem.label, lineX, lineY);
 				g2d.drawLine(lineX, lineY, transaction.x, lineY);
 				if (messageItem.isIn()) {
-					int[] xPoints = { transaction.x, transaction.x - 7, transaction.x - 7 };
+					int[] xPoints = { transaction.x - 5, transaction.x - 12, transaction.x - 12 };
 					int[] yPoints = { lineY, lineY - 4, lineY + 4 };
 					g2d.fillPolygon(xPoints, yPoints, 3);
 				} else {
-					int[] xPoints = { transaction.x - 10, transaction.x - 3, transaction.x - 3 };
+					int[] xPoints = { transaction.x - 12, transaction.x - 5, transaction.x - 5 };
 					int[] yPoints = { lineY, lineY - 4, lineY + 4 };
 					g2d.fillPolygon(xPoints, yPoints, 3);
 				}
@@ -226,14 +226,61 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 							Transaction actionTransaction = transactionMap
 									.get(RolesPanelControl16.getTransaction(action).getId());
 							MessageItem actionMessage = messageItemMap.get(action.getId());
-							g2d.drawLine(transaction.x, lineY, transaction.x + 4, lineY);
-							g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x + 4, lineY);
-							g2d.drawLine(actionTransaction.x + 4, lineY, actionTransaction.x + 4,
-									actionMessage.index * 12 + yInitStart);
-							g2d.drawLine(actionTransaction.x + 4, actionMessage.index * 12 + yInitStart,
-									actionTransaction.x, actionMessage.index * 12 + yInitStart);
+							int actionY = actionMessage.index * 12 + yInitStart;
+							boolean sameTransaction = transaction == actionTransaction;
+							if (sameTransaction) {
+								if (lineY < actionY) {
+									g2d.drawArc(transaction.x - 4, lineY, 8, 8, 90, -90);
+									g2d.drawLine(actionTransaction.x + 4, lineY + 4, actionTransaction.x + 4,
+											actionY - 4);
+									g2d.drawArc(transaction.x - 4, actionY - 8, 8, 8, 0, -90);
+								} else {
+									g2d.drawArc(transaction.x - 4, lineY - 8, 8, 8, -90, 90);
+									g2d.drawLine(transaction.x + 4, lineY - 4, actionTransaction.x + 4, actionY + 4);
+									g2d.drawArc(transaction.x - 4, actionY, 8, 8, 0, 90);
+								}
+							} else {
+								if (lineY < actionY) {
+									if (transaction.x > actionTransaction.x) {
+										g2d.drawArc(transaction.x - 4, lineY, 8, 8, 90, -90);
+										g2d.drawLine(transaction.x + 4, lineY + 4, transaction.x + 4, actionY - 4);
+										g2d.drawArc(transaction.x - 4, actionY - 8, 8, 8, 0, -90);
+										g2d.drawLine(transaction.x, actionY, actionTransaction.x, actionY);
+									} else {
+										g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x, lineY);
+										g2d.drawArc(actionTransaction.x - 4, lineY, 8, 8, 90, -90);
+										g2d.drawLine(actionTransaction.x + 4, lineY + 4, actionTransaction.x + 4,
+												actionY - 4);
+										g2d.drawArc(actionTransaction.x - 4, actionY - 8, 8, 8, 0, -90);
+									}
+								} else if (lineY > actionY) {
+									if (transaction.x > actionTransaction.x) {
+										g2d.drawArc(transaction.x - 4, lineY - 8, 8, 8, -90, 90);
+										g2d.drawLine(transaction.x + 4, lineY - 4, transaction.x + 4, actionY + 4);
+										g2d.drawArc(transaction.x - 4, actionY, 8, 8, 0, 90);
+										g2d.drawLine(transaction.x, actionY, actionTransaction.x, actionY);
+									} else {
+										g2d.drawLine(transaction.x, lineY, actionTransaction.x, lineY);
+										g2d.drawArc(actionTransaction.x - 4, lineY - 8, 8, 8, -90, 90);
+										g2d.drawLine(actionTransaction.x + 4, lineY - 4, actionTransaction.x + 4,
+												actionY + 4);
+										g2d.drawArc(actionTransaction.x - 4, actionY, 8, 8, 0, 90);
+									}
+								}
+							}
 						}
 					} else {
+						g2d.setColor(Color.red);
+						g2d.fillOval(transaction.x - 4, lineY - 4, 8, 8);
+						g2d.setColor(Color.black);
+						g2d.drawOval(transaction.x - 4, lineY - 4, 8, 8);
+					}
+				} else {
+					if (messageItem.mitt.getPrevious() == null) {
+						g2d.setColor(Color.green);
+						g2d.fillOval(transaction.x - 4, lineY - 4, 8, 8);
+						g2d.setColor(Color.black);
+						g2d.drawOval(transaction.x - 4, lineY - 4, 8, 8);
 					}
 				}
 				lineNumber++;
