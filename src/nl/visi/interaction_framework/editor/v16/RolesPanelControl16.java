@@ -3,10 +3,14 @@ package nl.visi.interaction_framework.editor.v16;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -30,6 +34,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageTypeType;
@@ -114,10 +119,48 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				return routes.size() - 1;
 			}
 
-			Transaction(TransactionTypeType transactionType, int x, int y) {
+			Transaction(final Canvas canvas, Graphics g, final TransactionTypeType transactionType, int x, int y) {
 				this.transactionType = transactionType;
 				this.x = x;
 				this.y = y;
+				String label = transactionType.getDescription();
+				Font font = new Font("Dialog", Font.PLAIN, 11);
+				int stringWidth = g.getFontMetrics(font).stringWidth(label);
+				if (stringWidth > yInitStart - 50) {
+					while (stringWidth > yInitStart - 50) {
+						label = label.substring(0, label.length() - 2);
+						stringWidth = g.getFontMetrics(font).stringWidth(label);
+					}
+					label += "...";
+				}
+
+				RotatingButton activeLabel = new RotatingButton(label);
+				activeLabel.setToolTipText(transactionType.getDescription());
+				activeLabel.setRotation(Math.PI / 2);
+				activeLabel.setContentAreaFilled(false);
+				activeLabel.setBackground(Color.white);
+				activeLabel.setBorderPainted(false);
+				activeLabel.setFont(font);
+				activeLabel.setLocation(x, y);
+				activeLabel.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						e.getComponent().setForeground(Color.red);
+						canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+						e.getComponent().setForeground(Color.black);
+						canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					}
+
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						Editor16.getMainFrameControl().navigate(transactionType);
+					}
+				});
+				canvas.add(activeLabel);
 				transactionMap.put(transactionType.getId(), this);
 			}
 
@@ -125,13 +168,13 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				Graphics2D g2 = (Graphics2D) g;
 				String label = transactionType.getId();
 				if (label != null) {
-					g2.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
-					int stringWidth = g2.getFontMetrics().stringWidth(label);
-					g2.translate((float) x, (float) y);
-					g2.rotate(Math.toRadians(-90));
-					g2.drawString(label, -stringWidth, -5);
-					g2.rotate(-Math.toRadians(-90));
-					g2.translate(-(float) x, -(float) y);
+//					g2.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
+//					int stringWidth = g2.getFontMetrics().stringWidth(label);
+//					g2.translate((float) x, (float) y);
+//					g2.rotate(Math.toRadians(-90));
+//					g2.drawString(label, -stringWidth, -5);
+//					g2.rotate(-Math.toRadians(-90));
+//					g2.translate(-(float) x, -(float) y);
 
 					Stroke saveStroke = g2.getStroke();
 					float dash[] = { 5.0f };
@@ -154,7 +197,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			private Condition condition;
 			private int index = 0;
 
-			public MessageItem(MessageInTransactionTypeType mitt) {
+			public MessageItem(final Canvas canvas, Graphics g, final MessageInTransactionTypeType mitt, int x, int y) {
 				this.mitt = mitt;
 				initiator = Control16.getInitiator(mitt);
 				executor = Control16.getExecutor(mitt);
@@ -164,6 +207,48 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				label = this.messageType.getId();
 				condition = new Condition(mitt);
 				this.index = messageItemMap.size();
+
+				// ---------------------------------------------------------------------
+				String label = getMessage(mitt).getDescription();
+				Font font = new Font("Dialog", Font.PLAIN, 11);
+				int stringWidth = g.getFontMetrics(font).stringWidth(label);
+				if (stringWidth > offsetLeft - 50) {
+					while (stringWidth > offsetLeft - 50) {
+						label = label.substring(0, label.length() - 2);
+						stringWidth = g.getFontMetrics(font).stringWidth(label);
+					}
+					label += "...";
+				}
+
+				RotatingButton activeLabel = new RotatingButton(label);
+				activeLabel.setToolTipText(getMessage(mitt).getDescription());
+				// activeLabel.setRotation(Math.PI / 2);
+				activeLabel.setContentAreaFilled(false);
+				activeLabel.setBackground(Color.white);
+				activeLabel.setBorderPainted(false);
+				activeLabel.setFont(font);
+				activeLabel.setLocation(x, y);
+				activeLabel.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseEntered(MouseEvent e) {
+						e.getComponent().setForeground(Color.red);
+						canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+					}
+
+					@Override
+					public void mouseExited(MouseEvent e) {
+						e.getComponent().setForeground(Color.black);
+						canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					}
+
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						Editor16.getMainFrameControl().navigate(getMessage(mitt));
+					}
+				});
+				canvas.add(activeLabel);
+				// -------------------------------------------------
+
 				messageItemMap.put(mitt.getId(), this);
 			}
 
@@ -192,6 +277,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		}
 
 		public Canvas() {
+			setLayout(null);
 			preferredSize = new Dimension(getWidth(), getHeight());
 			setSize(getPreferredSize());
 			transactions = new ArrayList<RolesPanelControl16.Canvas.Transaction>();
@@ -215,14 +301,14 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
 				for (int index = 0; index < transactionsRowCount; index++) {
 					TransactionTypeType transactionTypeType = transactionsTableModel.get(index);
-					transactions.add(new Transaction(transactionTypeType,
+					transactions.add(new Transaction(this, g, transactionTypeType,
 							offsetLeft + transactionWidth * (index + 1) - transactionWidth / 2, 25));
 				}
 				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
 					MessageInTransactionTypeType mitt = messagesTableModel.get(index);
 					MessageTypeType messageType = getMessage(mitt);
 					if (messageType != null) {
-						messages.add(new MessageItem(mitt));
+						messages.add(new MessageItem(this, g, mitt, 20, index * 15 + yInitStart - 12));
 					}
 				}
 			}
@@ -239,12 +325,13 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			}
 
 			int lineNumber = 0;
-			for (MessageItem messageItem : messages) {
+			for (final MessageItem messageItem : messages) {
 				Transaction transaction = messageItem.getTransaction();
 				titleWidth = g2d.getFontMetrics().stringWidth(messageItem.label);
 				int lineX = 20;
-				int lineY = lineNumber * 12 + yInitStart;
-				g2d.drawString(messageItem.label, lineX, lineY);
+				int lineY = lineNumber * 15 + yInitStart;
+				// g2d.drawString(messageItem.label, lineX, lineY);
+
 				g2d.drawLine(lineX, lineY, transaction.x, lineY);
 				if (messageItem.isIn()) {
 					int[] xPoints = { transaction.x - 5, transaction.x - 12, transaction.x - 12 };
@@ -262,7 +349,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 							Transaction actionTransaction = transactionMap
 									.get(RolesPanelControl16.getTransaction(action).getId());
 							MessageItem actionMessage = messageItemMap.get(action.getId());
-							int actionY = actionMessage.index * 12 + yInitStart;
+							int actionY = actionMessage.index * 15 + yInitStart;
 							boolean sameTransaction = transaction == actionTransaction;
 							int disp = 0;
 							if (sameTransaction) {
@@ -373,6 +460,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			}
 
 			if (selectedElement != currentRole) {
+				removeAll();
 				transactions.clear();
 				messages.clear();
 				transactionMap.clear();
