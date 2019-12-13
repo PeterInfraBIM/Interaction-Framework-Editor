@@ -334,10 +334,16 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 				g2d.drawLine(lineX, lineY, transaction.x, lineY);
 				if (messageItem.isIn()) {
+					int[] xsPoints = { lineX - 5, lineX - 12, lineX - 12 };
+					int[] ysPoints = { lineY, lineY - 4, lineY + 4 };
+					g2d.fillPolygon(xsPoints, ysPoints, 3);
 					int[] xPoints = { transaction.x - 5, transaction.x - 12, transaction.x - 12 };
 					int[] yPoints = { lineY, lineY - 4, lineY + 4 };
 					g2d.fillPolygon(xPoints, yPoints, 3);
 				} else {
+					int[] xsPoints = { lineX - 13, lineX - 6, lineX - 6 };
+					int[] ysPoints = { lineY, lineY - 4, lineY + 4 };
+					g2d.fillPolygon(xsPoints, ysPoints, 3);
 					int[] xPoints = { transaction.x - 12, transaction.x - 5, transaction.x - 5 };
 					int[] yPoints = { lineY, lineY - 4, lineY + 4 };
 					g2d.fillPolygon(xPoints, yPoints, 3);
@@ -382,6 +388,9 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 												actionY - 4);
 										g2d.drawArc(transaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
 										g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
+										int[] xPoints = { transaction.x - 12, transaction.x - 5, transaction.x - 5 };
+										int[] yPoints = { actionY, actionY - 4, actionY + 4 };
+										g2d.fillPolygon(xPoints, yPoints, 3);
 									} else {
 										disp = 4 * actionTransaction.addInterval(lineY + 4, actionY - 4);
 										// disp = 3 * actionTransaction.routeCount++;
@@ -390,6 +399,9 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 										g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
 												actionTransaction.x + 4 + disp, actionY - 4);
 										g2d.drawArc(actionTransaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
+										int[] xsPoints = { actionTransaction.x - 5, actionTransaction.x - 12, actionTransaction.x - 12 };
+										int[] ysPoints = { lineY, lineY - 4, lineY + 4 };
+										g2d.fillPolygon(xsPoints, ysPoints, 3);
 									}
 								} else if (lineY > actionY) {
 									if (transaction.x > actionTransaction.x) {
@@ -401,6 +413,9 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 												actionY + 4);
 										g2d.drawArc(transaction.x - 4 + disp, actionY, 8, 8, 0, 90);
 										g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
+										int[] xPoints = { transaction.x - 12, transaction.x - 5, transaction.x - 5 };
+										int[] yPoints = { actionY, actionY - 4, actionY + 4 };
+										g2d.fillPolygon(xPoints, yPoints, 3);
 									} else {
 										disp = 4 * actionTransaction.addInterval(lineY - 4, actionY + 4);
 										// disp = 3 * actionTransaction.routeCount++;
@@ -410,6 +425,10 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 												actionTransaction.x + 4 + disp, actionY + 4);
 										g2d.drawArc(actionTransaction.x - 4 + disp, actionY, 8, 8, 0, 90);
 										g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
+										int[] xPoints = { actionTransaction.x - 5, actionTransaction.x - 12,
+												actionTransaction.x - 12 };
+										int[] yPoints = { lineY, lineY - 4, lineY + 4 };
+										g2d.fillPolygon(xPoints, yPoints, 3);
 									}
 								}
 							}
