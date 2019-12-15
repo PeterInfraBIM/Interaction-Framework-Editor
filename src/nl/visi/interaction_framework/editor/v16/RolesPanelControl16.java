@@ -9,11 +9,14 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -70,6 +73,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		private class Transaction {
 			private int x, y;
 			private TransactionTypeType transactionType;
+			RotatingButton activeLabel;
 			// private int routeCount = 0;
 
 			class Interval {
@@ -134,7 +138,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					label += "...";
 				}
 
-				RotatingButton activeLabel = new RotatingButton(label);
+				activeLabel = new RotatingButton(label);
 				activeLabel.setToolTipText(transactionType.getDescription());
 				activeLabel.setRotation(Math.PI / 2);
 				activeLabel.setContentAreaFilled(false);
@@ -304,12 +308,22 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					transactions.add(new Transaction(this, g, transactionTypeType,
 							offsetLeft + transactionWidth * (index + 1) - transactionWidth / 2, 25));
 				}
+
 				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
 					MessageInTransactionTypeType mitt = messagesTableModel.get(index);
 					MessageTypeType messageType = getMessage(mitt);
 					if (messageType != null) {
 						messages.add(new MessageItem(this, g, mitt, 20, index * 15 + yInitStart - 12));
 					}
+				}
+			} else {
+				int transactionsRowCount = transactionsTableModel.getRowCount();
+				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
+				for (int index = 0; index < transactionsRowCount; index++) {
+					TransactionTypeType transactionTypeType = transactionsTableModel.get(index);
+					transactions.get(index).x = offsetLeft + transactionWidth * (index + 1) - transactionWidth / 2;
+					transactions.get(index).activeLabel.setLocation(transactions.get(index).x,
+							transactions.get(index).y);
 				}
 			}
 
@@ -399,7 +413,8 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 										g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
 												actionTransaction.x + 4 + disp, actionY - 4);
 										g2d.drawArc(actionTransaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
-										int[] xsPoints = { actionTransaction.x - 5, actionTransaction.x - 12, actionTransaction.x - 12 };
+										int[] xsPoints = { actionTransaction.x - 5, actionTransaction.x - 12,
+												actionTransaction.x - 12 };
 										int[] ysPoints = { lineY, lineY - 4, lineY + 4 };
 										g2d.fillPolygon(xsPoints, ysPoints, 3);
 									}
@@ -839,6 +854,7 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 			return null;
 		}
+
 	}
 
 	public RolesPanelControl16() throws Exception {
@@ -1188,6 +1204,20 @@ class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				}
 			}
 		}
+		
+		messagesTableModel.elements.sort(new Comparator<MessageInTransactionTypeType>() {
+
+			@Override
+			public int compare(MessageInTransactionTypeType o1, MessageInTransactionTypeType o2) {
+				RoleTypeType initiator1 = getInitiator(o1);
+				RoleTypeType executor1 = getExecutor(o1);
+				RoleTypeType initiator2 = getInitiator(o2);
+				RoleTypeType executor2 = getExecutor(o2);
+				RoleTypeType role1 = initiator1.equals(selectedElement) ? executor1 : initiator1;
+				RoleTypeType role2 = initiator2.equals(selectedElement) ? executor2 : initiator2;
+				return role1.getId().compareTo(role2.getId());
+			}
+		});
 	}
 
 	public void newElement() {

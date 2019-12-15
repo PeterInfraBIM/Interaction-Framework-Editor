@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.swing.AbstractCellEditor;
@@ -36,7 +35,6 @@ import nl.visi.interaction_framework.editor.v16.DateField16;
 import nl.visi.interaction_framework.editor.v16.Editor16;
 import nl.visi.interaction_framework.editor.v16.Control16;
 import nl.visi.interaction_framework.editor.v16.Store16;
-import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
 
@@ -315,34 +313,37 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 			newId = Editor16.getStore16().getNewId(prefix);
 		}
 		newElement.setId(newId);
-		Method setDescriptionMethod = newElement.getClass().getDeclaredMethod("setDescription",
-				new Class[] { String.class });
-		setDescriptionMethod.invoke(newElement, "");
-		if (!(newElement instanceof ElementConditionType)) {
-			Method setStateMethod = newElement.getClass().getDeclaredMethod("setState", new Class[] { String.class });
-			setStateMethod.invoke(newElement, "active");
-			updateLaMu(newElement, user);
-			try {
-				Method setStartDateMethod = newElement.getClass().getDeclaredMethod("setStartDate",
-						new Class[] { XMLGregorianCalendar.class });
-				Method setEndDateMethod = newElement.getClass().getDeclaredMethod("setEndDate",
-						new Class[] { XMLGregorianCalendar.class });
-				try {
-					gcal.setTime(new Date());
-					GregorianCalendar endDate = new GregorianCalendar();
-					long yearInMillis = Math.round(1000 * 60 * 60 * 24 * 365.2425);
-					endDate.setTimeInMillis(gcal.getTimeInMillis() + yearInMillis);
-					XMLGregorianCalendar xEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(endDate);
-					XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
-					setStartDateMethod.invoke(newElement, xgcal);
-					setEndDateMethod.invoke(newElement, xEndDate);
-				} catch (DatatypeConfigurationException e) {
-					e.printStackTrace();
-				}
-			} catch (NoSuchMethodException e) {
-			}
+		if (newElement.getClass().getDeclaredField("description") != null) {
+			Method setDescriptionMethod = newElement.getClass().getDeclaredMethod("setDescription",
+					new Class[] { String.class });
+			setDescriptionMethod.invoke(newElement, getBundle().getString("lbl_DescriptionOf") + " " + newId);
 		}
+//		if (!(newElement instanceof ElementConditionType)) {
+//			Method setStateMethod = newElement.getClass().getDeclaredMethod("setState", new Class[] { String.class });
+//			setStateMethod.invoke(newElement, "active");
+//			updateLaMu(newElement, user);
+//			try {
+//				Method setStartDateMethod = newElement.getClass().getDeclaredMethod("setStartDate",
+//						new Class[] { XMLGregorianCalendar.class });
+//				Method setEndDateMethod = newElement.getClass().getDeclaredMethod("setEndDate",
+//						new Class[] { XMLGregorianCalendar.class });
+//				try {
+//					gcal.setTime(new Date());
+//					GregorianCalendar endDate = new GregorianCalendar();
+//					long yearInMillis = Math.round(1000 * 60 * 60 * 24 * 365.2425);
+//					endDate.setTimeInMillis(gcal.getTimeInMillis() + yearInMillis);
+//					XMLGregorianCalendar xEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(endDate);
+//					XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
+//					setStartDateMethod.invoke(newElement, xgcal);
+//					setEndDateMethod.invoke(newElement, xEndDate);
+//				} catch (DatatypeConfigurationException e) {
+//					e.printStackTrace();
+//				}
+//			} catch (NoSuchMethodException e) {
+//			}
+//		}
 		Editor16.getStore16().put(newId, newElement);
+		updateLaMu(newElement, MainFrameControl16.user);
 	}
 
 	@SuppressWarnings("serial")

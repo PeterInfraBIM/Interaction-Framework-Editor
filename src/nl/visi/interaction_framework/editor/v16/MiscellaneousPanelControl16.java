@@ -11,6 +11,7 @@ import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
@@ -36,11 +37,12 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	private static final String MISCELLANEOUS_PANEL = "nl/visi/interaction_framework/editor/swixml/MiscellaneousPanel.xml";
 	private JTable tbl_ComplexElements;
 	private JPanel startDatePanel, endDatePanel, relationsPanel;
-	private JLabel lbl_Code;
+	private JLabel lbl_Code, lbl_Namespace;
 	private JComboBox<MiscellaneousTypes> cbx_ElementType;
 	private JComboBox<String> cbx_ComplexElements;
 	private ComplexElementsTableModel complexElementsTableModel;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement;
+	private JTextField tfd_Namespace;
 
 	private enum MiscellaneousTypes {
 		AppendixType, GroupType, OrganisationType, PersonType, ProjectType, TransactionPhaseType;
@@ -476,28 +478,33 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
-		boolean rowSelectied = selectedRow >= 0;
-		selectedElement = rowSelectied ? elementsTableModel.get(selectedRow) : null;
+		boolean rowSelected = selectedRow >= 0;
+		selectedElement = rowSelected ? elementsTableModel.get(selectedRow) : null;
 		boolean isGroupType = selectedElement instanceof GroupTypeType;
+		boolean isProjectType = selectedElement instanceof ProjectTypeType;
 		boolean isTransactionPhaseType = selectedElement instanceof TransactionPhaseTypeType;
-		btn_DeleteElement.setEnabled(rowSelectied);
-		tfd_Id.setEnabled(rowSelectied);
-		tfd_Description.setEnabled(rowSelectied);
-		startDateField.setEnabled(rowSelectied);
-		endDateField.setEnabled(rowSelectied);
-		tfd_State.setEnabled(rowSelectied);
-		tfd_Language.setEnabled(rowSelectied);
-		tfd_Category.setEnabled(rowSelectied);
-		tfd_HelpInfo.setEnabled(rowSelectied);
-		tfd_Code.setEnabled(rowSelectied);
+		btn_DeleteElement.setEnabled(rowSelected);
+		tfd_Id.setEnabled(rowSelected);
+		tfd_Description.setEnabled(rowSelected);
+		startDateField.setEnabled(rowSelected);
+		endDateField.setEnabled(rowSelected);
+		tfd_State.setEnabled(rowSelected);
+		tfd_Language.setEnabled(rowSelected);
+		tfd_Category.setEnabled(rowSelected);
+		tfd_HelpInfo.setEnabled(rowSelected);
+		tfd_Code.setEnabled(rowSelected);
 		lbl_Code.setVisible(!isGroupType);
 		tfd_Code.setVisible(!isGroupType);
 		tfd_Code.getParent().invalidate();
-		tbl_ComplexElements.setEnabled(rowSelectied);
-		cbx_ComplexElements.setEnabled(rowSelectied);
+		tfd_Namespace.setEnabled(rowSelected);
+		lbl_Namespace.setVisible(isProjectType);
+		tfd_Namespace.setVisible(isProjectType);
+		tfd_Namespace.getParent().invalidate();
+		tbl_ComplexElements.setEnabled(rowSelected);
+		cbx_ComplexElements.setEnabled(rowSelected);
 		relationsPanel.setVisible(!isGroupType && !isTransactionPhaseType);
 		relationsPanel.invalidate();
-		if (rowSelectied) {
+		if (rowSelected) {
 			complexElementsTableModel.clear();
 			tfd_Id.setText(selectedElement.getId());
 			List<Object> ceList = null;
@@ -513,6 +520,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				tfd_Category.setText(projectType.getCategory());
 				tfd_HelpInfo.setText(projectType.getHelpInfo());
 				tfd_Code.setText(projectType.getCode());
+				tfd_Namespace.setText(projectType.getNamespace());
 				ProjectTypeType.ComplexElements complexElements = projectType.getComplexElements();
 				if (complexElements != null) {
 					ceList = complexElements.getComplexElementTypeOrComplexElementTypeRef();
@@ -618,6 +626,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
 			tfd_Code.setText("");
+			tfd_Namespace.setText("");
 			complexElementsTableModel.clear();
 			cbx_ComplexElements.removeAllItems();
 		}

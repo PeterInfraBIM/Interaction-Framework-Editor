@@ -138,7 +138,7 @@ class Loader16 {
 						.add((ElementType) object);
 			}
 		}
-		JAXBContext jc = JAXBContext.newInstance("nl.visi.interaction_schema");
+		JAXBContext jc = JAXBContext.newInstance("nl.visi.schemas._20160331");
 		Marshaller m = jc.createMarshaller();
 		m.setProperty("jaxb.formatted.output", true);
 		m.marshal(visiXMLVISISystematics, out);

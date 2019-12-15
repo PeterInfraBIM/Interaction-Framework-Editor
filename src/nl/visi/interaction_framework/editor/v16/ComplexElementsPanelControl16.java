@@ -23,9 +23,6 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import nl.visi.interaction_framework.editor.v16.PanelControl16;
-import nl.visi.interaction_framework.editor.v16.Store16;
-import nl.visi.interaction_framework.editor.v16.PanelControl16.Fields;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.ComplexElements;
@@ -539,6 +536,31 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 								list.remove(object);
 								break;
 							}
+						}
+						if (list.isEmpty()) {
+							Class<?>[] cArg = new Class[1];
+							switch (classType.getSimpleName()) {
+							case "ComplexElementTypeType":
+								cArg[0] = ComplexElementTypeType.ComplexElements.class;
+								break;
+							case "ProjectTypeType":
+								cArg[0] = ProjectTypeType.ComplexElements.class;
+								break;
+							case "PersonTypeType":
+								cArg[0] = PersonTypeType.ComplexElements.class;
+								break;
+							case "OrganisationTypeType":
+								cArg[0] = OrganisationTypeType.ComplexElements.class;
+								break;
+							case "AppendixTypeType":
+								cArg[0] = AppendixTypeType.ComplexElements.class;
+								break;
+							case "MessageTypeType":
+								cArg[0] = MessageTypeType.ComplexElements.class;
+								break;
+							}
+							Method setComplexElements = elementType.getClass().getMethod("setComplexElements", cArg);
+							setComplexElements.invoke(elementType, (Object) null);
 						}
 					}
 				}
