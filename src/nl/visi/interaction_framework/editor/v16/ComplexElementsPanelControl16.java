@@ -623,6 +623,9 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				}
 			}
 		}
+		if (list.isEmpty()) {
+			selectedElement.setComplexElements(null);
+		}
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 	}
@@ -668,6 +671,9 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 					break;
 				}
 			}
+		}
+		if (list.isEmpty()) {
+			selectedElement.setSimpleElements(null);
 		}
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);

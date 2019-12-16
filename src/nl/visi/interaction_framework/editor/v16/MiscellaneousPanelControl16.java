@@ -681,6 +681,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		complexElementsTableModel.add(element);
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
+		cbx_ComplexElements.setSelectedItem(null);
 	}
 
 	public void removeComplexElement() {
@@ -715,6 +716,17 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 					list.remove(object);
 					break;
 				}
+			}
+		}
+		if (list.isEmpty()) {
+			if (selectedElement instanceof AppendixTypeType) {
+				((AppendixTypeType) selectedElement).setComplexElements(null);
+			} else if (selectedElement instanceof OrganisationTypeType) {
+				((OrganisationTypeType) selectedElement).setComplexElements(null);
+			} else if (selectedElement instanceof PersonTypeType) {
+				((PersonTypeType) selectedElement).setComplexElements(null);
+			} else if (selectedElement instanceof ProjectTypeType) {
+				((ProjectTypeType) selectedElement).setComplexElements(null);
 			}
 		}
 		updateLaMu(selectedElement, user);

@@ -31,7 +31,7 @@ import nl.visi.interaction_schema.TransactionTypeType.Executor;
 import nl.visi.interaction_schema.TransactionTypeType.Initiator;
 
 public class MessagesPanelControl12 extends PanelControl12<MessageTypeType> {
-	private static final String MESSAGES_PANEL = "nl/visi/interaction_framework/editor/swixml/MessagesPanel.xml";
+	private static final String MESSAGES_PANEL = "nl/visi/interaction_framework/editor/swixml/MessagesPanel12.xml";
 
 	private JPanel startDatePanel, endDatePanel;
 	private JTable tbl_ComplexElements, tbl_Transactions;

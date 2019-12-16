@@ -1,5 +1,7 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -100,6 +102,15 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				selectedElement.setValueList(tfd_ValueList.getText());
 				updateLaMu(selectedElement, user);
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+			}
+		});
+
+		cbx_UserDefinedType.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+
 			}
 		});
 	}
@@ -215,6 +226,13 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			selectedElement.setUserDefinedType(value);
 			updateLaMu(selectedElement, user);
 			elementsTableModel.update(selectedRow);
+		} else {
+			if (selectedElement != null) {
+				UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
+				if (userDefinedType != null) {
+					selectedElement.setUserDefinedType(null);
+				}
+			}
 		}
 	}
 

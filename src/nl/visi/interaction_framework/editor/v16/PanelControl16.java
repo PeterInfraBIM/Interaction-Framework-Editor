@@ -37,6 +37,7 @@ import nl.visi.interaction_framework.editor.v16.Control16;
 import nl.visi.interaction_framework.editor.v16.Store16;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
+import nl.visi.schemas._20160331.ProjectTypeType;
 
 abstract class PanelControl16<E extends ElementType> extends Control16 {
 	enum Fields {
@@ -317,6 +318,10 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 			Method setDescriptionMethod = newElement.getClass().getDeclaredMethod("setDescription",
 					new Class[] { String.class });
 			setDescriptionMethod.invoke(newElement, getBundle().getString("lbl_DescriptionOf") + " " + newId);
+		}
+		if (newElement instanceof ProjectTypeType) {
+			ProjectTypeType newProjectElement = (ProjectTypeType) newElement;
+			newProjectElement.setNamespace("http://www.visi.nl/schemas/20160331/NewProject");
 		}
 //		if (!(newElement instanceof ElementConditionType)) {
 //			Method setStateMethod = newElement.getClass().getDeclaredMethod("setState", new Class[] { String.class });

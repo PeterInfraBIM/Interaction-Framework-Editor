@@ -7,6 +7,7 @@ import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -30,7 +31,7 @@ import nl.visi.schemas._20160331.TransactionTypeType.Executor;
 import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 
 public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
-	private static final String MESSAGES_PANEL = "nl/visi/interaction_framework/editor/swixml/MessagesPanel.xml";
+	private static final String MESSAGES_PANEL = "nl/visi/interaction_framework/editor/swixml/MessagesPanel16.xml";
 
 	private JPanel startDatePanel, endDatePanel;
 	private JTable tbl_ComplexElements, tbl_Transactions;
@@ -38,6 +39,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private TransactionsTableModel transactionsTableModel;
 	private JComboBox<String> cbx_ComplexElements;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement;
+	private JCheckBox chb_AppendixMandatory;
 
 	private enum MessagesTableColumns {
 		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
@@ -398,6 +400,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_Code.setEnabled(rowSelected);
+		chb_AppendixMandatory.setEnabled(rowSelected);
 		tbl_ComplexElements.setEnabled(rowSelected);
 		tbl_Transactions.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
@@ -418,6 +421,9 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
 			tfd_Code.setText(selectedElement.getCode());
+			Boolean appendixMandatory = selectedElement.isAppendixMandatory();
+			chb_AppendixMandatory
+					.setSelected(appendixMandatory != null ? selectedElement.isAppendixMandatory() : false);
 
 			complexElementsTableModel.clear();
 			MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
@@ -468,6 +474,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
 			tfd_Code.setText("");
+			chb_AppendixMandatory.setSelected(false);
 			transactionsTableModel.clear();
 			complexElementsTableModel.clear();
 		}

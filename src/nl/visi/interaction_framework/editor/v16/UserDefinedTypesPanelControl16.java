@@ -1,8 +1,12 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
@@ -10,16 +14,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 
-import nl.visi.interaction_framework.editor.v16.PanelControl16;
-import nl.visi.interaction_framework.editor.v16.Store16;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20160331.UserDefinedTypeType;
 
-class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTypeType> {
-	private static final String USER_DEFINED_TYPES_PANEL = "nl/visi/interaction_framework/editor/swixml/UserDefinedTypesPanel.xml";
+public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTypeType> {
+	private static final String USER_DEFINED_TYPES_PANEL = "nl/visi/interaction_framework/editor/swixml/UserDefinedTypesPanel16.xml";
 
-	private JTextField tfd_BaseType, tfd_XsdRestriction;
+	private JTextField tfd_XsdRestriction;
+	private JComboBox<String> cbx_BaseType;
 	private JTable tbl_XsdEnumerations;
 	private XsdEnumerationsTableModel xsdEnumerationsTableModel;
 
@@ -163,16 +166,25 @@ class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTypeType>
 	}
 
 	private void initBaseType() {
-		tfd_BaseType.getDocument().addDocumentListener(new DocumentAdapter16() {
+		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<String>();
+		String[] baseTypes = new String[] { null, "ANYURI", "BOOLEAN", "DATE", "DATETIME", "DECIMAL", "INTEGER",
+				"STRING", "TIME" };
+		for (String baseType : baseTypes) {
+			model.addElement(baseType);
+		}
+		cbx_BaseType.setModel(model);
+		cbx_BaseType.addActionListener(new ActionListener() {
+
+			@SuppressWarnings("unchecked")
 			@Override
-			protected void update(DocumentEvent e) {
-				if (inSelection)
-					return;
-				selectedElement.setBaseType(tfd_BaseType.getText());
-				updateLaMu(selectedElement, user);
-				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
+			public void actionPerformed(ActionEvent e) {
+				JComboBox<String> cbx = (JComboBox<String>) e.getSource();
+				if (selectedElement != null) {
+					selectedElement.setBaseType((String) cbx.getSelectedItem());
+				}
 			}
 		});
+
 	}
 
 	private void initElementsTable() {
@@ -202,7 +214,7 @@ class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTypeType>
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
-		tfd_BaseType.setEnabled(rowSelected);
+		cbx_BaseType.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
@@ -212,7 +224,7 @@ class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTypeType>
 			selectedElement = elementsTableModel.get(selectedRow);
 			tfd_Id.setText(selectedElement.getId());
 			tfd_Description.setText(selectedElement.getDescription());
-			tfd_BaseType.setText(selectedElement.getBaseType());
+			cbx_BaseType.setSelectedItem(selectedElement.getBaseType());
 			tfd_State.setText(selectedElement.getState());
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
@@ -223,7 +235,7 @@ class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTypeType>
 			selectedElement = null;
 			tfd_Id.setText("");
 			tfd_Description.setText("");
-			tfd_BaseType.setText("");
+			cbx_BaseType.setSelectedItem(null);
 			tfd_State.setText("");
 			tfd_Language.setText("");
 			tfd_HelpInfo.setText("");
@@ -251,7 +263,7 @@ class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTypeType>
 		try {
 			UserDefinedTypeType newUserDefinedType = objectFactory.createUserDefinedTypeType();
 			newElement(newUserDefinedType, "UserDefinedType_");
-
+			newUserDefinedType.setBaseType("STRING");
 			int row = elementsTableModel.add(newUserDefinedType);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 		} catch (Exception e) {

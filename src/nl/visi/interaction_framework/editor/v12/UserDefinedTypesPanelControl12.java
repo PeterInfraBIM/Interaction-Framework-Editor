@@ -14,8 +14,8 @@ import nl.visi.interaction_schema.SimpleElementTypeType;
 import nl.visi.interaction_schema.SimpleElementTypeType.UserDefinedType;
 import nl.visi.interaction_schema.UserDefinedTypeType;
 
-class UserDefinedTypesPanelControl12 extends PanelControl12<UserDefinedTypeType> {
-	private static final String USER_DEFINED_TYPES_PANEL = "nl/visi/interaction_framework/editor/swixml/UserDefinedTypesPanel.xml";
+public class UserDefinedTypesPanelControl12 extends PanelControl12<UserDefinedTypeType> {
+	private static final String USER_DEFINED_TYPES_PANEL = "nl/visi/interaction_framework/editor/swixml/UserDefinedTypesPanel12.xml";
 
 	private JTextField tfd_BaseType, tfd_XsdRestriction;
 	private JTable tbl_XsdEnumerations;
