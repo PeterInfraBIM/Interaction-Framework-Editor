@@ -21,7 +21,7 @@ import nl.visi.interaction_schema.TransactionTypeType;
 import nl.visi.interaction_schema.TransactionTypeType.Executor;
 import nl.visi.interaction_schema.TransactionTypeType.Initiator;
 
-class RolesPanelControl12 extends PanelControl12<RoleTypeType> {
+public class RolesPanelControl12 extends PanelControl12<RoleTypeType> {
 	private static final String ROLES_PANEL = "nl/visi/interaction_framework/editor/swixml/RolesPanel12.xml";
 
 	private JPanel startDatePanel, endDatePanel;

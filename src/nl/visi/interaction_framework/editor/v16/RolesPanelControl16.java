@@ -9,8 +9,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -44,7 +42,7 @@ import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
 
-class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
+public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private static final String ROLES_PANEL = "nl/visi/interaction_framework/editor/swixml/RolesPanel16.xml";
 
 	private JTabbedPane relationsTabs;

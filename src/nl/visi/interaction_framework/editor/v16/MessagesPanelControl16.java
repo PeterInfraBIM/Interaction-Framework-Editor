@@ -535,6 +535,10 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		btn_AddComplexElement.setEnabled(selectedIndex > 0);
 	}
 
+	public void setAppendixMandatory() {
+		selectedElement.setAppendixMandatory(chb_AppendixMandatory.isSelected());
+	}
+
 	public void addComplexElement() {
 		String ceId = (String) cbx_ComplexElements.getSelectedItem();
 		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, ceId);
