@@ -18,6 +18,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.schemas._20160331.AppendixTypeType;
+import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
@@ -25,6 +27,7 @@ import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20160331.MessageTypeType;
+import nl.visi.schemas._20160331.MessageTypeType.AppendixTypes;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType.Executor;
@@ -34,11 +37,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private static final String MESSAGES_PANEL = "nl/visi/interaction_framework/editor/swixml/MessagesPanel16.xml";
 
 	private JPanel startDatePanel, endDatePanel;
-	private JTable tbl_ComplexElements, tbl_Transactions;
+	private JTable tbl_ComplexElements, tbl_Transactions, tbl_Appendices;
 	private ComplexElementsTableModel complexElementsTableModel;
+	private AppendicesTableModel appendicesTableModel;
 	private TransactionsTableModel transactionsTableModel;
-	private JComboBox<String> cbx_ComplexElements;
-	private JButton btn_AddComplexElement, btn_RemoveComplexElement;
+	private JComboBox<String> cbx_ComplexElements, cbx_Appendices;
+	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddAppendix, btn_RemoveAppendix;
 	private JCheckBox chb_AppendixMandatory;
 
 	private enum MessagesTableColumns {
@@ -247,11 +251,56 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		return transactionsTableModel;
 	}
 
+	private enum AppendicesTableColumns {
+		Id, Description, Navigate;
+
+		@Override
+		public String toString() {
+			return getBundle().getString("lbl_" + name());
+		}
+
+	}
+
+	@SuppressWarnings("serial")
+	public class AppendicesTableModel extends ElementsTableModel<AppendixTypeType> {
+
+		@Override
+		public int getColumnCount() {
+			return AppendicesTableColumns.values().length;
+		}
+
+		@Override
+		public String getColumnName(int columnIndex) {
+			return AppendicesTableColumns.values()[columnIndex].toString();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			AppendixTypeType appendixElement = get(rowIndex);
+			switch (AppendicesTableColumns.values()[columnIndex]) {
+			case Id:
+				return appendixElement.getId();
+			case Description:
+				return appendixElement.getDescription();
+			default:
+				break;
+			}
+			return null;
+		}
+
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			return columnIndex == AppendicesTableColumns.Navigate.ordinal();
+		}
+
+	}
+
 	public MessagesPanelControl16() throws Exception {
 		super(MESSAGES_PANEL);
 		initMessagesTable();
 		initComplexElementsTable();
 		initTransactionsTable();
+		initAppendicesTable();
 		initStartDateField();
 		initEndDateField();
 	}
@@ -380,6 +429,37 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		});
 	}
 
+	@SuppressWarnings("serial")
+	private void initAppendicesTable() {
+		appendicesTableModel = new AppendicesTableModel();
+		appendicesTableModel.setSorted(false);
+		tbl_Appendices.setModel(appendicesTableModel);
+		tbl_Appendices.setFillsViewportHeight(true);
+		tbl_Appendices.setDropMode(DropMode.INSERT_ROWS);
+		tbl_Appendices.setTransferHandler(getTransferHandler(tbl_Appendices, appendicesTableModel, true));
+		tbl_Appendices.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				int selectedRow = tbl_Appendices.getSelectedRow();
+				btn_RemoveAppendix.setEnabled(selectedRow >= 0);
+			}
+		});
+		TableColumn navigateColumn = tbl_Appendices.getColumnModel()
+				.getColumn(AppendicesTableColumns.Navigate.ordinal());
+		navigateColumn.setMaxWidth(50);
+		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
+		navigateColumn.setCellEditor(new NavigatorEditor() {
+			@Override
+			protected void navigate() {
+				int row = tbl_Appendices.getSelectedRow();
+				AppendixTypeType appendixTypeType = appendicesTableModel.get(row);
+				if (appendixTypeType != null) {
+					Editor16.getMainFrameControl().navigate(appendixTypeType);
+				}
+			}
+		});
+	}
+
 	@Override
 	public void fillTable() {
 		fillTable(MessageTypeType.class);
@@ -403,7 +483,9 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		chb_AppendixMandatory.setEnabled(rowSelected);
 		tbl_ComplexElements.setEnabled(rowSelected);
 		tbl_Transactions.setEnabled(rowSelected);
+		tbl_Appendices.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
+		cbx_Appendices.setEnabled(rowSelected);
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
 			tfd_Id.setText(selectedElement.getId());
@@ -441,9 +523,30 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			}
 			cbx_ComplexElements.removeAllItems();
 			cbx_ComplexElements.addItem(null);
-			List<ComplexElementTypeType> elements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
-			for (ComplexElementTypeType element : elements) {
+			List<ComplexElementTypeType> ceElements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
+			for (ComplexElementTypeType element : ceElements) {
 				cbx_ComplexElements.addItem(element.getId());
+			}
+
+			appendicesTableModel.clear();
+			AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
+			if (appendixTypes != null) {
+				List<Object> appendixList = appendixTypes.getAppendixTypeOrAppendixTypeRef();
+				for (Object object : appendixList) {
+					AppendixTypeType element = null;
+					if (object instanceof AppendixTypeTypeRef) {
+						element = (AppendixTypeType) ((AppendixTypeTypeRef) object).getIdref();
+					} else {
+						element = (AppendixTypeType) object;
+					}
+					appendicesTableModel.add(element);
+				}
+			}
+			cbx_Appendices.removeAllItems();
+			cbx_Appendices.addItem(null);
+			List<AppendixTypeType> apElements = Editor16.getStore16().getElements(AppendixTypeType.class);
+			for (AppendixTypeType element : apElements) {
+				cbx_Appendices.addItem(element.getId());
 			}
 
 			transactionsTableModel.clear();
@@ -535,6 +638,11 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		btn_AddComplexElement.setEnabled(selectedIndex > 0);
 	}
 
+	public void selectAppendix() {
+		int selectedIndex = cbx_Appendices.getSelectedIndex();
+		btn_AddAppendix.setEnabled(selectedIndex > 0);
+	}
+
 	public void setAppendixMandatory() {
 		selectedElement.setAppendixMandatory(chb_AppendixMandatory.isSelected());
 	}
@@ -554,6 +662,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		complexElementsTableModel.add(element);
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
+		cbx_ComplexElements.setSelectedItem(null);
 	}
 
 	public void removeComplexElement() {
@@ -576,8 +685,55 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				}
 			}
 		}
+		if (list.isEmpty()) {
+			selectedElement.setComplexElements(null);
+		}
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 	}
 
+	public void addAppendix() {
+		String appId = (String) cbx_Appendices.getSelectedItem();
+		AppendixTypeType element = Editor16.getStore16().getElement(AppendixTypeType.class, appId);
+		AppendixTypeTypeRef ref = objectFactory.createAppendixTypeTypeRef();
+		ref.setIdref(element);
+		AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
+		if (appendixTypes == null) {
+			appendixTypes = objectFactory.createMessageTypeTypeAppendixTypes();
+			selectedElement.setAppendixTypes(appendixTypes);
+		}
+		List<Object> list = appendixTypes.getAppendixTypeOrAppendixTypeRef();
+		list.add(ref);
+		appendicesTableModel.add(element);
+		updateLaMu(selectedElement, user);
+		elementsTableModel.update(selectedRow);
+		cbx_Appendices.setSelectedItem(null);
+	}
+
+	public void removeAppendix() {
+		int selectedRow = tbl_Appendices.getSelectedRow();
+
+		AppendixTypeType appendices = appendicesTableModel.remove(selectedRow);
+		AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
+		List<Object> list = appendixTypes.getAppendixTypeOrAppendixTypeRef();
+		for (Object object : list) {
+			AppendixTypeType element = null;
+			if (object instanceof AppendixTypeTypeRef) {
+				element = (AppendixTypeType) ((AppendixTypeTypeRef) object).getIdref();
+			} else if (object instanceof AppendixTypeType) {
+				element = (AppendixTypeType) object;
+			}
+			if (element != null) {
+				if (appendices.equals(element)) {
+					list.remove(object);
+					break;
+				}
+			}
+		}
+		if (list.isEmpty()) {
+			selectedElement.setAppendixTypes(null);
+		}
+		updateLaMu(selectedElement, user);
+		elementsTableModel.update(selectedRow);
+	}
 }
