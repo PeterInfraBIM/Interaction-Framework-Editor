@@ -13,6 +13,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableRowSorter;
 
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
@@ -68,6 +69,11 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			default:
 				return null;
 			}
+		}
+
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			return String.class;
 		}
 	}
 
@@ -190,6 +196,10 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 	private void initElementsTable() {
 		elementsTableModel = new UserDefinedTypesTableModel();
 		tbl_Elements.setModel(elementsTableModel);
+		tbl_Elements.setAutoCreateRowSorter(true);
+		TableRowSorter<ElementsTableModel<UserDefinedTypeType>> tableRowSorter = new TableRowSorter<>(
+				elementsTableModel);
+		tableRowSorter.setComparator(UserDefinedTypesTableColumns.DateLamu.ordinal(), dateComparator);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override

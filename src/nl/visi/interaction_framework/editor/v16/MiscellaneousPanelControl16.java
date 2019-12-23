@@ -15,12 +15,11 @@ import javax.swing.JTextField;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import nl.visi.interaction_framework.editor.v16.PanelControl16;
-import nl.visi.interaction_framework.editor.v16.Store16;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
@@ -175,6 +174,12 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				return null;
 			}
 		}
+
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			return String.class;
+		}
+
 	}
 
 	ComplexElementsTableModel getComplexElementsTableModel() {
@@ -314,6 +319,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		complexElementsTableModel = new ComplexElementsTableModel();
 		complexElementsTableModel.setSorted(false);
 		tbl_ComplexElements.setModel(complexElementsTableModel);
+		tbl_ComplexElements.setAutoCreateRowSorter(true);
 		tbl_ComplexElements.setFillsViewportHeight(true);
 		tbl_ComplexElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_ComplexElements
@@ -344,6 +350,11 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	private void initMiscellaneousTable() {
 		elementsTableModel = new MiscellaneousTableModel();
 		tbl_Elements.setModel(elementsTableModel);
+		tbl_Elements.setAutoCreateRowSorter(true);
+		TableRowSorter<ElementsTableModel<ElementType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
+		tableRowSorter.setComparator(MiscellaneousTableColumns.StartDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(MiscellaneousTableColumns.EndDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(MiscellaneousTableColumns.DateLamu.ordinal(), dateComparator);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -500,9 +511,15 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		lbl_Namespace.setVisible(isProjectType);
 		tfd_Namespace.setVisible(isProjectType);
 		tfd_Namespace.getParent().invalidate();
-		tbl_ComplexElements.setEnabled(rowSelected);
-		cbx_ComplexElements.setEnabled(rowSelected);
-		relationsPanel.setVisible(!isGroupType && !isTransactionPhaseType);
+		if (rowSelected && !(isGroupType || isTransactionPhaseType)) {
+			tbl_ComplexElements.setEnabled(true);
+			cbx_ComplexElements.setEnabled(true);
+			relationsPanel.setVisible(true);
+		} else {
+			tbl_ComplexElements.setEnabled(false);
+			cbx_ComplexElements.setEnabled(false);
+			relationsPanel.setVisible(false);
+		}
 		relationsPanel.invalidate();
 		if (rowSelected) {
 			complexElementsTableModel.clear();

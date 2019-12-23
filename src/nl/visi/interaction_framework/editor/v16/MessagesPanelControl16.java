@@ -14,6 +14,7 @@ import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -90,6 +91,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				return null;
 			}
 		}
+
+		@Override
+		public Class<?> getColumnClass(int columnIndex) {
+			return String.class;
+		}
+
 	}
 
 	private enum ComplexElementsTableColumns {
@@ -359,6 +366,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		elementsTableModel = new MessagesTableModel();
 		tbl_Elements.setModel(elementsTableModel);
 		tbl_Elements.setFillsViewportHeight(true);
+		tbl_Elements.setAutoCreateRowSorter(true);
+		TableRowSorter<ElementsTableModel<MessageTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
+		tableRowSorter.setComparator(MessagesTableColumns.StartDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(MessagesTableColumns.EndDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(MessagesTableColumns.DateLamu.ordinal(), dateComparator);
+		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -373,6 +386,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private void initTransactionsTable() {
 		transactionsTableModel = new TransactionsTableModel();
 		tbl_Transactions.setModel(transactionsTableModel);
+		tbl_Transactions.setAutoCreateRowSorter(true);
 		tbl_Transactions.setFillsViewportHeight(true);
 		TableColumn navigateColumn = tbl_Transactions.getColumnModel()
 				.getColumn(TransactionsTableColumns.Navigate.ordinal());
@@ -402,6 +416,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		complexElementsTableModel = new ComplexElementsTableModel();
 		complexElementsTableModel.setSorted(false);
 		tbl_ComplexElements.setModel(complexElementsTableModel);
+		tbl_ComplexElements.setAutoCreateRowSorter(true);
 		tbl_ComplexElements.setFillsViewportHeight(true);
 		tbl_ComplexElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_ComplexElements
@@ -434,6 +449,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		appendicesTableModel = new AppendicesTableModel();
 		appendicesTableModel.setSorted(false);
 		tbl_Appendices.setModel(appendicesTableModel);
+		tbl_Appendices.setAutoCreateRowSorter(true);
 		tbl_Appendices.setFillsViewportHeight(true);
 		tbl_Appendices.setDropMode(DropMode.INSERT_ROWS);
 		tbl_Appendices.setTransferHandler(getTransferHandler(tbl_Appendices, appendicesTableModel, true));

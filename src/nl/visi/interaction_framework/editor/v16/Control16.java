@@ -3,8 +3,11 @@ package nl.visi.interaction_framework.editor.v16;
 import java.awt.Component;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -36,7 +39,7 @@ import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 abstract class Control16 {
 	public static final String RESOURCE_BUNDLE = "nl.visi.interaction_framework.editor.locale.Editor";
 	private static final ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
-	private static final java.text.DateFormat sdfDate = SimpleDateFormat.getDateInstance();
+	static final java.text.DateFormat sdfDate = SimpleDateFormat.getDateInstance();
 	private static final java.text.DateFormat sdfDateTime = SimpleDateFormat.getDateTimeInstance();
 	private final SwingEngine swingEngine;
 	protected static final ObjectFactory objectFactory = new ObjectFactory();
@@ -44,6 +47,22 @@ abstract class Control16 {
 	protected PropertyChangeSupport propertyChangeSupport;
 	protected static String user = "???";
 	protected static Preferences userPrefs = Preferences.userNodeForPackage(Control16.class);
+
+	protected Comparator<String> dateComparator = new Comparator<String>() {
+		@Override
+		public int compare(String o1, String o2) {
+			if (o1 != null && o2 != null && !o1.isEmpty() && !o2.isEmpty()) {
+				try {
+					Date o1Date = sdfDateTime.parse(o1);
+					Date o2Date = sdfDateTime.parse(o2);
+					return o1Date.compareTo(o2Date);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			return 0;
+		}
+	};
 
 	@SuppressWarnings("serial")
 	public abstract class ElementsTableModel<T extends ElementType> extends AbstractTableModel {
@@ -111,6 +130,15 @@ abstract class Control16 {
 		protected String getSortId(T element) {
 			return element.getId();
 		}
+
+//		@Override
+//		public Class<?> getColumnClass(int columnIndex) {
+//			if (elements.isEmpty()) {
+//				return Object.class;
+//			}
+//			Object valueAt = getValueAt(0, columnIndex);
+//			return valueAt != null ? getValueAt(0, columnIndex).getClass() : Object.class;
+//		}
 
 	}
 
@@ -263,7 +291,7 @@ abstract class Control16 {
 		}
 		return null;
 	}
-	
+
 	protected static List<MessageInTransactionTypeType> getSendAfters(MessageInTransactionTypeType mitt) {
 		List<MessageInTransactionTypeConditionType> conditions = getConditions(mitt);
 		if (conditions != null) {
@@ -289,7 +317,7 @@ abstract class Control16 {
 		}
 		return null;
 	}
-	
+
 	protected static List<MessageInTransactionTypeType> getSendBefores(MessageInTransactionTypeType mitt) {
 		List<MessageInTransactionTypeConditionType> conditions = getConditions(mitt);
 		if (conditions != null) {
