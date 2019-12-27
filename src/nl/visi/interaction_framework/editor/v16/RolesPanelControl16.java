@@ -31,6 +31,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -1086,6 +1087,12 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private void initRolesTable() {
 		elementsTableModel = new RolesTableModel();
 		tbl_Elements.setModel(elementsTableModel);
+		tbl_Elements.setAutoCreateRowSorter(true);
+		TableRowSorter<ElementsTableModel<RoleTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
+		tableRowSorter.setComparator(RoleTableColumns.StartDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(RoleTableColumns.EndDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(RoleTableColumns.DateLamu.ordinal(), dateTimeComparator);
+		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override

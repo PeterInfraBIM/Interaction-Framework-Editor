@@ -36,6 +36,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
@@ -2047,7 +2048,13 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private void initTransactionsTable() {
 		elementsTableModel = new TransactionsTableModel();
 		tbl_Elements.setModel(elementsTableModel);
+		tbl_Elements.setAutoCreateRowSorter(true);
 		tbl_Elements.setFillsViewportHeight(true);
+		TableRowSorter<ElementsTableModel<TransactionTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
+		tableRowSorter.setComparator(TransactionsTableColumns.StartDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(TransactionsTableColumns.EndDate.ordinal(), dateComparator);
+		tableRowSorter.setComparator(TransactionsTableColumns.DateLamu.ordinal(), dateTimeComparator);
+		tbl_Elements.setRowSorter(tableRowSorter);
 		TransactionsTableRenderer renderer = new TransactionsTableRenderer();
 		for (int index = 0; index < tbl_Elements.getColumnCount(); index++) {
 			if (index == TransactionsTableColumns.Main.ordinal())

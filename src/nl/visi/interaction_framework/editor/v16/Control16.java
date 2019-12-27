@@ -39,8 +39,10 @@ import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 abstract class Control16 {
 	public static final String RESOURCE_BUNDLE = "nl.visi.interaction_framework.editor.locale.Editor";
 	private static final ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
-	static final java.text.DateFormat sdfDate = SimpleDateFormat.getDateInstance();
-	private static final java.text.DateFormat sdfDateTime = SimpleDateFormat.getDateTimeInstance();
+	// static final java.text.DateFormat sdfDate = SimpleDateFormat.getDateInstance();
+	static final java.text.DateFormat sdfDate = new SimpleDateFormat("d MMM yyyy");
+	// private static final java.text.DateFormat sdfDateTime = SimpleDateFormat.getDateTimeInstance();
+	static final java.text.DateFormat sdfDateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss");	
 	private final SwingEngine swingEngine;
 	protected static final ObjectFactory objectFactory = new ObjectFactory();
 	protected static final GregorianCalendar gcal = new GregorianCalendar();
@@ -49,6 +51,22 @@ abstract class Control16 {
 	protected static Preferences userPrefs = Preferences.userNodeForPackage(Control16.class);
 
 	protected Comparator<String> dateComparator = new Comparator<String>() {
+		@Override
+		public int compare(String o1, String o2) {
+			if (o1 != null && o2 != null && !o1.isEmpty() && !o2.isEmpty()) {
+				try {
+					Date o1Date = sdfDate.parse(o1);
+					Date o2Date = sdfDate.parse(o2);
+					return o1Date.compareTo(o2Date);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+			}
+			return 0;
+		}
+	};
+	
+	protected Comparator<String> dateTimeComparator = new Comparator<String>() {
 		@Override
 		public int compare(String o1, String o2) {
 			if (o1 != null && o2 != null && !o1.isEmpty() && !o2.isEmpty()) {

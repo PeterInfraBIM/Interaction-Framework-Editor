@@ -10,6 +10,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableRowSorter;
 
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
@@ -73,7 +74,12 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		super(SIMPLE_ELEMENTS_PANEL);
 		elementsTableModel = new SimpleElementsTableModel();
 		tbl_Elements.setModel(elementsTableModel);
+		tbl_Elements.setAutoCreateRowSorter(true);
 		tbl_Elements.setFillsViewportHeight(true);
+		TableRowSorter<ElementsTableModel<SimpleElementTypeType>> tableRowSorter = new TableRowSorter<>(
+				elementsTableModel);
+		tableRowSorter.setComparator(SimpleElementsTableColumns.DateLamu.ordinal(), dateTimeComparator);
+		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {

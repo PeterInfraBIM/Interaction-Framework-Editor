@@ -370,7 +370,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		TableRowSorter<ElementsTableModel<MessageTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
 		tableRowSorter.setComparator(MessagesTableColumns.StartDate.ordinal(), dateComparator);
 		tableRowSorter.setComparator(MessagesTableColumns.EndDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(MessagesTableColumns.DateLamu.ordinal(), dateComparator);
+		tableRowSorter.setComparator(MessagesTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override

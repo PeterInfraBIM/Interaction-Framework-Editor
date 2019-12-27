@@ -354,7 +354,8 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		TableRowSorter<ElementsTableModel<ElementType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
 		tableRowSorter.setComparator(MiscellaneousTableColumns.StartDate.ordinal(), dateComparator);
 		tableRowSorter.setComparator(MiscellaneousTableColumns.EndDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(MiscellaneousTableColumns.DateLamu.ordinal(), dateComparator);
+		tableRowSorter.setComparator(MiscellaneousTableColumns.DateLamu.ordinal(), dateTimeComparator);
+		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
