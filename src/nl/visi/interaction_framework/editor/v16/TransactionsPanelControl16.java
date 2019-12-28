@@ -1015,7 +1015,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			if (TransactionsTableColumns.values()[columnIndex] == TransactionsTableColumns.Main) {
 				return Boolean.class;
 			} else
-				return Object.class;
+				return String.class;
 		}
 	}
 
@@ -1935,6 +1935,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private void initElementConditionsTable() {
 		elementConditionsTableModel = new ElementConditionsTableModel();
 		tbl_ElementConditions.setModel(elementConditionsTableModel);
+		tbl_ElementConditions.setAutoCreateRowSorter(true);
 		tbl_ElementConditions.setFillsViewportHeight(true);
 
 		cbx_Conditions = new JComboBox<>(new DefaultComboBoxModel<String>());
@@ -2008,6 +2009,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private void initPreviousMessagesTable() {
 		previousMessagesTableModel = new PreviousMessagesTableModel();
 		tbl_PreviousMessages.setModel(previousMessagesTableModel);
+		tbl_PreviousMessages.setAutoCreateRowSorter(true);
 		tbl_PreviousMessages.setFillsViewportHeight(true);
 		tbl_PreviousMessages.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -2035,6 +2037,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private void initSubtransactionsTable() {
 		subtransactionsTableModel = new SubtransactionsTableModel();
 		tbl_Subtransactions.setModel(subtransactionsTableModel);
+		tbl_Subtransactions.setAutoCreateRowSorter(true);
 		tbl_Subtransactions.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override

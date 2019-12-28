@@ -25,12 +25,17 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.RowSorter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterEvent.Type;
+import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableColumn;
+import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -65,7 +70,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		private Map<String, MessageItem> messageItemMap = new HashMap<>();
 		private final List<MessageItem> messages;
 		private RoleTypeType currentRole;
-		private int offsetLeft = 200;
+		private int offsetLeft = 220;
 		private int yInitStart = 200;
 		private int yHeight = 0;
 
@@ -212,19 +217,19 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				this.index = messageItemMap.size();
 
 				// ---------------------------------------------------------------------
-				String label = getMessage(mitt).getDescription();
-				Font font = new Font("Dialog", Font.PLAIN, 11);
-				int stringWidth = g.getFontMetrics(font).stringWidth(label);
-				if (stringWidth > offsetLeft - 50) {
-					while (stringWidth > offsetLeft - 50) {
-						label = label.substring(0, label.length() - 2);
-						stringWidth = g.getFontMetrics(font).stringWidth(label);
-					}
-					label += "...";
+				String other = null;
+				if (initiator.getId().equals(selectedElement.getId())) {
+					other = executor.getDescription();
+				} else {
+					other = initiator.getDescription();
 				}
+				Font font = new Font("Dialog", Font.PLAIN, 11);
+				String rolOther = shorten(g, other, font, offsetLeft - 150);
+				String msglabel = shorten(g, getMessage(mitt).getDescription(), font, offsetLeft - 120);
+				String label = "[" + rolOther + "] " + msglabel;
 
 				RotatingButton activeLabel = new RotatingButton(label);
-				activeLabel.setToolTipText(getMessage(mitt).getDescription());
+				activeLabel.setToolTipText("[" + other + "] " + getMessage(mitt).getDescription());
 				// activeLabel.setRotation(Math.PI / 2);
 				activeLabel.setContentAreaFilled(false);
 				activeLabel.setBackground(Color.white);
@@ -253,6 +258,22 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				// -------------------------------------------------
 
 				messageItemMap.put(mitt.getId(), this);
+			}
+
+			private String shorten(Graphics g, String label, Font font, int maxLength) {
+				int stringWidth = g.getFontMetrics(font).stringWidth(label);
+				if (stringWidth > maxLength) {
+					int leftMarker = label.length() / 2;
+					int rightMarker = label.length() / 2;
+					while (stringWidth > maxLength) {
+						leftMarker--;
+						rightMarker++;
+						String text = label.substring(0, leftMarker) + label.substring(rightMarker);
+						stringWidth = g.getFontMetrics(font).stringWidth(text);
+					}
+					label = label.substring(0, leftMarker) + "..." + label.substring(rightMarker);
+				}
+				return label;
 			}
 
 			public Transaction getTransaction() {
@@ -995,6 +1016,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private void initTransactionsTable() {
 		transactionsTableModel = new TransactionsTableModel();
 		tbl_Transactions.setModel(transactionsTableModel);
+		tbl_Transactions.setAutoCreateRowSorter(true);
 		tbl_Transactions.setFillsViewportHeight(true);
 		tbl_Transactions.getColumnModel().getColumn(TransactionsTableColumns.Initiator.ordinal()).setMaxWidth(50);
 		TableColumn navigateColumn = tbl_Transactions.getColumnModel()
@@ -1014,6 +1036,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private void initMessagesTable() {
 		messagesTableModel = new MessagesTableModel();
 		tbl_Messages.setModel(messagesTableModel);
+		tbl_Messages.setAutoCreateRowSorter(true);
 		tbl_Messages.setFillsViewportHeight(true);
 		tbl_Messages.getColumnModel().getColumn(MessagesTableColumns.Type.ordinal()).setMaxWidth(50);
 		TableColumn navigateColumn = tbl_Messages.getColumnModel().getColumn(MessagesTableColumns.Navigate.ordinal());
@@ -1110,8 +1133,11 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
 		inSelection = true;
-
+		
 		selectedRow = tbl_Elements.getSelectedRow();
+		if (selectedRow >= 0) {
+			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
+		}
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
 		btn_DeleteElement.setEnabled(rowSelected);
@@ -1131,7 +1157,6 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 		tbl_Transactions.setEnabled(rowSelected);
 		tbl_Messages.setEnabled(rowSelected);
-		canvas.repaint();
 
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
@@ -1189,6 +1214,9 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			messagesTableModel.clear();
 			conditionsTableModel.clear();
 		}
+
+		canvas.repaint();
+
 		inSelection = false;
 	}
 
@@ -1209,7 +1237,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				}
 			}
 		}
-		
+
 		messagesTableModel.elements.sort(new Comparator<MessageInTransactionTypeType>() {
 
 			@Override

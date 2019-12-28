@@ -149,15 +149,6 @@ abstract class Control16 {
 			return element.getId();
 		}
 
-//		@Override
-//		public Class<?> getColumnClass(int columnIndex) {
-//			if (elements.isEmpty()) {
-//				return Object.class;
-//			}
-//			Object valueAt = getValueAt(0, columnIndex);
-//			return valueAt != null ? getValueAt(0, columnIndex).getClass() : Object.class;
-//		}
-
 	}
 
 	public Control16() {
