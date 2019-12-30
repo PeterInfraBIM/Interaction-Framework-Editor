@@ -1,5 +1,6 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
@@ -15,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -43,6 +45,7 @@ import nl.visi_1_1a.interaction_framework.importer.Transform;
 
 public class MainFrameControl16 extends Control16 {
 	private static final String MAIN_FRAME = "nl/visi/interaction_framework/editor/swixml/MainFrame.xml";
+	private static final String NEW_FRAMEWORK_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewFrameworkDialog.xml";
 	private JFrame frame;
 	private JPanel rolesPanel, transactionsPanel, messagesPanel, complexElementsPanel, simpleElementsPanel,
 			userDefinedTypesPanel, miscellaneousPanel;
@@ -206,6 +209,12 @@ public class MainFrameControl16 extends Control16 {
 		btn_Print.setEnabled(true);
 		btn_Report.setEnabled(true);
 		Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
+		try {
+			JDialog newFrameworkDialog = (JDialog) render(NEW_FRAMEWORK_DIALOG);
+			newFrameworkDialog.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void openFramework() throws IOException {

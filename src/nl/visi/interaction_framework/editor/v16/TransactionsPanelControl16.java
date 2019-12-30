@@ -943,6 +943,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				int row, int column) {
 			super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 			if (row >= 0) {
+				row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 				if (column != TransactionsTableColumns.Main.ordinal()) {
 					TransactionTypeType transactionTypeType = elementsTableModel.get(row);
 					if (transactionTypeType != null) {
@@ -2127,6 +2128,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	protected void updateSelectionArea(ListSelectionEvent e) {
 		inSelection = true;
 		selectedRow = tbl_Elements.getSelectedRow();
+		if (selectedRow >= 0) {
+			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
+		}
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
 		btn_DeleteElement.setEnabled(rowSelected);
@@ -2155,7 +2159,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 		successorMap = new HashMap<MessageInTransactionTypeType, List<MessageInTransactionTypeType>>();
 		initPrevMap();
-		canvas.repaint();
 
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
@@ -2264,6 +2267,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			sequenceTableModel.clear();
 			subtransactionsTableModel.clear();
 		}
+		
+		canvas.repaint();
+
 		inSelection = false;
 	}
 

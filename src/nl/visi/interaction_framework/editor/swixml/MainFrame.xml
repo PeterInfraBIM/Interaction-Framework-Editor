@@ -39,7 +39,7 @@
 
 			<separator />
 
-			<button id="btn_XsdCheck" Action="xsdCheck" Text="lbl_XsdCheck" />
+			<button id="btn_XsdCheck" Action="xsdCheck" Enabled="false" Text="lbl_XsdCheck" />
 
 			<separator />
 
