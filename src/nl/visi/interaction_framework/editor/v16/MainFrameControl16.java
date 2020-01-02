@@ -1,12 +1,13 @@
 package nl.visi.interaction_framework.editor.v16;
 
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -16,7 +17,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -41,11 +41,11 @@ import org.xml.sax.helpers.DefaultHandler;
 
 import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.Canvas;
 import nl.visi.schemas._20160331.ElementType;
+import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi_1_1a.interaction_framework.importer.Transform;
 
 public class MainFrameControl16 extends Control16 {
 	private static final String MAIN_FRAME = "nl/visi/interaction_framework/editor/swixml/MainFrame.xml";
-	private static final String NEW_FRAMEWORK_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewFrameworkDialog.xml";
 	private JFrame frame;
 	private JPanel rolesPanel, transactionsPanel, messagesPanel, complexElementsPanel, simpleElementsPanel,
 			userDefinedTypesPanel, miscellaneousPanel;
@@ -159,6 +159,20 @@ public class MainFrameControl16 extends Control16 {
 				}
 			}
 		});
+//		buildTabs();
+
+		user = userPrefs.get("User", "???");
+		tfd_User.setText(user);
+		tfd_User.getDocument().addDocumentListener(new DocumentAdapter16() {
+			@Override
+			protected void update(DocumentEvent e) {
+				user = tfd_User.getText();
+				userPrefs.put("User", user);
+			}
+		});
+	}
+
+	private void buildTabs() throws Exception {
 		rolesPC = new RolesPanelControl16();
 		rolesPanel.add(rolesPC.getPanel());
 		transactionsPC = new TransactionsPanelControl16();
@@ -173,16 +187,6 @@ public class MainFrameControl16 extends Control16 {
 		userDefinedTypesPanel.add(userDefinedTypesPC.getPanel());
 		miscellaneousPC = new MiscellaneousPanelControl16();
 		miscellaneousPanel.add(miscellaneousPC.getPanel());
-
-		user = userPrefs.get("User", "???");
-		tfd_User.setText(user);
-		tfd_User.getDocument().addDocumentListener(new DocumentAdapter16() {
-			@Override
-			protected void update(DocumentEvent e) {
-				user = tfd_User.getText();
-				userPrefs.put("User", user);
-			}
-		});
 	}
 
 	private Runnable doRun = new Runnable() {
@@ -208,10 +212,32 @@ public class MainFrameControl16 extends Control16 {
 		btn_XsdCheck.setEnabled(false);
 		btn_Print.setEnabled(true);
 		btn_Report.setEnabled(true);
-		Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
 		try {
-			JDialog newFrameworkDialog = (JDialog) render(NEW_FRAMEWORK_DIALOG);
-			newFrameworkDialog.setVisible(true);
+			final NewFrameworkDialogControl newFrameworkDialogControl = new NewFrameworkDialogControl();
+			newFrameworkDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
+					if (evt.getPropertyName().equals("btn_Create")) {
+						if (newFrameworkDialogControl.getVersion().equals("1.6")) {
+							ProjectTypeType projectType = objectFactory.createProjectTypeType();
+							projectType.setDescription(newFrameworkDialogControl.getDescription());
+							projectType.setNamespace(newFrameworkDialogControl.getNamespace());
+							try {
+								buildTabs();
+								getMiscellaneousPC().newElement(projectType, "ProjectType_");
+								Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
+								tabs.repaint();
+								MainFrameControl16.this.setMainframeText(projectType.getId());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					}
+				}
+			});
+			newFrameworkDialogControl.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -243,12 +269,14 @@ public class MainFrameControl16 extends Control16 {
 				try {
 					Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
 					Editor16.getLoader16().load(schema, frameworkFile);
+					buildTabs();
+					Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
+					tabs.repaint();
 				} catch (SAXParseException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-				Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
 			} else if (version.equals("1.2")) {
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
 				InputSource schema = new InputSource(new FileInputStream("_3_12.xsd"));
@@ -262,6 +290,7 @@ public class MainFrameControl16 extends Control16 {
 				}
 				Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
 			}
+			setMainframeText(frameworkFile.getName());
 		}
 
 	}
@@ -354,6 +383,7 @@ public class MainFrameControl16 extends Control16 {
 			if (frameworkFile != null) {
 				Editor16.getLoader16().marshal(new PrintStream(frameworkFile));
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
+				setMainframeText(frameworkFile.getName());
 			}
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(fileChooser, e.getMessage(), "Exception handling", JOptionPane.ERROR_MESSAGE);
@@ -546,5 +576,10 @@ public class MainFrameControl16 extends Control16 {
 			btn_NavigateBackward.setEnabled(!backwardStack.isEmpty());
 			btn_NavigateForward.setEnabled(!forwardStack.isEmpty());
 		}
+	}
+
+	private void setMainframeText(String text) {
+		String prefix = getBundle().getString("lbl_InteractionFrameworkEditor");
+		frame.setTitle(prefix + " - " + text);
 	}
 }

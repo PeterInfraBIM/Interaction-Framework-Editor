@@ -9,12 +9,14 @@
 			<gridbagconstraints Fill="GridBagConstraints.BOTH"
 				Gridx="0" Gridy="0" Weightx="1.0" />
 			<buttongroup id="visiVersion">
-				<radiobutton id="rdb_V14" text="1.4">
+				<radiobutton id="rdb_V14" text="1.4"
+					FocusPainted="false">
 					<gridbagconstraints
 						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
 						Insets="4,4,4,4" Weightx="1.0" />
 				</radiobutton>
-				<radiobutton id="rdb_V16" text="1.6">
+				<radiobutton id="rdb_V16" text="1.6" Selected="true"
+					FocusPainted="false">
 					<gridbagconstraints
 						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1"
 						Insets="4,4,4,4" Weightx="1.0" />
@@ -48,9 +50,15 @@
 					Insets="4,4,4,4" Weightx="1.0" />
 			</textfield>
 		</panel>
-		<panel layout="GridBagLayout">
+		<panel layout="BorderLayout">
 			<gridbagconstraints Fill="GridBagConstraints.BOTH"
 				Gridx="0" Gridy="2" Weightx="1.0" Weighty="1.0" />
+			<panel layout="BorderLayout" constraints="BorderLayout.SOUTH">
+				<button id="btn_Cancel" constraints="BorderLayout.WEST"
+					Text="lbl_Cancel"></button>
+				<button id="btn_Create" constraints="BorderLayout.EAST"
+					Text="lbl_Create"></button>
+			</panel>
 		</panel>
 	</panel>
 </dialog>
