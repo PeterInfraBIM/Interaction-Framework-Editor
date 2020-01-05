@@ -24,7 +24,7 @@
 			</buttongroup>
 		</panel>
 		<panel Layout="GridBagLayout"
-			Border="TitledBorder(lbl_Attributes)">
+			Border="TitledBorder(lbl_MandatoryAttributes)">
 			<gridbagconstraints Fill="GridBagConstraints.BOTH"
 				Gridx="0" Gridy="1" Weightx="1.0" />
 			<label Text="lbl_Namespace">

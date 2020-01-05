@@ -1,5 +1,7 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
@@ -17,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Stack;
 
 import javax.swing.JButton;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -60,7 +63,8 @@ public class MainFrameControl16 extends Control16 {
 	private JFileChooser fileChooser, reportChooser;
 	JTabbedPane tabs;
 	private JTextField tfd_User;
-	private JButton btn_NavigateBackward, btn_NavigateForward, btn_XsdCheck, btn_Print, btn_Report;
+	private JButton btn_NavigateBackward, btn_NavigateForward, btn_XsdCheck, btn_Print, btn_Report, btn_NewFramework,
+			btn_SaveFramework, btn_SaveAsFramework;
 	private File frameworkFile, excelFile;
 	private String version;
 
@@ -207,11 +211,7 @@ public class MainFrameControl16 extends Control16 {
 	}
 
 	public void newFramework() {
-		Editor16.getStore16().clear();
-		frameworkFile = null;
-		btn_XsdCheck.setEnabled(false);
-		btn_Print.setEnabled(true);
-		btn_Report.setEnabled(true);
+		btn_NewFramework.setEnabled(false);
 		try {
 			final NewFrameworkDialogControl newFrameworkDialogControl = new NewFrameworkDialogControl();
 			newFrameworkDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
@@ -225,6 +225,13 @@ public class MainFrameControl16 extends Control16 {
 							projectType.setDescription(newFrameworkDialogControl.getDescription());
 							projectType.setNamespace(newFrameworkDialogControl.getNamespace());
 							try {
+								Editor16.getStore16().clear();
+								frameworkFile = null;
+								btn_SaveFramework.setEnabled(true);
+								btn_SaveAsFramework.setEnabled(true);
+								btn_XsdCheck.setEnabled(false);
+								btn_Print.setEnabled(true);
+								btn_Report.setEnabled(true);
 								buildTabs();
 								getMiscellaneousPC().newElement(projectType, "ProjectType_");
 								Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
@@ -235,6 +242,7 @@ public class MainFrameControl16 extends Control16 {
 							}
 						}
 					}
+					btn_NewFramework.setEnabled(true);
 				}
 			});
 			newFrameworkDialogControl.setVisible(true);
@@ -258,14 +266,16 @@ public class MainFrameControl16 extends Control16 {
 		int returnVal = fileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			frameworkFile = fileChooser.getSelectedFile();
-			btn_XsdCheck.setEnabled(true);
-			btn_Print.setEnabled(true);
-			btn_Report.setEnabled(true);
 
 			checkOnVersion(frameworkFile);
 			if (version.equals("1.6")) {
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
 				InputSource schema = new InputSource(new FileInputStream("_3_16.xsd"));
+				btn_SaveFramework.setEnabled(true);
+				btn_SaveAsFramework.setEnabled(true);
+				btn_XsdCheck.setEnabled(true);
+				btn_Print.setEnabled(true);
+				btn_Report.setEnabled(true);
 				try {
 					Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
 					Editor16.getLoader16().load(schema, frameworkFile);
@@ -280,6 +290,11 @@ public class MainFrameControl16 extends Control16 {
 			} else if (version.equals("1.2")) {
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
 				InputSource schema = new InputSource(new FileInputStream("_3_12.xsd"));
+				btn_SaveFramework.setEnabled(true);
+				btn_SaveAsFramework.setEnabled(true);
+				btn_XsdCheck.setEnabled(true);
+				btn_Print.setEnabled(true);
+				btn_Report.setEnabled(true);
 				try {
 					Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
 					Editor16.getLoader16().load(schema, frameworkFile);
@@ -428,18 +443,18 @@ public class MainFrameControl16 extends Control16 {
 
 	public void print() {
 		PrinterJob job = PrinterJob.getPrinterJob();
-		job.setPrintable(new PrintDiagram());
+		job.setPrintable(new PrintRolesDiagram());
 		boolean doPrint = job.printDialog();
 		if (doPrint) {
 			try {
 				job.print();
 			} catch (PrinterException e) {
-				// The job did not successfully complete
+				e.printStackTrace();
 			}
 		}
 	}
 
-	class PrintDiagram implements Printable {
+	class PrintTransactionsDiagram implements Printable {
 
 		@Override
 		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
@@ -462,8 +477,46 @@ public class MainFrameControl16 extends Control16 {
 
 			// Now we perform our rendering
 			// graphics.drawString("Hello world!", 100, 100);
-			Canvas drawingPlane = transactionsPC.getDrawingPlane();
-			drawingPlane.paintComponent(graphics);
+			nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.Canvas transactionsDrawingPlane = transactionsPC
+					.getDrawingPlane();
+			transactionsDrawingPlane.paintComponent(graphics);
+
+			// tell the caller that this page is part
+			// of the printed document
+			return PAGE_EXISTS;
+		}
+	}
+
+	class PrintRolesDiagram implements Printable {
+
+		@Override
+		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+
+			// We have only one page, and 'page'
+			// is zero-based
+			tabs.setSelectedIndex(Tabs.Roles.ordinal());
+			int rowCount = rolesPC.tbl_Elements.getRowCount();
+			if (pageIndex > rowCount - 1) {
+				return NO_SUCH_PAGE;
+			}
+			rolesPC.tbl_Elements.getSelectionModel().setSelectionInterval(pageIndex, pageIndex);
+
+			// User (0,0) is typically outside the
+			// imageable area, so we must translate
+			// by the X and Y values in the PageFormat
+			// to avoid clipping.
+			nl.visi.interaction_framework.editor.v16.RolesPanelControl16.Canvas rolesDrawingPlane = rolesPC
+					.getDrawingPlane();
+			rolesDrawingPlane.setSize((int) pageFormat.getImageableWidth(), (int) pageFormat.getImageableHeight());
+			Graphics2D g2d = (Graphics2D) graphics;
+			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+			g2d.scale(0.8, 0.8);
+
+			// Now we perform our rendering
+			// graphics.drawString("Hello world!", 100, 100);
+			rolesDrawingPlane.setCurrentRole(null);
+			System.out.println("pageIndex=" + pageIndex);
+			rolesDrawingPlane.paintComponent(graphics);
 
 			// tell the caller that this page is part
 			// of the printed document

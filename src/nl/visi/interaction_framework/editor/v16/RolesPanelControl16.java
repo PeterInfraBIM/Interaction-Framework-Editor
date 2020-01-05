@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
@@ -20,22 +21,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.RowSorter;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.RowSorterEvent;
-import javax.swing.event.RowSorterEvent.Type;
-import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableColumn;
-import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -73,6 +70,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		private int offsetLeft = 220;
 		private int yInitStart = 200;
 		private int yHeight = 0;
+		private int lineHeight = 15;
 
 		private class Transaction {
 			private int x, y;
@@ -168,6 +166,13 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 						Editor16.getMainFrameControl().navigate(transactionType);
 					}
 				});
+
+				Graphics2D g2d = (Graphics2D) g;
+				AffineTransform old = g2d.getTransform();
+				g2d.rotate(Math.toRadians(90), x, y);
+				g.drawString(label, x, y);
+				g2d.setTransform(old);
+
 				canvas.add(activeLabel);
 				transactionMap.put(transactionType.getId(), this);
 			}
@@ -202,6 +207,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			private RoleTypeType executor;
 			private boolean initiatorToExecutor;
 			private String label;
+			private Font font;
 			private Condition condition;
 			private int index = 0;
 
@@ -223,10 +229,10 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				} else {
 					other = initiator.getDescription();
 				}
-				Font font = new Font("Dialog", Font.PLAIN, 11);
+				font = new Font("Dialog", Font.PLAIN, 11);
 				String rolOther = shorten(g, other, font, offsetLeft - 150);
 				String msglabel = shorten(g, getMessage(mitt).getDescription(), font, offsetLeft - 120);
-				String label = "[" + rolOther + "] " + msglabel;
+				label = "[" + rolOther + "] " + msglabel;
 
 				RotatingButton activeLabel = new RotatingButton(label);
 				activeLabel.setToolTipText("[" + other + "] " + getMessage(mitt).getDescription());
@@ -254,7 +260,13 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 						Editor16.getMainFrameControl().navigate(getMessage(mitt));
 					}
 				});
+//				Color saveColor = g.getColor();
+//				g.setColor(Color.WHITE);
+//				g.fillRect(x, y + 3, g.getFontMetrics(font).stringWidth(label), lineHeight);
+//				g.setColor(saveColor);
+				g.drawString(label, x, y + lineHeight);
 				canvas.add(activeLabel);
+				canvas.validate();
 				// -------------------------------------------------
 
 				messageItemMap.put(mitt.getId(), this);
@@ -308,10 +320,12 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			messages = new ArrayList<RolesPanelControl16.Canvas.MessageItem>();
 		}
 
+		public Graphics2D g2d;
+
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-			Graphics2D g2d = (Graphics2D) g;
+			g2d = (Graphics2D) g;
 			if (selectedElement == null) {
 				reset(g2d);
 				return;
@@ -325,7 +339,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
 				for (int index = 0; index < transactionsRowCount; index++) {
 					TransactionTypeType transactionTypeType = transactionsTableModel.get(index);
-					transactions.add(new Transaction(this, g, transactionTypeType,
+					transactions.add(new Transaction(this, g2d, transactionTypeType,
 							offsetLeft + transactionWidth * (index + 1) - transactionWidth / 2, 25));
 				}
 
@@ -333,7 +347,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					MessageInTransactionTypeType mitt = messagesTableModel.get(index);
 					MessageTypeType messageType = getMessage(mitt);
 					if (messageType != null) {
-						messages.add(new MessageItem(this, g, mitt, 20, index * 15 + yInitStart - 12));
+						messages.add(new MessageItem(this, g2d, mitt, 20, index * 15 + yInitStart - 12));
 					}
 				}
 			} else {
@@ -352,6 +366,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				title = selectedElement.getId();
 			}
 			int titleWidth = g2d.getFontMetrics().stringWidth(title);
+			System.out.println("width=" + getWidth());
 			g2d.drawString(title, (getWidth() - titleWidth) / 2, 18);
 
 			for (Transaction transaction : transactions) {
@@ -363,10 +378,10 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				Transaction transaction = messageItem.getTransaction();
 				titleWidth = g2d.getFontMetrics().stringWidth(messageItem.label);
 				int lineX = 20;
-				int lineY = lineNumber * 15 + yInitStart;
+				int lineY = lineNumber * lineHeight + yInitStart;
 				// g2d.drawString(messageItem.label, lineX, lineY);
 
-				g2d.drawLine(lineX, lineY, transaction.x, lineY);
+				g2d.drawLine(titleWidth + lineX + 2, lineY, transaction.x, lineY);
 				if (messageItem.isIn()) {
 					int[] xsPoints = { lineX - 5, lineX - 12, lineX - 12 };
 					int[] ysPoints = { lineY, lineY - 4, lineY + 4 };
@@ -1133,7 +1148,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
 		inSelection = true;
-		
+
 		selectedRow = tbl_Elements.getSelectedRow();
 		if (selectedRow >= 0) {
 			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
@@ -1284,5 +1299,9 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 		Editor16.getStore16().remove(roleType.getId());
 		elementsTableModel.remove(row);
+	}
+
+	public Canvas getDrawingPlane() {
+		return drawingPlane;
 	}
 }

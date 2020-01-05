@@ -11,6 +11,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
+import javax.swing.event.DocumentEvent;
 
 public class NewFrameworkDialogControl extends Control16 {
 	private static final String NEW_FRAMEWORK_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewFrameworkDialog.xml";
@@ -19,12 +20,27 @@ public class NewFrameworkDialogControl extends Control16 {
 	private JTextField tfd_Description, tfd_Namespace;
 	private JButton btn_Cancel, btn_Create;
 	private JRadioButton rdb_V14, rdb_V16;
+	private boolean discriptionEmpty = false, namespaceEmpty = false;
 
 	public NewFrameworkDialogControl() throws Exception {
 		super();
 		dialog = (JDialog) render(NEW_FRAMEWORK_DIALOG);
 		JRootPane rootPane = SwingUtilities.getRootPane(btn_Create);
 		rootPane.setDefaultButton(btn_Create);
+		tfd_Description.getDocument().addDocumentListener(new DocumentAdapter16() {
+			@Override
+			protected void update(DocumentEvent e) {
+				discriptionEmpty = e.getDocument().getLength() == 0;
+				enableCreateButton();
+			}
+		});
+		tfd_Namespace.getDocument().addDocumentListener(new DocumentAdapter16() {
+			@Override
+			protected void update(DocumentEvent e) {
+				namespaceEmpty = e.getDocument().getLength() == 0;
+				enableCreateButton();
+			}
+		});
 		btn_Create.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -47,6 +63,11 @@ public class NewFrameworkDialogControl extends Control16 {
 			}
 		});
 		clear();
+		enableCreateButton();
+	}
+
+	private void enableCreateButton() {
+		btn_Create.setEnabled(!discriptionEmpty && !namespaceEmpty);
 	}
 
 	public String getDescription() {
