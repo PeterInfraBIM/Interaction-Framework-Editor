@@ -16,6 +16,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.swing.JButton;
@@ -488,39 +490,60 @@ public class MainFrameControl16 extends Control16 {
 	}
 
 	class PrintRolesDiagram implements Printable {
+		private static final int LINES_PER_PAGE = 50;
+		private List<PrintPage> pageList;
+
+		class PrintPage {
+			private final int elementIndex;
+			private final int startLine;
+
+			public PrintPage(int elementIndex, int startLine) {
+				this.elementIndex = elementIndex;
+				this.startLine = startLine;
+			}
+		}
+
+		public PrintRolesDiagram() {
+			this.pageList = new ArrayList<>();
+			tabs.setSelectedIndex(Tabs.Roles.ordinal());
+			int elementCount = rolesPC.tbl_Elements.getRowCount();
+			for (int elementIndex = 0; elementIndex < elementCount; elementIndex++) {
+				int messageCount = getMessageCount(elementIndex);
+				int pagesPerElement = (int) (Math.floor(messageCount / LINES_PER_PAGE) + 1);
+				int startLine = 0;
+				for (int page = 0; page < pagesPerElement; page++) {
+					pageList.add(new PrintPage(elementIndex, startLine));
+					startLine += LINES_PER_PAGE;
+				}
+			}
+		}
 
 		@Override
 		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
-
-			// We have only one page, and 'page'
-			// is zero-based
-			tabs.setSelectedIndex(Tabs.Roles.ordinal());
-			int rowCount = rolesPC.tbl_Elements.getRowCount();
-			if (pageIndex > rowCount - 1) {
+			if (pageIndex > pageList.size() - 1) {
+				System.out.println("NO_SUCH_PAGE");
 				return NO_SUCH_PAGE;
 			}
-			rolesPC.tbl_Elements.getSelectionModel().setSelectionInterval(pageIndex, pageIndex);
 
-			// User (0,0) is typically outside the
-			// imageable area, so we must translate
-			// by the X and Y values in the PageFormat
-			// to avoid clipping.
 			nl.visi.interaction_framework.editor.v16.RolesPanelControl16.Canvas rolesDrawingPlane = rolesPC
 					.getDrawingPlane();
 			rolesDrawingPlane.setSize((int) pageFormat.getImageableWidth(), (int) pageFormat.getImageableHeight());
 			Graphics2D g2d = (Graphics2D) graphics;
 			g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 			g2d.scale(0.8, 0.8);
-
-			// Now we perform our rendering
-			// graphics.drawString("Hello world!", 100, 100);
+			getMessageCount(pageList.get(pageIndex).elementIndex);
 			rolesDrawingPlane.setCurrentRole(null);
-			System.out.println("pageIndex=" + pageIndex);
-			rolesDrawingPlane.paintComponent(graphics);
+			rolesDrawingPlane.print(graphics, pageList.get(pageIndex).startLine, LINES_PER_PAGE);
 
-			// tell the caller that this page is part
-			// of the printed document
+			System.out.println("PAGE_EXISTS");
 			return PAGE_EXISTS;
+		}
+
+		private int getMessageCount(int elementIndex) {
+			rolesPC.tbl_Elements.getSelectionModel().setSelectionInterval(elementIndex, elementIndex);
+			rolesPC.selectedElement = rolesPC.elementsTableModel.get(elementIndex);
+			rolesPC.fillMessagesTable();
+			return rolesPC.tbl_Messages.getRowCount();
 		}
 	}
 

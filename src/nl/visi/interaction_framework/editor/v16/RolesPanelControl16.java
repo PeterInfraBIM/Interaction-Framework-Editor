@@ -50,7 +50,11 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	private JTabbedPane relationsTabs;
 	private JPanel startDatePanel, endDatePanel, canvas;
-	private JTable tbl_Transactions, tbl_Messages, tbl_Conditions;
+	private JTable tbl_Transactions;
+
+	JTable tbl_Messages;
+
+	private JTable tbl_Conditions;
 	private JTextField tfd_ResponsibilityScope, tfd_ResponsibilityTask, tfd_ResponsibilitySupportTask,
 			tfd_ResponsibilityFeedback;
 	private TransactionsTableModel transactionsTableModel;
@@ -71,6 +75,8 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		private int yInitStart = 200;
 		private int yHeight = 0;
 		private int lineHeight = 15;
+		private int startLine = -1;
+		private int linesPerPage = -1;
 
 		private class Transaction {
 			private int x, y;
@@ -344,10 +350,21 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				}
 
 				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
-					MessageInTransactionTypeType mitt = messagesTableModel.get(index);
-					MessageTypeType messageType = getMessage(mitt);
-					if (messageType != null) {
-						messages.add(new MessageItem(this, g2d, mitt, 20, index * 15 + yInitStart - 12));
+					if (startLine == -1) {
+						MessageInTransactionTypeType mitt = messagesTableModel.get(index);
+						MessageTypeType messageType = getMessage(mitt);
+						if (messageType != null) {
+							messages.add(new MessageItem(this, g2d, mitt, 20, index * 15 + yInitStart - 12));
+						}
+					} else {
+						if (index >= startLine && index < startLine + linesPerPage) {
+							MessageInTransactionTypeType mitt = messagesTableModel.get(index);
+							MessageTypeType messageType = getMessage(mitt);
+							if (messageType != null) {
+								messages.add(new MessageItem(this, g2d, mitt, 20,
+										(index - startLine) * 15 + yInitStart - 12));
+							}
+						}
 					}
 				}
 			} else {
@@ -379,6 +396,12 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				titleWidth = g2d.getFontMetrics().stringWidth(messageItem.label);
 				int lineX = 20;
 				int lineY = lineNumber * lineHeight + yInitStart;
+//				if (startLine != -1) {
+//					if (lineNumber < startLine || lineNumber > startLine + linesPerPage) {
+//						continue;
+//					}
+//					lineY -= startLine * lineHeight;
+//				}
 				// g2d.drawString(messageItem.label, lineX, lineY);
 
 				g2d.drawLine(titleWidth + lineX + 2, lineY, transaction.x, lineY);
@@ -404,81 +427,86 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 							Transaction actionTransaction = transactionMap
 									.get(RolesPanelControl16.getTransaction(action).getId());
 							MessageItem actionMessage = messageItemMap.get(action.getId());
-							int actionY = actionMessage.index * 15 + yInitStart;
-							boolean sameTransaction = transaction == actionTransaction;
-							int disp = 0;
-							if (sameTransaction) {
-								// disp = 3 * transaction.routeCount++;
-								if (lineY < actionY) {
-									disp = 4 * transaction.addInterval(lineY + 4, actionY - 4);
-									g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
-									g2d.drawArc(transaction.x - 4 + disp, lineY, 8, 8, 90, -90);
-									g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
-											actionTransaction.x + 4 + disp, actionY - 4);
-									g2d.drawArc(actionTransaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
-									g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
-								} else {
-									disp = 4 * transaction.addInterval(lineY - 4, actionY + 4);
-									g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
-									g2d.drawArc(transaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
-									g2d.drawLine(transaction.x + 4 + disp, lineY - 4, actionTransaction.x + 4 + disp,
-											actionY + 4);
-									g2d.drawArc(actionTransaction.x - 4 + disp, actionY, 8, 8, 0, 90);
-									g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
-								}
-							} else {
-								if (lineY < actionY) {
-									if (transaction.x > actionTransaction.x) {
+							if (actionMessage != null) {
+								int actionY = actionMessage.index * 15 + yInitStart;
+								boolean sameTransaction = transaction == actionTransaction;
+								int disp = 0;
+								if (sameTransaction) {
+									// disp = 3 * transaction.routeCount++;
+									if (lineY < actionY) {
 										disp = 4 * transaction.addInterval(lineY + 4, actionY - 4);
-										// disp = 3 * transaction.routeCount++;
 										g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
 										g2d.drawArc(transaction.x - 4 + disp, lineY, 8, 8, 90, -90);
-										g2d.drawLine(transaction.x + 4 + disp, lineY + 4, transaction.x + 4 + disp,
-												actionY - 4);
-										g2d.drawArc(transaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
-										g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
-										int[] xPoints = { transaction.x - 12, transaction.x - 5, transaction.x - 5 };
-										int[] yPoints = { actionY, actionY - 4, actionY + 4 };
-										g2d.fillPolygon(xPoints, yPoints, 3);
-									} else {
-										disp = 4 * actionTransaction.addInterval(lineY + 4, actionY - 4);
-										// disp = 3 * actionTransaction.routeCount++;
-										g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x + disp, lineY);
-										g2d.drawArc(actionTransaction.x - 4 + disp, lineY, 8, 8, 90, -90);
 										g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
 												actionTransaction.x + 4 + disp, actionY - 4);
 										g2d.drawArc(actionTransaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
-										int[] xsPoints = { actionTransaction.x - 5, actionTransaction.x - 12,
-												actionTransaction.x - 12 };
-										int[] ysPoints = { lineY, lineY - 4, lineY + 4 };
-										g2d.fillPolygon(xsPoints, ysPoints, 3);
-									}
-								} else if (lineY > actionY) {
-									if (transaction.x > actionTransaction.x) {
+										g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
+									} else {
 										disp = 4 * transaction.addInterval(lineY - 4, actionY + 4);
-										// disp = 3 * transaction.routeCount++;
 										g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
 										g2d.drawArc(transaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
-										g2d.drawLine(transaction.x + 4 + disp, lineY - 4, transaction.x + 4 + disp,
-												actionY + 4);
-										g2d.drawArc(transaction.x - 4 + disp, actionY, 8, 8, 0, 90);
-										g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
-										int[] xPoints = { transaction.x - 12, transaction.x - 5, transaction.x - 5 };
-										int[] yPoints = { actionY, actionY - 4, actionY + 4 };
-										g2d.fillPolygon(xPoints, yPoints, 3);
-									} else {
-										disp = 4 * actionTransaction.addInterval(lineY - 4, actionY + 4);
-										// disp = 3 * actionTransaction.routeCount++;
-										g2d.drawLine(transaction.x, lineY, actionTransaction.x + disp, lineY);
-										g2d.drawArc(actionTransaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
-										g2d.drawLine(actionTransaction.x + 4 + disp, lineY - 4,
+										g2d.drawLine(transaction.x + 4 + disp, lineY - 4,
 												actionTransaction.x + 4 + disp, actionY + 4);
 										g2d.drawArc(actionTransaction.x - 4 + disp, actionY, 8, 8, 0, 90);
 										g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x, actionY);
-										int[] xPoints = { actionTransaction.x - 5, actionTransaction.x - 12,
-												actionTransaction.x - 12 };
-										int[] yPoints = { lineY, lineY - 4, lineY + 4 };
-										g2d.fillPolygon(xPoints, yPoints, 3);
+									}
+								} else {
+									if (lineY < actionY) {
+										if (transaction.x > actionTransaction.x) {
+											disp = 4 * transaction.addInterval(lineY + 4, actionY - 4);
+											// disp = 3 * transaction.routeCount++;
+											g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
+											g2d.drawArc(transaction.x - 4 + disp, lineY, 8, 8, 90, -90);
+											g2d.drawLine(transaction.x + 4 + disp, lineY + 4, transaction.x + 4 + disp,
+													actionY - 4);
+											g2d.drawArc(transaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
+											g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
+											int[] xPoints = { transaction.x - 12, transaction.x - 5,
+													transaction.x - 5 };
+											int[] yPoints = { actionY, actionY - 4, actionY + 4 };
+											g2d.fillPolygon(xPoints, yPoints, 3);
+										} else {
+											disp = 4 * actionTransaction.addInterval(lineY + 4, actionY - 4);
+											// disp = 3 * actionTransaction.routeCount++;
+											g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x + disp, lineY);
+											g2d.drawArc(actionTransaction.x - 4 + disp, lineY, 8, 8, 90, -90);
+											g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
+													actionTransaction.x + 4 + disp, actionY - 4);
+											g2d.drawArc(actionTransaction.x - 4 + disp, actionY - 8, 8, 8, 0, -90);
+											int[] xsPoints = { actionTransaction.x - 5, actionTransaction.x - 12,
+													actionTransaction.x - 12 };
+											int[] ysPoints = { lineY, lineY - 4, lineY + 4 };
+											g2d.fillPolygon(xsPoints, ysPoints, 3);
+										}
+									} else if (lineY > actionY) {
+										if (transaction.x > actionTransaction.x) {
+											disp = 4 * transaction.addInterval(lineY - 4, actionY + 4);
+											// disp = 3 * transaction.routeCount++;
+											g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
+											g2d.drawArc(transaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
+											g2d.drawLine(transaction.x + 4 + disp, lineY - 4, transaction.x + 4 + disp,
+													actionY + 4);
+											g2d.drawArc(transaction.x - 4 + disp, actionY, 8, 8, 0, 90);
+											g2d.drawLine(transaction.x + disp, actionY, actionTransaction.x, actionY);
+											int[] xPoints = { transaction.x - 12, transaction.x - 5,
+													transaction.x - 5 };
+											int[] yPoints = { actionY, actionY - 4, actionY + 4 };
+											g2d.fillPolygon(xPoints, yPoints, 3);
+										} else {
+											disp = 4 * actionTransaction.addInterval(lineY - 4, actionY + 4);
+											// disp = 3 * actionTransaction.routeCount++;
+											g2d.drawLine(transaction.x, lineY, actionTransaction.x + disp, lineY);
+											g2d.drawArc(actionTransaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
+											g2d.drawLine(actionTransaction.x + 4 + disp, lineY - 4,
+													actionTransaction.x + 4 + disp, actionY + 4);
+											g2d.drawArc(actionTransaction.x - 4 + disp, actionY, 8, 8, 0, 90);
+											g2d.drawLine(actionTransaction.x + disp, actionY, actionTransaction.x,
+													actionY);
+											int[] xPoints = { actionTransaction.x - 5, actionTransaction.x - 12,
+													actionTransaction.x - 12 };
+											int[] yPoints = { lineY, lineY - 4, lineY + 4 };
+											g2d.fillPolygon(xPoints, yPoints, 3);
+										}
 									}
 								}
 							}
@@ -501,14 +529,16 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				yHeight = lineY;
 			}
 
-			int height = preferredSize.height;
-			int width = preferredSize.width;
-			preferredSize = new Dimension(width, yInitStart + yHeight + 20);
+			if (startLine == -1) {
+				int height = preferredSize.height;
+				int width = preferredSize.width;
+				preferredSize = new Dimension(width, yInitStart + yHeight + 20);
 
-			if (height != preferredSize.height || width != preferredSize.width) {
-				setSize(getPreferredSize());
-				canvas.invalidate();
-				canvas.repaint();
+				if (height != preferredSize.height || width != preferredSize.width) {
+					setSize(getPreferredSize());
+					canvas.invalidate();
+					canvas.repaint();
+				}
 			}
 
 		}
@@ -540,6 +570,18 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 		public void setCurrentRole(Object object) {
 			this.currentRole = null;
+		}
+
+		public int getMessageCount() {
+			return messages.size();
+		}
+
+		public void print(Graphics graphics, int startLine, int linesPerPage) {
+			this.startLine = startLine;
+			this.linesPerPage = linesPerPage;
+			paintComponent(graphics);
+			this.startLine = -1;
+			this.linesPerPage = -1;
 		}
 	}
 
@@ -1235,7 +1277,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		inSelection = false;
 	}
 
-	private void fillMessagesTable() {
+	void fillMessagesTable() {
 		messagesTableModel.clear();
 		List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
