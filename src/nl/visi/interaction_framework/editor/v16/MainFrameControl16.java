@@ -1,7 +1,5 @@
 package nl.visi.interaction_framework.editor.v16;
 
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.print.PageFormat;
@@ -21,7 +19,6 @@ import java.util.List;
 import java.util.Stack;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -44,7 +41,6 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.Canvas;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi_1_1a.interaction_framework.importer.Transform;
@@ -180,19 +176,28 @@ public class MainFrameControl16 extends Control16 {
 
 	private void buildTabs() throws Exception {
 		rolesPC = new RolesPanelControl16();
+		rolesPanel.removeAll();
 		rolesPanel.add(rolesPC.getPanel());
 		transactionsPC = new TransactionsPanelControl16();
+		transactionsPanel.removeAll();
 		transactionsPanel.add(transactionsPC.getPanel());
 		messagesPC = new MessagesPanelControl16();
+		messagesPanel.removeAll();
 		messagesPanel.add(messagesPC.getPanel());
 		complexElementsPC = new ComplexElementsPanelControl16();
+		complexElementsPanel.removeAll();
 		complexElementsPanel.add(complexElementsPC.getPanel());
 		simpleElementsPC = new SimpleElementsPanelControl16();
+		simpleElementsPanel.removeAll();
 		simpleElementsPanel.add(simpleElementsPC.getPanel());
 		userDefinedTypesPC = new UserDefinedTypesPanelControl16();
+		userDefinedTypesPanel.removeAll();
 		userDefinedTypesPanel.add(userDefinedTypesPC.getPanel());
 		miscellaneousPC = new MiscellaneousPanelControl16();
+		miscellaneousPanel.removeAll();
 		miscellaneousPanel.add(miscellaneousPC.getPanel());
+		tabs.invalidate();
+		tabs.repaint();
 	}
 
 	private Runnable doRun = new Runnable() {
@@ -283,7 +288,6 @@ public class MainFrameControl16 extends Control16 {
 					Editor16.getLoader16().load(schema, frameworkFile);
 					buildTabs();
 					Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
-					tabs.repaint();
 				} catch (SAXParseException e) {
 					e.printStackTrace();
 				} catch (Exception e) {
