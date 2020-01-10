@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dialog id="newConditionDialog" Size="480,360"
+	Title="lbl_NewConditionDialog" Modal="true"
+	DefaultCloseOperation="JFrame.EXIT_ON_CLOSE"
+	bundle="nl.visi.interaction_framework.editor.locale.Editor"
+	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel">
+	<panel layout="GridBagLayout" border="EmptyBorder(8,8,8,8)">
+		<panel Layout="GridBagLayout"
+			Border="TitledBorder(lbl_ConditionType)">
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="0" Weightx="1.0" />
+			<combobox id="cbx_ConditionType">
+				<gridbagconstraints
+					Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
+					Insets="4,4,4,4" Weightx="1.0" />
+			</combobox>
+		</panel>
+		<panel Layout="GridBagLayout" Border="TitledBorder(lbl_Value)">
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="1" Weightx="1.0" />
+			<label Text="lbl_Transaction">
+				<gridbagconstraints
+					Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+					Insets="4,4,4,4" />
+			</label>
+			<combobox id="cbx_Transaction">
+				<gridbagconstraints
+					Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
+					Insets="4,4,4,4" Weightx="1.0" />
+			</combobox>
+			<label Text="lbl_Message">
+				<gridbagconstraints
+					Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
+					Insets="4,4,4,4" />
+			</label>
+			<combobox id="cbx_Message">
+				<gridbagconstraints
+					Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
+					Insets="4,4,4,4" Weightx="1.0" />
+			</combobox>
+			<label Text="lbl_Mitt">
+				<gridbagconstraints
+					Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="2"
+					Insets="4,4,4,4" />
+			</label>
+			<combobox id="cbx_MessageInTransaction">
+				<gridbagconstraints
+					Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
+					Insets="4,4,4,4" Weightx="1.0" />
+			</combobox>
+		</panel>
+		<panel layout="BorderLayout">
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="2" Weightx="1.0" Weighty="1.0" />
+			<panel layout="BorderLayout" constraints="BorderLayout.SOUTH">
+				<button id="btn_Cancel" constraints="BorderLayout.WEST"
+					Text="lbl_Cancel"></button>
+				<button id="btn_Create" constraints="BorderLayout.EAST"
+					Text="lbl_Create"></button>
+			</panel>
+		</panel>
+	</panel>
+</dialog>

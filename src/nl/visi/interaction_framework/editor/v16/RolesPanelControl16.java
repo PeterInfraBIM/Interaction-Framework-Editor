@@ -39,9 +39,11 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
+import nl.visi.interaction_framework.editor.v16.MainFrameControl16.Tabs;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageTypeType;
+import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
 
@@ -57,6 +59,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private JTable tbl_Conditions;
 	private JTextField tfd_ResponsibilityScope, tfd_ResponsibilityTask, tfd_ResponsibilitySupportTask,
 			tfd_ResponsibilityFeedback;
+	private JButton btn_RemoveCondition, btn_AddCondition;
 	private TransactionsTableModel transactionsTableModel;
 	private MessagesTableModel messagesTableModel;
 	private ConditionsTableModel conditionsTableModel;
@@ -1115,23 +1118,19 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			int selectedRow = tbl_Messages.getSelectedRow();
+			int selectedRow = tbl_Messages.getSelectedRow() > -1
+					? tbl_Messages.getRowSorter().convertRowIndexToModel(tbl_Messages.getSelectedRow())
+					: -1;
+			// int selectedRow = tbl_Messages.getSelectedRow();
 			boolean selectedMessage = selectedRow >= 0;
 			conditionsTableModel.clear();
 			tbl_Conditions.setEnabled(selectedMessage);
+			btn_AddCondition.setEnabled(selectedMessage);
 			if (selectedMessage) {
 				String inOut = (String) messagesTableModel.getValueAt(selectedRow, MessagesTableColumns.Type.ordinal());
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
 				Condition condition = new Condition(mitt);
 				if (inOut.contentEquals("out")) {
-					List<MessageInTransactionTypeType> triggers = condition.getTriggers();
-					if (triggers != null) {
-						for (MessageInTransactionTypeType trigger : triggers) {
-							conditionsTableModel.add(new ConditionRule(ConditionRuleType.Trigger, trigger));
-						}
-					} else {
-						conditionsTableModel.add(new ConditionRule(ConditionRuleType.Start, null));
-					}
 					List<MessageInTransactionTypeType> sendAfters = condition.getSendAfters();
 					if (sendAfters != null) {
 						for (MessageInTransactionTypeType sendAfter : sendAfters) {
@@ -1142,6 +1141,16 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					if (sendBefores != null) {
 						for (MessageInTransactionTypeType sendBefore : sendBefores) {
 							conditionsTableModel.add(new ConditionRule(ConditionRuleType.SendBefore, sendBefore));
+						}
+					}
+					List<MessageInTransactionTypeType> triggers = condition.getTriggers();
+					if (triggers != null) {
+						for (MessageInTransactionTypeType trigger : triggers) {
+							conditionsTableModel.add(new ConditionRule(ConditionRuleType.Trigger, trigger));
+						}
+					} else {
+						if (sendAfters == null && sendBefores == null) {
+							conditionsTableModel.add(new ConditionRule(ConditionRuleType.Start, null));
 						}
 					}
 				} else {
@@ -1161,7 +1170,88 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private void initConditionsTable() {
 		conditionsTableModel = new ConditionsTableModel();
 		tbl_Conditions.setModel(conditionsTableModel);
+		tbl_Conditions.setAutoCreateRowSorter(true);
 		tbl_Conditions.setFillsViewportHeight(true);
+		tbl_Conditions.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+				int selectedRow = tbl_Conditions.getSelectedRow();
+				if (selectedRow < 0) {
+					btn_RemoveCondition.setEnabled(false);
+				} else {
+					ConditionRule conditionRule = conditionsTableModel
+							.get(tbl_Conditions.getRowSorter().convertRowIndexToModel(selectedRow));
+					boolean isStopCondition = conditionRule.getType().equals(ConditionRuleType.Stop);
+					boolean isStartCondition = conditionRule.getType().equals(ConditionRuleType.Start);
+					btn_RemoveCondition.setEnabled(!isStartCondition && !isStopCondition);
+				}
+			}
+		});
+	}
+
+	public void removeCondition() {
+		int selectedRow = tbl_Conditions.getSelectedRow() > -1
+				? tbl_Conditions.getRowSorter().convertRowIndexToModel(tbl_Conditions.getSelectedRow())
+				: -1;
+		if (selectedRow > -1) {
+			int selectedMessageTableRow = tbl_Messages.getRowSorter()
+					.convertRowIndexToModel(tbl_Messages.getSelectedRow());
+			MessageInTransactionTypeType parent = messagesTableModel.get(selectedMessageTableRow);
+			ConditionRule conditionRule = conditionsTableModel.get(selectedRow);
+			switch (conditionRule.getType()) {
+			case Action:
+				removePrevious(conditionRule.getMitt(), parent);
+				break;
+			case SendAfter:
+				removeSendAfter(parent, conditionRule.getMitt());
+				break;
+			case SendBefore:
+				removeSendBefore(parent, conditionRule.getMitt());
+				break;
+			case Start:
+				// Should not occur
+				return;
+			case Stop:
+				// Should not occur
+				return;
+			case Trigger:
+				removePrevious(parent, conditionRule.getMitt());
+				break;
+			default:
+				break;
+			}
+			conditionsTableModel.elements.remove(selectedRow);
+			conditionsTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
+			messageTableSelectionListener.valueChanged(null);
+		}
+	}
+
+	public void addCondition() {
+		btn_AddCondition.setEnabled(false);
+
+		try {
+			int selectedRow = tbl_Messages.getSelectedRow();
+			int selectedRowIndex = tbl_Messages.getRowSorter().convertRowIndexToModel(selectedRow);
+			String inOut = (String) messagesTableModel.getValueAt(selectedRowIndex,
+					MessagesTableColumns.Type.ordinal());
+			final NewConditionDialogControl newFrameworkDialogControl = new NewConditionDialogControl(inOut);
+			newFrameworkDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
+					if (evt.getPropertyName().equals("btn_Create")) {
+					}
+				}
+			});
+			newFrameworkDialogControl.setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		btn_AddCondition.setEnabled(true);
 	}
 
 	private void initRolesTable() {
@@ -1279,6 +1369,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	void fillMessagesTable() {
 		messagesTableModel.clear();
+		tbl_Messages.getSelectionModel().clearSelection();
 		List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
 		if (mitts != null) {

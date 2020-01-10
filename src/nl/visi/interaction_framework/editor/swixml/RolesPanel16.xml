@@ -196,8 +196,8 @@
 					</panel>
 				</panel>
 			</scrollpane>
-			<panel
-				Border="TitledBorder(lbl_Relations)" Layout="BorderLayout">
+			<panel Border="TitledBorder(lbl_Relations)"
+				Layout="BorderLayout">
 				<tabbedpane id="relationsTabs"
 					Border="EmptyBorder(4,4,4,4)"
 					Titles="lbl_Transactions,lbl_Messages,lbl_SequenceDiagram">
@@ -238,10 +238,29 @@
 										SelectionMode="ListSelectionModel.SINGLE_SELECTION"
 										PreferredScrollableViewportSize="200,50" />
 								</scrollpane>
+								<panel Layout="GridBagLayout">
+									<gridbagconstraints
+										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
+									<button id="btn_RemoveCondition"
+										Action="removeCondition" Enabled="false" Text="lbl_Remove"
+										ToolTipText="lbl_RemoveCondition">
+										<gridbagconstraints
+											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+											Insets="0,2,2,2" Weightx="1.0" />
+									</button>
+									<button id="btn_AddCondition"
+										Action="addCondition" Text="lbl_Add"
+										ToolTipText="lbl_AddCondition" Enabled="false">
+										<gridbagconstraints
+											Anchor="GridBagConstraints.EAST" Gridx="1" Gridy="0"
+											Insets="0,2,2,2" Weightx="1.0" />
+									</button>
+								</panel>
 							</panel>
 						</tabbedpane>
 					</panel>
-					<panel id="canvas" Border="EmptyBorder(4,4,4,4)" Layout="BorderLayout" />
+					<panel id="canvas" Border="EmptyBorder(4,4,4,4)"
+						Layout="BorderLayout" />
 				</tabbedpane>
 			</panel>
 		</splitpane>

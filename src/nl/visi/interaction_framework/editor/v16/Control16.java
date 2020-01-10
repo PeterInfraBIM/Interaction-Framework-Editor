@@ -39,10 +39,12 @@ import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 abstract class Control16 {
 	public static final String RESOURCE_BUNDLE = "nl.visi.interaction_framework.editor.locale.Editor";
 	private static final ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
-	// static final java.text.DateFormat sdfDate = SimpleDateFormat.getDateInstance();
+	// static final java.text.DateFormat sdfDate =
+	// SimpleDateFormat.getDateInstance();
 	static final java.text.DateFormat sdfDate = new SimpleDateFormat("d MMM yyyy");
-	// private static final java.text.DateFormat sdfDateTime = SimpleDateFormat.getDateTimeInstance();
-	static final java.text.DateFormat sdfDateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss");	
+	// private static final java.text.DateFormat sdfDateTime =
+	// SimpleDateFormat.getDateTimeInstance();
+	static final java.text.DateFormat sdfDateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
 	private final SwingEngine swingEngine;
 	protected static final ObjectFactory objectFactory = new ObjectFactory();
 	protected static final GregorianCalendar gcal = new GregorianCalendar();
@@ -65,7 +67,7 @@ abstract class Control16 {
 			return 0;
 		}
 	};
-	
+
 	protected Comparator<String> dateTimeComparator = new Comparator<String>() {
 		@Override
 		public int compare(String o1, String o2) {
@@ -278,6 +280,31 @@ abstract class Control16 {
 		return null;
 	}
 
+	protected static int removePrevious(MessageInTransactionTypeType mitt, MessageInTransactionTypeType previousMitt) {
+		int size = 0;
+		Previous previous = mitt.getPrevious();
+		if (previous != null) {
+			List<Object> previousList = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+			for (Object object : previousList) {
+				MessageInTransactionTypeType prev = null;
+				if (object instanceof MessageInTransactionTypeType) {
+					prev = (MessageInTransactionTypeType) object;
+				} else {
+					prev = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object).getIdref();
+				}
+				if (prev.equals(previousMitt)) {
+					previousList.remove(object);
+					break;
+				}
+			}
+			size = previousList.size();
+			if (size == 0) {
+				mitt.setPrevious(null);
+			}
+		}
+		return size;
+	}
+
 	protected static List<MessageInTransactionTypeConditionType> getConditions(MessageInTransactionTypeType mitt) {
 		if (mitt != null) {
 			Conditions conditions = mitt.getConditions();
@@ -327,6 +354,50 @@ abstract class Control16 {
 		return null;
 	}
 
+	protected static void removeSendAfter(MessageInTransactionTypeType mitt,
+			MessageInTransactionTypeType sendAfterMitt) {
+		Conditions conditions = mitt.getConditions();
+		if (conditions != null) {
+			List<Object> conditionRefs = conditions
+					.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
+			boolean found = false;
+			for (Object conditionRef : conditionRefs) {
+				MessageInTransactionTypeConditionType condition = null;
+				if (conditionRef instanceof MessageInTransactionTypeConditionType) {
+					condition = (MessageInTransactionTypeConditionType) conditionRef;
+				} else {
+					condition = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) conditionRef)
+							.getIdref();
+				}
+				SendAfter sendAfter = condition.getSendAfter();
+				if (sendAfter != null) {
+					List<Object> sendAfterRefs = sendAfter.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+					for (Object sendAfterRef : sendAfterRefs) {
+						MessageInTransactionTypeType saMitt = null;
+						if (sendAfterRef instanceof MessageInTransactionTypeType) {
+							saMitt = (MessageInTransactionTypeType) sendAfterRef;
+						} else {
+							saMitt = (MessageInTransactionTypeType) (((MessageInTransactionTypeTypeRef) sendAfterRef)
+									.getIdref());
+						}
+						if (saMitt.equals(sendAfterMitt)) {
+							found = true;
+							sendAfterRefs.remove(sendAfterRef);
+							break;
+						}
+					}
+					if (sendAfterRefs.size() == 0) {
+						condition.setSendAfter(null);
+					}
+
+				}
+				if (found) {
+					return;
+				}
+			}
+		}
+	}
+
 	protected static List<MessageInTransactionTypeType> getSendBefores(MessageInTransactionTypeType mitt) {
 		List<MessageInTransactionTypeConditionType> conditions = getConditions(mitt);
 		if (conditions != null) {
@@ -351,6 +422,50 @@ abstract class Control16 {
 			}
 		}
 		return null;
+	}
+	
+	protected static void removeSendBefore(MessageInTransactionTypeType mitt,
+			MessageInTransactionTypeType sendBeforeMitt) {
+		Conditions conditions = mitt.getConditions();
+		if (conditions != null) {
+			List<Object> conditionRefs = conditions
+					.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
+			boolean found = false;
+			for (Object conditionRef : conditionRefs) {
+				MessageInTransactionTypeConditionType condition = null;
+				if (conditionRef instanceof MessageInTransactionTypeConditionType) {
+					condition = (MessageInTransactionTypeConditionType) conditionRef;
+				} else {
+					condition = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) conditionRef)
+							.getIdref();
+				}
+				SendBefore sendBefore = condition.getSendBefore();
+				if (sendBefore != null) {
+					List<Object> sendBeforeRefs = sendBefore.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+					for (Object sendBeforeRef : sendBeforeRefs) {
+						MessageInTransactionTypeType sbMitt = null;
+						if (sendBeforeRef instanceof MessageInTransactionTypeType) {
+							sbMitt = (MessageInTransactionTypeType) sendBeforeRef;
+						} else {
+							sbMitt = (MessageInTransactionTypeType) (((MessageInTransactionTypeTypeRef) sendBeforeRef)
+									.getIdref());
+						}
+						if (sbMitt.equals(sendBeforeMitt)) {
+							found = true;
+							sendBeforeRefs.remove(sendBeforeRef);
+							break;
+						}
+					}
+					if (sendBeforeRefs.size() == 0) {
+						condition.setSendBefore(null);
+					}
+
+				}
+				if (found) {
+					return;
+				}
+			}
+		}
 	}
 
 }

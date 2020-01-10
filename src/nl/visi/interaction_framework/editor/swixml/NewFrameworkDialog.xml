@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dialog id="newFrameworkDialog" Size="480,360"
-	Title="lbl_NewFrameworkDialog"
+	Title="lbl_NewFrameworkDialog" Modal="true"
 	DefaultCloseOperation="JFrame.EXIT_ON_CLOSE"
 	bundle="nl.visi.interaction_framework.editor.locale.Editor"
 	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel">
