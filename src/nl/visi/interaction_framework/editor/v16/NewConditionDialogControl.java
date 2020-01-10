@@ -231,4 +231,12 @@ public class NewConditionDialogControl extends Control16 {
 	public void setVisible(boolean visible) {
 		dialog.setVisible(visible);
 	}
+
+	public String getConditionType() {
+		return (String) cbx_ConditionType.getSelectedItem();
+	}
+
+	public MessageInTransactionTypeType getMitt() {
+		return mittsModel.getSelectedElement();
+	}
 }

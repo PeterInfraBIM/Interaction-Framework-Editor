@@ -39,11 +39,9 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
-import nl.visi.interaction_framework.editor.v16.MainFrameControl16.Tabs;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageTypeType;
-import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
 
@@ -1233,25 +1231,52 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 		try {
 			int selectedRow = tbl_Messages.getSelectedRow();
-			int selectedRowIndex = tbl_Messages.getRowSorter().convertRowIndexToModel(selectedRow);
+			final int selectedRowIndex = tbl_Messages.getRowSorter().convertRowIndexToModel(selectedRow);
 			String inOut = (String) messagesTableModel.getValueAt(selectedRowIndex,
 					MessagesTableColumns.Type.ordinal());
-			final NewConditionDialogControl newFrameworkDialogControl = new NewConditionDialogControl(inOut);
-			newFrameworkDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
+			final NewConditionDialogControl newConditionDialogControl = new NewConditionDialogControl(inOut);
+			newConditionDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
 
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
 					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
 					if (evt.getPropertyName().equals("btn_Create")) {
+						String conditionType = newConditionDialogControl.getConditionType();
+						MessageInTransactionTypeType value = newConditionDialogControl.getMitt();
+						String mittId = (String) messagesTableModel.getValueAt(selectedRowIndex,
+								MessagesTableColumns.Id.ordinal());
+						MessageInTransactionTypeType mitt = Editor16.getStore16()
+								.getElement(MessageInTransactionTypeType.class, mittId);
+						addCondition(conditionType, mitt, value);
+						conditionsTableModel.add(new ConditionRule(ConditionRuleType.valueOf(conditionType), value));
 					}
 				}
+
 			});
-			newFrameworkDialogControl.setVisible(true);
+			newConditionDialogControl.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
+
 		btn_AddCondition.setEnabled(true);
+	}
+
+	private void addCondition(String conditionType, MessageInTransactionTypeType mitt,
+			MessageInTransactionTypeType value) {
+		switch (conditionType) {
+		case "Action":
+			addPrevious(value, mitt);
+			break;
+		case "Send after":
+			break;
+		case "Send before":
+			break;
+		case "Trigger":
+			addPrevious(mitt, value);
+			break;
+		default:
+			break;
+		}
 	}
 
 	private void initRolesTable() {

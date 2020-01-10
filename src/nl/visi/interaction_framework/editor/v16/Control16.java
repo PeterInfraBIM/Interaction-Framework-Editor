@@ -280,6 +280,17 @@ abstract class Control16 {
 		return null;
 	}
 
+	protected static void addPrevious(MessageInTransactionTypeType mitt, MessageInTransactionTypeType previousMitt) {
+		Previous previous = mitt.getPrevious();
+		if (previous == null) {
+			previous = objectFactory.createMessageInTransactionTypeTypePrevious();
+			mitt.setPrevious(previous);
+		}
+		MessageInTransactionTypeTypeRef mittRef = objectFactory.createMessageInTransactionTypeTypeRef();
+		mittRef.setIdref(previousMitt);
+		previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef().add(mittRef);
+	}
+
 	protected static int removePrevious(MessageInTransactionTypeType mitt, MessageInTransactionTypeType previousMitt) {
 		int size = 0;
 		Previous previous = mitt.getPrevious();
@@ -423,7 +434,7 @@ abstract class Control16 {
 		}
 		return null;
 	}
-	
+
 	protected static void removeSendBefore(MessageInTransactionTypeType mitt,
 			MessageInTransactionTypeType sendBeforeMitt) {
 		Conditions conditions = mitt.getConditions();
