@@ -365,6 +365,38 @@ abstract class Control16 {
 		return null;
 	}
 
+	protected static void addSendAfter(MessageInTransactionTypeType mitt, MessageInTransactionTypeType sendAfterMitt) {
+		Conditions conditions = mitt.getConditions();
+		if (conditions == null) {
+			conditions = objectFactory.createMessageInTransactionTypeTypeConditions();
+			mitt.setConditions(conditions);
+		}
+		List<Object> conditionRefs = conditions
+				.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
+		if (conditionRefs.isEmpty()) {
+			MessageInTransactionTypeConditionType condition = objectFactory
+					.createMessageInTransactionTypeConditionType();
+			condition.setId(Editor16.getStore16().getNewId("Condition"));
+			conditionRefs.add(condition);
+		}
+		Object conditionObject = conditionRefs.get(0);
+		MessageInTransactionTypeConditionType condition = null;
+		if (conditionObject instanceof MessageInTransactionTypeConditionType) {
+			condition = (MessageInTransactionTypeConditionType) conditionObject;
+		} else {
+			condition = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) conditionObject)
+					.getIdref();
+		}
+		SendAfter sendAfters = condition.getSendAfter();
+		if (sendAfters == null) {
+			sendAfters = objectFactory.createMessageInTransactionTypeConditionTypeSendAfter();
+			condition.setSendAfter(sendAfters);
+		}
+		MessageInTransactionTypeTypeRef mittRef = objectFactory.createMessageInTransactionTypeTypeRef();
+		mittRef.setIdref(sendAfterMitt);
+		sendAfters.getMessageInTransactionTypeOrMessageInTransactionTypeRef().add(mittRef);
+	}
+
 	protected static void removeSendAfter(MessageInTransactionTypeType mitt,
 			MessageInTransactionTypeType sendAfterMitt) {
 		Conditions conditions = mitt.getConditions();
@@ -433,6 +465,39 @@ abstract class Control16 {
 			}
 		}
 		return null;
+	}
+
+	protected static void addSendBefore(MessageInTransactionTypeType mitt,
+			MessageInTransactionTypeType sendBeforeMitt) {
+		Conditions conditions = mitt.getConditions();
+		if (conditions == null) {
+			conditions = objectFactory.createMessageInTransactionTypeTypeConditions();
+			mitt.setConditions(conditions);
+		}
+		List<Object> conditionRefs = conditions
+				.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
+		if (conditionRefs.isEmpty()) {
+			MessageInTransactionTypeConditionType condition = objectFactory
+					.createMessageInTransactionTypeConditionType();
+			condition.setId(Editor16.getStore16().getNewId("Condition"));
+			conditionRefs.add(condition);
+		}
+		Object conditionObject = conditionRefs.get(0);
+		MessageInTransactionTypeConditionType condition = null;
+		if (conditionObject instanceof MessageInTransactionTypeConditionType) {
+			condition = (MessageInTransactionTypeConditionType) conditionObject;
+		} else {
+			condition = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) conditionObject)
+					.getIdref();
+		}
+		SendBefore sendBefores = condition.getSendBefore();
+		if (sendBefores == null) {
+			sendBefores = objectFactory.createMessageInTransactionTypeConditionTypeSendBefore();
+			condition.setSendBefore(sendBefores);
+		}
+		MessageInTransactionTypeTypeRef mittRef = objectFactory.createMessageInTransactionTypeTypeRef();
+		mittRef.setIdref(sendBeforeMitt);
+		sendBefores.getMessageInTransactionTypeOrMessageInTransactionTypeRef().add(mittRef);
 	}
 
 	protected static void removeSendBefore(MessageInTransactionTypeType mitt,

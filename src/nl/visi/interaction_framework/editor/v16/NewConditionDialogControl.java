@@ -23,7 +23,7 @@ import nl.visi.schemas._20160331.TransactionTypeType;
 public class NewConditionDialogControl extends Control16 {
 	private static final String NEW_CONDITION_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewConditionDialog.xml";
 	private static final String[] IN_CONDITION_TYPES = { "Action" };
-	private static final String[] OUT_CONDITION_TYPES = { "Send after", "Send before", "Trigger" };
+	private static final String[] OUT_CONDITION_TYPES = { "SendAfter", "SendBefore", "Trigger" };
 
 	private JDialog dialog;
 	private JButton btn_Cancel, btn_Create;
@@ -120,6 +120,7 @@ public class NewConditionDialogControl extends Control16 {
 				transactionsModel.setSelectedElement(transaction);
 				cbx_Transaction.repaint();
 				fillMessageComboBox(transaction.getId());
+				cbx_Message.setEnabled(true);
 				MessageTypeType message = getMessage(selectedMitt);
 				messagesModel.setSelectedElement(message);
 				cbx_Message.repaint();
@@ -143,6 +144,7 @@ public class NewConditionDialogControl extends Control16 {
 				TransactionTypeType selectedTransaction = transactionsModel.getSelectedElement();
 				String selectedTransactionId = selectedTransaction.getId();
 				fillMessageComboBox(selectedTransactionId);
+				cbx_Message.setEnabled(true);
 				enableCreateButton();
 			}
 		});

@@ -1267,9 +1267,11 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		case "Action":
 			addPrevious(value, mitt);
 			break;
-		case "Send after":
+		case "SendAfter":
+			addSendAfter(mitt, value);
 			break;
-		case "Send before":
+		case "SendBefore":
+			addSendBefore(mitt, value);
 			break;
 		case "Trigger":
 			addPrevious(mitt, value);

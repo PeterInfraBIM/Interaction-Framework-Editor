@@ -33,7 +33,7 @@
 					Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
 					Insets="4,4,4,4" />
 			</label>
-			<combobox id="cbx_Message">
+			<combobox id="cbx_Message" Enabled="false">
 				<gridbagconstraints
 					Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
 					Insets="4,4,4,4" Weightx="1.0" />
