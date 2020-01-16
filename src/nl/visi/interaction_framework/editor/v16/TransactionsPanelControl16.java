@@ -44,6 +44,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType;
@@ -2029,7 +2030,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				PreviousMessage previousMessage = previousMessagesTableModel.get(row);
 				MessageTypeType messageType = previousMessage.messageType;
 				if (messageType != null) {
-					Editor16.getMainFrameControl().navigate(messageType);
+					InteractionFrameworkEditor.navigate(messageType);
 				}
 			}
 		});
@@ -2110,7 +2111,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						messageType = (MessageTypeType) message.getMessageTypeRef().getIdref();
 					}
 					if (messageType != null) {
-						Editor16.getMainFrameControl().navigate(messageType);
+						InteractionFrameworkEditor.navigate(messageType);
 					}
 				}
 			}
@@ -2731,13 +2732,13 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	public void navigateInitiator() {
 		String idref = (String) cbx_Initiator.getSelectedItem();
 		RoleTypeType element = Editor16.getStore16().getElement(RoleTypeType.class, idref);
-		Editor16.getMainFrameControl().navigate(element);
+		InteractionFrameworkEditor.navigate(element);
 	}
 
 	public void navigateExecutor() {
 		String idref = (String) cbx_Executor.getSelectedItem();
 		RoleTypeType element = Editor16.getStore16().getElement(RoleTypeType.class, idref);
-		Editor16.getMainFrameControl().navigate(element);
+		InteractionFrameworkEditor.navigate(element);
 	}
 
 	private void initPrevMap() {

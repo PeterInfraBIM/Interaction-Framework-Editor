@@ -69,7 +69,7 @@ import nl.visi.schemas._20160331.UserDefinedTypeType;
 import nl.visi.schemas._20160331.UserDefinedTypeTypeRef;
 import nl.visi.schemas._20160331.VisiXMLVISISystematics;
 
-class Loader16 {
+public class Loader16 {
 	static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
 	static final String JAXP_SCHEMA_SOURCE = "http://java.sun.com/xml/jaxp/properties/schemaSource";
 	static final String W3C_XML_SCHEMA = "http://www.w3.org/2001/XMLSchema";
@@ -95,7 +95,8 @@ class Loader16 {
 		}
 	};
 
-	public void validate(InputSource schema, File xml, DefaultHandler defaultHandler) throws SAXParseException {
+	public void validate(InputSource schema, File xml, DefaultHandler defaultHandler)
+			throws ParserConfigurationException, SAXException, IOException {
 		if (xml != null) {
 			// build an XSD-aware SchemaFactory
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -107,24 +108,14 @@ class Loader16 {
 			// Create a Validator capable of validating XML files according to my
 			// custom schema.
 			// Validator validator = schemaXSD.newValidator();
-			try {
-				SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-				saxParserFactory.setNamespaceAware(true);
-				saxParserFactory.setValidating(true);
-				SAXParser saxParser = saxParserFactory.newSAXParser();
+			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+			saxParserFactory.setNamespaceAware(true);
+			saxParserFactory.setValidating(true);
+			SAXParser saxParser = saxParserFactory.newSAXParser();
 
-				saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-				saxParser.setProperty(JAXP_SCHEMA_SOURCE, schema);
-				saxParser.parse(xml, defaultHandler);
-			} catch (SAXNotRecognizedException e) {
-				e.getStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+			saxParser.setProperty(JAXP_SCHEMA_SOURCE, schema);
+			saxParser.parse(xml, defaultHandler);
 		}
 	}
 

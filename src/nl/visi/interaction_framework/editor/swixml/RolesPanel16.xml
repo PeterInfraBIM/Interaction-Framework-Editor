@@ -36,7 +36,9 @@
 		</panel>
 		<splitpane ContinuousLayout="true" DividerLocation="280"
 			OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT">
-			<scrollpane Border="TitledBorder(lbl_Attributes)">
+			<scrollpane
+				HorizontalScrollBarPolicy="HORIZONTAL_SCROLLBAR_AS_NEEDED"
+				Border="TitledBorder(lbl_Attributes)">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<label Text="lbl_Id">
 						<gridbagconstraints
@@ -47,7 +49,7 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
 					<label Text="lbl_Description">
 						<gridbagconstraints
@@ -58,7 +60,7 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
 					<label Text="lbl_StartDate">
 						<gridbagconstraints
@@ -69,7 +71,7 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</panel>
 					<label Text="lbl_EndDate">
 						<gridbagconstraints
@@ -80,12 +82,12 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="3"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</panel>
 					<label Text="lbl_State">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="4"
-							Insets="2,2,2,2" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</label>
 					<textfield id="tfd_State" enabled="false">
 						<gridbagconstraints
@@ -102,7 +104,7 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="5"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
 					<label Text="lbl_Category">
 						<gridbagconstraints
@@ -113,7 +115,7 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="6"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
 					<label Text="lbl_HelpInfo">
 						<gridbagconstraints
@@ -124,7 +126,7 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="7"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
 					<label Text="lbl_Code">
 						<gridbagconstraints
@@ -135,13 +137,13 @@
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="8"
-							Insets="2,2,2,2" Weightx="1.0" />
+							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
 					<panel Border="TitledBorder(lbl_Responsibility)"
 						Layout="GridBagLayout">
 						<gridbagconstraints
 							Fill="GridBagConstraints.BOTH" Gridwidth="2" Gridx="0" Gridy="9"
-							Insets="2,2,2,2" />
+							Insets="2,2,2,2" Weightx="0.0" />
 						<label Text="lbl_Scope">
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
@@ -151,12 +153,12 @@
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST"
 								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
-								Insets="2,2,2,2" Weightx="1.0" />
+								Insets="2,2,2,2" Weightx="0.0" />
 						</textfield>
 						<label Text="lbl_Task">
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
-								Insets="2,2,2,2" />
+								Insets="2,2,2,2" Weightx="0.0" />
 						</label>
 						<textfield id="tfd_ResponsibilityTask" enabled="false">
 							<gridbagconstraints
@@ -174,7 +176,7 @@
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST"
 								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
-								Insets="2,2,2,2" Weightx="1.0" />
+								Insets="2,2,2,2" Weightx="0.0" />
 						</textfield>
 						<label Text="lbl_Feedback">
 							<gridbagconstraints
@@ -186,13 +188,13 @@
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST"
 								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="3"
-								Insets="2,2,2,2" Weightx="1.0" />
+								Insets="2,2,2,2" Weightx="0.0" />
 						</textfield>
 					</panel>
 					<panel>
 						<gridbagconstraints
 							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="10" GridWidth="2"
-							Weighty="1.0" />
+							Weightx="0.0" Weighty="1.0" />
 					</panel>
 				</panel>
 			</scrollpane>
@@ -248,9 +250,8 @@
 											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
 											Insets="0,2,2,2" Weightx="1.0" />
 									</button>
-									<button id="btn_AddCondition"
-										Action="addCondition" Text="lbl_Add"
-										ToolTipText="lbl_AddCondition" Enabled="false">
+									<button id="btn_AddCondition" Action="addCondition"
+										Text="lbl_Add" ToolTipText="lbl_AddCondition" Enabled="false">
 										<gridbagconstraints
 											Anchor="GridBagConstraints.EAST" Gridx="1" Gridy="0"
 											Insets="0,2,2,2" Weightx="1.0" />

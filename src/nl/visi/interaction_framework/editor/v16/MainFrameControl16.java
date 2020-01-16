@@ -57,13 +57,13 @@ public class MainFrameControl16 extends Control16 {
 	private static SimpleElementsPanelControl16 simpleElementsPC;
 	private static UserDefinedTypesPanelControl16 userDefinedTypesPC;
 	private static MiscellaneousPanelControl16 miscellaneousPC;
-	private ExcelReportGenerator16 excelReportGenerator;
-	private JFileChooser fileChooser, reportChooser;
+//	private ExcelReportGenerator16 excelReportGenerator;
+	private JFileChooser fileChooser;
 	JTabbedPane tabs;
 	private JTextField tfd_User;
 	private JButton btn_NavigateBackward, btn_NavigateForward, btn_XsdCheck, btn_Print, btn_Report, btn_NewFramework,
 			btn_SaveFramework, btn_SaveAsFramework;
-	private File frameworkFile, excelFile;
+	private File frameworkFile;
 	private String version;
 
 	public static TransactionsPanelControl16 getTransactionsPC() {
@@ -82,7 +82,7 @@ public class MainFrameControl16 extends Control16 {
 		return complexElementsPC;
 	}
 
-	enum Tabs {
+	public enum Tabs {
 		Roles, Transactions, Messages, ComplexElements, SimpleElements, UserDefinedTypes, Miscellaneous;
 
 		PanelControl16<?> getPanelControl() {
@@ -418,33 +418,33 @@ public class MainFrameControl16 extends Control16 {
 	}
 
 	public void report() {
-		if (excelReportGenerator == null) {
-			excelReportGenerator = new ExcelReportGenerator16(this);
-		}
-		if (reportChooser == null) {
-			reportChooser = new JFileChooser();
-		}
-		reportChooser.setDialogTitle(getBundle().getString("lbl_SaveExcelReport"));
-		reportChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel", "xls");
-		reportChooser.setFileFilter(filter);
-		String defaultExcelPath = userPrefs.get("ExcelFile", "");
-		if (!defaultExcelPath.equals("")) {
-			excelFile = new File(defaultExcelPath);
-			reportChooser.setSelectedFile(excelFile);
-		}
-		int returnVal = reportChooser.showOpenDialog(frame);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			excelFile = reportChooser.getSelectedFile();
-			userPrefs.put("ExcelFile", excelFile.getAbsolutePath());
-		}
-
-		try {
-			excelReportGenerator.writeReport(excelFile);
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(frame, e.getMessage(), "IO Error", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
+//		if (excelReportGenerator == null) {
+//			excelReportGenerator = new ExcelReportGenerator16(this);
+//		}
+//		if (reportChooser == null) {
+//			reportChooser = new JFileChooser();
+//		}
+//		reportChooser.setDialogTitle(getBundle().getString("lbl_SaveExcelReport"));
+//		reportChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+//		FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel", "xls");
+//		reportChooser.setFileFilter(filter);
+//		String defaultExcelPath = userPrefs.get("ExcelFile", "");
+//		if (!defaultExcelPath.equals("")) {
+//			excelFile = new File(defaultExcelPath);
+//			reportChooser.setSelectedFile(excelFile);
+//		}
+//		int returnVal = reportChooser.showOpenDialog(frame);
+//		if (returnVal == JFileChooser.APPROVE_OPTION) {
+//			excelFile = reportChooser.getSelectedFile();
+//			userPrefs.put("ExcelFile", excelFile.getAbsolutePath());
+//		}
+//
+//		try {
+//			excelReportGenerator.writeReport(excelFile);
+//		} catch (IOException e) {
+//			JOptionPane.showMessageDialog(frame, e.getMessage(), "IO Error", JOptionPane.ERROR_MESSAGE);
+//			e.printStackTrace();
+//		}
 	}
 
 	public void print() {
@@ -552,12 +552,12 @@ public class MainFrameControl16 extends Control16 {
 	}
 
 	public void xsdCheck() {
-		try {
-			ClassLoader classLoader = getClass().getClassLoader();
-			InputSource schema = new InputSource(classLoader.getResourceAsStream("_3.xsd"));
-			Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
-		} catch (SAXParseException e) {
-		}
+//		try {
+//			ClassLoader classLoader = getClass().getClassLoader();
+//			InputSource schema = new InputSource(classLoader.getResourceAsStream("_3.xsd"));
+//			Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
+//		} catch (SAXParseException e) {
+//		}
 	}
 
 	private Stack<ElementType> forwardStack = new Stack<ElementType>();

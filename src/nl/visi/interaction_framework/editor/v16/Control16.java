@@ -1,8 +1,6 @@
 package nl.visi.interaction_framework.editor.v16;
 
-import java.awt.Component;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,49 +8,37 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
 
 import javax.swing.table.AbstractTableModel;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.swixml.SwingEngine;
-
+import nl.visi.interaction_framework.editor.Control;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType;
+import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendAfter;
+import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendBefore;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Conditions;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
-import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendAfter;
-import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendBefore;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Conditions;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20160331.TransactionTypeType.Executor;
 import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 
-abstract class Control16 {
-	public static final String RESOURCE_BUNDLE = "nl.visi.interaction_framework.editor.locale.Editor";
-	private static final ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
-	// static final java.text.DateFormat sdfDate =
-	// SimpleDateFormat.getDateInstance();
+public abstract class Control16 extends Control {
 	static final java.text.DateFormat sdfDate = new SimpleDateFormat("d MMM yyyy");
-	// private static final java.text.DateFormat sdfDateTime =
-	// SimpleDateFormat.getDateTimeInstance();
 	static final java.text.DateFormat sdfDateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
-	private final SwingEngine swingEngine;
 	protected static final ObjectFactory objectFactory = new ObjectFactory();
 	protected static final GregorianCalendar gcal = new GregorianCalendar();
-	protected PropertyChangeSupport propertyChangeSupport;
-	protected static String user = "???";
-	protected static Preferences userPrefs = Preferences.userNodeForPackage(Control16.class);
 
 	protected Comparator<String> dateComparator = new Comparator<String>() {
+
 		@Override
 		public int compare(String o1, String o2) {
 			if (o1 != null && o2 != null && !o1.isEmpty() && !o2.isEmpty()) {
@@ -154,18 +140,7 @@ abstract class Control16 {
 	}
 
 	public Control16() {
-		swingEngine = new SwingEngine(this);
-		propertyChangeSupport = new PropertyChangeSupport(this);
-	}
-
-	protected static ResourceBundle getBundle() {
-		return bundle;
-	}
-
-	protected Component render(String swiXmlResource) throws Exception {
-		Component component = null;
-		component = swingEngine.render(swiXmlResource);
-		return component;
+		super();
 	}
 
 	protected String getDate(XMLGregorianCalendar dateTime) {

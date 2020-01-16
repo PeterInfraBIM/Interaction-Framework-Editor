@@ -24,6 +24,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.ComplexElements;
@@ -341,7 +342,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				int row = tbl_SimpleElements.getSelectedRow();
 				SimpleElementTypeType simpleElementTypeType = simpleElementsTableModel.get(row);
 				if (simpleElementTypeType != null) {
-					Editor16.getMainFrameControl().navigate(simpleElementTypeType);
+					InteractionFrameworkEditor.navigate(simpleElementTypeType);
 				}
 			}
 		});
@@ -374,7 +375,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				int row = tbl_SubComplexElements.getSelectedRow();
 				ComplexElementTypeType complexElementTypeType = subComplexElementsTableModel.get(row);
 				if (complexElementTypeType != null) {
-					Editor16.getMainFrameControl().navigate(complexElementTypeType);
+					InteractionFrameworkEditor.navigate(complexElementTypeType);
 				}
 			}
 		});

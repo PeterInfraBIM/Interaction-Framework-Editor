@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML file is used to create a Swing container using the SwiXml rendering 
+	engine. org.jvnet.substance.SubstanceLookAndFeel com.jgoodies.looks.plastic.PlasticXPLookAndFeel 
+	org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel a03.swing.plaf/A03LookAndFeel -->
+<frame id="mainFrame" DefaultCloseOperation="JFrame.EXIT_ON_CLOSE"
+	Size="900,680" Title="lbl_InteractionFrameworkEditor"
+	bundle="nl.visi.interaction_framework.editor.locale.Editor"
+	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel">
+
+	<panel layout="BorderLayout">
+
+		<toolbar BorderPainted="false" Floatable="true"
+			Name="lbl_Toolbar" RollOver="true" constraints="BorderLayout.NORTH">
+
+			<button id="btn_NewFramework" Action="newFramework"
+				Icon="img_NewFramework" ToolTipText="lbl_NewFramework" />
+
+			<button id="btn_OpenFramework" Action="openFramework"
+				Icon="img_OpenFramework" ToolTipText="lbl_OpenFramework" />
+
+			<button id="btn_SaveFramework" Action="saveFramework"
+				Enabled="false" Icon="img_SaveFramework"
+				ToolTipText="lbl_SaveFramework" />
+
+			<button id="btn_SaveAsFramework" Action="saveAsFramework"
+				Enabled="false" Icon="img_SaveAsFramework"
+				ToolTipText="lbl_SaveAsFramework" />
+
+			<button id="btn_Print" Action="print" Enabled="false"
+				Icon="img_Print" ToolTipText="lbl_Print" />
+
+			<button id="btn_Report" Action="report" Enabled="false"
+				Icon="img_Report" ToolTipText="lbl_Report" />
+
+			<separator />
+
+			<button id="btn_NavigateBackward" Action="navigateBackward"
+				Enabled="false" Icon="img_BackwardNav"
+				ToolTipText="lbl_NavigateBackward" />
+
+			<button id="btn_NavigateForward" Action="navigateForward"
+				Enabled="false" Icon="img_ForwardNav"
+				ToolTipText="lbl_NavigateForward" />
+
+			<separator />
+
+			<button id="btn_XsdCheck" Action="xsdCheck" Enabled="false"
+				Text="lbl_XsdCheck" />
+
+			<separator />
+
+			<panel Layout="GridBagLayout">
+
+				<label Text="lbl_User">
+
+					<gridbagconstraints
+						Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+						Insets="2,2,2,2" />
+				</label>
+
+				<textfield id="tfd_User" Columns="10">
+
+					<gridbagconstraints
+						Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
+						Insets="2,2,2,2" Weightx="1.0" />
+				</textfield>
+			</panel>
+		</toolbar>
+
+		<panel id="mainPanel" Layout="BorderLayout"
+			constraints="BorderLayout.CENTER" />
+
+	</panel>
+
+</frame>

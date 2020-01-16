@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML file is used to create a Swing container using the SwiXml rendering 
+	engine. org.jvnet.substance.SubstanceLookAndFeel com.jgoodies.looks.plastic.PlasticXPLookAndFeel 
+	org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel a03.swing.plaf/A03LookAndFeel -->
+<panel id="mainPanel"
+	bundle="nl.visi.interaction_framework.editor.locale.Editor"
+	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel"
+	layout="BorderLayout">
+	<panel layout="GridbagLayout" constraints="BorderLayout.CENTER">
+		<tabbedpane id="tabs"
+			Titles="lbl_Roles,lbl_Transactions,lbl_Messages,lbl_ComplexElements,lbl_SimpleElements,lbl_UserDefinedTypes,lbl_Miscellaneous">
+
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="0" Weightx="1.0" Weighty="1.0" />
+
+			<panel id="rolesPanel" Border="EmptyBorder(4,4,4,4)"
+				Layout="BorderLayout" />
+
+			<panel id="transactionsPanel" Border="EmptyBorder(4,4,4,4)"
+				Layout="BorderLayout" />
+
+			<panel id="messagesPanel" Border="EmptyBorder(4,4,4,4)"
+				Layout="BorderLayout" />
+
+			<panel id="complexElementsPanel" Border="EmptyBorder(4,4,4,4)"
+				Layout="BorderLayout" />
+
+			<panel id="simpleElementsPanel" Border="EmptyBorder(4,4,4,4)"
+				Layout="BorderLayout" />
+
+			<panel id="userDefinedTypesPanel" Border="EmptyBorder(4,4,4,4)"
+				Layout="BorderLayout" />
+
+			<panel id="miscellaneousPanel" Border="EmptyBorder(4,4,4,4)"
+				Layout="BorderLayout" />
+		</tabbedpane>
+	</panel>
+</panel>

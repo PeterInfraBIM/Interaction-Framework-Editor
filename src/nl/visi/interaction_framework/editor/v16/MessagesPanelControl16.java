@@ -19,6 +19,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
@@ -404,7 +405,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 						transactionType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
 					}
 					if (transactionType != null) {
-						Editor16.getMainFrameControl().navigate(transactionType);
+						InteractionFrameworkEditor.navigate(transactionType);
 					}
 				}
 			}
@@ -438,7 +439,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				int row = tbl_ComplexElements.getSelectedRow();
 				ComplexElementTypeType complexElementTypeType = complexElementsTableModel.get(row);
 				if (complexElementTypeType != null) {
-					Editor16.getMainFrameControl().navigate(complexElementTypeType);
+					InteractionFrameworkEditor.navigate(complexElementTypeType);
 				}
 			}
 		});
@@ -470,7 +471,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				int row = tbl_Appendices.getSelectedRow();
 				AppendixTypeType appendixTypeType = appendicesTableModel.get(row);
 				if (appendixTypeType != null) {
-					Editor16.getMainFrameControl().navigate(appendixTypeType);
+					InteractionFrameworkEditor.navigate(appendixTypeType);
 				}
 			}
 		});

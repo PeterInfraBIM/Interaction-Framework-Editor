@@ -33,13 +33,14 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.v16.DateField16;
 import nl.visi.interaction_framework.editor.v16.Editor16;
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.v16.Control16;
 import nl.visi.interaction_framework.editor.v16.Store16;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
 import nl.visi.schemas._20160331.ProjectTypeType;
 
-abstract class PanelControl16<E extends ElementType> extends Control16 {
+public abstract class PanelControl16<E extends ElementType> extends Control16 {
 	enum Fields {
 		Id, Description, State, Language, Category, HelpInfo, Code;
 	}
@@ -89,7 +90,7 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 		}
 
 		protected void navigate() {
-			Editor16.getMainFrameControl().navigate(selectedElement);
+			InteractionFrameworkEditor.navigate(selectedElement);
 		}
 	}
 
@@ -306,7 +307,7 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 		}
 	}
 
-	protected void newElement(ElementType newElement, String prefix) throws Exception {
+	protected String newElement(ElementType newElement, String prefix) throws Exception {
 		String newId = null;
 		if (prefix.startsWith("Standard")) {
 			newId = prefix;
@@ -349,6 +350,7 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 //		}
 		Editor16.getStore16().put(newId, newElement);
 		updateLaMu(newElement, MainFrameControl16.user);
+		return newId;
 	}
 
 	@SuppressWarnings("serial")

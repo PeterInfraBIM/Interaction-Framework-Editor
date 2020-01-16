@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import javax.xml.datatype.XMLGregorianCalendar;
+
 import jxl.CellView;
 import jxl.Workbook;
 import jxl.format.Border;
@@ -18,8 +20,7 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import nl.visi.interaction_framework.editor.v16.Control16;
-import nl.visi.interaction_framework.editor.v16.MainFrameControl16;
-import nl.visi.interaction_framework.editor.v16.MainFrameControl16.Tabs;
+import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SimpleElementsTableModel;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTableModel;
 import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.ComplexElementsTableModel;
@@ -42,10 +43,10 @@ import nl.visi.schemas._20160331.UserDefinedTypeType;
 
 class ExcelReportGenerator16 extends Control16 {
 
-	private final MainFrameControl16 mainFrameControl;
+	private final MainPanelControl16 mainPanelControl;
 
-	public ExcelReportGenerator16(MainFrameControl16 mainFrameControl) {
-		this.mainFrameControl = mainFrameControl;
+	public ExcelReportGenerator16(MainPanelControl16 mainPanel) {
+		this.mainPanelControl = mainPanel;
 	}
 
 	public void writeReport(File excelFile) throws IOException {
@@ -124,12 +125,18 @@ class ExcelReportGenerator16 extends Control16 {
 			sheet.addCell(new Label(col + 1, row, roleType.getDescription(), getDataFormat()));
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_StartDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, roleType.getStartDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar startDate = roleType.getStartDate();
+			if (startDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, roleType.getStartDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_EndDate"), getDataFormat()));
-			sheet.addCell(
-					new DateTime(col + 1, row, roleType.getEndDate().toGregorianCalendar().getTime(), getDateFormat()));
+			XMLGregorianCalendar endDate = roleType.getEndDate();
+			if (endDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, roleType.getEndDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_State"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, roleType.getState(), getDataFormat()));
@@ -226,12 +233,18 @@ class ExcelReportGenerator16 extends Control16 {
 			sheet.addCell(new Label(col + 1, row, transactionType.getDescription(), getDataFormat()));
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_StartDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, transactionType.getStartDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar startDate = transactionType.getStartDate();
+			if (startDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, transactionType.getStartDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_EndDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, transactionType.getEndDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar endDate = transactionType.getEndDate();
+			if (endDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, transactionType.getEndDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_State"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, transactionType.getState(), getDataFormat()));
@@ -279,8 +292,8 @@ class ExcelReportGenerator16 extends Control16 {
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_Messages"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
-			mainFrameControl.tabs.setSelectedIndex(Tabs.Transactions.ordinal());
-			TransactionsPanelControl16 transactionsPC = MainFrameControl16.getTransactionsPC();
+			mainPanelControl.tabs.setSelectedIndex(Tabs.Transactions.ordinal());
+			TransactionsPanelControl16 transactionsPC = MainPanelControl16.getTransactionsPC();
 			transactionsPC.tbl_Elements.getSelectionModel().setSelectionInterval(transactionIndex, transactionIndex);
 			MessagesTableModel messagesTableModel = transactionsPC.getMessagesTableModel();
 			for (int msgIndex = 0; msgIndex < messagesTableModel.getRowCount(); msgIndex++) {
@@ -318,12 +331,18 @@ class ExcelReportGenerator16 extends Control16 {
 			sheet.addCell(new Label(col + 1, row, messageType.getDescription(), getDataFormat()));
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_StartDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, messageType.getStartDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar startDate = messageType.getStartDate();
+			if (startDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, messageType.getStartDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_EndDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, messageType.getEndDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar endDate = messageType.getEndDate();
+			if (endDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, messageType.getEndDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_State"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, messageType.getState(), getDataFormat()));
@@ -343,8 +362,8 @@ class ExcelReportGenerator16 extends Control16 {
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_Transactions"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
-			mainFrameControl.tabs.setSelectedIndex(Tabs.Messages.ordinal());
-			MessagesPanelControl16 messagesPC = MainFrameControl16.getMessagesPC();
+			mainPanelControl.tabs.setSelectedIndex(Tabs.Messages.ordinal());
+			MessagesPanelControl16 messagesPC = MainPanelControl16.getMessagesPC();
 			messagesPC.tbl_Elements.getSelectionModel().setSelectionInterval(messageIndex, messageIndex);
 			TransactionsTableModel transactionsTableModel = messagesPC.getTransactionsTableModel();
 			for (int trnsIndex = 0; trnsIndex < transactionsTableModel.getRowCount(); trnsIndex++) {
@@ -393,12 +412,18 @@ class ExcelReportGenerator16 extends Control16 {
 			sheet.addCell(new Label(col + 1, row, complexElementType.getDescription(), getDataFormat()));
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_StartDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, complexElementType.getStartDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar startDate = complexElementType.getStartDate();
+			if (startDate != null) {
+				sheet.addCell(new DateTime(col + 1, row,
+						complexElementType.getStartDate().toGregorianCalendar().getTime(), getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_EndDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, complexElementType.getEndDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar endDate = complexElementType.getEndDate();
+			if (endDate != null) {
+				sheet.addCell(new DateTime(col + 1, row,
+						complexElementType.getEndDate().toGregorianCalendar().getTime(), getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_State"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, complexElementType.getState(), getDataFormat()));
@@ -415,8 +440,8 @@ class ExcelReportGenerator16 extends Control16 {
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_ComplexElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
-			mainFrameControl.tabs.setSelectedIndex(Tabs.ComplexElements.ordinal());
-			ComplexElementsPanelControl16 complexElementsPC = MainFrameControl16.getComplexElementsPC();
+			mainPanelControl.tabs.setSelectedIndex(Tabs.ComplexElements.ordinal());
+			ComplexElementsPanelControl16 complexElementsPC = MainPanelControl16.getComplexElementsPC();
 			complexElementsPC.tbl_Elements.getSelectionModel().setSelectionInterval(complexElementIndex,
 					complexElementIndex);
 			SubComplexElementsTableModel subComplexElementsTableModel = complexElementsPC
@@ -528,7 +553,7 @@ class ExcelReportGenerator16 extends Control16 {
 		int row = 0;
 		sheet.addCell(new Label(col, row, getBundle().getString("lbl_AppendixTypesSheet")));
 		int miscellaneousIndex = 0;
-		MiscellaneousPanelControl16 miscellaneousPC = MainFrameControl16.getMiscellaneousPC();
+		MiscellaneousPanelControl16 miscellaneousPC = MainPanelControl16.getMiscellaneousPC();
 		ElementType elementType = null;
 		nl.visi.interaction_framework.editor.v16.MiscellaneousPanelControl16.ComplexElementsTableModel complexElementsTableModel = null;
 //		do {
@@ -547,12 +572,18 @@ class ExcelReportGenerator16 extends Control16 {
 			sheet.addCell(new Label(col + 1, row, appendixType.getDescription(), getDataFormat()));
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_StartDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, appendixType.getStartDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar startDate = appendixType.getStartDate();
+			if (startDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, appendixType.getStartDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_EndDate"), getDataFormat()));
-			sheet.addCell(new DateTime(col + 1, row, appendixType.getEndDate().toGregorianCalendar().getTime(),
-					getDateFormat()));
+			XMLGregorianCalendar endDate = appendixType.getEndDate();
+			if (endDate != null) {
+				sheet.addCell(new DateTime(col + 1, row, appendixType.getEndDate().toGregorianCalendar().getTime(),
+						getDateFormat()));
+			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_State"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, appendixType.getState(), getDataFormat()));
@@ -572,7 +603,7 @@ class ExcelReportGenerator16 extends Control16 {
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_ComplexElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
-			mainFrameControl.tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			mainPanelControl.tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			while (!(elementType instanceof AppendixTypeType)
 					&& miscellaneousIndex < miscellaneousPC.tbl_Elements.getRowCount()) {
 				miscellaneousPC.tbl_Elements.getSelectionModel().setSelectionInterval(miscellaneousIndex,
