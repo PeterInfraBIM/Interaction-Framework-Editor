@@ -38,6 +38,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
@@ -170,7 +171,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 
 					@Override
 					public void mouseClicked(MouseEvent e) {
-						Editor14.getMainFrameControl().navigate(transactionType);
+						InteractionFrameworkEditor.navigate(transactionType);
 					}
 				});
 
@@ -264,7 +265,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 
 					@Override
 					public void mouseClicked(MouseEvent e) {
-						Editor14.getMainFrameControl().navigate(getMessage(mitt));
+						InteractionFrameworkEditor.navigate(getMessage(mitt));
 					}
 				});
 //				Color saveColor = g.getColor();
@@ -1085,7 +1086,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 			@Override
 			protected void navigate() {
 				int row = tbl_Transactions.getSelectedRow();
-				Editor14.getMainFrameControl().navigate(transactionsTableModel.get(row));
+				InteractionFrameworkEditor.navigate(transactionsTableModel.get(row));
 			}
 		});
 	}
@@ -1105,7 +1106,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 			protected void navigate() {
 				int row = tbl_Messages.getSelectedRow();
 				MessageTypeType message = getMessage(messagesTableModel.get(row));
-				Editor14.getMainFrameControl().navigate(message);
+				InteractionFrameworkEditor.navigate(message);
 			}
 		});
 

@@ -306,7 +306,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 		}
 	}
 
-	protected void newElement(ElementType newElement, String prefix) throws Exception {
+	protected String newElement(ElementType newElement, String prefix) throws Exception {
 		String newId = null;
 		if (prefix.startsWith("Standard")) {
 			newId = prefix;
@@ -349,6 +349,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 //		}
 		Editor14.getStore14().put(newId, newElement);
 		updateLaMu(newElement, MainFrameControl14.user);
+		return newId;
 	}
 
 	@SuppressWarnings("serial")

@@ -29,14 +29,15 @@ import org.xml.sax.helpers.DefaultHandler;
 import com.jgoodies.looks.plastic.PlasticXPLookAndFeel;
 import com.jgoodies.looks.plastic.theme.ExperienceRoyale;
 
+import nl.visi.interaction_framework.editor.v14.MainPanelControl14;
 import nl.visi.interaction_framework.editor.v16.MainPanelControl16;
-import nl.visi.schemas._20160331.ElementType;
 
 public class InteractionFrameworkEditor extends Control {
 	private static final String TOP_LEVEL = "nl/visi/interaction_framework/editor/swixml/TopLevel.xml";
 	private static InteractionFrameworkEditor instance;
 	private File frameworkFile;
 	private String version;
+	private MainPanelControl14 mainPanelControl14;
 	private MainPanelControl16 mainPanelControl16;
 
 	private JFrame frame;
@@ -140,6 +141,23 @@ public class InteractionFrameworkEditor extends Control {
 								JOptionPane.showMessageDialog(mainPanel, e.getMessage(),
 										getBundle().getString("lbl_ErrorMessage"), JOptionPane.ERROR_MESSAGE);
 							}
+						} else if (newFrameworkDialogControl.getVersion().equals("1.4")) {
+							try {
+								mainPanel.removeAll();
+								mainPanelControl14 = new MainPanelControl14();
+								mainPanel.add(mainPanelControl14.getMainPanel());
+								mainPanel.revalidate();
+								String newProjectId = mainPanelControl14.newFramework(newFrameworkDialogControl);
+								btn_SaveFramework.setEnabled(true);
+								btn_SaveAsFramework.setEnabled(true);
+								btn_XsdCheck.setEnabled(false);
+								btn_Print.setEnabled(true);
+								btn_Report.setEnabled(true);
+								setWindowTitle(newProjectId);
+							} catch (Exception e) {
+								JOptionPane.showMessageDialog(mainPanel, e.getMessage(),
+										getBundle().getString("lbl_ErrorMessage"), JOptionPane.ERROR_MESSAGE);
+							}
 						}
 					}
 					btn_NewFramework.setEnabled(true);
@@ -172,6 +190,18 @@ public class InteractionFrameworkEditor extends Control {
 				mainPanel.add(mainPanelControl16.getMainPanel());
 				mainPanel.revalidate();
 				mainPanelControl16.openFramework(frameworkFile, defaultHandler);
+				btn_SaveFramework.setEnabled(true);
+				btn_SaveAsFramework.setEnabled(true);
+				btn_XsdCheck.setEnabled(true);
+				btn_Print.setEnabled(true);
+				btn_Report.setEnabled(true);
+			} else if (version.equals("1.4")) {
+				setWindowTitle(frameworkFile.getName());
+				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
+				mainPanelControl14 = new MainPanelControl14();
+				mainPanel.add(mainPanelControl14.getMainPanel());
+				mainPanel.revalidate();
+				mainPanelControl14.openFramework(frameworkFile, defaultHandler);
 				btn_SaveFramework.setEnabled(true);
 				btn_SaveAsFramework.setEnabled(true);
 				btn_XsdCheck.setEnabled(true);
@@ -245,6 +275,8 @@ public class InteractionFrameworkEditor extends Control {
 			if (frameworkFile != null) {
 				if (version.equals("1.6")) {
 					mainPanelControl16.saveFramework(frameworkFile);
+				} else if (version.equals("1.4")) {
+					mainPanelControl14.saveFramework(frameworkFile);
 				}
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
 				setWindowTitle(frameworkFile.getName());
@@ -285,6 +317,13 @@ public class InteractionFrameworkEditor extends Control {
 				JOptionPane.showMessageDialog(frame, e.getMessage(), "IO Error", JOptionPane.ERROR_MESSAGE);
 				e.printStackTrace();
 			}
+		} else if (version.equals("1.4")) {
+			try {
+				mainPanelControl14.report(excelFile);
+			} catch (IOException e) {
+				JOptionPane.showMessageDialog(frame, e.getMessage(), "IO Error", JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -293,6 +332,10 @@ public class InteractionFrameworkEditor extends Control {
 			mainPanelControl16.navigateForward();
 			btn_NavigateBackward.setEnabled(!mainPanelControl16.isBackwardStackEmpty());
 			btn_NavigateForward.setEnabled(!mainPanelControl16.isForwardStackEmpty());
+		} else if (version.equals("1.4")) {
+			mainPanelControl14.navigateForward();
+			btn_NavigateBackward.setEnabled(!mainPanelControl14.isBackwardStackEmpty());
+			btn_NavigateForward.setEnabled(!mainPanelControl14.isForwardStackEmpty());
 		}
 	}
 
@@ -301,6 +344,10 @@ public class InteractionFrameworkEditor extends Control {
 			mainPanelControl16.navigateBackward();
 			btn_NavigateBackward.setEnabled(!mainPanelControl16.isBackwardStackEmpty());
 			btn_NavigateForward.setEnabled(!mainPanelControl16.isForwardStackEmpty());
+		} else if (version.equals("1.4")) {
+			mainPanelControl14.navigateBackward();
+			btn_NavigateBackward.setEnabled(!mainPanelControl14.isBackwardStackEmpty());
+			btn_NavigateForward.setEnabled(!mainPanelControl14.isForwardStackEmpty());
 		}
 	}
 
@@ -308,6 +355,16 @@ public class InteractionFrameworkEditor extends Control {
 		if (version.equals("1.6")) {
 			try {
 				mainPanelControl16.xsdCheck(frameworkFile, defaultHandler);
+				JOptionPane.showMessageDialog(frame, getBundle().getString("lbl_FrameworkValidated"),
+						getBundle().getString("lbl_Information"), JOptionPane.INFORMATION_MESSAGE);
+			} catch (ParserConfigurationException | SAXException | IOException e) {
+				JOptionPane.showMessageDialog(frame, e.getMessage(), getBundle().getString("lbl_ErrorMessage"),
+						JOptionPane.ERROR_MESSAGE);
+				e.printStackTrace();
+			}
+		} else if (version.equals("1.4")) {
+			try {
+				mainPanelControl14.xsdCheck(frameworkFile, defaultHandler);
 				JOptionPane.showMessageDialog(frame, getBundle().getString("lbl_FrameworkValidated"),
 						getBundle().getString("lbl_Information"), JOptionPane.INFORMATION_MESSAGE);
 			} catch (ParserConfigurationException | SAXException | IOException e) {
@@ -327,11 +384,19 @@ public class InteractionFrameworkEditor extends Control {
 		return instance.mainPanelControl16;
 	}
 
-	public static void navigate(ElementType element) {
-		if (instance.version.equals("1.6")) {
-			instance.mainPanelControl16.navigate(element);
+	public static MainPanelControl14 getMainPanelControl14() {
+		return instance.mainPanelControl14;
+	}
+
+	public static void navigate(Object element) {
+		if (element instanceof nl.visi.schemas._20160331.ElementType) {
+			instance.mainPanelControl16.navigate((nl.visi.schemas._20160331.ElementType) element);
 			instance.btn_NavigateBackward.setEnabled(!instance.mainPanelControl16.isBackwardStackEmpty());
 			instance.btn_NavigateForward.setEnabled(!instance.mainPanelControl16.isForwardStackEmpty());
+		} else if (element instanceof nl.visi.schemas._20140331.ElementType) {
+			instance.mainPanelControl14.navigate((nl.visi.schemas._20140331.ElementType) element);
+			instance.btn_NavigateBackward.setEnabled(!instance.mainPanelControl14.isBackwardStackEmpty());
+			instance.btn_NavigateForward.setEnabled(!instance.mainPanelControl14.isForwardStackEmpty());
 		}
 	}
 }

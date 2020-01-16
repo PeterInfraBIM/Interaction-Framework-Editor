@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
@@ -245,6 +246,6 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 	public void navigateUserDefinedType() {
 		String idref = (String) cbx_UserDefinedType.getSelectedItem();
 		UserDefinedTypeType element = Editor14.getStore14().getElement(UserDefinedTypeType.class, idref);
-		Editor14.getMainFrameControl().navigate(element);
+		InteractionFrameworkEditor.navigate(element);
 	}
 }

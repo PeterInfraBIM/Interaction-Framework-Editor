@@ -421,33 +421,33 @@ public class MainFrameControl14 extends Control14 {
 	}
 
 	public void report() {
-		if (excelReportGenerator == null) {
-			excelReportGenerator = new ExcelReportGenerator14(this);
-		}
-		if (reportChooser == null) {
-			reportChooser = new JFileChooser();
-		}
-		reportChooser.setDialogTitle(getBundle().getString("lbl_SaveExcelReport"));
-		reportChooser.setDialogType(JFileChooser.SAVE_DIALOG);
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel", "xls");
-		reportChooser.setFileFilter(filter);
-		String defaultExcelPath = userPrefs.get("ExcelFile", "");
-		if (!defaultExcelPath.equals("")) {
-			excelFile = new File(defaultExcelPath);
-			reportChooser.setSelectedFile(excelFile);
-		}
-		int returnVal = reportChooser.showOpenDialog(frame);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			excelFile = reportChooser.getSelectedFile();
-			userPrefs.put("ExcelFile", excelFile.getAbsolutePath());
-		}
-
-		try {
-			excelReportGenerator.writeReport(excelFile);
-		} catch (IOException e) {
-			JOptionPane.showMessageDialog(frame, e.getMessage(), "IO Error", JOptionPane.ERROR_MESSAGE);
-			e.printStackTrace();
-		}
+//		if (excelReportGenerator == null) {
+//			excelReportGenerator = new ExcelReportGenerator14(this);
+//		}
+//		if (reportChooser == null) {
+//			reportChooser = new JFileChooser();
+//		}
+//		reportChooser.setDialogTitle(getBundle().getString("lbl_SaveExcelReport"));
+//		reportChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+//		FileNameExtensionFilter filter = new FileNameExtensionFilter("Excel", "xls");
+//		reportChooser.setFileFilter(filter);
+//		String defaultExcelPath = userPrefs.get("ExcelFile", "");
+//		if (!defaultExcelPath.equals("")) {
+//			excelFile = new File(defaultExcelPath);
+//			reportChooser.setSelectedFile(excelFile);
+//		}
+//		int returnVal = reportChooser.showOpenDialog(frame);
+//		if (returnVal == JFileChooser.APPROVE_OPTION) {
+//			excelFile = reportChooser.getSelectedFile();
+//			userPrefs.put("ExcelFile", excelFile.getAbsolutePath());
+//		}
+//
+//		try {
+//			excelReportGenerator.writeReport(excelFile);
+//		} catch (IOException e) {
+//			JOptionPane.showMessageDialog(frame, e.getMessage(), "IO Error", JOptionPane.ERROR_MESSAGE);
+//			e.printStackTrace();
+//		}
 	}
 
 	public void print() {
