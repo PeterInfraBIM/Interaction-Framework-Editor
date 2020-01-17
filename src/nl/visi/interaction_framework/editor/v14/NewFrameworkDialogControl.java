@@ -13,6 +13,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 
+import nl.visi.interaction_framework.editor.DocumentAdapter;
+
 public class NewFrameworkDialogControl extends Control14 {
 	private static final String NEW_FRAMEWORK_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewFrameworkDialog.xml";
 
@@ -27,14 +29,14 @@ public class NewFrameworkDialogControl extends Control14 {
 		dialog = (JDialog) render(NEW_FRAMEWORK_DIALOG);
 		JRootPane rootPane = SwingUtilities.getRootPane(btn_Create);
 		rootPane.setDefaultButton(btn_Create);
-		tfd_Description.getDocument().addDocumentListener(new DocumentAdapter14() {
+		tfd_Description.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				discriptionEmpty = e.getDocument().getLength() == 0;
 				enableCreateButton();
 			}
 		});
-		tfd_Namespace.getDocument().addDocumentListener(new DocumentAdapter14() {
+		tfd_Namespace.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				namespaceEmpty = e.getDocument().getLength() == 0;

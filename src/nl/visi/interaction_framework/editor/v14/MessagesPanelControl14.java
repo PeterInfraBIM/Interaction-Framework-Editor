@@ -18,6 +18,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
@@ -313,7 +314,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 	}
 
 	private void initEndDateField() {
-		endDateField = new DateField14(endDatePanel);
+		endDateField = new DateField(endDatePanel);
 		endDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
@@ -338,7 +339,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 	}
 
 	private void initStartDateField() {
-		startDateField = new DateField14(startDatePanel);
+		startDateField = new DateField(startDatePanel);
 		startDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {

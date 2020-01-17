@@ -15,6 +15,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
 
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
@@ -159,7 +160,7 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 	}
 
 	private void initXsdRestriction() {
-		tfd_XsdRestriction.getDocument().addDocumentListener(new DocumentAdapter14() {
+		tfd_XsdRestriction.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				if (inSelection)

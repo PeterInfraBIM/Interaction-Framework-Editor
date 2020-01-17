@@ -187,6 +187,7 @@ public class InteractionFrameworkEditor extends Control {
 				setWindowTitle(frameworkFile.getName());
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
 				mainPanelControl16 = new MainPanelControl16();
+				mainPanel.removeAll();
 				mainPanel.add(mainPanelControl16.getMainPanel());
 				mainPanel.revalidate();
 				mainPanelControl16.openFramework(frameworkFile, defaultHandler);
@@ -199,6 +200,7 @@ public class InteractionFrameworkEditor extends Control {
 				setWindowTitle(frameworkFile.getName());
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
 				mainPanelControl14 = new MainPanelControl14();
+				mainPanel.removeAll();
 				mainPanel.add(mainPanelControl14.getMainPanel());
 				mainPanel.revalidate();
 				mainPanelControl14.openFramework(frameworkFile, defaultHandler);

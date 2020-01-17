@@ -31,8 +31,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import nl.visi.interaction_framework.editor.v14.DateField14;
 import nl.visi.interaction_framework.editor.v14.Editor14;
+import nl.visi.interaction_framework.editor.DateField;
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.v14.Control14;
 import nl.visi.interaction_framework.editor.v14.Store14;
 import nl.visi.schemas._20140331.ElementType;
@@ -51,7 +52,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 	protected JTable tbl_Elements;
 	protected JButton btn_NewElement, btn_DeleteElement;
 	protected JTextField tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
-	protected DateField14 startDateField, endDateField;
+	protected DateField startDateField, endDateField;
 	protected boolean inSelection = false;
 
 	@SuppressWarnings("serial")
@@ -132,14 +133,14 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 	protected PanelControl14(String swixml) throws Exception {
 		panel = (JPanel) render(swixml);
 
-		tfd_Id.getDocument().addDocumentListener(new DocumentAdapter14() {
+		tfd_Id.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				setField(Fields.Id);
 			}
 		});
 		if (tfd_Description != null) {
-			tfd_Description.getDocument().addDocumentListener(new DocumentAdapter14() {
+			tfd_Description.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Description);
@@ -147,7 +148,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			});
 		}
 		if (tfd_State != null) {
-			tfd_State.getDocument().addDocumentListener(new DocumentAdapter14() {
+			tfd_State.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.State);
@@ -155,7 +156,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			});
 		}
 		if (tfd_Language != null) {
-			tfd_Language.getDocument().addDocumentListener(new DocumentAdapter14() {
+			tfd_Language.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Language);
@@ -163,7 +164,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			});
 		}
 		if (tfd_Category != null) {
-			tfd_Category.getDocument().addDocumentListener(new DocumentAdapter14() {
+			tfd_Category.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Category);
@@ -171,7 +172,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			});
 		}
 		if (tfd_HelpInfo != null) {
-			tfd_HelpInfo.getDocument().addDocumentListener(new DocumentAdapter14() {
+			tfd_HelpInfo.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.HelpInfo);
@@ -179,7 +180,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			});
 		}
 		if (tfd_Code != null) {
-			tfd_Code.getDocument().addDocumentListener(new DocumentAdapter14() {
+			tfd_Code.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Code);

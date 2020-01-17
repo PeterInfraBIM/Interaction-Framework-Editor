@@ -41,6 +41,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi_1_1a.interaction_framework.importer.Transform;
@@ -165,7 +166,7 @@ public class MainFrameControl16 extends Control16 {
 
 		user = userPrefs.get("User", "???");
 		tfd_User.setText(user);
-		tfd_User.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_User.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				user = tfd_User.getText();

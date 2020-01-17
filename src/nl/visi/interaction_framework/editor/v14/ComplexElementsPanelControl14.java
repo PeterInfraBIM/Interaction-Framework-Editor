@@ -4,18 +4,14 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
@@ -24,6 +20,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20140331.AppendixTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
@@ -220,7 +217,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	}
 
 	private void initEndDateField() {
-		endDateField = new DateField14(endDatePanel);
+		endDateField = new DateField(endDatePanel);
 		endDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
@@ -245,7 +242,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	}
 
 	private void initStartDateField() {
-		startDateField = new DateField14(startDatePanel);
+		startDateField = new DateField(startDatePanel);
 		startDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {

@@ -12,6 +12,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableRowSorter;
 
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
@@ -90,7 +91,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			}
 		});
 
-		tfd_InterfaceType.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_InterfaceType.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				if (inSelection)
@@ -101,7 +102,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			}
 		});
 
-		tfd_ValueList.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_ValueList.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				if (inSelection)

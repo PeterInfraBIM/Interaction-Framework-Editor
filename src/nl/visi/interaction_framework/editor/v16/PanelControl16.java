@@ -31,8 +31,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import nl.visi.interaction_framework.editor.v16.DateField16;
 import nl.visi.interaction_framework.editor.v16.Editor16;
+import nl.visi.interaction_framework.editor.DateField;
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.v16.Control16;
 import nl.visi.interaction_framework.editor.v16.Store16;
@@ -52,7 +53,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 	protected JTable tbl_Elements;
 	protected JButton btn_NewElement, btn_DeleteElement;
 	protected JTextField tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
-	protected DateField16 startDateField, endDateField;
+	protected DateField startDateField, endDateField;
 	protected boolean inSelection = false;
 
 	@SuppressWarnings("serial")
@@ -133,14 +134,14 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 	protected PanelControl16(String swixml) throws Exception {
 		panel = (JPanel) render(swixml);
 
-		tfd_Id.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_Id.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				setField(Fields.Id);
 			}
 		});
 		if (tfd_Description != null) {
-			tfd_Description.getDocument().addDocumentListener(new DocumentAdapter16() {
+			tfd_Description.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Description);
@@ -148,7 +149,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 			});
 		}
 		if (tfd_State != null) {
-			tfd_State.getDocument().addDocumentListener(new DocumentAdapter16() {
+			tfd_State.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.State);
@@ -156,7 +157,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 			});
 		}
 		if (tfd_Language != null) {
-			tfd_Language.getDocument().addDocumentListener(new DocumentAdapter16() {
+			tfd_Language.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Language);
@@ -164,7 +165,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 			});
 		}
 		if (tfd_Category != null) {
-			tfd_Category.getDocument().addDocumentListener(new DocumentAdapter16() {
+			tfd_Category.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Category);
@@ -172,7 +173,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 			});
 		}
 		if (tfd_HelpInfo != null) {
-			tfd_HelpInfo.getDocument().addDocumentListener(new DocumentAdapter16() {
+			tfd_HelpInfo.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.HelpInfo);
@@ -180,7 +181,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 			});
 		}
 		if (tfd_Code != null) {
-			tfd_Code.getDocument().addDocumentListener(new DocumentAdapter16() {
+			tfd_Code.getDocument().addDocumentListener(new DocumentAdapter() {
 				@Override
 				protected void update(DocumentEvent e) {
 					setField(Fields.Code);

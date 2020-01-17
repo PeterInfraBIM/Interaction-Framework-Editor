@@ -1,8 +1,8 @@
 /**
- * Copyright 2008-2010 COINS
+ * Copyright 2008-2020 COINS
  * No part of this code may be reproduced, stored in a retrieval system, or transmitted  
  * in any form or by any means, electronic, mechanical, photocopying, recording or otherwise, 
- * without the prior written permission of COINS.
+ * without the prior written permission of infraBIM.
  *
  * Created on 22 mei 2008
  */
@@ -12,10 +12,10 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 /**
- * @author Peter Willems (COINS/TNO)
+ * @author Peter Willems (COINS/TNO/infraBIM)
  * 
  */
-abstract class DocumentAdapter implements DocumentListener {
+public abstract class DocumentAdapter implements DocumentListener {
 
 	/**
 	 * @see javax.swing.event.DocumentListener#changedUpdate(javax.swing.event.DocumentEvent)

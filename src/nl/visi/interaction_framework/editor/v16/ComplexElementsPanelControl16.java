@@ -24,6 +24,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.DateField;
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
@@ -220,7 +222,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	}
 
 	private void initEndDateField() {
-		endDateField = new DateField16(endDatePanel);
+		endDateField = new DateField(endDatePanel);
 		endDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
@@ -245,7 +247,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	}
 
 	private void initStartDateField() {
-		startDateField = new DateField16(startDatePanel);
+		startDateField = new DateField(startDatePanel);
 		startDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
@@ -270,7 +272,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	}
 
 	private void initMinOccurs() {
-		tfd_MinOccurs.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_MinOccurs.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected synchronized void update(DocumentEvent e) {
 				if (inSelection)
@@ -294,7 +296,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	}
 
 	private void initMaxOccurs() {
-		tfd_MaxOccurs.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_MaxOccurs.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected synchronized void update(DocumentEvent e) {
 				if (inSelection)

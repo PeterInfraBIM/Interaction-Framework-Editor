@@ -38,6 +38,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import nl.visi.interaction_framework.editor.DateField;
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20160331.ElementType;
@@ -966,7 +968,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private void initResponsibilityFeedback() {
-		tfd_ResponsibilityFeedback.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_ResponsibilityFeedback.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected synchronized void update(DocumentEvent e) {
 				if (inSelection)
@@ -980,7 +982,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private void initResponsibilitySupportTask() {
-		tfd_ResponsibilitySupportTask.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_ResponsibilitySupportTask.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected synchronized void update(DocumentEvent e) {
 				if (inSelection)
@@ -994,7 +996,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private void initResponsibilityTask() {
-		tfd_ResponsibilityTask.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_ResponsibilityTask.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected synchronized void update(DocumentEvent e) {
 				if (inSelection)
@@ -1008,7 +1010,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private void initResponsibilityScope() {
-		tfd_ResponsibilityScope.getDocument().addDocumentListener(new DocumentAdapter16() {
+		tfd_ResponsibilityScope.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected synchronized void update(DocumentEvent e) {
 				if (inSelection)
@@ -1022,7 +1024,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private void initEndDateField() {
-		endDateField = new DateField16(endDatePanel);
+		endDateField = new DateField(endDatePanel);
 		endDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
@@ -1047,7 +1049,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private void initStartDateField() {
-		startDateField = new DateField16(startDatePanel);
+		startDateField = new DateField(startDatePanel);
 		startDateField.addPropertyChangeListener("date", new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent e) {
