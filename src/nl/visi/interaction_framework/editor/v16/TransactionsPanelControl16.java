@@ -2057,7 +2057,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tbl_Elements.setModel(elementsTableModel);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		tbl_Elements.setFillsViewportHeight(true);
-		TableRowSorter<ElementsTableModel<TransactionTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
+		TableRowSorter<ElementsTableModel<TransactionTypeType>> tableRowSorter = new TableRowSorter<>(
+				elementsTableModel);
 		tableRowSorter.setComparator(TransactionsTableColumns.StartDate.ordinal(), dateComparator);
 		tableRowSorter.setComparator(TransactionsTableColumns.EndDate.ordinal(), dateComparator);
 		tableRowSorter.setComparator(TransactionsTableColumns.DateLamu.ordinal(), dateTimeComparator);
@@ -2270,7 +2271,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			sequenceTableModel.clear();
 			subtransactionsTableModel.clear();
 		}
-		
+
 		canvas.repaint();
 
 		inSelection = false;

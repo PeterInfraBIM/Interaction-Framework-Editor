@@ -43,7 +43,7 @@ public class InteractionFrameworkEditor extends Control {
 	private JFrame frame;
 	private JButton btn_NewFramework, btn_SaveFramework, btn_SaveAsFramework, btn_XsdCheck, btn_Print, btn_Report,
 			btn_NavigateBackward, btn_NavigateForward;
-	private JTextField tfd_User;
+	private JTextField tfd_User, tfd_Version;
 	private JPanel mainPanel;
 
 	DefaultHandler defaultHandler = new DefaultHandler() {
@@ -124,7 +124,9 @@ public class InteractionFrameworkEditor extends Control {
 				public void propertyChange(PropertyChangeEvent evt) {
 					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
 					if (evt.getPropertyName().equals("btn_Create")) {
-						if (newFrameworkDialogControl.getVersion().equals("1.6")) {
+						version = newFrameworkDialogControl.getVersion();
+						tfd_Version.setText(version);
+						if (version.equals("1.6")) {
 							try {
 								mainPanel.removeAll();
 								mainPanelControl16 = new MainPanelControl16();
@@ -183,6 +185,7 @@ public class InteractionFrameworkEditor extends Control {
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			frameworkFile = fileChooser.getSelectedFile();
 			checkOnVersion(frameworkFile);
+			tfd_Version.setText(version);
 			if (version.equals("1.6")) {
 				setWindowTitle(frameworkFile.getName());
 				userPrefs.put("FrameworkFile", frameworkFile.getAbsolutePath());
