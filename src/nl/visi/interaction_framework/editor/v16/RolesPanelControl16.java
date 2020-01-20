@@ -57,13 +57,13 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	JTable tbl_Messages;
 
-	private JTable tbl_Conditions;
+	private JTable tbl_Sequences;
 	private JTextField tfd_ResponsibilityScope, tfd_ResponsibilityTask, tfd_ResponsibilitySupportTask,
 			tfd_ResponsibilityFeedback;
-	private JButton btn_RemoveCondition, btn_AddCondition;
+	private JButton btn_RemoveSequenceElement, btn_AddSequenceElement;
 	private TransactionsTableModel transactionsTableModel;
 	private MessagesTableModel messagesTableModel;
-	private ConditionsTableModel conditionsTableModel;
+	private SequenceTableModel sequenceTableModel;
 	private JScrollPane scrollPane;
 	private Canvas drawingPlane;
 
@@ -218,7 +218,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			private boolean initiatorToExecutor;
 			private String label;
 			private Font font;
-			private Condition condition;
+			private SequenceMitt sequenceElement;
 			private int index = 0;
 
 			public MessageItem(final Canvas canvas, Graphics g, final MessageInTransactionTypeType mitt, int x, int y) {
@@ -229,7 +229,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				this.messageType = Control16.getMessage(mitt);
 				this.transactionType = Control16.getTransaction(mitt);
 				label = this.messageType.getId();
-				condition = new Condition(mitt);
+				sequenceElement = new SequenceMitt(mitt);
 				this.index = messageItemMap.size();
 
 				// ---------------------------------------------------------------------
@@ -425,7 +425,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					g2d.fillPolygon(xPoints, yPoints, 3);
 				}
 				if (messageItem.isIn()) {
-					List<MessageInTransactionTypeType> actions = messageItem.condition.getActions();
+					List<MessageInTransactionTypeType> actions = messageItem.sequenceElement.getNextMitts();
 					if (actions != null) {
 						for (MessageInTransactionTypeType action : actions) {
 							Transaction actionTransaction = transactionMap
@@ -698,8 +698,8 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	}
 
-	private enum ConditionRuleType {
-		Action, Trigger, SendAfter, SendBefore, Start, Stop;
+	private enum SequenceElementType {
+		Next, Previous, SendAfter, SendBefore, Start, Stop;
 
 		@Override
 		public String toString() {
@@ -707,21 +707,21 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		}
 	}
 
-	private class ConditionRule extends ElementType {
-		private ConditionRuleType type;
+	private class SequenceRule extends ElementType {
+		private SequenceElementType type;
 		private MessageInTransactionTypeType mitt;
 
-		public ConditionRule() {
+		public SequenceRule() {
 			super();
 		}
 
-		public ConditionRule(ConditionRuleType type, MessageInTransactionTypeType mitt) {
+		public SequenceRule(SequenceElementType type, MessageInTransactionTypeType mitt) {
 			this();
 			this.type = type;
 			this.mitt = mitt;
 		}
 
-		public ConditionRuleType getType() {
+		public SequenceElementType getType() {
 			return type;
 		}
 
@@ -741,30 +741,30 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	}
 
-	private class Condition {
+	private class SequenceMitt {
 		private MessageInTransactionTypeType mitt;
 
 		@SuppressWarnings("unused")
-		public Condition() {
+		public SequenceMitt() {
 		}
 
-		public Condition(MessageInTransactionTypeType mitt) {
+		public SequenceMitt(MessageInTransactionTypeType mitt) {
 			this.mitt = mitt;
 		}
 
-		public List<MessageInTransactionTypeType> getTriggers() {
+		public List<MessageInTransactionTypeType> getPreviousMitts() {
 			return getPrevious(mitt);
 		}
 
-		public List<MessageInTransactionTypeType> getSendAfters() {
+		public List<MessageInTransactionTypeType> getSendAfterMitts() {
 			return Control16.getSendAfters(mitt);
 		}
 
-		public List<MessageInTransactionTypeType> getSendBefores() {
+		public List<MessageInTransactionTypeType> getSendBeforeMitts() {
 			return Control16.getSendBefores(mitt);
 		}
 
-		public List<MessageInTransactionTypeType> getActions() {
+		public List<MessageInTransactionTypeType> getNextMitts() {
 			if (mitt != null) {
 				List<MessageInTransactionTypeType> actions = null;
 
@@ -870,7 +870,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	}
 
-	private enum ConditionsTableColumns {
+	private enum SequenceTableColumns {
 		Type, Id, Role, Transaction, Message;
 
 		@Override
@@ -881,23 +881,23 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	@SuppressWarnings("serial")
-	private class ConditionsTableModel extends ElementsTableModel<ConditionRule> {
+	private class SequenceTableModel extends ElementsTableModel<SequenceRule> {
 
 		@Override
 		public int getColumnCount() {
-			return ConditionsTableColumns.values().length;
+			return SequenceTableColumns.values().length;
 		}
 
 		@Override
 		public String getColumnName(int columnIndex) {
-			return ConditionsTableColumns.values()[columnIndex].toString();
+			return SequenceTableColumns.values()[columnIndex].toString();
 		}
 
 		@Override
 		public Object getValueAt(int rowIndex, int columnIndex) {
-			ConditionRule conditionRule = get(rowIndex);
+			SequenceRule conditionRule = get(rowIndex);
 			MessageInTransactionTypeType mitt = conditionRule.getMitt();
-			switch (ConditionsTableColumns.values()[columnIndex]) {
+			switch (SequenceTableColumns.values()[columnIndex]) {
 			case Type:
 				return conditionRule.getType().name();
 			case Id:
@@ -954,7 +954,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		initRolesTable();
 		initTransactionsTable();
 		initMessagesTable();
-		initConditionsTable();
+		initSequenceTable();
 		initStartDateField();
 		initEndDateField();
 		initResponsibilityScope();
@@ -1124,86 +1124,89 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					: -1;
 			// int selectedRow = tbl_Messages.getSelectedRow();
 			boolean selectedMessage = selectedRow >= 0;
-			conditionsTableModel.clear();
-			tbl_Conditions.setEnabled(selectedMessage);
-			btn_AddCondition.setEnabled(selectedMessage);
+			sequenceTableModel.clear();
+			tbl_Sequences.setEnabled(selectedMessage);
+			btn_AddSequenceElement.setEnabled(selectedMessage);
 			if (selectedMessage) {
 				String inOut = (String) messagesTableModel.getValueAt(selectedRow, MessagesTableColumns.Type.ordinal());
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
-				Condition condition = new Condition(mitt);
+				SequenceMitt sequenceMitt = new SequenceMitt(mitt);
 				if (inOut.contentEquals("out")) {
-					List<MessageInTransactionTypeType> sendAfters = condition.getSendAfters();
+					List<MessageInTransactionTypeType> sendAfters = sequenceMitt.getSendAfterMitts();
 					if (sendAfters != null) {
 						for (MessageInTransactionTypeType sendAfter : sendAfters) {
-							conditionsTableModel.add(new ConditionRule(ConditionRuleType.SendAfter, sendAfter));
+							sequenceTableModel.add(new SequenceRule(SequenceElementType.SendAfter, sendAfter));
 						}
 					}
-					List<MessageInTransactionTypeType> sendBefores = condition.getSendBefores();
+					List<MessageInTransactionTypeType> sendBefores = sequenceMitt.getSendBeforeMitts();
 					if (sendBefores != null) {
 						for (MessageInTransactionTypeType sendBefore : sendBefores) {
-							conditionsTableModel.add(new ConditionRule(ConditionRuleType.SendBefore, sendBefore));
+							sequenceTableModel.add(new SequenceRule(SequenceElementType.SendBefore, sendBefore));
 						}
 					}
-					List<MessageInTransactionTypeType> triggers = condition.getTriggers();
+					List<MessageInTransactionTypeType> triggers = sequenceMitt.getPreviousMitts();
 					if (triggers != null) {
 						for (MessageInTransactionTypeType trigger : triggers) {
-							conditionsTableModel.add(new ConditionRule(ConditionRuleType.Trigger, trigger));
+							sequenceTableModel.add(new SequenceRule(SequenceElementType.Previous, trigger));
 						}
 					} else {
 						if (sendAfters == null && sendBefores == null) {
-							conditionsTableModel.add(new ConditionRule(ConditionRuleType.Start, null));
+							sequenceTableModel.add(new SequenceRule(SequenceElementType.Start, null));
 						}
 					}
 				} else {
-					List<MessageInTransactionTypeType> actions = condition.getActions();
+					List<MessageInTransactionTypeType> actions = sequenceMitt.getNextMitts();
 					if (actions != null) {
 						for (MessageInTransactionTypeType action : actions) {
-							conditionsTableModel.add(new ConditionRule(ConditionRuleType.Action, action));
+							sequenceTableModel.add(new SequenceRule(SequenceElementType.Next, action));
 						}
 					} else {
-						conditionsTableModel.add(new ConditionRule(ConditionRuleType.Stop, null));
+						sequenceTableModel.add(new SequenceRule(SequenceElementType.Stop, null));
 					}
 				}
 			}
 		}
 	};
 
-	private void initConditionsTable() {
-		conditionsTableModel = new ConditionsTableModel();
-		tbl_Conditions.setModel(conditionsTableModel);
-		tbl_Conditions.setAutoCreateRowSorter(true);
-		tbl_Conditions.setFillsViewportHeight(true);
-		tbl_Conditions.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+	private void initSequenceTable() {
+		sequenceTableModel = new SequenceTableModel();
+		tbl_Sequences.setModel(sequenceTableModel);
+		tbl_Sequences.setAutoCreateRowSorter(true);
+		tbl_Sequences.setFillsViewportHeight(true);
+		tbl_Sequences.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				if (e.getValueIsAdjusting())
 					return;
-				int selectedRow = tbl_Conditions.getSelectedRow();
+				int selectedRow = tbl_Sequences.getSelectedRow();
 				if (selectedRow < 0) {
-					btn_RemoveCondition.setEnabled(false);
+					btn_RemoveSequenceElement.setEnabled(false);
 				} else {
-					ConditionRule conditionRule = conditionsTableModel
-							.get(tbl_Conditions.getRowSorter().convertRowIndexToModel(selectedRow));
-					boolean isStopCondition = conditionRule.getType().equals(ConditionRuleType.Stop);
-					boolean isStartCondition = conditionRule.getType().equals(ConditionRuleType.Start);
-					btn_RemoveCondition.setEnabled(!isStartCondition && !isStopCondition);
+					SequenceRule sequenceRule = sequenceTableModel
+							.get(tbl_Sequences.getRowSorter().convertRowIndexToModel(selectedRow));
+					boolean isStopCondition = sequenceRule.getType().equals(SequenceElementType.Stop);
+					boolean isStartCondition = sequenceRule.getType().equals(SequenceElementType.Start);
+					btn_RemoveSequenceElement.setEnabled(!isStartCondition && !isStopCondition);
 				}
 			}
 		});
 	}
 
-	public void removeCondition() {
-		int selectedRow = tbl_Conditions.getSelectedRow() > -1
-				? tbl_Conditions.getRowSorter().convertRowIndexToModel(tbl_Conditions.getSelectedRow())
+	public void removeSequenceElement() {
+		int selectedRow = tbl_Sequences.getSelectedRow() > -1
+				? tbl_Sequences.getRowSorter().convertRowIndexToModel(tbl_Sequences.getSelectedRow())
 				: -1;
 		if (selectedRow > -1) {
 			int selectedMessageTableRow = tbl_Messages.getRowSorter()
 					.convertRowIndexToModel(tbl_Messages.getSelectedRow());
 			MessageInTransactionTypeType parent = messagesTableModel.get(selectedMessageTableRow);
-			ConditionRule conditionRule = conditionsTableModel.get(selectedRow);
+			SequenceRule conditionRule = sequenceTableModel.get(selectedRow);
 			switch (conditionRule.getType()) {
-			case Action:
+			case Next:
 				removePrevious(conditionRule.getMitt(), parent);
+				break;
+			case Previous:
+				removePrevious(parent, conditionRule.getMitt());
 				break;
 			case SendAfter:
 				removeSendAfter(parent, conditionRule.getMitt());
@@ -1217,67 +1220,66 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			case Stop:
 				// Should not occur
 				return;
-			case Trigger:
-				removePrevious(parent, conditionRule.getMitt());
-				break;
 			default:
 				break;
 			}
-			conditionsTableModel.elements.remove(selectedRow);
-			conditionsTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
+			sequenceTableModel.elements.remove(selectedRow);
+			sequenceTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
 			messageTableSelectionListener.valueChanged(null);
 		}
 	}
 
-	public void addCondition() {
-		btn_AddCondition.setEnabled(false);
+	public void addSequenceElement() {
+		btn_AddSequenceElement.setEnabled(false);
 
 		try {
 			int selectedRow = tbl_Messages.getSelectedRow();
 			final int selectedRowIndex = tbl_Messages.getRowSorter().convertRowIndexToModel(selectedRow);
 			String inOut = (String) messagesTableModel.getValueAt(selectedRowIndex,
 					MessagesTableColumns.Type.ordinal());
-			final NewConditionDialogControl newConditionDialogControl = new NewConditionDialogControl(inOut);
-			newConditionDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
+			final NewSequenceElementDialogControl newSequenceElementDialogControl = new NewSequenceElementDialogControl(
+					inOut);
+			newSequenceElementDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
 
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
 					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
 					if (evt.getPropertyName().equals("btn_Create")) {
-						String conditionType = newConditionDialogControl.getConditionType();
-						MessageInTransactionTypeType value = newConditionDialogControl.getMitt();
+						String sequenceElementType = newSequenceElementDialogControl.getConditionType();
+						MessageInTransactionTypeType value = newSequenceElementDialogControl.getMitt();
 						String mittId = (String) messagesTableModel.getValueAt(selectedRowIndex,
 								MessagesTableColumns.Id.ordinal());
 						MessageInTransactionTypeType mitt = Editor16.getStore16()
 								.getElement(MessageInTransactionTypeType.class, mittId);
-						addCondition(conditionType, mitt, value);
-						conditionsTableModel.add(new ConditionRule(ConditionRuleType.valueOf(conditionType), value));
+						addSequenceElement(sequenceElementType, mitt, value);
+						sequenceTableModel
+								.add(new SequenceRule(SequenceElementType.valueOf(sequenceElementType), value));
 					}
 				}
 
 			});
-			newConditionDialogControl.setVisible(true);
+			newSequenceElementDialogControl.setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		btn_AddCondition.setEnabled(true);
+		btn_AddSequenceElement.setEnabled(true);
 	}
 
-	private void addCondition(String conditionType, MessageInTransactionTypeType mitt,
+	private void addSequenceElement(String sequenceElementType, MessageInTransactionTypeType mitt,
 			MessageInTransactionTypeType value) {
-		switch (conditionType) {
-		case "Action":
+		switch (sequenceElementType) {
+		case "Next":
 			addPrevious(value, mitt);
+			break;
+		case "Previous":
+			addPrevious(mitt, value);
 			break;
 		case "SendAfter":
 			addSendAfter(mitt, value);
 			break;
 		case "SendBefore":
 			addSendBefore(mitt, value);
-			break;
-		case "Trigger":
-			addPrevious(mitt, value);
 			break;
 		default:
 			break;
@@ -1389,7 +1391,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			tfd_ResponsibilityFeedback.setText("");
 			transactionsTableModel.clear();
 			messagesTableModel.clear();
-			conditionsTableModel.clear();
+			sequenceTableModel.clear();
 		}
 
 		canvas.repaint();

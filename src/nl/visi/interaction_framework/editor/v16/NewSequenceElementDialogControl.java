@@ -1,4 +1,4 @@
-package nl.visi.interaction_framework.editor.v14;
+package nl.visi.interaction_framework.editor.v16;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,18 +16,18 @@ import javax.swing.JDialog;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
-import nl.visi.schemas._20140331.MessageInTransactionTypeType;
-import nl.visi.schemas._20140331.MessageTypeType;
-import nl.visi.schemas._20140331.TransactionTypeType;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType;
+import nl.visi.schemas._20160331.MessageTypeType;
+import nl.visi.schemas._20160331.TransactionTypeType;
 
-public class NewConditionDialogControl extends Control14 {
-	private static final String NEW_CONDITION_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewConditionDialog.xml";
-	private static final String[] IN_CONDITION_TYPES = { "Action" };
-	private static final String[] OUT_CONDITION_TYPES = { "SendAfter", "SendBefore", "Trigger" };
+public class NewSequenceElementDialogControl extends Control16 {
+	private static final String NEW_SEQUENCE_ELEMENT_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewSequenceElementDialog.xml";
+	private static final String[] IN_SEQUENCE_ELEMENT_TYPES = { "Next" };
+	private static final String[] OUT_SEQUENCE_ELEMENT_TYPES = { "Previous", "SendAfter", "SendBefore" };
 
 	private JDialog dialog;
 	private JButton btn_Cancel, btn_Create;
-	private JComboBox<String> cbx_ConditionType, cbx_Message, cbx_MessageInTransaction, cbx_Transaction;
+	private JComboBox<String> cbx_SequenceElementType, cbx_Message, cbx_MessageInTransaction, cbx_Transaction;
 	private ElementsModel<TransactionTypeType> transactionsModel;
 	private ElementsModel<MessageTypeType> messagesModel;
 	private ElementsModel<MessageInTransactionTypeType> mittsModel;
@@ -96,17 +96,18 @@ public class NewConditionDialogControl extends Control14 {
 
 	}
 
-	public NewConditionDialogControl(String inOut) throws Exception {
+	public NewSequenceElementDialogControl(String inOut) throws Exception {
 		super();
-		dialog = (JDialog) render(NEW_CONDITION_DIALOG);
+		dialog = (JDialog) render(NEW_SEQUENCE_ELEMENT_DIALOG);
 		JRootPane rootPane = SwingUtilities.getRootPane(btn_Create);
 		rootPane.setDefaultButton(btn_Create);
-		DefaultComboBoxModel<String> typesModel = inOut.equals("in") ? new DefaultComboBoxModel<>(IN_CONDITION_TYPES)
-				: new DefaultComboBoxModel<>(OUT_CONDITION_TYPES);
-		cbx_ConditionType.setModel(typesModel);
+		DefaultComboBoxModel<String> typesModel = inOut.equals("in")
+				? new DefaultComboBoxModel<>(IN_SEQUENCE_ELEMENT_TYPES)
+				: new DefaultComboBoxModel<>(OUT_SEQUENCE_ELEMENT_TYPES);
+		cbx_SequenceElementType.setModel(typesModel);
 
 		mittsModel = new ElementsModel<>();
-		List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+		List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType mitt : mitts) {
 			mittsModel.addElement(mitt);
@@ -129,7 +130,7 @@ public class NewConditionDialogControl extends Control14 {
 		});
 
 		transactionsModel = new ElementsModel<>();
-		List<TransactionTypeType> transactions = Editor14.getStore14().getElements(TransactionTypeType.class);
+		List<TransactionTypeType> transactions = Editor16.getStore16().getElements(TransactionTypeType.class);
 		for (TransactionTypeType transaction : transactions) {
 			transactionsModel.addElement(transaction);
 		}
@@ -159,7 +160,7 @@ public class NewConditionDialogControl extends Control14 {
 				TransactionTypeType selectedTransaction = transactionsModel.getSelectedElement();
 				MessageTypeType selectedMessage = messagesModel.getSelectedElement();
 				if (selectedTransaction != null && selectedMessage != null) {
-					List<MessageInTransactionTypeType> mittElements = Editor14.getStore14()
+					List<MessageInTransactionTypeType> mittElements = Editor16.getStore16()
 							.getElements(MessageInTransactionTypeType.class);
 					for (MessageInTransactionTypeType mitt : mittElements) {
 						TransactionTypeType transaction = getTransaction(mitt);
@@ -207,7 +208,7 @@ public class NewConditionDialogControl extends Control14 {
 
 	private void fillMessageComboBox(String selectedTransactionId) {
 		messagesModel.elements.clear();
-		List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+		List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType mitt : mitts) {
 			TransactionTypeType transaction = getTransaction(mitt);
@@ -235,7 +236,7 @@ public class NewConditionDialogControl extends Control14 {
 	}
 
 	public String getConditionType() {
-		return (String) cbx_ConditionType.getSelectedItem();
+		return (String) cbx_SequenceElementType.getSelectedItem();
 	}
 
 	public MessageInTransactionTypeType getMitt() {

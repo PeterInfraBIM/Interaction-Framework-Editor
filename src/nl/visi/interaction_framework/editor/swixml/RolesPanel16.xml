@@ -230,7 +230,7 @@
 									PreferredScrollableViewportSize="200,50" />
 							</scrollpane>
 						</panel>
-						<tabbedpane Titles="lbl_Conditions">
+						<panel Border="TitledBorder(lbl_Sequence)" Layout="BorderLayout">
 							<gridbagconstraints
 								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="1"
 								Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
@@ -239,29 +239,29 @@
 									<gridbagconstraints
 										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
 										Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
-									<table id="tbl_Conditions"
+									<table id="tbl_Sequences"
 										SelectionMode="ListSelectionModel.SINGLE_SELECTION"
 										PreferredScrollableViewportSize="200,50" />
 								</scrollpane>
 								<panel Layout="GridBagLayout">
 									<gridbagconstraints
 										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
-									<button id="btn_RemoveCondition"
-										Action="removeCondition" Enabled="false" Text="lbl_Remove"
-										ToolTipText="lbl_RemoveCondition">
+									<button id="btn_RemoveSequenceElement"
+										Action="removeSequenceElement" Enabled="false" Text="lbl_Remove"
+										ToolTipText="lbl_RemoveSequenceElement">
 										<gridbagconstraints
 											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
 											Insets="0,2,2,2" Weightx="1.0" />
 									</button>
-									<button id="btn_AddCondition" Action="addCondition"
-										Text="lbl_Add" ToolTipText="lbl_AddCondition" Enabled="false">
+									<button id="btn_AddSequenceElement" Action="addSequenceElement"
+										Text="lbl_Add" ToolTipText="lbl_AddSequenceElement" Enabled="false">
 										<gridbagconstraints
 											Anchor="GridBagConstraints.EAST" Gridx="1" Gridy="0"
 											Insets="0,2,2,2" Weightx="1.0" />
 									</button>
 								</panel>
 							</panel>
-						</tabbedpane>
+						</panel>
 					</panel>
 					<panel id="canvas" Border="EmptyBorder(4,4,4,4)"
 						Layout="BorderLayout" />
