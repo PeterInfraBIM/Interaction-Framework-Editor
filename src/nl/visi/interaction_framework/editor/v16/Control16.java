@@ -234,6 +234,30 @@ public abstract class Control16 extends Control {
 		return getInitiator(transactionType);
 	}
 
+	protected static List<MessageInTransactionTypeType> getNext(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			List<MessageInTransactionTypeType> next = null;
+
+			List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+					.getElements(MessageInTransactionTypeType.class);
+			for (MessageInTransactionTypeType mittElement : allMitts) {
+				List<MessageInTransactionTypeType> previous = getPrevious(mittElement);
+				if (previous != null) {
+					for (MessageInTransactionTypeType prev : previous) {
+						if (prev.getId().equals(mitt.getId())) {
+							if (next == null) {
+								next = new ArrayList<>();
+							}
+							next.add(mittElement);
+						}
+					}
+				}
+			}
+			return next;
+		}
+		return null;
+	}
+
 	protected static List<MessageInTransactionTypeType> getPrevious(MessageInTransactionTypeType mitt) {
 		if (mitt != null) {
 			Previous previous = mitt.getPrevious();

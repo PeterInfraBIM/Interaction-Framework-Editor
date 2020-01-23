@@ -20,19 +20,19 @@ import org.swixml.SwingEngine;
 
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType;
+import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendAfter;
+import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendBefore;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionTypeRef;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.Conditions;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.Message;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.Previous;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20140331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.ObjectFactory;
 import nl.visi.schemas._20140331.RoleTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType;
-import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendAfter;
-import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendBefore;
-import nl.visi.schemas._20140331.MessageInTransactionTypeType.Conditions;
-import nl.visi.schemas._20140331.MessageInTransactionTypeType.Message;
-import nl.visi.schemas._20140331.MessageInTransactionTypeType.Previous;
-import nl.visi.schemas._20140331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20140331.TransactionTypeType.Executor;
 import nl.visi.schemas._20140331.TransactionTypeType.Initiator;
 
@@ -257,6 +257,30 @@ abstract class Control14 {
 	protected static RoleTypeType getInitiator(MessageInTransactionTypeType mitt) {
 		TransactionTypeType transactionType = getTransaction(mitt);
 		return getInitiator(transactionType);
+	}
+
+	protected static List<MessageInTransactionTypeType> getNext(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			List<MessageInTransactionTypeType> next = null;
+
+			List<MessageInTransactionTypeType> allMitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			for (MessageInTransactionTypeType mittElement : allMitts) {
+				List<MessageInTransactionTypeType> previous = getPrevious(mittElement);
+				if (previous != null) {
+					for (MessageInTransactionTypeType prev : previous) {
+						if (prev.getId().equals(mitt.getId())) {
+							if (next == null) {
+								next = new ArrayList<>();
+							}
+							next.add(mittElement);
+						}
+					}
+				}
+			}
+			return next;
+		}
+		return null;
 	}
 
 	protected static List<MessageInTransactionTypeType> getPrevious(MessageInTransactionTypeType mitt) {

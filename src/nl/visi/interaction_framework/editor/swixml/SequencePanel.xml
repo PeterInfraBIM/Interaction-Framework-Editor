@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML file is used to create a Swing container using the SwiXml rendering 
+	engine. org.jvnet.substance.SubstanceLookAndFeel com.jgoodies.looks.plastic.PlasticXPLookAndFeel 
+	org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel a03.swing.plaf/A03LookAndFeel -->
+<panel bundle="nl.visi.interaction_framework.editor.locale.Editor"
+	id="rolesPanel" plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel"
+	layout="BorderLayout">
+	<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout"
+		Constraint="BorderLayout.CENTER">
+		<scrollpane>
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="0" Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+			<table id="tbl_Sequences"
+				SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+				PreferredScrollableViewportSize="200,50" />
+		</scrollpane>
+		<panel Layout="GridBagLayout">
+			<gridbagconstraints
+				Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
+			<button id="btn_RemoveSequenceElement"
+				Action="removeSequenceElement" Enabled="false" Text="lbl_Remove"
+				ToolTipText="lbl_RemoveSequenceElement">
+				<gridbagconstraints
+					Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+					Insets="0,2,2,2" Weightx="1.0" />
+			</button>
+			<button id="btn_AddSequenceElement"
+				Action="addSequenceElement" Text="lbl_Add"
+				ToolTipText="lbl_AddSequenceElement" Enabled="false">
+				<gridbagconstraints
+					Anchor="GridBagConstraints.EAST" Gridx="1" Gridy="0"
+					Insets="0,2,2,2" Weightx="1.0" />
+			</button>
+		</panel>
+	</panel>
+</panel>

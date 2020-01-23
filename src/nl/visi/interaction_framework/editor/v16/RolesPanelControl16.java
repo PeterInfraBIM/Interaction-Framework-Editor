@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -42,7 +41,6 @@ import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
-import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.RoleTypeType;
@@ -52,18 +50,19 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	private static final String ROLES_PANEL = "nl/visi/interaction_framework/editor/swixml/RolesPanel16.xml";
 
 	private JTabbedPane relationsTabs;
-	private JPanel startDatePanel, endDatePanel, canvas;
+	private JPanel startDatePanel, endDatePanel, canvas, sequencePanel;
 	private JTable tbl_Transactions;
 
 	JTable tbl_Messages;
 
-	private JTable tbl_Sequences;
+//	private JTable tbl_Sequences;
+	private SequenceTable sequenceTable;
 	private JTextField tfd_ResponsibilityScope, tfd_ResponsibilityTask, tfd_ResponsibilitySupportTask,
 			tfd_ResponsibilityFeedback;
-	private JButton btn_RemoveSequenceElement, btn_AddSequenceElement;
+//	private JButton btn_RemoveSequenceElement, btn_AddSequenceElement;
 	private TransactionsTableModel transactionsTableModel;
 	private MessagesTableModel messagesTableModel;
-	private SequenceTableModel sequenceTableModel;
+//	private SequenceTableModel sequenceTableModel;
 	private JScrollPane scrollPane;
 	private Canvas drawingPlane;
 
@@ -191,14 +190,6 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				Graphics2D g2 = (Graphics2D) g;
 				String label = transactionType.getId();
 				if (label != null) {
-//					g2.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
-//					int stringWidth = g2.getFontMetrics().stringWidth(label);
-//					g2.translate((float) x, (float) y);
-//					g2.rotate(Math.toRadians(-90));
-//					g2.drawString(label, -stringWidth, -5);
-//					g2.rotate(-Math.toRadians(-90));
-//					g2.translate(-(float) x, -(float) y);
-
 					Stroke saveStroke = g2.getStroke();
 					float dash[] = { 5.0f };
 					g2.setStroke(
@@ -218,7 +209,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			private boolean initiatorToExecutor;
 			private String label;
 			private Font font;
-			private SequenceMitt sequenceElement;
+//			private SequenceMitt sequenceElement;
 			private int index = 0;
 
 			public MessageItem(final Canvas canvas, Graphics g, final MessageInTransactionTypeType mitt, int x, int y) {
@@ -229,7 +220,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				this.messageType = Control16.getMessage(mitt);
 				this.transactionType = Control16.getTransaction(mitt);
 				label = this.messageType.getId();
-				sequenceElement = new SequenceMitt(mitt);
+//				sequenceElement = new SequenceMitt(mitt);
 				this.index = messageItemMap.size();
 
 				// ---------------------------------------------------------------------
@@ -270,10 +261,6 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 						InteractionFrameworkEditor.navigate(getMessage(mitt));
 					}
 				});
-//				Color saveColor = g.getColor();
-//				g.setColor(Color.WHITE);
-//				g.fillRect(x, y + 3, g.getFontMetrics(font).stringWidth(label), lineHeight);
-//				g.setColor(saveColor);
 				g.drawString(label, x, y + lineHeight);
 				canvas.add(activeLabel);
 				canvas.validate();
@@ -375,7 +362,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				int transactionsRowCount = transactionsTableModel.getRowCount();
 				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
 				for (int index = 0; index < transactionsRowCount; index++) {
-					TransactionTypeType transactionTypeType = transactionsTableModel.get(index);
+//					TransactionTypeType transactionTypeType = transactionsTableModel.get(index);
 					transactions.get(index).x = offsetLeft + transactionWidth * (index + 1) - transactionWidth / 2;
 					transactions.get(index).activeLabel.setLocation(transactions.get(index).x,
 							transactions.get(index).y);
@@ -400,13 +387,6 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				titleWidth = g2d.getFontMetrics().stringWidth(messageItem.label);
 				int lineX = 20;
 				int lineY = lineNumber * lineHeight + yInitStart;
-//				if (startLine != -1) {
-//					if (lineNumber < startLine || lineNumber > startLine + linesPerPage) {
-//						continue;
-//					}
-//					lineY -= startLine * lineHeight;
-//				}
-				// g2d.drawString(messageItem.label, lineX, lineY);
 
 				g2d.drawLine(titleWidth + lineX + 2, lineY, transaction.x, lineY);
 				if (messageItem.isIn()) {
@@ -425,7 +405,8 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					g2d.fillPolygon(xPoints, yPoints, 3);
 				}
 				if (messageItem.isIn()) {
-					List<MessageInTransactionTypeType> actions = messageItem.sequenceElement.getNextMitts();
+//					List<MessageInTransactionTypeType> actions = messageItem.sequenceElement.getNextMitts();
+					List<MessageInTransactionTypeType> actions = getNext(messageItem.mitt);
 					if (actions != null) {
 						for (MessageInTransactionTypeType action : actions) {
 							Transaction actionTransaction = transactionMap
@@ -698,96 +679,76 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	}
 
-	private enum SequenceElementType {
-		Next, Previous, SendAfter, SendBefore, Start, Stop;
-
-		@Override
-		public String toString() {
-			return getBundle().getString("lbl_" + name());
-		}
-	}
-
-	private class SequenceRule extends ElementType {
-		private SequenceElementType type;
-		private MessageInTransactionTypeType mitt;
-
-		public SequenceRule() {
-			super();
-		}
-
-		public SequenceRule(SequenceElementType type, MessageInTransactionTypeType mitt) {
-			this();
-			this.type = type;
-			this.mitt = mitt;
-		}
-
-		public SequenceElementType getType() {
-			return type;
-		}
-
-		public MessageInTransactionTypeType getMitt() {
-			return mitt;
-		}
-
-		@Override
-		public String getId() {
-			return mitt != null ? mitt.getId() : null;
-		}
-
-		@Override
-		public String toString() {
-			return mitt != null ? mitt.getId() : null;
-		}
-
-	}
-
-	private class SequenceMitt {
-		private MessageInTransactionTypeType mitt;
-
-		@SuppressWarnings("unused")
-		public SequenceMitt() {
-		}
-
-		public SequenceMitt(MessageInTransactionTypeType mitt) {
-			this.mitt = mitt;
-		}
-
-		public List<MessageInTransactionTypeType> getPreviousMitts() {
-			return getPrevious(mitt);
-		}
-
-		public List<MessageInTransactionTypeType> getSendAfterMitts() {
-			return Control16.getSendAfters(mitt);
-		}
-
-		public List<MessageInTransactionTypeType> getSendBeforeMitts() {
-			return Control16.getSendBefores(mitt);
-		}
-
-		public List<MessageInTransactionTypeType> getNextMitts() {
-			if (mitt != null) {
-				List<MessageInTransactionTypeType> actions = null;
-
-				List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
-						.getElements(MessageInTransactionTypeType.class);
-				for (MessageInTransactionTypeType mittElement : allMitts) {
-					List<MessageInTransactionTypeType> previous = getPrevious(mittElement);
-					if (previous != null) {
-						for (MessageInTransactionTypeType prev : previous) {
-							if (prev.getId().equals(mitt.getId())) {
-								if (actions == null) {
-									actions = new ArrayList<>();
-								}
-								actions.add(mittElement);
-							}
-						}
-					}
-				}
-				return actions;
-			}
-			return null;
-		}
-	}
+//	private enum SequenceElementType {
+//		Next, Previous, SendAfter, SendBefore, Start, Stop;
+//
+//		@Override
+//		public String toString() {
+//			return getBundle().getString("lbl_" + name());
+//		}
+//	}
+//
+//	private class SequenceRule extends ElementType {
+//		private SequenceElementType type;
+//		private MessageInTransactionTypeType mitt;
+//
+//		public SequenceRule() {
+//			super();
+//		}
+//
+//		public SequenceRule(SequenceElementType type, MessageInTransactionTypeType mitt) {
+//			this();
+//			this.type = type;
+//			this.mitt = mitt;
+//		}
+//
+//		public SequenceElementType getType() {
+//			return type;
+//		}
+//
+//		public MessageInTransactionTypeType getMitt() {
+//			return mitt;
+//		}
+//
+//		@Override
+//		public String getId() {
+//			return mitt != null ? mitt.getId() : null;
+//		}
+//
+//		@Override
+//		public String toString() {
+//			return mitt != null ? mitt.getId() : null;
+//		}
+//
+//	}
+//
+//	private class SequenceMitt {
+//		private MessageInTransactionTypeType mitt;
+//
+//		@SuppressWarnings("unused")
+//		public SequenceMitt() {
+//		}
+//
+//		public SequenceMitt(MessageInTransactionTypeType mitt) {
+//			this.mitt = mitt;
+//		}
+//
+//		public List<MessageInTransactionTypeType> getPreviousMitts() {
+//			return getPrevious(mitt);
+//		}
+//
+//		public List<MessageInTransactionTypeType> getSendAfterMitts() {
+//			return Control16.getSendAfters(mitt);
+//		}
+//
+//		public List<MessageInTransactionTypeType> getSendBeforeMitts() {
+//			return Control16.getSendBefores(mitt);
+//		}
+//
+//		public List<MessageInTransactionTypeType> getNextMitts() {
+//			return Control16.getNext(mitt);
+//		}
+//	}
 
 	private enum MessagesTableColumns {
 		Type, Id, Role, Transaction, Message, Navigate;
@@ -870,73 +831,73 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 	}
 
-	private enum SequenceTableColumns {
-		Type, Id, Role, Transaction, Message;
-
-		@Override
-		public String toString() {
-			return getBundle().getString("lbl_" + name());
-		}
-
-	}
-
-	@SuppressWarnings("serial")
-	private class SequenceTableModel extends ElementsTableModel<SequenceRule> {
-
-		@Override
-		public int getColumnCount() {
-			return SequenceTableColumns.values().length;
-		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			return SequenceTableColumns.values()[columnIndex].toString();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			SequenceRule conditionRule = get(rowIndex);
-			MessageInTransactionTypeType mitt = conditionRule.getMitt();
-			switch (SequenceTableColumns.values()[columnIndex]) {
-			case Type:
-				return conditionRule.getType().name();
-			case Id:
-				return conditionRule.getId();
-			case Role:
-				if (mitt != null) {
-					RoleTypeType initiator = getInitiator(mitt);
-					RoleTypeType executor = getExecutor(mitt);
-					Boolean initiatorToExecutor = mitt.isInitiatorToExecutor();
-					if (initiatorToExecutor == null) {
-						initiatorToExecutor = false;
-					}
-					if (initiatorToExecutor) {
-						if (selectedElement.equals(initiator)) {
-							return executor != null ? executor.getId() : null;
-						} else {
-							return initiator != null ? initiator.getId() : null;
-						}
-					} else {
-						if (selectedElement.equals(executor)) {
-							return initiator != null ? initiator.getId() : null;
-						} else {
-							return executor != null ? executor.getId() : null;
-						}
-					}
-				}
-				break;
-			case Transaction:
-				TransactionTypeType transactionType = getTransaction(mitt);
-				return transactionType != null ? transactionType.getId() : null;
-			case Message:
-				MessageTypeType messageType = getMessage(mitt);
-				return messageType != null ? messageType.getId() : null;
-			}
-
-			return null;
-		}
-
-	}
+//	private enum SequenceTableColumns {
+//		Type, Id, Role, Transaction, Message;
+//
+//		@Override
+//		public String toString() {
+//			return getBundle().getString("lbl_" + name());
+//		}
+//
+//	}
+//
+//	@SuppressWarnings("serial")
+//	private class SequenceTableModel extends ElementsTableModel<SequenceRule> {
+//
+//		@Override
+//		public int getColumnCount() {
+//			return SequenceTableColumns.values().length;
+//		}
+//
+//		@Override
+//		public String getColumnName(int columnIndex) {
+//			return SequenceTableColumns.values()[columnIndex].toString();
+//		}
+//
+//		@Override
+//		public Object getValueAt(int rowIndex, int columnIndex) {
+//			SequenceRule conditionRule = get(rowIndex);
+//			MessageInTransactionTypeType mitt = conditionRule.getMitt();
+//			switch (SequenceTableColumns.values()[columnIndex]) {
+//			case Type:
+//				return conditionRule.getType().name();
+//			case Id:
+//				return conditionRule.getId();
+//			case Role:
+//				if (mitt != null) {
+//					RoleTypeType initiator = getInitiator(mitt);
+//					RoleTypeType executor = getExecutor(mitt);
+//					Boolean initiatorToExecutor = mitt.isInitiatorToExecutor();
+//					if (initiatorToExecutor == null) {
+//						initiatorToExecutor = false;
+//					}
+//					if (initiatorToExecutor) {
+//						if (selectedElement.equals(initiator)) {
+//							return executor != null ? executor.getId() : null;
+//						} else {
+//							return initiator != null ? initiator.getId() : null;
+//						}
+//					} else {
+//						if (selectedElement.equals(executor)) {
+//							return initiator != null ? initiator.getId() : null;
+//						} else {
+//							return executor != null ? executor.getId() : null;
+//						}
+//					}
+//				}
+//				break;
+//			case Transaction:
+//				TransactionTypeType transactionType = getTransaction(mitt);
+//				return transactionType != null ? transactionType.getId() : null;
+//			case Message:
+//				MessageTypeType messageType = getMessage(mitt);
+//				return messageType != null ? messageType.getId() : null;
+//			}
+//
+//			return null;
+//		}
+//
+//	}
 
 	public RolesPanelControl16() throws Exception {
 		super(ROLES_PANEL);
@@ -1124,167 +1085,176 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 					: -1;
 			// int selectedRow = tbl_Messages.getSelectedRow();
 			boolean selectedMessage = selectedRow >= 0;
-			sequenceTableModel.clear();
-			tbl_Sequences.setEnabled(selectedMessage);
-			btn_AddSequenceElement.setEnabled(selectedMessage);
+
+//			sequenceTableModel.clear();
+//			tbl_Sequences.setEnabled(selectedMessage);
+//			btn_AddSequenceElement.setEnabled(selectedMessage);
 			if (selectedMessage) {
 				String inOut = (String) messagesTableModel.getValueAt(selectedRow, MessagesTableColumns.Type.ordinal());
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
-				SequenceMitt sequenceMitt = new SequenceMitt(mitt);
-				if (inOut.contentEquals("out")) {
-					List<MessageInTransactionTypeType> sendAfters = sequenceMitt.getSendAfterMitts();
-					if (sendAfters != null) {
-						for (MessageInTransactionTypeType sendAfter : sendAfters) {
-							sequenceTableModel.add(new SequenceRule(SequenceElementType.SendAfter, sendAfter));
-						}
-					}
-					List<MessageInTransactionTypeType> sendBefores = sequenceMitt.getSendBeforeMitts();
-					if (sendBefores != null) {
-						for (MessageInTransactionTypeType sendBefore : sendBefores) {
-							sequenceTableModel.add(new SequenceRule(SequenceElementType.SendBefore, sendBefore));
-						}
-					}
-					List<MessageInTransactionTypeType> triggers = sequenceMitt.getPreviousMitts();
-					if (triggers != null) {
-						for (MessageInTransactionTypeType trigger : triggers) {
-							sequenceTableModel.add(new SequenceRule(SequenceElementType.Previous, trigger));
-						}
-					} else {
-						if (sendAfters == null && sendBefores == null) {
-							sequenceTableModel.add(new SequenceRule(SequenceElementType.Start, null));
-						}
-					}
-				} else {
-					List<MessageInTransactionTypeType> actions = sequenceMitt.getNextMitts();
-					if (actions != null) {
-						for (MessageInTransactionTypeType action : actions) {
-							sequenceTableModel.add(new SequenceRule(SequenceElementType.Next, action));
-						}
-					} else {
-						sequenceTableModel.add(new SequenceRule(SequenceElementType.Stop, null));
-					}
-				}
+				sequenceTable.fillSequenceTable(selectedElement, inOut, mitt);
+
+//				SequenceMitt sequenceMitt = new SequenceMitt(mitt);
+//				if (inOut.contentEquals("out")) {
+//					List<MessageInTransactionTypeType> sendAfters = sequenceMitt.getSendAfterMitts();
+//					if (sendAfters != null) {
+//						for (MessageInTransactionTypeType sendAfter : sendAfters) {
+//							sequenceTableModel.add(new SequenceRule(SequenceElementType.SendAfter, sendAfter));
+//						}
+//					}
+//					List<MessageInTransactionTypeType> sendBefores = sequenceMitt.getSendBeforeMitts();
+//					if (sendBefores != null) {
+//						for (MessageInTransactionTypeType sendBefore : sendBefores) {
+//							sequenceTableModel.add(new SequenceRule(SequenceElementType.SendBefore, sendBefore));
+//						}
+//					}
+//					List<MessageInTransactionTypeType> triggers = sequenceMitt.getPreviousMitts();
+//					if (triggers != null) {
+//						for (MessageInTransactionTypeType trigger : triggers) {
+//							sequenceTableModel.add(new SequenceRule(SequenceElementType.Previous, trigger));
+//						}
+//					} else {
+//						if (sendAfters == null && sendBefores == null) {
+//							sequenceTableModel.add(new SequenceRule(SequenceElementType.Start, null));
+//						}
+//					}
+//				} else {
+//					List<MessageInTransactionTypeType> actions = sequenceMitt.getNextMitts();
+//					if (actions != null) {
+//						for (MessageInTransactionTypeType action : actions) {
+//							sequenceTableModel.add(new SequenceRule(SequenceElementType.Next, action));
+//						}
+//					} else {
+//						sequenceTableModel.add(new SequenceRule(SequenceElementType.Stop, null));
+//					}
+//				}
+//			}
 			}
 		}
 	};
 
-	private void initSequenceTable() {
-		sequenceTableModel = new SequenceTableModel();
-		tbl_Sequences.setModel(sequenceTableModel);
-		tbl_Sequences.setAutoCreateRowSorter(true);
-		tbl_Sequences.setFillsViewportHeight(true);
-		tbl_Sequences.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				if (e.getValueIsAdjusting())
-					return;
-				int selectedRow = tbl_Sequences.getSelectedRow();
-				if (selectedRow < 0) {
-					btn_RemoveSequenceElement.setEnabled(false);
-				} else {
-					SequenceRule sequenceRule = sequenceTableModel
-							.get(tbl_Sequences.getRowSorter().convertRowIndexToModel(selectedRow));
-					boolean isStopCondition = sequenceRule.getType().equals(SequenceElementType.Stop);
-					boolean isStartCondition = sequenceRule.getType().equals(SequenceElementType.Start);
-					btn_RemoveSequenceElement.setEnabled(!isStartCondition && !isStopCondition);
-				}
-			}
-		});
+	private void initSequenceTable() throws Exception {
+		sequenceTable = new SequenceTable();
+		sequencePanel.removeAll();
+		sequencePanel.add(sequenceTable.getPanel());
+		sequencePanel.revalidate();
+
+//		sequenceTableModel = new SequenceTableModel();
+//		tbl_Sequences.setModel(sequenceTableModel);
+//		tbl_Sequences.setAutoCreateRowSorter(true);
+//		tbl_Sequences.setFillsViewportHeight(true);
+//		tbl_Sequences.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//			@Override
+//			public void valueChanged(ListSelectionEvent e) {
+//				if (e.getValueIsAdjusting())
+//					return;
+//				int selectedRow = tbl_Sequences.getSelectedRow();
+//				if (selectedRow < 0) {
+//					btn_RemoveSequenceElement.setEnabled(false);
+//				} else {
+//					SequenceRule sequenceRule = sequenceTableModel
+//							.get(tbl_Sequences.getRowSorter().convertRowIndexToModel(selectedRow));
+//					boolean isStopCondition = sequenceRule.getType().equals(SequenceElementType.Stop);
+//					boolean isStartCondition = sequenceRule.getType().equals(SequenceElementType.Start);
+//					btn_RemoveSequenceElement.setEnabled(!isStartCondition && !isStopCondition);
+//				}
+//			}
+//		});
 	}
 
-	public void removeSequenceElement() {
-		int selectedRow = tbl_Sequences.getSelectedRow() > -1
-				? tbl_Sequences.getRowSorter().convertRowIndexToModel(tbl_Sequences.getSelectedRow())
-				: -1;
-		if (selectedRow > -1) {
-			int selectedMessageTableRow = tbl_Messages.getRowSorter()
-					.convertRowIndexToModel(tbl_Messages.getSelectedRow());
-			MessageInTransactionTypeType parent = messagesTableModel.get(selectedMessageTableRow);
-			SequenceRule conditionRule = sequenceTableModel.get(selectedRow);
-			switch (conditionRule.getType()) {
-			case Next:
-				removePrevious(conditionRule.getMitt(), parent);
-				break;
-			case Previous:
-				removePrevious(parent, conditionRule.getMitt());
-				break;
-			case SendAfter:
-				removeSendAfter(parent, conditionRule.getMitt());
-				break;
-			case SendBefore:
-				removeSendBefore(parent, conditionRule.getMitt());
-				break;
-			case Start:
-				// Should not occur
-				return;
-			case Stop:
-				// Should not occur
-				return;
-			default:
-				break;
-			}
-			sequenceTableModel.elements.remove(selectedRow);
-			sequenceTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
-			messageTableSelectionListener.valueChanged(null);
-		}
-	}
-
-	public void addSequenceElement() {
-		btn_AddSequenceElement.setEnabled(false);
-
-		try {
-			int selectedRow = tbl_Messages.getSelectedRow();
-			final int selectedRowIndex = tbl_Messages.getRowSorter().convertRowIndexToModel(selectedRow);
-			String inOut = (String) messagesTableModel.getValueAt(selectedRowIndex,
-					MessagesTableColumns.Type.ordinal());
-			final NewSequenceElementDialogControl newSequenceElementDialogControl = new NewSequenceElementDialogControl(
-					inOut);
-			newSequenceElementDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
-
-				@Override
-				public void propertyChange(PropertyChangeEvent evt) {
-					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
-					if (evt.getPropertyName().equals("btn_Create")) {
-						String sequenceElementType = newSequenceElementDialogControl.getConditionType();
-						MessageInTransactionTypeType value = newSequenceElementDialogControl.getMitt();
-						String mittId = (String) messagesTableModel.getValueAt(selectedRowIndex,
-								MessagesTableColumns.Id.ordinal());
-						MessageInTransactionTypeType mitt = Editor16.getStore16()
-								.getElement(MessageInTransactionTypeType.class, mittId);
-						addSequenceElement(sequenceElementType, mitt, value);
-						sequenceTableModel
-								.add(new SequenceRule(SequenceElementType.valueOf(sequenceElementType), value));
-					}
-				}
-
-			});
-			newSequenceElementDialogControl.setVisible(true);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		btn_AddSequenceElement.setEnabled(true);
-	}
-
-	private void addSequenceElement(String sequenceElementType, MessageInTransactionTypeType mitt,
-			MessageInTransactionTypeType value) {
-		switch (sequenceElementType) {
-		case "Next":
-			addPrevious(value, mitt);
-			break;
-		case "Previous":
-			addPrevious(mitt, value);
-			break;
-		case "SendAfter":
-			addSendAfter(mitt, value);
-			break;
-		case "SendBefore":
-			addSendBefore(mitt, value);
-			break;
-		default:
-			break;
-		}
-	}
+//	public void removeSequenceElement() {
+//		int selectedRow = tbl_Sequences.getSelectedRow() > -1
+//				? tbl_Sequences.getRowSorter().convertRowIndexToModel(tbl_Sequences.getSelectedRow())
+//				: -1;
+//		if (selectedRow > -1) {
+//			int selectedMessageTableRow = tbl_Messages.getRowSorter()
+//					.convertRowIndexToModel(tbl_Messages.getSelectedRow());
+//			MessageInTransactionTypeType parent = messagesTableModel.get(selectedMessageTableRow);
+//			SequenceRule conditionRule = sequenceTableModel.get(selectedRow);
+//			switch (conditionRule.getType()) {
+//			case Next:
+//				removePrevious(conditionRule.getMitt(), parent);
+//				break;
+//			case Previous:
+//				removePrevious(parent, conditionRule.getMitt());
+//				break;
+//			case SendAfter:
+//				removeSendAfter(parent, conditionRule.getMitt());
+//				break;
+//			case SendBefore:
+//				removeSendBefore(parent, conditionRule.getMitt());
+//				break;
+//			case Start:
+//				// Should not occur
+//				return;
+//			case Stop:
+//				// Should not occur
+//				return;
+//			default:
+//				break;
+//			}
+//			sequenceTableModel.elements.remove(selectedRow);
+//			sequenceTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
+//			messageTableSelectionListener.valueChanged(null);
+//		}
+//	}
+//
+//	public void addSequenceElement() {
+//		btn_AddSequenceElement.setEnabled(false);
+//
+//		try {
+//			int selectedRow = tbl_Messages.getSelectedRow();
+//			final int selectedRowIndex = tbl_Messages.getRowSorter().convertRowIndexToModel(selectedRow);
+//			String inOut = (String) messagesTableModel.getValueAt(selectedRowIndex,
+//					MessagesTableColumns.Type.ordinal());
+//			final NewSequenceElementDialogControl newSequenceElementDialogControl = new NewSequenceElementDialogControl(
+//					inOut);
+//			newSequenceElementDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
+//
+//				@Override
+//				public void propertyChange(PropertyChangeEvent evt) {
+//					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
+//					if (evt.getPropertyName().equals("btn_Create")) {
+//						String sequenceElementType = newSequenceElementDialogControl.getConditionType();
+//						MessageInTransactionTypeType value = newSequenceElementDialogControl.getMitt();
+//						String mittId = (String) messagesTableModel.getValueAt(selectedRowIndex,
+//								MessagesTableColumns.Id.ordinal());
+//						MessageInTransactionTypeType mitt = Editor16.getStore16()
+//								.getElement(MessageInTransactionTypeType.class, mittId);
+//						addSequenceElement(sequenceElementType, mitt, value);
+//						sequenceTableModel
+//								.add(new SequenceRule(SequenceElementType.valueOf(sequenceElementType), value));
+//					}
+//				}
+//
+//			});
+//			newSequenceElementDialogControl.setVisible(true);
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+//
+//		btn_AddSequenceElement.setEnabled(true);
+//	}
+//
+//	private void addSequenceElement(String sequenceElementType, MessageInTransactionTypeType mitt,
+//			MessageInTransactionTypeType value) {
+//		switch (sequenceElementType) {
+//		case "Next":
+//			addPrevious(value, mitt);
+//			break;
+//		case "Previous":
+//			addPrevious(mitt, value);
+//			break;
+//		case "SendAfter":
+//			addSendAfter(mitt, value);
+//			break;
+//		case "SendBefore":
+//			addSendBefore(mitt, value);
+//			break;
+//		default:
+//			break;
+//		}
+//	}
 
 	private void initRolesTable() {
 		elementsTableModel = new RolesTableModel();
@@ -1391,7 +1361,8 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			tfd_ResponsibilityFeedback.setText("");
 			transactionsTableModel.clear();
 			messagesTableModel.clear();
-			sequenceTableModel.clear();
+			// sequenceTableModel.clear();
+			sequenceTable.clear();
 		}
 
 		canvas.repaint();

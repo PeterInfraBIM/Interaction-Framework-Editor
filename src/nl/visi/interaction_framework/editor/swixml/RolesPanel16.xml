@@ -230,7 +230,7 @@
 									PreferredScrollableViewportSize="200,50" />
 							</scrollpane>
 						</panel>
-						<panel Border="TitledBorder(lbl_Sequence)" Layout="BorderLayout">
+						<panel id="sequencePanel" Border="TitledBorder(lbl_Sequence)" Layout="BorderLayout">
 							<gridbagconstraints
 								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="1"
 								Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />

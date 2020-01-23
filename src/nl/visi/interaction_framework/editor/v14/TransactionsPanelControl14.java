@@ -47,7 +47,6 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
-import nl.visi.interaction_framework.editor.v14.Editor14;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20140331.ElementConditionType;
@@ -55,10 +54,6 @@ import nl.visi.schemas._20140331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.GroupTypeType;
 import nl.visi.schemas._20140331.GroupTypeTypeRef;
-import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType;
-import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendAfter;
-import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendBefore;
-import nl.visi.schemas._20140331.MessageInTransactionTypeConditionTypeRef;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Group;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Message;
@@ -84,9 +79,9 @@ import nl.visi.schemas._20140331.TransactionTypeTypeRef;
 public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel, canvas;
+	private JPanel startDatePanel, endDatePanel, canvas, sequencePanel;
 	private JTabbedPane transactionTabs;
-	private JTable tbl_Messages, tbl_PreviousMessages, tbl_ElementConditions, tbl_Sequence, tbl_Subtransactions;
+	private JTable tbl_Messages, tbl_PreviousMessages, tbl_ElementConditions, tbl_Subtransactions;
 	private JTextField tfd_Result;
 //	private JTextField tfd_BasePoint;
 	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups,
@@ -95,11 +90,11 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private MessagesTableModel messagesTableModel;
 	private PreviousMessagesTableModel previousMessagesTableModel;
 	private ElementConditionsTableModel elementConditionsTableModel;
-	private SequenceTableModel sequenceTableModel;
+//	private SequenceTableModel sequenceTableModel;
+	private SequenceTable sequenceTable;
 	private SubtransactionsTableModel subtransactionsTableModel;
 	private JButton btn_AddMessage, btn_RemoveMessage, btn_Reverse, btn_AddPreviousMessage, btn_RemovePreviousMessage,
-			btn_NewElementCondition, btn_RemoveElementCondition, btn_RemoveSequenceCondition, btn_NavigateInitiator,
-			btn_NavigateExecutor;
+			btn_NewElementCondition, btn_RemoveElementCondition, btn_NavigateInitiator, btn_NavigateExecutor;
 	private JTextArea tar_Initiator, tar_Executor;
 	private JScrollPane scrollPane;
 	private Canvas drawingPlane;
@@ -796,7 +791,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				cbx_PreviousMessages.addItem(null);
 
 				fillElementConditionsTable(mitt);
-				fillSequencesTable(mitt);
+//				fillSequencesTable(mitt);
+				sequenceTable.fillSequenceTable(null, "inOut", mitt);
 
 				cbx_ComplexElements.removeAllItems();
 				cbx_ComplexElements.addItem(null);
@@ -880,24 +876,24 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 		}
 
-		private void fillSequencesTable(MessageInTransactionTypeType mitt) {
-			sequenceTableModel.clear();
-			MessageInTransactionTypeType.Conditions conditions = mitt.getConditions();
-			if (conditions != null) {
-				System.out.println(conditions);
-				List<Object> list = conditions
-						.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
-				for (Object object : list) {
-					if (object instanceof MessageInTransactionTypeConditionTypeRef) {
-						MessageInTransactionTypeConditionType mittCond = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) object)
-								.getIdref();
-						sequenceTableModel.add(mittCond);
-					} else {
-						sequenceTableModel.add((MessageInTransactionTypeConditionType) object);
-					}
-				}
-			}
-		}
+//		private void fillSequencesTable(MessageInTransactionTypeType mitt) {
+//			sequenceTableModel.clear();
+//			MessageInTransactionTypeType.Conditions conditions = mitt.getConditions();
+//			if (conditions != null) {
+//				System.out.println(conditions);
+//				List<Object> list = conditions
+//						.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
+//				for (Object object : list) {
+//					if (object instanceof MessageInTransactionTypeConditionTypeRef) {
+//						MessageInTransactionTypeConditionType mittCond = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) object)
+//								.getIdref();
+//						sequenceTableModel.add(mittCond);
+//					} else {
+//						sequenceTableModel.add((MessageInTransactionTypeConditionType) object);
+//					}
+//				}
+//			}
+//		}
 
 	};
 
@@ -1720,77 +1716,77 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 	}
 
-	private enum SequenceTableColumns {
-		Id, State, HelpInfo, SendAfter, SendBefore;
+//	private enum SequenceTableColumns {
+//		Id, State, HelpInfo, SendAfter, SendBefore;
+//
+//		@Override
+//		public String toString() {
+//			return getBundle().getString("lbl_" + name());
+//		}
+//	}
 
-		@Override
-		public String toString() {
-			return getBundle().getString("lbl_" + name());
-		}
-	}
-
-	@SuppressWarnings("serial")
-	private class SequenceTableModel extends ElementsTableModel<MessageInTransactionTypeConditionType> {
-
-		@Override
-		public int getColumnCount() {
-			return SequenceTableColumns.values().length;
-		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			return SequenceTableColumns.values()[columnIndex].toString();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			MessageInTransactionTypeConditionType messageInTransactionTypeConditionType = get(rowIndex);
-
-			switch (SequenceTableColumns.values()[columnIndex]) {
-			case HelpInfo:
-				return messageInTransactionTypeConditionType.getHelpInfo();
-			case Id:
-				return messageInTransactionTypeConditionType.getId();
-			case SendAfter:
-				SendAfter sendAfter = messageInTransactionTypeConditionType.getSendAfter();
-				if (sendAfter != null) {
-					List<Object> list = sendAfter.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-					if (list != null) {
-						for (Object object : list) {
-							if (object instanceof MessageInTransactionTypeTypeRef) {
-								return ((MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object)
-										.getIdref()).getId();
-							} else {
-								return ((MessageInTransactionTypeType) object).getId();
-							}
-						}
-					}
-				}
-				break;
-			case SendBefore:
-				SendBefore sendBefore = messageInTransactionTypeConditionType.getSendBefore();
-				if (sendBefore != null) {
-					List<Object> list = sendBefore.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-					if (list != null) {
-						for (Object object : list) {
-							if (object instanceof MessageInTransactionTypeTypeRef) {
-								return ((MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object)
-										.getIdref()).getId();
-							} else {
-								return ((MessageInTransactionTypeType) object).getId();
-							}
-						}
-					}
-				}
-				break;
-			case State:
-				return messageInTransactionTypeConditionType.getState();
-			default:
-				break;
-			}
-			return null;
-		}
-	}
+//	@SuppressWarnings("serial")
+//	private class SequenceTableModel extends ElementsTableModel<MessageInTransactionTypeConditionType> {
+//
+//		@Override
+//		public int getColumnCount() {
+//			return SequenceTableColumns.values().length;
+//		}
+//
+//		@Override
+//		public String getColumnName(int columnIndex) {
+//			return SequenceTableColumns.values()[columnIndex].toString();
+//		}
+//
+//		@Override
+//		public Object getValueAt(int rowIndex, int columnIndex) {
+//			MessageInTransactionTypeConditionType messageInTransactionTypeConditionType = get(rowIndex);
+//
+//			switch (SequenceTableColumns.values()[columnIndex]) {
+//			case HelpInfo:
+//				return messageInTransactionTypeConditionType.getHelpInfo();
+//			case Id:
+//				return messageInTransactionTypeConditionType.getId();
+//			case SendAfter:
+//				SendAfter sendAfter = messageInTransactionTypeConditionType.getSendAfter();
+//				if (sendAfter != null) {
+//					List<Object> list = sendAfter.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+//					if (list != null) {
+//						for (Object object : list) {
+//							if (object instanceof MessageInTransactionTypeTypeRef) {
+//								return ((MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object)
+//										.getIdref()).getId();
+//							} else {
+//								return ((MessageInTransactionTypeType) object).getId();
+//							}
+//						}
+//					}
+//				}
+//				break;
+//			case SendBefore:
+//				SendBefore sendBefore = messageInTransactionTypeConditionType.getSendBefore();
+//				if (sendBefore != null) {
+//					List<Object> list = sendBefore.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+//					if (list != null) {
+//						for (Object object : list) {
+//							if (object instanceof MessageInTransactionTypeTypeRef) {
+//								return ((MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object)
+//										.getIdref()).getId();
+//							} else {
+//								return ((MessageInTransactionTypeType) object).getId();
+//							}
+//						}
+//					}
+//				}
+//				break;
+//			case State:
+//				return messageInTransactionTypeConditionType.getState();
+//			default:
+//				break;
+//			}
+//			return null;
+//		}
+//	}
 
 	public TransactionsPanelControl14() throws Exception {
 		super(TRANSACTIONS_PANEL);
@@ -1928,40 +1924,23 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		});
 	}
 
-	private void initSequenceTable() {
-		sequenceTableModel = new SequenceTableModel();
-		tbl_Sequence.setModel(sequenceTableModel);
-		tbl_Sequence.setFillsViewportHeight(true);
+	private void initSequenceTable() throws Exception {
+		sequenceTable = new SequenceTable();
+		sequencePanel.removeAll();
+		sequencePanel.add(sequenceTable.getPanel());
+		sequencePanel.revalidate();
 
-//		cbx_Conditions = new JComboBox<>(new DefaultComboBoxModel<String>());
-//		cbx_Conditions.addItem("FIXED");
-//		cbx_Conditions.addItem("FREE");
-//		cbx_Conditions.addItem("EMPTY");
-//		TableColumn conditionColumn = tbl_ElementConditions.getColumnModel()
-//				.getColumn(ElementConditionsTableColumns.Condition.ordinal());
-//		conditionColumn.setCellEditor(new DefaultCellEditor(cbx_Conditions));
-
-//		cbx_ComplexElements = new JComboBox<>(new DefaultComboBoxModel<String>());
-//		TableColumn complexElement1Column = tbl_ElementConditions.getColumnModel()
-//				.getColumn(ElementConditionsTableColumns.ComplexElement1.ordinal());
-//		complexElement1Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements));
-//		TableColumn complexElement2Column = tbl_ElementConditions.getColumnModel()
-//				.getColumn(ElementConditionsTableColumns.ComplexElement2.ordinal());
-//		complexElement2Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements));
-
-//		cbx_SimpleElements = new JComboBox<>(new DefaultComboBoxModel<String>());
-//		TableColumn simpleElementColumn = tbl_ElementConditions.getColumnModel()
-//				.getColumn(ElementConditionsTableColumns.SimpleElement.ordinal());
-//		simpleElementColumn.setCellEditor(new DefaultCellEditor(cbx_SimpleElements));
-
-		tbl_Sequence.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				int selectedSequenceRow = tbl_Sequence.getSelectedRow();
-				boolean rowSelected = selectedSequenceRow >= 0;
-				btn_RemoveSequenceCondition.setEnabled(rowSelected);
-			}
-		});
+//		sequenceTableModel = new SequenceTableModel();
+//		tbl_Sequence.setModel(sequenceTableModel);
+//		tbl_Sequence.setFillsViewportHeight(true);
+//		tbl_Sequence.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+//			@Override
+//			public void valueChanged(ListSelectionEvent e) {
+//				int selectedSequenceRow = tbl_Sequence.getSelectedRow();
+//				boolean rowSelected = selectedSequenceRow >= 0;
+//				btn_RemoveSequenceCondition.setEnabled(rowSelected);
+//			}
+//		});
 	}
 
 	@SuppressWarnings("serial")
@@ -2113,7 +2092,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		tbl_PreviousMessages.setEnabled(rowSelected);
 		cbx_PreviousMessages.setEnabled(rowSelected);
 		tbl_ElementConditions.setEnabled(rowSelected);
-		tbl_Sequence.setEnabled(rowSelected);
+//		tbl_Sequence.setEnabled(rowSelected);
 		tbl_Subtransactions.setEnabled(rowSelected);
 
 		successorMap = new HashMap<MessageInTransactionTypeType, List<MessageInTransactionTypeType>>();
@@ -2223,7 +2202,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			previousMessagesTableModel.clear();
 			cbx_PreviousMessages.removeAllItems();
 			elementConditionsTableModel.clear();
-			sequenceTableModel.clear();
+//			sequenceTableModel.clear();
+			sequenceTable.clear();
 			subtransactionsTableModel.clear();
 		}
 

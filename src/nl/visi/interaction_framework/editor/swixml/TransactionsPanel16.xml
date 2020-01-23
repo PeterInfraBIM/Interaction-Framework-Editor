@@ -337,33 +337,33 @@
 									</button>
 								</panel>
 							</panel>
-							<panel Layout="GridBagLayout">
-								<scrollpane>
-									<gridbagconstraints
-										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
-										Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
-									<table id="tbl_Sequence"
-										SelectionMode="ListSelectionModel.SINGLE_SELECTION"
-										PreferredScrollableViewportSize="200,30" />
-								</scrollpane>
-								<panel Layout="GridBagLayout">
-									<gridbagconstraints
-										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
-									<button id="btn_NewSequenceCondition"
-										Action="newSequenceCondition" Enabled="false"
-										Text="lbl_NewElement">
-										<gridbagconstraints
-											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
-											Insets="0,2,2,2" />
-									</button>
-									<button id="btn_RemoveSequenceCondition"
-										Action="removeSequenceCondition" Enabled="false"
-										Text="lbl_Remove">
-										<gridbagconstraints
-											Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
-											Insets="0,2,2,2" Weightx="1.0" />
-									</button>
-								</panel>
+							<panel id="sequencePanel" Layout="BorderLayout">
+<!-- 								<scrollpane> -->
+<!-- 									<gridbagconstraints -->
+<!-- 										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" -->
+<!-- 										Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" /> -->
+<!-- 									<table id="tbl_Sequence" -->
+<!-- 										SelectionMode="ListSelectionModel.SINGLE_SELECTION" -->
+<!-- 										PreferredScrollableViewportSize="200,30" /> -->
+<!-- 								</scrollpane> -->
+<!-- 								<panel Layout="GridBagLayout"> -->
+<!-- 									<gridbagconstraints -->
+<!-- 										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" /> -->
+<!-- 									<button id="btn_NewSequenceCondition" -->
+<!-- 										Action="newSequenceCondition" Enabled="false" -->
+<!-- 										Text="lbl_NewElement"> -->
+<!-- 										<gridbagconstraints -->
+<!-- 											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0" -->
+<!-- 											Insets="0,2,2,2" /> -->
+<!-- 									</button> -->
+<!-- 									<button id="btn_RemoveSequenceCondition" -->
+<!-- 										Action="removeSequenceCondition" Enabled="false" -->
+<!-- 										Text="lbl_Remove"> -->
+<!-- 										<gridbagconstraints -->
+<!-- 											Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0" -->
+<!-- 											Insets="0,2,2,2" Weightx="1.0" /> -->
+<!-- 									</button> -->
+<!-- 								</panel> -->
 							</panel>
 						</tabbedpane>
 					</panel>

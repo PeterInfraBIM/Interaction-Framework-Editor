@@ -24,6 +24,7 @@ public class NewSequenceElementDialogControl extends Control14 {
 	private static final String NEW_SEQUENCE_ELEMENT_DIALOG = "nl/visi/interaction_framework/editor/swixml/NewSequenceElementDialog.xml";
 	private static final String[] IN_SEQUENCE_ELEMENT_TYPES = { "Next" };
 	private static final String[] OUT_SEQUENCE_ELEMENT_TYPES = { "Previous", "SendAfter", "SendBefore" };
+	private static final String[] INOUT_SEQUENCE_ELEMENT_TYPES = { "Next", "Previous", "SendAfter", "SendBefore" };
 
 	private JDialog dialog;
 	private JButton btn_Cancel, btn_Create;
@@ -101,9 +102,20 @@ public class NewSequenceElementDialogControl extends Control14 {
 		dialog = (JDialog) render(NEW_SEQUENCE_ELEMENT_DIALOG);
 		JRootPane rootPane = SwingUtilities.getRootPane(btn_Create);
 		rootPane.setDefaultButton(btn_Create);
-		DefaultComboBoxModel<String> typesModel = inOut.equals("in")
-				? new DefaultComboBoxModel<>(IN_SEQUENCE_ELEMENT_TYPES)
-				: new DefaultComboBoxModel<>(OUT_SEQUENCE_ELEMENT_TYPES);
+		DefaultComboBoxModel<String> typesModel = null;
+		switch (inOut) {
+		case "in":
+			typesModel = new DefaultComboBoxModel<>(IN_SEQUENCE_ELEMENT_TYPES);
+			break;
+		case "out":
+			typesModel = new DefaultComboBoxModel<>(OUT_SEQUENCE_ELEMENT_TYPES);
+			break;
+		case "inOut":
+			typesModel = new DefaultComboBoxModel<>(INOUT_SEQUENCE_ELEMENT_TYPES);
+			break;
+		default:
+			break;
+		}
 		cbx_SequenceElementType.setModel(typesModel);
 
 		mittsModel = new ElementsModel<>();
