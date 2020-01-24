@@ -163,7 +163,7 @@
 				Layout="BorderLayout">
 				<tabbedpane id="transactionTabs"
 					Border="EmptyBorder(4,4,4,4)"
-					Titles="lbl_Initiator,lbl_Executor,lbl_Messages,lbl_Subtransactions,lbl_SequenceDiagram">
+					Titles="lbl_Roles,lbl_Messages,lbl_Subtransactions,lbl_SequenceDiagram">
 					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 						<label Text="lbl_Initiator">
 							<gridbagconstraints
@@ -196,35 +196,33 @@
 							<textarea id="tar_Initiator" Editable="false"
 								Enabled="false" />
 						</scrollpane>
-					</panel>
-					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 						<label Text="lbl_Executor">
 							<gridbagconstraints
-								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="2"
 								Insets="2,2,2,2" />
 						</label>
 						<combobox id="cbx_Executor" Action="setExecutor"
 							Enabled="false">
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST"
-								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
 								Insets="2,2,2,2" Weightx="1.0" />
 						</combobox>
 						<button id="btn_NavigateExecutor" Action="navigateExecutor"
 							Enabled="false" Icon="img_ForwardNav">
 							<gridbagconstraints
-								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
+								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="2"
 								Insets="2,2,2,2" />
 						</button>
 						<label Text="lbl_Description">
 							<gridbagconstraints
-								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="3"
 								Insets="2,2,2,2" />
 						</label>
 						<scrollpane>
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST" Fill="GridBagConstraints.BOTH"
-								Gridwidth="2" Gridx="1" Gridy="1" Insets="2,2,2,2" Weightx="1.0"
+								Gridwidth="2" Gridx="1" Gridy="3" Insets="2,2,2,2" Weightx="1.0"
 								Weighty="1.0" />
 							<textarea id="tar_Executor" Editable="false"
 								Enabled="false" />
@@ -269,45 +267,72 @@
 									Insets="0,2,2,2" />
 							</button>
 						</panel>
-						<tabbedpane
-							Titles="lbl_PreviousMessages,lbl_ElementConditions,lbl_Sequence">
+						<tabbedpane Titles="lbl_Sequence,lbl_ElementConditions">
 							<gridbagconstraints
 								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="2" Weightx="1.0"
 								Weighty="1.0" />
-							<panel Layout="GridBagLayout">
-								<scrollpane>
-									<gridbagconstraints
-										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
-										Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
-									<table id="tbl_PreviousMessages"
-										SelectionMode="ListSelectionModel.SINGLE_SELECTION"
-										PreferredScrollableViewportSize="200,30" />
-								</scrollpane>
-								<panel Layout="GridBagLayout">
-									<gridbagconstraints
-										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
-									<combobox id="cbx_PreviousMessages"
-										Action="selectPreviousMessage" Enabled="false"
-										PrototypeDisplayValue="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX">
-										<gridbagconstraints
-											Anchor="GridBagConstraints.WEST"
-											Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
-											Insets="0,2,2,2" Weightx="1.0" />
-									</combobox>
-									<button id="btn_AddPreviousMessage"
-										Action="addPreviousMessage" Enabled="false" Text="lbl_Add">
-										<gridbagconstraints
-											Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
-											Insets="0,2,2,2" />
-									</button>
-									<button id="btn_RemovePreviousMessage"
-										Action="removePreviousMessage" Enabled="false"
-										Text="lbl_Remove">
-										<gridbagconstraints
-											Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
-											Insets="0,2,2,2" />
-									</button>
-								</panel>
+							<!-- <panel Layout="GridBagLayout"> -->
+							<!-- <scrollpane> -->
+							<!-- <gridbagconstraints -->
+							<!-- Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" -->
+							<!-- Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" /> -->
+							<!-- <table id="tbl_PreviousMessages" -->
+							<!-- SelectionMode="ListSelectionModel.SINGLE_SELECTION" -->
+							<!-- PreferredScrollableViewportSize="200,30" /> -->
+							<!-- </scrollpane> -->
+							<!-- <panel Layout="GridBagLayout"> -->
+							<!-- <gridbagconstraints -->
+							<!-- Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" /> -->
+							<!-- <combobox id="cbx_PreviousMessages" -->
+							<!-- Action="selectPreviousMessage" Enabled="false" -->
+							<!-- PrototypeDisplayValue="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"> -->
+							<!-- <gridbagconstraints -->
+							<!-- Anchor="GridBagConstraints.WEST" -->
+							<!-- Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0" -->
+							<!-- Insets="0,2,2,2" Weightx="1.0" /> -->
+							<!-- </combobox> -->
+							<!-- <button id="btn_AddPreviousMessage" -->
+							<!-- Action="addPreviousMessage" Enabled="false" Text="lbl_Add"> -->
+							<!-- <gridbagconstraints -->
+							<!-- Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0" -->
+							<!-- Insets="0,2,2,2" /> -->
+							<!-- </button> -->
+							<!-- <button id="btn_RemovePreviousMessage" -->
+							<!-- Action="removePreviousMessage" Enabled="false" -->
+							<!-- Text="lbl_Remove"> -->
+							<!-- <gridbagconstraints -->
+							<!-- Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0" -->
+							<!-- Insets="0,2,2,2" /> -->
+							<!-- </button> -->
+							<!-- </panel> -->
+							<!-- </panel> -->
+							<panel id="sequencePanel" Layout="BorderLayout">
+<!-- 								<scrollpane> -->
+<!-- 									<gridbagconstraints -->
+<!-- 										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" -->
+<!-- 										Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" /> -->
+<!-- 									<table id="tbl_Sequence" -->
+<!-- 										SelectionMode="ListSelectionModel.SINGLE_SELECTION" -->
+<!-- 										PreferredScrollableViewportSize="200,30" /> -->
+<!-- 								</scrollpane> -->
+<!-- 								<panel Layout="GridBagLayout"> -->
+<!-- 									<gridbagconstraints -->
+<!-- 										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" /> -->
+<!-- 									<button id="btn_NewSequenceCondition" -->
+<!-- 										Action="newSequenceCondition" Enabled="false" -->
+<!-- 										Text="lbl_NewElement"> -->
+<!-- 										<gridbagconstraints -->
+<!-- 											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0" -->
+<!-- 											Insets="0,2,2,2" /> -->
+<!-- 									</button> -->
+<!-- 									<button id="btn_RemoveSequenceCondition" -->
+<!-- 										Action="removeSequenceCondition" Enabled="false" -->
+<!-- 										Text="lbl_Remove"> -->
+<!-- 										<gridbagconstraints -->
+<!-- 											Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0" -->
+<!-- 											Insets="0,2,2,2" Weightx="1.0" /> -->
+<!-- 									</button> -->
+<!-- 								</panel> -->
 							</panel>
 							<panel Layout="GridBagLayout">
 								<scrollpane>
@@ -336,34 +361,6 @@
 											Insets="0,2,2,2" Weightx="1.0" />
 									</button>
 								</panel>
-							</panel>
-							<panel id="sequencePanel" Layout="BorderLayout">
-<!-- 								<scrollpane> -->
-<!-- 									<gridbagconstraints -->
-<!-- 										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" -->
-<!-- 										Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" /> -->
-<!-- 									<table id="tbl_Sequence" -->
-<!-- 										SelectionMode="ListSelectionModel.SINGLE_SELECTION" -->
-<!-- 										PreferredScrollableViewportSize="200,30" /> -->
-<!-- 								</scrollpane> -->
-<!-- 								<panel Layout="GridBagLayout"> -->
-<!-- 									<gridbagconstraints -->
-<!-- 										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" /> -->
-<!-- 									<button id="btn_NewSequenceCondition" -->
-<!-- 										Action="newSequenceCondition" Enabled="false" -->
-<!-- 										Text="lbl_NewElement"> -->
-<!-- 										<gridbagconstraints -->
-<!-- 											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0" -->
-<!-- 											Insets="0,2,2,2" /> -->
-<!-- 									</button> -->
-<!-- 									<button id="btn_RemoveSequenceCondition" -->
-<!-- 										Action="removeSequenceCondition" Enabled="false" -->
-<!-- 										Text="lbl_Remove"> -->
-<!-- 										<gridbagconstraints -->
-<!-- 											Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0" -->
-<!-- 											Insets="0,2,2,2" Weightx="1.0" /> -->
-<!-- 									</button> -->
-<!-- 								</panel> -->
 							</panel>
 						</tabbedpane>
 					</panel>

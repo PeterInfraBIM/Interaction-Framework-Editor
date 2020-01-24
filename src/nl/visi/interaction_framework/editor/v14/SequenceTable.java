@@ -1,12 +1,10 @@
 package nl.visi.interaction_framework.editor.v14;
 
-import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
@@ -70,54 +68,6 @@ public class SequenceTable extends Control14 {
 		}
 
 	}
-
-//	private class SequenceMitt {
-//		private MessageInTransactionTypeType mitt;
-//
-//		@SuppressWarnings("unused")
-//		public SequenceMitt() {
-//		}
-//
-//		public SequenceMitt(MessageInTransactionTypeType mitt) {
-//			this.mitt = mitt;
-//		}
-//
-//		public List<MessageInTransactionTypeType> getPreviousMitts() {
-//			return getPrevious(mitt);
-//		}
-//
-//		public List<MessageInTransactionTypeType> getSendAfterMitts() {
-//			return Control16.getSendAfters(mitt);
-//		}
-//
-//		public List<MessageInTransactionTypeType> getSendBeforeMitts() {
-//			return Control16.getSendBefores(mitt);
-//		}
-//
-//		public List<MessageInTransactionTypeType> getNextMitts() {
-//			if (mitt != null) {
-//				List<MessageInTransactionTypeType> actions = null;
-//
-//				List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
-//						.getElements(MessageInTransactionTypeType.class);
-//				for (MessageInTransactionTypeType mittElement : allMitts) {
-//					List<MessageInTransactionTypeType> previous = getPrevious(mittElement);
-//					if (previous != null) {
-//						for (MessageInTransactionTypeType prev : previous) {
-//							if (prev.getId().equals(mitt.getId())) {
-//								if (actions == null) {
-//									actions = new ArrayList<>();
-//								}
-//								actions.add(mittElement);
-//							}
-//						}
-//					}
-//				}
-//				return actions;
-//			}
-//			return null;
-//		}
-//	}
 
 	private enum SequenceTableColumns {
 		Type, Id, Role, Transaction, Message;
@@ -228,7 +178,6 @@ public class SequenceTable extends Control14 {
 		btn_AddSequenceElement.setEnabled(enabled);
 		sequenceTableModel.clear();
 		if (enabled) {
-//			SequenceMitt sequenceMitt = new SequenceMitt(mitt);
 			if (inOut.contentEquals("out") || inOut.contentEquals("inOut")) {
 				List<MessageInTransactionTypeType> sendAfters = getSendAfters(mitt);
 				if (sendAfters != null) {
@@ -270,10 +219,6 @@ public class SequenceTable extends Control14 {
 		btn_AddSequenceElement.setEnabled(false);
 
 		try {
-//			int selectedRow = tbl_Messages.getSelectedRow();
-//			final int selectedRowIndex = tbl_Messages.getRowSorter().convertRowIndexToModel(selectedRow);
-//			String inOut = (String) messagesTableModel.getValueAt(selectedRowIndex,
-//					MessagesTableColumns.Type.ordinal());
 			final NewSequenceElementDialogControl newSequenceElementDialogControl = new NewSequenceElementDialogControl(
 					inOut);
 			newSequenceElementDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
@@ -285,6 +230,35 @@ public class SequenceTable extends Control14 {
 						String sequenceElementType = newSequenceElementDialogControl.getConditionType();
 						MessageInTransactionTypeType value = newSequenceElementDialogControl.getMitt();
 						addSequenceElement(sequenceElementType, parent, value);
+						SequenceElementType seqType = SequenceElementType.valueOf(sequenceElementType);
+						switch (seqType) {
+						case Next:
+							if (sequenceTableModel.elements.size() == 1) {
+								SequenceRule conditionRule = sequenceTableModel.get(0);
+								if (conditionRule.type == SequenceElementType.Stop) {
+									sequenceTableModel.remove(0);
+								}
+							}
+							break;
+						case Previous:
+							if (sequenceTableModel.elements.size() == 1) {
+								SequenceRule conditionRule = sequenceTableModel.get(0);
+								if (conditionRule.type == SequenceElementType.Start) {
+									sequenceTableModel.remove(0);
+								}
+							}
+							break;
+						case SendAfter:
+							break;
+						case SendBefore:
+							break;
+						case Start:
+							break;
+						case Stop:
+							break;
+						default:
+							break;
+						}
 						sequenceTableModel
 								.add(new SequenceRule(SequenceElementType.valueOf(sequenceElementType), value));
 					}
@@ -324,9 +298,6 @@ public class SequenceTable extends Control14 {
 				? tbl_Sequences.getRowSorter().convertRowIndexToModel(tbl_Sequences.getSelectedRow())
 				: -1;
 		if (selectedRow > -1) {
-//		int selectedMessageTableRow = tbl_Messages.getRowSorter()
-//				.convertRowIndexToModel(tbl_Messages.getSelectedRow());
-//		MessageInTransactionTypeType parent = messagesTableModel.get(selectedMessageTableRow);
 			SequenceRule conditionRule = sequenceTableModel.get(selectedRow);
 			switch (conditionRule.getType()) {
 			case Next:
@@ -352,7 +323,6 @@ public class SequenceTable extends Control14 {
 			}
 			sequenceTableModel.elements.remove(selectedRow);
 			sequenceTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
-//			messageTableSelectionListener.valueChanged(null);
 		}
 	}
 
@@ -364,41 +334,6 @@ public class SequenceTable extends Control14 {
 
 	public JPanel getPanel() {
 		return panel;
-	}
-
-	public static void main(String[] arg) throws Exception {
-		SequenceTable sequenceTable = new SequenceTable();
-		sequenceTable.addPropertyChangeListener(new PropertyChangeListener() {
-
-			@Override
-			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
-				if (evt.getPropertyName().equals("btn_Create")) {
-					System.out.println(evt.getPropertyName());
-//					String sequenceElementType = newSequenceElementDialogControl.getConditionType();
-//					MessageInTransactionTypeType value = newSequenceElementDialogControl.getMitt();
-//					String mittId = (String) messagesTableModel.getValueAt(selectedRowIndex,
-//							MessagesTableColumns.Id.ordinal());
-//					MessageInTransactionTypeType mitt = Editor16.getStore16()
-//							.getElement(MessageInTransactionTypeType.class, mittId);
-//					addSequenceElement(sequenceElementType, mitt, value);
-//					sequenceTableModel
-//							.add(new SequenceRule(SequenceElementType.valueOf(sequenceElementType), value));
-				}
-			}
-		});
-		MessageInTransactionTypeType mitt = objectFactory.createMessageInTransactionTypeType();
-		mitt.setId("BerichtInTransactie10");
-		// MessageInTransactionTypeType mitt =
-		// Editor16.getStore16().getElement(MessageInTransactionTypeType.class,
-		// "BerichtInTransactie10");
-		JFrame frame = new JFrame("Test");
-		Component panel = sequenceTable.render(SEQUENCE_PANEL);
-		frame.add(panel);
-		// sequenceTable.initSequenceTable();
-		// sequenceTable.fillSequenceTable("in", mitt);
-		frame.pack();
-		frame.setVisible(true);
 	}
 
 	public void clear() {
