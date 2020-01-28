@@ -374,7 +374,7 @@
 								PreferredScrollableViewportSize="200,70" />
 						</scrollpane>
 					</panel>
-					<panel id="canvas" Border="EmptyBorder(4,4,4,4)"
+					<panel id="canvasPanel" Border="EmptyBorder(4,4,4,4)"
 						Layout="BorderLayout" />
 				</tabbedpane>
 			</panel>
