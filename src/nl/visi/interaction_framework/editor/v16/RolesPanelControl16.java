@@ -319,9 +319,11 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 		public Graphics2D g2d;
 
+//		private int callCount = 0;
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
+//			System.out.println(++callCount + " " + System.currentTimeMillis());
 			g2d = (Graphics2D) g;
 			if (selectedElement == null) {
 				reset(g2d);

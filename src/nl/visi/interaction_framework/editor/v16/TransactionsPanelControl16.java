@@ -9,7 +9,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
+import java.awt.Insets;
 import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -113,26 +113,31 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		private Dimension preferredSize;
 		private Role init, exec;
 		private final List<MessageItem> messages;
-		private final Map<Point, TransactionConnection> tcMap;
+		private final Map<Integer, TransactionConnection> tcMap;
 
 		private TransactionTypeType currentTransaction;
 		private int leftMargin, rightMargin, middleMargin;
 
 		private void showButton(final Canvas canvas, int x, int y, MessageInTransactionTypeType mitt, String label,
 				String toolTipText) {
-			TransactionConnection tc = tcMap.get(new Point(x, y));
+			int hash = (Integer.toString(x) + Integer.toString(y)).hashCode();
+			TransactionConnection tc = tcMap.get(hash);
 			if (tc == null) {
 				tc = new TransactionConnection(canvas, mitt, label, toolTipText, x, y);
+				tc.activeLabel.setText(tc.label);
+				tc.activeLabel.setToolTipText(tc.toolTipText);
+				tc.activeLabel.setContentAreaFilled(false);
+				tc.activeLabel.setBackground(Color.white);
+				tc.activeLabel.setBorderPainted(false);
+				tc.activeLabel.setBorder(null);
+				tc.activeLabel.setMargin(new Insets(0, 0, 0, 0));
+				tc.activeLabel.setFont(tc.font);
+				tc.activeLabel.setLocation(x, y - 10);
 			}
-			tc.activeLabel.setText(tc.label);
-			tc.activeLabel.setToolTipText(tc.toolTipText);
-			tc.activeLabel.setContentAreaFilled(false);
-			tc.activeLabel.setBackground(Color.white);
-			tc.activeLabel.setBorderPainted(false);
-			tc.activeLabel.setFont(tc.font);
-			tc.activeLabel.setLocation(x + 5, y - 10);
 			List<Component> components = Arrays.asList(canvas.getComponents());
 			if (!components.contains(tc.activeLabel)) {
+//				System.out.println(callCount + " showButton ...");
+
 				canvas.add(tc.activeLabel);
 				canvas.revalidate();
 			}
@@ -141,13 +146,14 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		private class TransactionConnection {
 			private final Font font = new Font("Dialog", Font.PLAIN, 10);
 			private RotatingButton activeLabel;
-			private final MessageInTransactionTypeType mitt;
+//			private final MessageInTransactionTypeType mitt;
 			private String label, toolTipText;
 
 			public TransactionConnection(final Canvas canvas, final MessageInTransactionTypeType mitt, String label,
 					String toolTipText, int x, int y) {
-				tcMap.put(new Point(x, y), this);
-				this.mitt = mitt;
+				int hash = (Integer.toString(x) + Integer.toString(y)).hashCode();
+				tcMap.put(hash, this);
+//				this.mitt = mitt;
 				this.label = label;
 				this.activeLabel = new RotatingButton(label);
 				this.toolTipText = toolTipText;
@@ -183,6 +189,13 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				this.x = x;
 				this.y = y;
 				activeLabel = new RotatingButton();
+				activeLabel.setText(label);
+				activeLabel.setToolTipText(getRole().getDescription());
+				activeLabel.setContentAreaFilled(false);
+				activeLabel.setBackground(Color.white);
+				activeLabel.setBorderPainted(false);
+				activeLabel.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
+
 				activeLabel.addMouseListener(new MouseAdapter() {
 					@Override
 					public void mouseEntered(MouseEvent e) {
@@ -218,18 +231,11 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					g2.drawLine(x + 50, y + 50, x + 50, getHeight() - 10);
 					g2.setStroke(saveStroke);
 
-					showButton(canvas, x + 50 - (stringWidth / 2), y + 25,
-							getFont().deriveFont(getFont().getSize() - 2.0f));
+					showButton(canvas, x + 50 - (stringWidth / 2), y + 25);
 				}
 			}
 
-			public void showButton(final Canvas canvas, int x, int y, Font font) {
-				activeLabel.setText(label);
-				activeLabel.setToolTipText(getRole().getDescription());
-				activeLabel.setContentAreaFilled(false);
-				activeLabel.setBackground(Color.white);
-				activeLabel.setBorderPainted(false);
-				activeLabel.setFont(font);
+			public void showButton(final Canvas canvas, int x, int y) {
 				activeLabel.setLocation(x - 10, y - 10);
 				List<Component> components = Arrays.asList(canvas.getComponents());
 				if (!components.contains(activeLabel)) {
@@ -448,9 +454,13 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			return preferredSize;
 		}
 
+//		private int callCount = 0;
+
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
+//			System.out.println(++callCount + " " + System.currentTimeMillis());
+
 			g2d = (Graphics2D) g;
 			if (selectedElement == null) {
 				reset(g2d);
@@ -464,6 +474,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			boolean prevMitt = false;
 			boolean lastDirection = true;
 			if (newDrawing) {
+//				System.out.println(callCount + " newDrawing ...");
+
 				List<MessageInTransactionTypeType> initGroup = new ArrayList<MessageInTransactionTypeType>();
 				List<MessageInTransactionTypeType> execGroup = new ArrayList<MessageInTransactionTypeType>();
 				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
@@ -853,8 +865,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				removeAll();
 				tcMap.clear();
 				setSize(getPreferredSize());
-				canvasPanel.invalidate();
-				canvasPanel.repaint();
+				canvasPanel.revalidate();
+//				canvasPanel.repaint();
 			}
 		}
 
