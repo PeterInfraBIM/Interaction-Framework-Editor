@@ -1,10 +1,18 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.print.PageFormat;
+import java.awt.print.Printable;
+import java.awt.print.PrinterException;
+import java.awt.print.PrinterJob;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import javax.swing.JPanel;
@@ -157,6 +165,102 @@ public class MainPanelControl16 extends Control16 {
 
 	public void saveFramework(File frameworkFile) throws FileNotFoundException, Exception {
 		Editor16.getLoader16().marshal(new PrintStream(frameworkFile));
+	}
+
+	class PrintDiagrams implements Printable {
+		private static final int LINES_PER_PAGE = 50;
+		private List<PrintPage> pageList;
+		private int transactionElementCount = 0;
+
+		class PrintPage {
+			private final int elementIndex;
+			private final int startLine;
+
+			public PrintPage(int elementIndex, int startLine) {
+				this.elementIndex = elementIndex;
+				this.startLine = startLine;
+			}
+		}
+
+		public PrintDiagrams() {
+			this.pageList = new ArrayList<>();
+			tabs.setSelectedIndex(Tabs.Roles.ordinal());
+			int roleElementCount = rolesPC.tbl_Elements.getRowCount();
+			for (int elementIndex = 0; elementIndex < roleElementCount; elementIndex++) {
+				int messageCount = getMessageCount(elementIndex);
+				int pagesPerElement = (int) (Math.floor(messageCount / LINES_PER_PAGE) + 1);
+				int startLine = 0;
+				for (int page = 0; page < pagesPerElement; page++) {
+					pageList.add(new PrintPage(elementIndex, startLine));
+					startLine += LINES_PER_PAGE;
+				}
+			}
+			tabs.setSelectedIndex(Tabs.Transactions.ordinal());
+			transactionElementCount = transactionsPC.tbl_Elements.getRowCount();
+		}
+
+		@Override
+		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
+			if (pageIndex > pageList.size() + transactionElementCount - 1) {
+				System.out.println("NO_SUCH_PAGE");
+				return NO_SUCH_PAGE;
+			}
+
+			if (pageIndex < pageList.size()) {
+				RolesPanelControl16.Canvas rolesDrawingPlane = rolesPC.getDrawingPlane();
+				rolesDrawingPlane.setSize((int) pageFormat.getImageableWidth(), (int) pageFormat.getImageableHeight());
+				Graphics2D g2d = (Graphics2D) graphics;
+				g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+				g2d.scale(0.8, 0.8);
+				getMessageCount(pageList.get(pageIndex).elementIndex);
+				rolesDrawingPlane.setCurrentRole(null);
+				rolesDrawingPlane.print(graphics, pageList.get(pageIndex).startLine, LINES_PER_PAGE);
+
+				System.out.println("PAGE_EXISTS");
+				return PAGE_EXISTS;
+			} else {
+				transactionsPC.tbl_Elements.getSelectionModel().setSelectionInterval(pageIndex - pageList.size(),
+						pageIndex - pageList.size());
+
+				// User (0,0) is typically outside the
+				// imageable area, so we must translate
+				// by the X and Y values in the PageFormat
+				// to avoid clipping.
+				Graphics2D g2d = (Graphics2D) graphics;
+				g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
+				g2d.scale(0.8, 0.8);
+
+				// Now we perform our rendering
+				// graphics.drawString("Hello world!", 100, 100);
+				TransactionsPanelControl16.Canvas transactionsDrawingPlane = transactionsPC.getDrawingPlane();
+				transactionsDrawingPlane.print(graphics);
+
+				// tell the caller that this page is part
+				// of the printed document
+				return PAGE_EXISTS;
+			}
+		}
+
+		private int getMessageCount(int elementIndex) {
+			rolesPC.tbl_Elements.getSelectionModel().setSelectionInterval(elementIndex, elementIndex);
+			rolesPC.selectedElement = rolesPC.elementsTableModel.get(elementIndex);
+			rolesPC.fillMessagesTable();
+			return rolesPC.tbl_Messages.getRowCount();
+		}
+
+	}
+
+	public void print() {
+		PrinterJob job = PrinterJob.getPrinterJob();
+		job.setPrintable(new PrintDiagrams());
+		boolean doPrint = job.printDialog();
+		if (doPrint) {
+			try {
+				job.print();
+			} catch (PrinterException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
 	public void report(File excelFile) throws IOException {

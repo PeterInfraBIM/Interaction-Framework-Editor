@@ -297,6 +297,14 @@ public class InteractionFrameworkEditor extends Control {
 		saveFramework();
 	}
 
+	public void print() {
+		if (version.equals("1.6")) {
+			mainPanelControl16.print();
+		} else if (version.equals("1.4")) {
+//			mainPanelControl14.print();
+		}
+	}
+
 	public void report() {
 		File excelFile = null;
 		JFileChooser reportChooser = new JFileChooser();
