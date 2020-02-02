@@ -245,7 +245,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 							new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
 					g2.drawLine(x + 50, y + 50, x + 50, getHeight() - 10);
 					g2.setStroke(saveStroke);
-
 				}
 			}
 
@@ -470,13 +469,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			return preferredSize;
 		}
 
-//		private int callCount = 0;
-
 		@Override
 		public void paintComponent(Graphics g) {
 			super.paintComponent(g);
-//			System.out.println(++callCount + " " + System.currentTimeMillis());
-
 			g2d = (Graphics2D) g;
 			if (selectedElement == null) {
 				reset(g2d);
@@ -490,8 +485,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			boolean prevMitt = false;
 			boolean lastDirection = true;
 			if (newDrawing) {
-//				System.out.println(callCount + " newDrawing ...");
-
 				List<MessageInTransactionTypeType> initGroup = new ArrayList<MessageInTransactionTypeType>();
 				List<MessageInTransactionTypeType> execGroup = new ArrayList<MessageInTransactionTypeType>();
 				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
@@ -911,8 +904,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					for (MessageItem mi : messages) {
 						if (mi.getMitt().equals(prevMess)) {
 							item.addIncomingConnection(mi);
-							// System.out.println("Incoming connection between: "
-							// + item.getName() + " and " + mi.getName());
 						}
 					}
 				}
