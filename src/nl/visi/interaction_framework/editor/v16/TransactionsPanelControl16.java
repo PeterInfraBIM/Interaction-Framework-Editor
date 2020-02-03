@@ -984,26 +984,13 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			boolean selectedMessage = selectedRow >= 0;
 			btn_RemoveMessage.setEnabled(selectedMessage);
 			btn_Reverse.setEnabled(selectedMessage);
-//			cbx_PreviousMessages.setEnabled(selectedMessage);
-//			previousMessagesTableModel.clear();
-//			tbl_PreviousMessages.setEnabled(selectedMessage);
 			sequenceTable.clear();
 			elementConditionsTableModel.clear();
 			tbl_ElementConditions.setEnabled(selectedMessage);
 			btn_NewElementCondition.setEnabled(selectedMessage);
 			if (selectedMessage) {
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
-//				List<MessageInTransactionTypeType> previous = getPrevious(mitt);
-//				if (previous != null) {
-//					for (MessageInTransactionTypeType prev : previous) {
-//						previousMessagesTableModel.add(new PreviousMessage(prev));
-//					}
-//				}
-//				cbx_PreviousMessages.removeAllItems();
-//				cbx_PreviousMessages.addItem(null);
-
 				fillElementConditionsTable(mitt);
-//				fillSequencesTable(mitt);
 				sequenceTable.fillSequenceTable(null, "inOut", mitt);
 
 				cbx_ComplexElements.removeAllItems();
@@ -1019,51 +1006,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				for (SimpleElementTypeType se : seList) {
 					cbx_SimpleElements.addItem(se.getId());
 				}
-
-//				boolean initiatorToExecutor = mitt.isInitiatorToExecutor() != null ? mitt.isInitiatorToExecutor()
-//						: true;
-//				RoleTypeType roleType = null;
-//				if (initiatorToExecutor) {
-//					roleType = getInitiator(selectedElement);
-//				} else {
-//					roleType = getExecutor(selectedElement);
-//				}
-//				if (roleType != null) {
-//					List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
-//							.getElements(MessageInTransactionTypeType.class);
-//					List<PreviousMessage> cbxPrevs = new ArrayList<PreviousMessage>();
-//					for (MessageInTransactionTypeType element : mitts) {
-//						TransactionTypeType transactionType = getTransaction(element);
-//						if (transactionType != null) {
-//							boolean init2Exec = element.isInitiatorToExecutor() != null
-//									? element.isInitiatorToExecutor()
-//									: true;
-//							RoleTypeType roleType2 = null;
-//							if (init2Exec) {
-//								roleType2 = getExecutor(transactionType);
-//							} else {
-//								roleType2 = getInitiator(transactionType);
-//							}
-//							if (roleType.equals(roleType2)) {
-//								PreviousMessage previousMessage = new PreviousMessage(element);
-//								boolean inserted = false;
-//								for (int index = 0; !inserted && index < cbxPrevs.size(); index++) {
-//									PreviousMessage message = cbxPrevs.get(index);
-//									if (message.toString().compareTo(previousMessage.toString()) > 0) {
-//										inserted = true;
-//										cbxPrevs.add(index, previousMessage);
-//									}
-//								}
-//								if (!inserted) {
-//									cbxPrevs.add(previousMessage);
-//								}
-//							}
-//						}
-//					}
-//					for (PreviousMessage pm : cbxPrevs) {
-//						cbx_PreviousMessages.addItem(pm);
-//					}
-//				}
 			}
 		}
 
@@ -1087,64 +1029,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				}
 			}
 		}
-
-//		private void fillSequencesTable(MessageInTransactionTypeType mitt) {
-//			sequenceTableModel.clear();
-//			MessageInTransactionTypeType.Conditions conditions = mitt.getConditions();
-//			if (conditions != null) {
-//				System.out.println(conditions);
-//				List<Object> list = conditions
-//						.getMessageInTransactionTypeConditionOrMessageInTransactionTypeConditionRef();
-//				for (Object object : list) {
-//					if (object instanceof MessageInTransactionTypeConditionTypeRef) {
-//						MessageInTransactionTypeConditionType mittCond = (MessageInTransactionTypeConditionType) ((MessageInTransactionTypeConditionTypeRef) object)
-//								.getIdref();
-//						sequenceTableModel.add(mittCond);
-//					} else {
-//						sequenceTableModel.add((MessageInTransactionTypeConditionType) object);
-//					}
-//				}
-//			}
-//		}
-
 	};
-
-//	private class PreviousMessage extends ElementType {
-//		private MessageInTransactionTypeType mitt;
-//		private MessageTypeType messageType;
-//		private TransactionTypeType transactionType;
-//
-//		PreviousMessage(MessageInTransactionTypeType mitt) {
-//			super();
-//			this.mitt = mitt;
-//			messageType = Control16.getMessage(mitt);
-//			transactionType = Control16.getTransaction(mitt);
-//		}
-
-//		public MessageInTransactionTypeType getMessageInTransaction() {
-//			return mitt;
-//		}
-
-//		public MessageTypeType getMessage() {
-//			return messageType;
-//		}
-//
-//		public TransactionTypeType getTransaction() {
-//			return transactionType;
-//		}
-//
-//		@Override
-//		public String getId() {
-//			return messageType.getId();
-//		}
-//
-//		@Override
-//		public String toString() {
-//			return messageType != null && transactionType != null ? transactionType.getId() + "/" + messageType.getId()
-//					: null;
-//		}
-//
-//	}
 
 	@SuppressWarnings("serial")
 	private class TransactionsTableRenderer extends DefaultTableCellRenderer {
@@ -1727,58 +1612,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		return messagesTableModel;
 	}
 
-//	private enum PreviousMessagesTableColumns {
-//		Id, Description, Transaction, Navigate;
-//
-//		@Override
-//		public String toString() {
-//			return getBundle().getString("lbl_" + name());
-//		}
-//	}
-
-//	@SuppressWarnings("serial")
-//	private class PreviousMessagesTableModel extends ElementsTableModel<PreviousMessage> {
-//
-//		@Override
-//		public int getColumnCount() {
-//			return PreviousMessagesTableColumns.values().length;
-//		}
-//
-//		@Override
-//		public String getColumnName(int columnIndex) {
-//			return PreviousMessagesTableColumns.values()[columnIndex].toString();
-//		}
-//
-//		@Override
-//		public Object getValueAt(int rowIndex, int columnIndex) {
-//			PreviousMessage pm = get(rowIndex);
-//			MessageTypeType messageType = pm.getMessage();
-//			if (messageType == null)
-//				return null;
-//
-//			switch (PreviousMessagesTableColumns.values()[columnIndex]) {
-//			case Id:
-//				return messageType.getId();
-//			case Description:
-//				return messageType.getDescription();
-//			case Transaction:
-//				TransactionTypeType transactionType = pm.getTransaction();
-//				if (transactionType != null) {
-//					return transactionType.getId();
-//				}
-//				return null;
-//			default:
-//				return null;
-//			}
-//		}
-//
-//		@Override
-//		public boolean isCellEditable(int rowIndex, int columnIndex) {
-//			return columnIndex == PreviousMessagesTableColumns.Navigate.ordinal();
-//		}
-//
-//	}
-
 	private enum ElementConditionsTableColumns {
 		Id, Description, Condition, ComplexElement1, ComplexElement2, SimpleElement, Global;
 
@@ -1904,27 +1737,11 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			case ComplexElement1:
 				if (value == null) {
 					elementConditionType.setComplexElements(null);
-				} else {
-//					String idref = (String) value;
-//					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
-//					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-//					ceRef.setIdref(ce);
-//					ComplexElements set = objectFactory.createElementConditionTypeComplexElements();
-//					set.setComplexElementTypeRef(ceRef);
-//					elementConditionType.setComplexElements(set);
 				}
 				break;
 			case ComplexElement2:
 				if (value == null) {
 					elementConditionType.setComplexElements(null);
-				} else {
-//					String idref = (String) value;
-//					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
-//					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-//					ceRef.setIdref(ce);
-//					ComplexElements set = objectFactory.createElementConditionTypeComplexElements();
-//					set.setComplexElementTypeRef(ceRef);
-//					elementConditionType.setComplexElements(set);
 				}
 				break;
 			case SimpleElement:
@@ -1974,80 +1791,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 			return Object.class;
 		}
-
 	}
-
-//	private enum SequenceTableColumns {
-//		Id, State, HelpInfo, SendAfter, SendBefore;
-//
-//		@Override
-//		public String toString() {
-//			return getBundle().getString("lbl_" + name());
-//		}
-//	}
-
-//	@SuppressWarnings("serial")
-//	private class SequenceTableModel extends ElementsTableModel<MessageInTransactionTypeConditionType> {
-//
-//		@Override
-//		public int getColumnCount() {
-//			return SequenceTableColumns.values().length;
-//		}
-//
-//		@Override
-//		public String getColumnName(int columnIndex) {
-//			return SequenceTableColumns.values()[columnIndex].toString();
-//		}
-//
-//		@Override
-//		public Object getValueAt(int rowIndex, int columnIndex) {
-//			MessageInTransactionTypeConditionType messageInTransactionTypeConditionType = get(rowIndex);
-//
-//			switch (SequenceTableColumns.values()[columnIndex]) {
-//			case HelpInfo:
-//				return messageInTransactionTypeConditionType.getHelpInfo();
-//			case Id:
-//				return messageInTransactionTypeConditionType.getId();
-//			case SendAfter:
-//				SendAfter sendAfter = messageInTransactionTypeConditionType.getSendAfter();
-//				if (sendAfter != null) {
-//					List<Object> list = sendAfter.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-//					if (list != null) {
-//						for (Object object : list) {
-//							if (object instanceof MessageInTransactionTypeTypeRef) {
-//								return ((MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object)
-//										.getIdref()).getId();
-//							} else {
-//								return ((MessageInTransactionTypeType) object).getId();
-//							}
-//						}
-//					}
-//				}
-//				break;
-//			case SendBefore:
-//				SendBefore sendBefore = messageInTransactionTypeConditionType.getSendBefore();
-//				if (sendBefore != null) {
-//					List<Object> list = sendBefore.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-//					if (list != null) {
-//						for (Object object : list) {
-//							if (object instanceof MessageInTransactionTypeTypeRef) {
-//								return ((MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) object)
-//										.getIdref()).getId();
-//							} else {
-//								return ((MessageInTransactionTypeType) object).getId();
-//							}
-//						}
-//					}
-//				}
-//				break;
-//			case State:
-//				return messageInTransactionTypeConditionType.getState();
-//			default:
-//				break;
-//			}
-//			return null;
-//		}
-//	}
 
 	public TransactionsPanelControl16() throws Exception {
 		super(TRANSACTIONS_PANEL);
@@ -2065,30 +1809,17 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		// Initialize tables and fields
 		initTransactionsTable();
 		initMessagesTable();
-//		initPreviousMessagesTable();
 		initElementConditionsTable();
 		initSequenceTable();
 		initSubtransactionsTable();
 		initStartDateField();
 		initEndDateField();
 		initResultField();
-//		initBasePointField();
 
 		drawingPlane = new Canvas();
 		scrollPane = new JScrollPane(drawingPlane);
 		canvasPanel.add(scrollPane, BorderLayout.CENTER);
 	}
-
-//	private void initBasePointField() {
-//		tfd_BasePoint.getDocument().addDocumentListener(new DocumentAdapter16() {
-//			@Override
-//			protected synchronized void update(DocumentEvent e) {
-//				if (inSelection)
-//					return;
-//				selectedElement.setBasePoint(tfd_BasePoint.getText());
-//			}
-//		});
-//	}
 
 	private void initResultField() {
 		tfd_Result.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -2193,48 +1924,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		sequencePanel.removeAll();
 		sequencePanel.add(sequenceTable.getPanel());
 		sequencePanel.revalidate();
-
-//		sequenceTableModel = new SequenceTableModel();
-//		tbl_Sequence.setModel(sequenceTableModel);
-//		tbl_Sequence.setFillsViewportHeight(true);
-//		tbl_Sequence.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				int selectedSequenceRow = tbl_Sequence.getSelectedRow();
-//				boolean rowSelected = selectedSequenceRow >= 0;
-//				btn_RemoveSequenceCondition.setEnabled(rowSelected);
-//			}
-//		});
 	}
-
-//	@SuppressWarnings("serial")
-//	private void initPreviousMessagesTable() {
-//		previousMessagesTableModel = new PreviousMessagesTableModel();
-//		tbl_PreviousMessages.setModel(previousMessagesTableModel);
-//		tbl_PreviousMessages.setAutoCreateRowSorter(true);
-//		tbl_PreviousMessages.setFillsViewportHeight(true);
-//		tbl_PreviousMessages.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				btn_RemovePreviousMessage.setEnabled(tbl_PreviousMessages.getSelectedRow() >= 0);
-//			}
-//		});
-//		TableColumn navigateColumn = tbl_PreviousMessages.getColumnModel()
-//				.getColumn(PreviousMessagesTableColumns.Navigate.ordinal());
-//		navigateColumn.setMaxWidth(50);
-//		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
-//		navigateColumn.setCellEditor(new NavigatorEditor() {
-//			@Override
-//			protected void navigate() {
-//				int row = tbl_PreviousMessages.getSelectedRow();
-//				PreviousMessage previousMessage = previousMessagesTableModel.get(row);
-//				MessageTypeType messageType = previousMessage.messageType;
-//				if (messageType != null) {
-//					InteractionFrameworkEditor.navigate(messageType);
-//				}
-//			}
-//		});
-//	}
 
 	private void initSubtransactionsTable() {
 		subtransactionsTableModel = new SubtransactionsTableModel();
@@ -2449,7 +2139,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			tfd_HelpInfo.setText("");
 			tfd_Code.setText("");
 			tfd_Result.setText("");
-//			tfd_BasePoint.setText("");
 
 			cbx_Initiator.removeAllItems();
 			btn_NavigateInitiator.setEnabled(false);
@@ -2458,10 +2147,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			btn_NavigateExecutor.setEnabled(false);
 			messagesTableModel.clear();
 			cbx_Messages.removeAllItems();
-//			previousMessagesTableModel.clear();
-//			cbx_PreviousMessages.removeAllItems();
 			elementConditionsTableModel.clear();
-//			sequenceTableModel.clear();
 			sequenceTable.clear();
 			subtransactionsTableModel.clear();
 		}
@@ -2675,7 +2361,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		}
 
-		// store.remove(transactionType.getId());
 		store.remove(transactionType);
 		elementsTableModel.remove(row);
 	}
@@ -2730,7 +2415,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
-		
+
 		fillMessageTable();
 	}
 
@@ -2779,70 +2464,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		}
 	}
-
-//	public void selectPreviousMessage() {
-//		int selectedIndex = cbx_PreviousMessages.getSelectedIndex();
-//		btn_AddPreviousMessage.setEnabled(selectedIndex > 0);
-//	}
-
-//	/**
-//	 * Add a previous MITT link to this MITT
-//	 */
-//	public void addPreviousMessage() {
-//		int messageRow = tbl_Messages.getSelectedRow();
-//		PreviousMessage pm = (PreviousMessage) cbx_PreviousMessages.getSelectedItem();
-//		MessageInTransactionTypeType previousMitt = pm.getMessageInTransaction();
-//		MessageInTransactionTypeType mitt = messagesTableModel.get(messageRow);
-//		Previous previous = mitt.getPrevious();
-//		if (previous == null) {
-//			previous = objectFactory.createMessageInTransactionTypeTypePrevious();
-//			mitt.setPrevious(previous);
-//		}
-//		List<Object> list = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-//		MessageInTransactionTypeTypeRef previousMittRef = objectFactory.createMessageInTransactionTypeTypeRef();
-//		previousMittRef.setIdref(previousMitt);
-//		list.add(previousMittRef);
-//
-//		previousMessagesTableModel.add(pm);
-//		messagesTableModel.fireTableRowsUpdated(messageRow, messageRow);
-//		drawingPlane.setCurrentTransaction(null);
-//	}
-
-//	public void removePreviousMessage() {
-//		int pmtRow = tbl_PreviousMessages.getSelectedRow();
-//		assert pmtRow >= 0;
-//		PreviousMessage previousMessage = previousMessagesTableModel.get(pmtRow);
-//		assert previousMessage != null;
-//		MessageInTransactionTypeType previousMitt = previousMessage.getMessageInTransaction();
-//		assert previousMitt != null;
-//		previousMessagesTableModel.remove(pmtRow);
-//
-//		int mtRow = tbl_Messages.getSelectedRow();
-//		assert mtRow >= 0;
-//		MessageInTransactionTypeType nextMitt = messagesTableModel.get(mtRow);
-//		assert nextMitt != null;
-//		Previous previous = nextMitt.getPrevious();
-//		assert previous != null;
-//		if (previous != null) {
-//			List<Object> list = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
-//			assert list != null;
-//			boolean found = false;
-//			for (Object object : list) {
-//				MessageInTransactionTypeType mitt = (MessageInTransactionTypeType) getElementType(object);
-//				if (mitt.equals(previousMitt)) {
-//					found = true;
-//					list.remove(object);
-//					break;
-//				}
-//			}
-//			assert found;
-//			if (list.size() == 0) {
-//				nextMitt.setPrevious(null);
-//			}
-//		}
-//		messageTableSelectionListener.valueChanged(new ListSelectionEvent(tbl_Messages, mtRow, mtRow, false));
-//		messagesTableModel.fireTableRowsUpdated(mtRow, mtRow);
-//	}
 
 	public boolean isMainTransaction(TransactionTypeType transactionType) {
 		Store16 store = Editor16.getStore16();
@@ -3024,5 +2645,4 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	public Canvas getDrawingPlane() {
 		return drawingPlane;
 	}
-
 }
