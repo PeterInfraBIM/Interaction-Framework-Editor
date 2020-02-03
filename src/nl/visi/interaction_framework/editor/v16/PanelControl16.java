@@ -316,14 +316,22 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 			newId = Editor16.getStore16().getNewId(prefix);
 		}
 		newElement.setId(newId);
-		if (newElement.getClass().getDeclaredField("description") != null) {
-			Method setDescriptionMethod = newElement.getClass().getDeclaredMethod("setDescription",
-					new Class[] { String.class });
-			setDescriptionMethod.invoke(newElement, getBundle().getString("lbl_DescriptionOf") + " " + newId);
-		}
 		if (newElement instanceof ProjectTypeType) {
 			ProjectTypeType newProjectElement = (ProjectTypeType) newElement;
-			newProjectElement.setNamespace("http://www.visi.nl/schemas/20160331/NewProject");
+			String namespace = newProjectElement.getNamespace();
+			if (namespace == null || namespace.isEmpty()) {
+				newProjectElement.setNamespace("http://www.visi.nl/schemas/20160331/NewProject");
+			}
+			String description = newProjectElement.getDescription();
+			if (description == null || description.isEmpty()) {
+				newProjectElement.setDescription(getBundle().getString("lbl_DescriptionOf") + " " + newId);
+			}
+		} else {
+			if (newElement.getClass().getDeclaredField("description") != null) {
+				Method setDescriptionMethod = newElement.getClass().getDeclaredMethod("setDescription",
+						new Class[] { String.class });
+				setDescriptionMethod.invoke(newElement, getBundle().getString("lbl_DescriptionOf") + " " + newId);
+			}
 		}
 //		if (!(newElement instanceof ElementConditionType)) {
 //			Method setStateMethod = newElement.getClass().getDeclaredMethod("setState", new Class[] { String.class });
@@ -350,7 +358,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 //			}
 //		}
 		Editor16.getStore16().put(newId, newElement);
-		updateLaMu(newElement, MainFrameControl16.user);
+		updateLaMu(newElement, InteractionFrameworkEditor.user);
 		return newId;
 	}
 

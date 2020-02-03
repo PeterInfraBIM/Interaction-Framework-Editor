@@ -34,6 +34,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.v14.Editor14;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.v14.Control14;
 import nl.visi.interaction_framework.editor.v14.Store14;
 import nl.visi.schemas._20140331.ElementType;
@@ -90,7 +91,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 		}
 
 		protected void navigate() {
-			Editor14.getMainFrameControl().navigate(selectedElement);
+			InteractionFrameworkEditor.navigate(selectedElement);
 		}
 	}
 
@@ -315,14 +316,22 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			newId = Editor14.getStore14().getNewId(prefix);
 		}
 		newElement.setId(newId);
-		if (newElement.getClass().getDeclaredField("description") != null) {
-			Method setDescriptionMethod = newElement.getClass().getDeclaredMethod("setDescription",
-					new Class[] { String.class });
-			setDescriptionMethod.invoke(newElement, getBundle().getString("lbl_DescriptionOf") + " " + newId);
-		}
 		if (newElement instanceof ProjectTypeType) {
 			ProjectTypeType newProjectElement = (ProjectTypeType) newElement;
-			newProjectElement.setNamespace("http://www.visi.nl/schemas/20160331/NewProject");
+			String namespace = newProjectElement.getNamespace();
+			if (namespace == null || namespace.isEmpty()) {
+				newProjectElement.setNamespace("http://www.visi.nl/schemas/20140331/NewProject");
+			}
+			String description = newProjectElement.getDescription();
+			if (description == null || description.isEmpty()) {
+				newProjectElement.setDescription(getBundle().getString("lbl_DescriptionOf") + " " + newId);
+			}
+		} else {
+			if (newElement.getClass().getDeclaredField("description") != null) {
+				Method setDescriptionMethod = newElement.getClass().getDeclaredMethod("setDescription",
+						new Class[] { String.class });
+				setDescriptionMethod.invoke(newElement, getBundle().getString("lbl_DescriptionOf") + " " + newId);
+			}
 		}
 //		if (!(newElement instanceof ElementConditionType)) {
 //			Method setStateMethod = newElement.getClass().getDeclaredMethod("setState", new Class[] { String.class });
@@ -349,7 +358,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 //			}
 //		}
 		Editor14.getStore14().put(newId, newElement);
-		updateLaMu(newElement, MainFrameControl14.user);
+		updateLaMu(newElement, InteractionFrameworkEditor.user);
 		return newId;
 	}
 

@@ -27,6 +27,26 @@ public class NewFrameworkDialogControl extends Control {
 		dialog = (JDialog) render(NEW_FRAMEWORK_DIALOG);
 		JRootPane rootPane = SwingUtilities.getRootPane(btn_Create);
 		rootPane.setDefaultButton(btn_Create);
+		rdb_V14.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (getVersion().equals("1.6")) {
+					tfd_Namespace.setText("http://www.visi.nl/schemas/20160331/NewFramework");
+				} else {
+					tfd_Namespace.setText("http://www.visi.nl/schemas/20140331/NewFramework");
+				}
+			}
+		});
+		rdb_V16.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (getVersion().equals("1.6")) {
+					tfd_Namespace.setText("http://www.visi.nl/schemas/20160331/NewFramework");
+				} else {
+					tfd_Namespace.setText("http://www.visi.nl/schemas/20140331/NewFramework");
+				}
+			}
+		});
 		tfd_Description.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
@@ -88,7 +108,11 @@ public class NewFrameworkDialogControl extends Control {
 
 	public void clear() {
 		tfd_Description.setText("Description of new framework");
-		tfd_Namespace.setText("http://www.visi.nl/schemas/20160331/NewFramework");
+		if (getVersion().equals("1.6")) {
+			tfd_Namespace.setText("http://www.visi.nl/schemas/20160331/NewFramework");
+		} else {
+			tfd_Namespace.setText("http://www.visi.nl/schemas/20140331/NewFramework");
+		}
 	}
 
 	public void setVisible(boolean visible) {

@@ -90,14 +90,10 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_ElementConditions, tbl_Subtransactions;
 	private JTextField tfd_Result;
-//	private JTextField tfd_BasePoint;
 	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups,
 			cbx_Conditions, cbx_ComplexElements, cbx_SimpleElements;
-//	private JComboBox<PreviousMessage> cbx_PreviousMessages;
 	private MessagesTableModel messagesTableModel;
-//	private PreviousMessagesTableModel previousMessagesTableModel;
 	private ElementConditionsTableModel elementConditionsTableModel;
-//	private SequenceTableModel sequenceTableModel;
 	private SequenceTable sequenceTable;
 	private SubtransactionsTableModel subtransactionsTableModel;
 	private JButton btn_AddMessage, btn_RemoveMessage, btn_Reverse, btn_NewElementCondition, btn_RemoveElementCondition,
@@ -916,8 +912,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						for (MessageInTransactionTypeType prevMess : previous) {
 							if (prevMess.equals(mitt)) {
 								item.addOutgoingConnection(mi);
-								// System.out.println("Outgoing connection between: "
-								// + item.getName() + " and " + mi.getName());
 							}
 						}
 					}
@@ -1600,26 +1594,21 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			for (int index = 0; index < currentNode.getChildCount(); index++) {
 				MittNode childNode = (MittNode) currentNode.getChildAt(index);
 				MessageInTransactionTypeType mitt = (MessageInTransactionTypeType) childNode.getUserObject();
-				// System.out.println(level + " " + getMessage(mitt).getId());
 				if (currentNode.getUserObject() instanceof MessageInTransactionTypeType && startMitt.contains(mitt)) {
 					continue;
 				}
 				if (!elements.contains(mitt)) {
 					if (currentNode.getUserObject() instanceof String) {
 						elements.add(mitt);
-						// System.out.println(level + " " + elements.size());
 					} else if (isEndMitt(mitt)
 							&& (mitt.isInitiatorToExecutor() != null && !mitt.isInitiatorToExecutor())) {
 						elements.add(beginIndex, mitt);
-						// System.out.println(level + " " + beginIndex);
 						middleIndex++;
 					} else if (isEndMitt(mitt)
 							&& (mitt.isInitiatorToExecutor() == null || mitt.isInitiatorToExecutor())) {
 						elements.add(mitt);
-						// System.out.println(level + " " + elements.size());
 					} else {
 						elements.add(middleIndex, mitt);
-						// System.out.println(level + " " + middleIndex);
 						middleIndex++;
 					}
 				}
@@ -2357,17 +2346,13 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_Code.setEnabled(rowSelected);
 		tfd_Result.setEnabled(rowSelected);
-//		tfd_BasePoint.setEnabled(rowSelected);
 		cbx_Initiator.setEnabled(rowSelected);
 		tar_Initiator.setEnabled(rowSelected);
 		cbx_Executor.setEnabled(rowSelected);
 		tar_Executor.setEnabled(rowSelected);
 		tbl_Messages.setEnabled(rowSelected);
 		cbx_Messages.setEnabled(rowSelected);
-//		tbl_PreviousMessages.setEnabled(rowSelected);
-//		cbx_PreviousMessages.setEnabled(rowSelected);
 		tbl_ElementConditions.setEnabled(rowSelected);
-//		tbl_Sequence.setEnabled(rowSelected);
 		tbl_Subtransactions.setEnabled(rowSelected);
 
 		successorMap = new HashMap<MessageInTransactionTypeType, List<MessageInTransactionTypeType>>();
@@ -2392,7 +2377,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
 			tfd_Code.setText(selectedElement.getCode());
 			tfd_Result.setText(selectedElement.getResult());
-//			tfd_BasePoint.setText(selectedElement.getBasePoint());
 
 			cbx_Initiator.removeAllItems();
 			tar_Initiator.setText("");
@@ -2746,6 +2730,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
+		
+		fillMessageTable();
 	}
 
 	public void reverse() {

@@ -202,7 +202,6 @@ public class MainPanelControl16 extends Control16 {
 		@Override
 		public int print(Graphics graphics, PageFormat pageFormat, int pageIndex) throws PrinterException {
 			if (pageIndex > pageList.size() + transactionElementCount - 1) {
-				System.out.println("NO_SUCH_PAGE");
 				return NO_SUCH_PAGE;
 			}
 
@@ -216,7 +215,6 @@ public class MainPanelControl16 extends Control16 {
 				rolesDrawingPlane.setCurrentRole(null);
 				rolesDrawingPlane.print(graphics, pageList.get(pageIndex).startLine, LINES_PER_PAGE);
 
-				System.out.println("PAGE_EXISTS");
 				return PAGE_EXISTS;
 			} else {
 				transactionsPC.tbl_Elements.getSelectionModel().setSelectionInterval(pageIndex - pageList.size(),
@@ -301,7 +299,6 @@ public class MainPanelControl16 extends Control16 {
 	}
 
 	private void navExec(ElementType element) {
-		System.out.println(element.getId());
 		PanelControl16<?> panelControl = null;
 		switch (Store16.ElementTypeType.valueOf(element.getClass().getSimpleName())) {
 		case AppendixTypeType:

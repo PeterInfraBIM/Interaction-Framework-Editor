@@ -122,7 +122,6 @@ public class InteractionFrameworkEditor extends Control {
 
 				@Override
 				public void propertyChange(PropertyChangeEvent evt) {
-					System.out.println(evt.getPropertyName() + ": " + evt.getNewValue());
 					if (evt.getPropertyName().equals("btn_Create")) {
 						version = newFrameworkDialogControl.getVersion();
 						tfd_Version.setText(version);

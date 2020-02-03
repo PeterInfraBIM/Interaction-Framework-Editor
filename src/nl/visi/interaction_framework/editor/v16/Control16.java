@@ -38,7 +38,6 @@ public abstract class Control16 extends Control {
 	protected static final GregorianCalendar gcal = new GregorianCalendar();
 
 	protected Comparator<String> dateComparator = new Comparator<String>() {
-
 		@Override
 		public int compare(String o1, String o2) {
 			if (o1 != null && o2 != null && !o1.isEmpty() && !o2.isEmpty()) {

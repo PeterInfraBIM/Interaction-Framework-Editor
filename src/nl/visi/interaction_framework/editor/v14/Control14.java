@@ -1,8 +1,6 @@
 package nl.visi.interaction_framework.editor.v14;
 
-import java.awt.Component;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,14 +8,11 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.ResourceBundle;
-import java.util.prefs.Preferences;
 
 import javax.swing.table.AbstractTableModel;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import org.swixml.SwingEngine;
-
+import nl.visi.interaction_framework.editor.Control;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendAfter;
@@ -36,21 +31,11 @@ import nl.visi.schemas._20140331.TransactionTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType.Executor;
 import nl.visi.schemas._20140331.TransactionTypeType.Initiator;
 
-abstract class Control14 {
-	public static final String RESOURCE_BUNDLE = "nl.visi.interaction_framework.editor.locale.Editor";
-	private static final ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
-	// static final java.text.DateFormat sdfDate =
-	// SimpleDateFormat.getDateInstance();
+abstract class Control14 extends Control {
 	static final java.text.DateFormat sdfDate = new SimpleDateFormat("d MMM yyyy");
-	// private static final java.text.DateFormat sdfDateTime =
-	// SimpleDateFormat.getDateTimeInstance();
 	static final java.text.DateFormat sdfDateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
-	private final SwingEngine swingEngine;
 	protected static final ObjectFactory objectFactory = new ObjectFactory();
 	protected static final GregorianCalendar gcal = new GregorianCalendar();
-	protected PropertyChangeSupport propertyChangeSupport;
-	protected static String user = "???";
-	protected static Preferences userPrefs = Preferences.userNodeForPackage(Control14.class);
 
 	protected Comparator<String> dateComparator = new Comparator<String>() {
 		@Override
@@ -154,18 +139,7 @@ abstract class Control14 {
 	}
 
 	public Control14() {
-		swingEngine = new SwingEngine(this);
-		propertyChangeSupport = new PropertyChangeSupport(this);
-	}
-
-	protected static ResourceBundle getBundle() {
-		return bundle;
-	}
-
-	protected Component render(String swiXmlResource) throws Exception {
-		Component component = null;
-		component = swingEngine.render(swiXmlResource);
-		return component;
+		super();
 	}
 
 	protected String getDate(XMLGregorianCalendar dateTime) {
