@@ -152,7 +152,8 @@ public class MainPanelControl16 extends Control16 {
 
 	public void openFramework(File frameworkFile, DefaultHandler defaultHandler) {
 		try {
-			InputSource schema = new InputSource(new FileInputStream("_3_16.xsd"));
+//			InputSource schema = new InputSource(new FileInputStream("_3_16.xsd"));
+			InputSource schema = new InputSource(getClass().getClassLoader().getResourceAsStream("main/resource/20160331.xsd"));
 			Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
 			Editor16.getLoader16().load(schema, frameworkFile);
 			Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();

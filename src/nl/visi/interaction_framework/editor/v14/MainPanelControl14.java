@@ -152,7 +152,9 @@ public class MainPanelControl14 extends Control14 {
 
 	public void openFramework(File frameworkFile, DefaultHandler defaultHandler) {
 		try {
-			InputSource schema = new InputSource(new FileInputStream("_3_14.xsd"));
+//			InputSource schema = new InputSource(new FileInputStream("_3_14.xsd"));
+			InputSource schema = new InputSource(
+					getClass().getClassLoader().getResourceAsStream("main/resource/20140331.xsd"));
 			Editor14.getLoader14().validate(schema, frameworkFile, defaultHandler);
 			Editor14.getLoader14().load(schema, frameworkFile);
 			Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
@@ -166,7 +168,7 @@ public class MainPanelControl14 extends Control14 {
 	public void saveFramework(File frameworkFile) throws FileNotFoundException, Exception {
 		Editor14.getLoader14().marshal(new PrintStream(frameworkFile));
 	}
-	
+
 	class PrintDiagrams implements Printable {
 		private static final int LINES_PER_PAGE = 50;
 		private List<PrintPage> pageList;
@@ -260,7 +262,7 @@ public class MainPanelControl14 extends Control14 {
 			}
 		}
 	}
-	
+
 	public void report(File excelFile) throws IOException {
 		ExcelReportGenerator14 excelReportGenerator = new ExcelReportGenerator14(this);
 		excelReportGenerator.writeReport(excelFile);

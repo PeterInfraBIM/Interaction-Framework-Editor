@@ -21,7 +21,6 @@ import javax.xml.validation.SchemaFactory;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
@@ -95,7 +94,8 @@ class Loader14 {
 		}
 	};
 
-	public void validate(InputSource schema, File xml, DefaultHandler defaultHandler) throws SAXParseException {
+	public void validate(InputSource schema, File xml, DefaultHandler defaultHandler)
+			throws ParserConfigurationException, SAXException, IOException {
 		if (xml != null) {
 			// build an XSD-aware SchemaFactory
 			SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -107,24 +107,14 @@ class Loader14 {
 			// Create a Validator capable of validating XML files according to my
 			// custom schema.
 			// Validator validator = schemaXSD.newValidator();
-			try {
-				SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
-				saxParserFactory.setNamespaceAware(true);
-				saxParserFactory.setValidating(true);
-				SAXParser saxParser = saxParserFactory.newSAXParser();
+			SAXParserFactory saxParserFactory = SAXParserFactory.newInstance();
+			saxParserFactory.setNamespaceAware(true);
+			saxParserFactory.setValidating(true);
+			SAXParser saxParser = saxParserFactory.newSAXParser();
 
-				saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
-				saxParser.setProperty(JAXP_SCHEMA_SOURCE, schema);
-				saxParser.parse(xml, defaultHandler);
-			} catch (SAXNotRecognizedException e) {
-				e.getStackTrace();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-			} catch (SAXException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			saxParser.setProperty(JAXP_SCHEMA_LANGUAGE, W3C_XML_SCHEMA);
+			saxParser.setProperty(JAXP_SCHEMA_SOURCE, schema);
+			saxParser.parse(xml, defaultHandler);
 		}
 	}
 

@@ -6,6 +6,7 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="src" path="images"/>
 	<classpathentry kind="src" path="src/nl/visi/interaction_framework/editor/locale"/>
 	<classpathentry kind="src" path="src/nl/visi/interaction_framework/editor/swixml"/>
 	<classpathentry kind="src" path="src/nl/visi/interaction_framework/editor/icons"/>
@@ -13,6 +14,7 @@
 	<classpathentry kind="src" path="src/nl/visi/interaction_framework/editor/lib"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7">
 		<attributes>
+			<attribute name="module" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
@@ -26,5 +28,6 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/swixml.jar"/>
 	<classpathentry kind="lib" path="lib/looks-2.3.1.jar"/>
+	<classpathentry kind="lib" path="src/main/resource"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

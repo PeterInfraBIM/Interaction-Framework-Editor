@@ -1,6 +1,10 @@
 package nl.visi.interaction_framework.editor;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.SplashScreen;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -33,7 +37,7 @@ import nl.visi.interaction_framework.editor.v14.MainPanelControl14;
 import nl.visi.interaction_framework.editor.v16.MainPanelControl16;
 
 public class InteractionFrameworkEditor extends Control {
-	private static final String TOP_LEVEL = "nl/visi/interaction_framework/editor/swixml/TopLevel.xml";
+	private static final String TOP_LEVEL = "nl/visi/interaction_framework/editor/swixml/Toplevel.xml";
 	private static InteractionFrameworkEditor instance;
 	private File frameworkFile;
 	private String version;
@@ -81,12 +85,38 @@ public class InteractionFrameworkEditor extends Control {
 
 	}
 
+	static void renderSplashFrame(Graphics2D g) {
+		final String version = "Release candidate 2.01";
+		g.setComposite(AlphaComposite.Clear);
+		g.fillRect(120, 140, 200, 40);
+		g.setPaintMode();
+		g.setColor(Color.BLACK);
+		g.drawString("Loading " + version + "...", 120, 350);
+	}
+
 	public InteractionFrameworkEditor() {
 		super();
 
 		instance = this;
 
 		try {
+			final SplashScreen splash = SplashScreen.getSplashScreen();
+			if (splash == null) {
+				System.out.println("SplashScreen.getSplashScreen() returned null");
+			} else {
+				Graphics2D g = splash.createGraphics();
+				if (g == null) {
+					System.out.println("g is null");
+					return;
+				}
+					renderSplashFrame(g);
+					splash.update();
+					try {
+						Thread.sleep(2000);
+					} catch (InterruptedException e) {
+				}
+				splash.close();
+			}
 			PlasticXPLookAndFeel laf = new PlasticXPLookAndFeel();
 			PlasticXPLookAndFeel.setCurrentTheme(new ExperienceRoyale());
 			PlasticXPLookAndFeel.setTabStyle(PlasticXPLookAndFeel.TAB_STYLE_METAL_VALUE);
