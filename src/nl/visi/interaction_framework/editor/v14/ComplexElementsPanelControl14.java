@@ -46,7 +46,6 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	private SimpleElementsTableModel simpleElementsTableModel;
 	private JComboBox<String> cbx_ComplexElements, cbx_SimpleElements;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddSimpleElement, btn_RemoveSimpleElement;
-//	private JTextField tfd_MinOccurs, tfd_MaxOccurs;
 
 	private enum ComplexElementsTableColumns {
 		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
@@ -409,6 +408,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -418,8 +418,6 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
-//		tfd_MaxOccurs.setEnabled(rowSelected);
-//		tfd_MinOccurs.setEnabled(rowSelected);
 		tbl_SubComplexElements.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
 		tbl_SimpleElements.setEnabled(rowSelected);
@@ -513,6 +511,32 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 
 			int row = elementsTableModel.add(newComplexElementType);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void copyElement() {
+		Store14 store = Editor14.getStore14();
+		int row = tbl_Elements.getSelectedRow();
+		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
+
+		try {
+			ComplexElementTypeType copyComplexElementType = objectFactory.createComplexElementTypeType();
+			newElement(copyComplexElementType, "ComplexElement_");
+			store.generateCopyId(copyComplexElementType, complexElementType);
+			copyComplexElementType.setCategory(complexElementType.getCategory());
+			copyComplexElementType.setComplexElements(complexElementType.getComplexElements());
+			copyComplexElementType.setDescription(complexElementType.getDescription());
+			copyComplexElementType.setEndDate(complexElementType.getEndDate());
+			copyComplexElementType.setHelpInfo(complexElementType.getHelpInfo());
+			copyComplexElementType.setLanguage(complexElementType.getLanguage());
+			copyComplexElementType.setSimpleElements(complexElementType.getSimpleElements());
+			copyComplexElementType.setStartDate(complexElementType.getStartDate());
+			copyComplexElementType.setState(complexElementType.getState());
+			store.put(copyComplexElementType.getId(), copyComplexElementType);
+			int copyrow = elementsTableModel.add(copyComplexElementType);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

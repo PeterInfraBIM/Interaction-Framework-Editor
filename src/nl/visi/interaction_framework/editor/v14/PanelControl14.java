@@ -51,7 +51,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 	protected int selectedRow;
 	protected ElementsTableModel<E> elementsTableModel;
 	protected JTable tbl_Elements;
-	protected JButton btn_NewElement, btn_DeleteElement;
+	protected JButton btn_NewElement, btn_CopyElement, btn_DeleteElement;
 	protected JTextField tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
 	protected DateField startDateField, endDateField;
 	protected boolean inSelection = false;

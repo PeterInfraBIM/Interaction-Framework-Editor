@@ -194,7 +194,21 @@ class Store16 {
 		Object elementType = store.remove(oldId);
 		store.put(newId, elementType);
 	}
-
+	
+	public void generateCopyId(ElementType copyElement, ElementType origElement) {
+		int sequenceNumber = 1;
+		boolean success = false;
+		while (!success) {
+			try {
+				renameId(copyElement.getId(), origElement.getId() + sequenceNumber);
+				copyElement.setId(origElement.getId() + sequenceNumber);
+				success = true;
+			} catch (Exception e) {
+				sequenceNumber++;
+			}
+		}
+	}
+	
 	public void clear() {
 		store.clear();
 	}

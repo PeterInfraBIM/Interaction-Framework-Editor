@@ -86,7 +86,7 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	static void renderSplashFrame(Graphics2D g) {
-		final String version = "Release candidate 2.01";
+		final String version = "Release candidate 2.02";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();
@@ -301,7 +301,7 @@ public class InteractionFrameworkEditor extends Control {
 				if (!defaultFilePath.equals("")) {
 					fileChooser.setSelectedFile(new File(defaultFilePath));
 				}
-				int returnVal = fileChooser.showOpenDialog(frame);
+				int returnVal = fileChooser.showSaveDialog(frame);
 				if (returnVal == JFileChooser.APPROVE_OPTION) {
 					frameworkFile = fileChooser.getSelectedFile();
 				}

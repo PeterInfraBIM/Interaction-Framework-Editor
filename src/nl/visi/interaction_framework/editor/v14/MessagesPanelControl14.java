@@ -37,15 +37,10 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 
 	private JPanel startDatePanel, endDatePanel;
 	private JTable tbl_ComplexElements, tbl_Transactions;
-//	private JTable tbl_Appendices;
 	private ComplexElementsTableModel complexElementsTableModel;
-//	private AppendicesTableModel appendicesTableModel;
 	private TransactionsTableModel transactionsTableModel;
 	private JComboBox<String> cbx_ComplexElements;
-//	private JComboBox<String> cbx_Appendices;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement;
-//	private JButton btn_AddAppendix, btn_RemoveAppendix;
-//	private JCheckBox chb_AppendixMandatory;
 
 	private enum MessagesTableColumns {
 		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
@@ -487,6 +482,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -497,12 +493,9 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_Code.setEnabled(rowSelected);
-//		chb_AppendixMandatory.setEnabled(rowSelected);
 		tbl_ComplexElements.setEnabled(rowSelected);
 		tbl_Transactions.setEnabled(rowSelected);
-//		tbl_Appendices.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
-//		cbx_Appendices.setEnabled(rowSelected);
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
 			tfd_Id.setText(selectedElement.getId());
@@ -520,9 +513,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
 			tfd_Code.setText(selectedElement.getCode());
-//			Boolean appendixMandatory = selectedElement.isAppendixMandatory();
-//			chb_AppendixMandatory
-//					.setSelected(appendixMandatory != null ? selectedElement.isAppendixMandatory() : false);
 
 			complexElementsTableModel.clear();
 			MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
@@ -612,7 +602,34 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 			e.printStackTrace();
 		}
 	}
+	
+	public void copyElement() {
+		Store14 store = Editor14.getStore14();
+		int row = tbl_Elements.getSelectedRow();
+		MessageTypeType messageType = elementsTableModel.get(row);
 
+		try {
+			MessageTypeType copyMessageType = objectFactory.createMessageTypeType();
+			newElement(copyMessageType, "Message_");
+			store.generateCopyId(copyMessageType, messageType);
+			copyMessageType.setAppendixTypes(messageType.getAppendixTypes());
+			copyMessageType.setCategory(messageType.getCategory());
+			copyMessageType.setCode(messageType.getCode());
+			copyMessageType.setComplexElements(messageType.getComplexElements());
+			copyMessageType.setDescription(messageType.getDescription());
+			copyMessageType.setEndDate(messageType.getEndDate());
+			copyMessageType.setHelpInfo(messageType.getHelpInfo());
+			copyMessageType.setLanguage(messageType.getLanguage());
+			copyMessageType.setStartDate(messageType.getStartDate());
+			copyMessageType.setState(messageType.getState());
+			store.put(copyMessageType.getId(), copyMessageType);
+			int copyrow = elementsTableModel.add(copyMessageType);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();

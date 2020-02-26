@@ -41,7 +41,7 @@ import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
 import nl.visi.schemas._20160331.ProjectTypeType;
 
-public abstract class PanelControl16<E extends ElementType> extends Control16 {
+abstract class PanelControl16<E extends ElementType> extends Control16 {
 	enum Fields {
 		Id, Description, State, Language, Category, HelpInfo, Code;
 	}
@@ -51,7 +51,7 @@ public abstract class PanelControl16<E extends ElementType> extends Control16 {
 	protected int selectedRow;
 	protected ElementsTableModel<E> elementsTableModel;
 	protected JTable tbl_Elements;
-	protected JButton btn_NewElement, btn_DeleteElement;
+	protected JButton btn_NewElement, btn_CopyElement, btn_DeleteElement;
 	protected JTextField tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
 	protected DateField startDateField, endDateField;
 	protected boolean inSelection = false;

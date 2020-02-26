@@ -488,6 +488,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -612,6 +613,35 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void copyElement() {
+		Store16 store = Editor16.getStore16();
+		int row = tbl_Elements.getSelectedRow();
+		MessageTypeType messageType = elementsTableModel.get(row);
+
+		try {
+			MessageTypeType copyMessageType = objectFactory.createMessageTypeType();
+			newElement(copyMessageType, "Message_");
+			store.generateCopyId(copyMessageType, messageType);
+			copyMessageType.setAppendixMandatory(messageType.isAppendixMandatory());
+			copyMessageType.setAppendixTypes(messageType.getAppendixTypes());
+			copyMessageType.setCategory(messageType.getCategory());
+			copyMessageType.setCode(messageType.getCode());
+			copyMessageType.setComplexElements(messageType.getComplexElements());
+			copyMessageType.setDescription(messageType.getDescription());
+			copyMessageType.setEndDate(messageType.getEndDate());
+			copyMessageType.setHelpInfo(messageType.getHelpInfo());
+			copyMessageType.setLanguage(messageType.getLanguage());
+			copyMessageType.setStartDate(messageType.getStartDate());
+			copyMessageType.setState(messageType.getState());
+			store.put(copyMessageType.getId(), copyMessageType);
+			int copyrow = elementsTableModel.add(copyMessageType);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public void deleteElement() {

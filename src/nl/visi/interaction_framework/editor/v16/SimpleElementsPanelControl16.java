@@ -133,6 +133,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -166,7 +167,6 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				UserDefinedTypeType userDefined = userDefinedType.getUserDefinedType();
 				if (userDefined == null) {
 					userDefined = (UserDefinedTypeType) userDefinedType.getUserDefinedTypeRef().getIdref();
-					cbx_UserDefinedType.setSelectedItem(userDefined);
 				}
 				cbx_UserDefinedType.setSelectedItem(userDefined.getId());
 			}
@@ -199,6 +199,31 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		}
 	}
 
+	public void copyElement() {
+		Store16 store = Editor16.getStore16();
+		int row = tbl_Elements.getSelectedRow();
+		SimpleElementTypeType simpleElementType = elementsTableModel.get(row);
+
+		try {
+			SimpleElementTypeType copySimpleElementType = objectFactory.createSimpleElementTypeType();
+			newElement(copySimpleElementType, "SimpleElement_");
+			store.generateCopyId(copySimpleElementType, simpleElementType);
+			copySimpleElementType.setCategory(simpleElementType.getCategory());
+			copySimpleElementType.setDescription(simpleElementType.getDescription());
+			copySimpleElementType.setHelpInfo(simpleElementType.getHelpInfo());
+			copySimpleElementType.setInterfaceType(simpleElementType.getInterfaceType());
+			copySimpleElementType.setLanguage(simpleElementType.getLanguage());
+			copySimpleElementType.setState(simpleElementType.getState());
+			copySimpleElementType.setUserDefinedType(simpleElementType.getUserDefinedType());
+			copySimpleElementType.setValueList(simpleElementType.getValueList());
+			store.put(copySimpleElementType.getId(), copySimpleElementType);
+			int copyrow = elementsTableModel.add(copySimpleElementType);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
@@ -223,26 +248,26 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		elementsTableModel.remove(row);
 	}
 
-	public void setUserDefinedType() {
-		String idref = (String) cbx_UserDefinedType.getSelectedItem();
-		if (idref != null) {
-			UserDefinedTypeType definedType = Editor16.getStore16().getElement(UserDefinedTypeType.class, idref);
-			SimpleElementTypeType.UserDefinedType value = objectFactory.createSimpleElementTypeTypeUserDefinedType();
-			UserDefinedTypeTypeRef userDefinedTypeTypeRef = objectFactory.createUserDefinedTypeTypeRef();
-			userDefinedTypeTypeRef.setIdref(definedType);
-			value.setUserDefinedTypeRef(userDefinedTypeTypeRef);
-			selectedElement.setUserDefinedType(value);
-			updateLaMu(selectedElement, user);
-			elementsTableModel.update(selectedRow);
-		} else {
-			if (selectedElement != null) {
-				UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
-				if (userDefinedType != null) {
-					selectedElement.setUserDefinedType(null);
-				}
-			}
-		}
-	}
+//	public void setUserDefinedType() {
+//		String idref = (String) cbx_UserDefinedType.getSelectedItem();
+//		if (idref != null) {
+//			UserDefinedTypeType definedType = Editor16.getStore16().getElement(UserDefinedTypeType.class, idref);
+//			SimpleElementTypeType.UserDefinedType value = objectFactory.createSimpleElementTypeTypeUserDefinedType();
+//			UserDefinedTypeTypeRef userDefinedTypeTypeRef = objectFactory.createUserDefinedTypeTypeRef();
+//			userDefinedTypeTypeRef.setIdref(definedType);
+//			value.setUserDefinedTypeRef(userDefinedTypeTypeRef);
+//			selectedElement.setUserDefinedType(value);
+//			updateLaMu(selectedElement, user);
+//			elementsTableModel.update(selectedRow);
+//		} else {
+//			if (selectedElement != null) {
+//				UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
+//				if (userDefinedType != null) {
+//					selectedElement.setUserDefinedType(null);
+//				}
+//			}
+//		}
+//	}
 
 	public void navigateUserDefinedType() {
 		String idref = (String) cbx_UserDefinedType.getSelectedItem();

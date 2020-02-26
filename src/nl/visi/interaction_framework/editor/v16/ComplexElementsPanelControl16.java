@@ -414,6 +414,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -522,7 +523,35 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			e.printStackTrace();
 		}
 	}
+	
+	public void copyElement() {
+		Store16 store = Editor16.getStore16();
+		int row = tbl_Elements.getSelectedRow();
+		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
 
+		try {
+			ComplexElementTypeType copyComplexElementType = objectFactory.createComplexElementTypeType();
+			newElement(copyComplexElementType, "ComplexElement_");
+			store.generateCopyId(copyComplexElementType, complexElementType);
+			copyComplexElementType.setCategory(complexElementType.getCategory());
+			copyComplexElementType.setComplexElements(complexElementType.getComplexElements());
+			copyComplexElementType.setDescription(complexElementType.getDescription());
+			copyComplexElementType.setEndDate(complexElementType.getEndDate());
+			copyComplexElementType.setHelpInfo(complexElementType.getHelpInfo());
+			copyComplexElementType.setLanguage(complexElementType.getLanguage());
+			copyComplexElementType.setMaxOccurs(complexElementType.getMaxOccurs());
+			copyComplexElementType.setMinOccurs(complexElementType.getMinOccurs());
+			copyComplexElementType.setSimpleElements(complexElementType.getSimpleElements());
+			copyComplexElementType.setStartDate(complexElementType.getStartDate());
+			copyComplexElementType.setState(complexElementType.getState());
+			store.put(copyComplexElementType.getId(), copyComplexElementType);
+			int copyrow = elementsTableModel.add(copyComplexElementType);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
