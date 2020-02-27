@@ -220,9 +220,14 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
 		inSelection = true;
+		
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
+		if (selectedRow >= 0) {
+			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
+		}
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -277,15 +282,42 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			newElement(newUserDefinedType, "UserDefinedType_");
 			newUserDefinedType.setBaseType("STRING");
 			int row = elementsTableModel.add(newUserDefinedType);
+			row = tbl_Elements.convertRowIndexToView(row);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	public void copyElement() {
+		Store16 store = Editor16.getStore16();
+		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
+		UserDefinedTypeType userDefinedType = elementsTableModel.get(row);
+
+		try {
+			UserDefinedTypeType copyUserDefinedType = objectFactory.createUserDefinedTypeType();
+			newElement(copyUserDefinedType, "UserDefinedType_");
+			store.generateCopyId(copyUserDefinedType, userDefinedType);
+			copyUserDefinedType.setBaseType(userDefinedType.getBaseType());
+			copyUserDefinedType.setDescription(userDefinedType.getDescription());
+			copyUserDefinedType.setHelpInfo(userDefinedType.getHelpInfo());
+			copyUserDefinedType.setLanguage(userDefinedType.getLanguage());
+			copyUserDefinedType.setState(userDefinedType.getState());
+			copyUserDefinedType.setXsdRestriction(userDefinedType.getXsdRestriction());
+			store.put(copyUserDefinedType.getId(), copyUserDefinedType);
+			int copyrow = elementsTableModel.add(copyUserDefinedType);
+			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		UserDefinedTypeType userDefinedType = elementsTableModel.get(row);
 
 		List<SimpleElementTypeType> elements = store.getElements(SimpleElementTypeType.class);

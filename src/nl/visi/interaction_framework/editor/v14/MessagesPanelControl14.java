@@ -481,6 +481,9 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		inSelection = true;
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
+		if (selectedRow >= 0) {
+			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
+		}
 		boolean rowSelected = selectedRow >= 0;
 		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
@@ -597,6 +600,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 			newElement(newMessageType, "Message_");
 
 			int row = elementsTableModel.add(newMessageType);
+			row = tbl_Elements.convertRowIndexToView(row);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -606,6 +610,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 	public void copyElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		MessageTypeType messageType = elementsTableModel.get(row);
 
 		try {
@@ -624,15 +629,18 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 			copyMessageType.setState(messageType.getState());
 			store.put(copyMessageType.getId(), copyMessageType);
 			int copyrow = elementsTableModel.add(copyMessageType);
+			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
 			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
+	
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		MessageTypeType messageType = elementsTableModel.get(row);
 
 		List<MessageInTransactionTypeType> elements = store.getElements(MessageInTransactionTypeType.class);

@@ -18,7 +18,6 @@ import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20160331.UserDefinedTypeType;
-import nl.visi.schemas._20160331.UserDefinedTypeTypeRef;
 
 public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTypeType> {
 	private static final String SIMPLE_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/SimpleElementsPanel.xml";
@@ -132,6 +131,9 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		inSelection = true;
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
+		if (selectedRow >= 0) {
+			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
+		}
 		boolean rowSelected = selectedRow >= 0;
 		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
@@ -193,6 +195,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			newSimpleElementType.setInterfaceType("");
 
 			int row = elementsTableModel.add(newSimpleElementType);
+			row = tbl_Elements.convertRowIndexToView(row);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -202,6 +205,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 	public void copyElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		SimpleElementTypeType simpleElementType = elementsTableModel.get(row);
 
 		try {
@@ -218,6 +222,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			copySimpleElementType.setValueList(simpleElementType.getValueList());
 			store.put(copySimpleElementType.getId(), copySimpleElementType);
 			int copyrow = elementsTableModel.add(copySimpleElementType);
+			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
 			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -227,6 +232,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		SimpleElementTypeType simpleElementType = elementsTableModel.get(row);
 
 		List<ComplexElementTypeType> elements = store.getElements(ComplexElementTypeType.class);

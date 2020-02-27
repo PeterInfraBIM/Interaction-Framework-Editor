@@ -32,10 +32,16 @@
 						Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
 						Insets="2,2,2,2" />
 				</button>
+				<button id="btn_CopyElement" Action="copyElement"
+					Enabled="false" Text="lbl_CopyElement">
+					<gridbagconstraints
+						Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
+						Insets="2,2,2,2" />
+				</button>
 				<button id="btn_DeleteElement" Action="deleteElement"
 					Enabled="false" Text="lbl_Remove">
 					<gridbagconstraints
-						Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
+						Anchor="GridBagConstraints.WEST" Gridx="3" Gridy="0"
 						Insets="2,0,2,2" Weightx="1.0" />
 				</button>
 			</panel>

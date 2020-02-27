@@ -2020,11 +2020,12 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	protected void updateSelectionArea(ListSelectionEvent e) {
 		inSelection = true;
 		selectedRow = tbl_Elements.getSelectedRow();
+		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		if (selectedRow >= 0) {
 			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
 		}
-		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -2274,15 +2275,50 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			newElement(newTransactionType, "Transaction_");
 
 			int row = elementsTableModel.add(newTransactionType);
+			row = tbl_Elements.convertRowIndexToView(row);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	public void copyElement() {
+		Store16 store = Editor16.getStore16();
+		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
+		TransactionTypeType origTransactionType = elementsTableModel.get(row);
+
+		try {
+			TransactionTypeType copyTransactionType = objectFactory.createTransactionTypeType();
+			newElement(copyTransactionType, "Transaction_");
+			store.generateCopyId(copyTransactionType, origTransactionType);
+			copyTransactionType.setAppendixTypes(origTransactionType.getAppendixTypes());
+			copyTransactionType.setCategory(origTransactionType.getCategory());
+			copyTransactionType.setCode(origTransactionType.getCode());
+			copyTransactionType.setDescription(origTransactionType.getDescription());
+			copyTransactionType.setEndDate(origTransactionType.getEndDate());
+			copyTransactionType.setExecutor(origTransactionType.getExecutor());
+			copyTransactionType.setHelpInfo(origTransactionType.getHelpInfo());
+			copyTransactionType.setInitiator(origTransactionType.getInitiator());
+			copyTransactionType.setLanguage(origTransactionType.getLanguage());
+			copyTransactionType.setResult(origTransactionType.getResult());
+			copyTransactionType.setStartDate(origTransactionType.getStartDate());
+			copyTransactionType.setState(origTransactionType.getState());
+			copyTransactionType.setSubTransactions(origTransactionType.getSubTransactions());
+			store.put(copyTransactionType.getId(), copyTransactionType);
+			int copyrow = elementsTableModel.add(copyTransactionType);
+			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		TransactionTypeType transactionType = elementsTableModel.get(row);
 
 		List<MessageInTransactionTypeType> toBeDeleted = new ArrayList<MessageInTransactionTypeType>();

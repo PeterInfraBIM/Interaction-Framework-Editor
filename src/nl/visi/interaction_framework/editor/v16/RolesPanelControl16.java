@@ -325,7 +325,8 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 
 			if (newDrawing) {
 				int transactionsRowCount = transactionsTableModel.getRowCount();
-				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
+				int transactionWidth = transactionsRowCount > 0 ? (getWidth() - offsetLeft) / transactionsRowCount
+						: getWidth() - offsetLeft;
 				for (int index = 0; index < transactionsRowCount; index++) {
 					TransactionTypeType transactionTypeType = transactionsTableModel.get(index);
 					transactions.add(new Transaction(this, g2d, transactionTypeType,
@@ -352,7 +353,9 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 				}
 			} else {
 				int transactionsRowCount = transactionsTableModel.getRowCount();
-				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
+				// int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
+				int transactionWidth = transactionsRowCount > 0 ? (getWidth() - offsetLeft) / transactionsRowCount
+						: getWidth() - offsetLeft;
 				for (int index = 0; index < transactionsRowCount; index++) {
 					transactions.get(index).x = offsetLeft + transactionWidth * (index + 1) - transactionWidth / 2;
 					transactions.get(index).activeLabel.setLocation(transactions.get(index).x,
@@ -976,11 +979,12 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		inSelection = true;
 
 		selectedRow = tbl_Elements.getSelectedRow();
+		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		if (selectedRow >= 0) {
 			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
 		}
-		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		boolean rowSelected = selectedRow >= 0;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
@@ -1100,15 +1104,49 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			RoleTypeType newRoleType = objectFactory.createRoleTypeType();
 			newElement(newRoleType, "Role_");
 			int row = elementsTableModel.add(newRoleType);
+			row = tbl_Elements.convertRowIndexToView(row);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
+	
+	public void copyElement() {
+		Store16 store = Editor16.getStore16();
+		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
+		RoleTypeType origRoleType = elementsTableModel.get(row);
+
+		try {
+			RoleTypeType copyRoleType = objectFactory.createRoleTypeType();
+			newElement(copyRoleType, "Role_");
+			store.generateCopyId(copyRoleType, origRoleType);
+			copyRoleType.setCategory(origRoleType.getCategory());
+			copyRoleType.setCode(origRoleType.getCode());
+			copyRoleType.setDescription(origRoleType.getDescription());
+			copyRoleType.setEndDate(origRoleType.getEndDate());
+			copyRoleType.setHelpInfo(origRoleType.getHelpInfo());
+			copyRoleType.setLanguage(origRoleType.getLanguage());
+			copyRoleType.setResponsibilityFeedback(origRoleType.getResponsibilityFeedback());
+			copyRoleType.setResponsibilityScope(origRoleType.getResponsibilityScope());
+			copyRoleType.setResponsibilitySupportTask(origRoleType.getResponsibilitySupportTask());
+			copyRoleType.setResponsibilityTask(origRoleType.getResponsibilityTask());
+			copyRoleType.setStartDate(origRoleType.getStartDate());
+			copyRoleType.setState(origRoleType.getState());
+			store.put(copyRoleType.getId(), copyRoleType);
+			int copyrow = elementsTableModel.add(copyRoleType);
+			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
 
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		RoleTypeType roleType = elementsTableModel.get(row);
 
 		List<TransactionTypeType> elements = store.getElements(TransactionTypeType.class);

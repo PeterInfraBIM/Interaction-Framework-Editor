@@ -431,11 +431,128 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		}
 
 		int row = elementsTableModel.add(et);
+		row = tbl_Elements.convertRowIndexToView(row);
 		tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 	}
 
+	public void copyElement() {
+		Store16 store = Editor16.getStore16();
+		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
+		ElementType origElementType = elementsTableModel.get(row);
+		ElementType copyElementType = null;
+		String simpleClassName = origElementType.getClass().getSimpleName();
+		try {
+			switch (MiscellaneousTypes.valueOf(simpleClassName.substring(0, simpleClassName.lastIndexOf("Type")))) {
+			case AppendixType:
+				AppendixTypeType origAppendixType = (AppendixTypeType) origElementType;
+				AppendixTypeType copyAppendixType = objectFactory.createAppendixTypeType();
+				newElement(copyAppendixType, "AppendixType_");
+				store.generateCopyId(copyAppendixType, origAppendixType);
+				copyAppendixType.setCategory(origAppendixType.getCategory());
+				copyAppendixType.setCode(origAppendixType.getCode());
+				copyAppendixType.setComplexElements(origAppendixType.getComplexElements());
+				copyAppendixType.setDescription(origAppendixType.getDescription());
+				copyAppendixType.setEndDate(origAppendixType.getEndDate());
+				copyAppendixType.setHelpInfo(origAppendixType.getHelpInfo());
+				copyAppendixType.setLanguage(origAppendixType.getLanguage());
+				copyAppendixType.setStartDate(origAppendixType.getStartDate());
+				copyAppendixType.setState(origAppendixType.getState());
+				copyElementType = copyAppendixType;
+				break;
+			case GroupType:
+				GroupTypeType origGroupType = (GroupTypeType) origElementType;
+				GroupTypeType copyGroupType = objectFactory.createGroupTypeType();
+				newElement(copyGroupType, "GroupType_");
+				store.generateCopyId(copyGroupType, origGroupType);
+				copyGroupType.setCategory(origGroupType.getCategory());
+				copyGroupType.setDescription(origGroupType.getDescription());
+				copyGroupType.setEndDate(origGroupType.getEndDate());
+				copyGroupType.setHelpInfo(origGroupType.getHelpInfo());
+				copyGroupType.setLanguage(origGroupType.getLanguage());
+				copyGroupType.setStartDate(origGroupType.getStartDate());
+				copyGroupType.setState(origGroupType.getState());
+				copyElementType = copyGroupType;
+				break;
+			case OrganisationType:
+				OrganisationTypeType origOrganisationType = (OrganisationTypeType) origElementType;
+				OrganisationTypeType copyOrganisationType = objectFactory.createOrganisationTypeType();
+				newElement(copyOrganisationType, "OrganisationType_");
+				store.generateCopyId(copyOrganisationType, origOrganisationType);
+				copyOrganisationType.setCategory(origOrganisationType.getCategory());
+				copyOrganisationType.setCode(origOrganisationType.getCode());
+				copyOrganisationType.setComplexElements(origOrganisationType.getComplexElements());
+				copyOrganisationType.setDescription(origOrganisationType.getDescription());
+				copyOrganisationType.setEndDate(origOrganisationType.getEndDate());
+				copyOrganisationType.setHelpInfo(origOrganisationType.getHelpInfo());
+				copyOrganisationType.setLanguage(origOrganisationType.getLanguage());
+				copyOrganisationType.setStartDate(origOrganisationType.getStartDate());
+				copyOrganisationType.setState(origOrganisationType.getState());
+				copyElementType = copyOrganisationType;
+				break;
+			case PersonType:
+				PersonTypeType origPersonType = (PersonTypeType) origElementType;
+				PersonTypeType copyPersonType = objectFactory.createPersonTypeType();
+				newElement(copyPersonType, "PersonType_");
+				store.generateCopyId(copyPersonType, origPersonType);
+				copyPersonType.setCategory(origPersonType.getCategory());
+				copyPersonType.setCode(origPersonType.getCode());
+				copyPersonType.setComplexElements(origPersonType.getComplexElements());
+				copyPersonType.setDescription(origPersonType.getDescription());
+				copyPersonType.setEndDate(origPersonType.getEndDate());
+				copyPersonType.setHelpInfo(origPersonType.getHelpInfo());
+				copyPersonType.setLanguage(origPersonType.getLanguage());
+				copyPersonType.setStartDate(origPersonType.getStartDate());
+				copyPersonType.setState(origPersonType.getState());
+				copyElementType = copyPersonType;
+				break;
+			case ProjectType:
+				ProjectTypeType origProjectType = (ProjectTypeType) origElementType;
+				ProjectTypeType copyProjectType = objectFactory.createProjectTypeType();
+				newElement(copyProjectType, "ProjectType_");
+				store.generateCopyId(copyProjectType, origProjectType);
+				copyProjectType.setCategory(origProjectType.getCategory());
+				copyProjectType.setCode(origProjectType.getCode());
+				copyProjectType.setComplexElements(origProjectType.getComplexElements());
+				copyProjectType.setDescription(origProjectType.getDescription());
+				copyProjectType.setEndDate(origProjectType.getEndDate());
+				copyProjectType.setHelpInfo(origProjectType.getHelpInfo());
+				copyProjectType.setLanguage(origProjectType.getLanguage());
+				copyProjectType.setNamespace(origProjectType.getNamespace());
+				copyProjectType.setStartDate(origProjectType.getStartDate());
+				copyProjectType.setState(origProjectType.getState());
+				copyElementType = copyProjectType;
+				break;
+			case TransactionPhaseType:
+				TransactionPhaseTypeType origTransactionPhaseType = (TransactionPhaseTypeType) origElementType;
+				TransactionPhaseTypeType copyTransactionPhaseType = objectFactory.createTransactionPhaseTypeType();
+				newElement(copyTransactionPhaseType, "TransactionPhaseType_");
+				store.generateCopyId(copyTransactionPhaseType, origTransactionPhaseType);
+				copyTransactionPhaseType.setCategory(origTransactionPhaseType.getCategory());
+				copyTransactionPhaseType.setCode(origTransactionPhaseType.getCode());
+				copyTransactionPhaseType.setDescription(origTransactionPhaseType.getDescription());
+				copyTransactionPhaseType.setEndDate(origTransactionPhaseType.getEndDate());
+				copyTransactionPhaseType.setHelpInfo(origTransactionPhaseType.getHelpInfo());
+				copyTransactionPhaseType.setLanguage(origTransactionPhaseType.getLanguage());
+				copyTransactionPhaseType.setStartDate(origTransactionPhaseType.getStartDate());
+				copyTransactionPhaseType.setState(origTransactionPhaseType.getState());
+				copyElementType = copyTransactionPhaseType;
+				break;
+			default:
+				break;
+			}
+			store.put(copyElementType.getId(), origElementType);
+			int copyrow = elementsTableModel.add(copyElementType);
+			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
+			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	public void deleteElement() {
 		int selectedMiscellaneousRow = tbl_Elements.getSelectedRow();
+		selectedMiscellaneousRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedMiscellaneousRow);
 		ElementType elementType = elementsTableModel.get(selectedMiscellaneousRow);
 		String className = elementType.getClass().getSimpleName();
 		MiscellaneousTypes type = MiscellaneousTypes.valueOf(className.substring(0, className.length() - 4));
@@ -492,11 +609,15 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
+		if (selectedRow >= 0) {
+			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
+		}
 		boolean rowSelected = selectedRow >= 0;
 		selectedElement = rowSelected ? elementsTableModel.get(selectedRow) : null;
 		boolean isGroupType = selectedElement instanceof GroupTypeType;
 		boolean isProjectType = selectedElement instanceof ProjectTypeType;
 		boolean isTransactionPhaseType = selectedElement instanceof TransactionPhaseTypeType;
+		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);

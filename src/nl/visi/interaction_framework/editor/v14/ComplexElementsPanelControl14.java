@@ -407,6 +407,9 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		inSelection = true;
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
+		if (selectedRow >= 0) {
+			selectedRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedRow);
+		}
 		boolean rowSelected = selectedRow >= 0;
 		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
@@ -510,6 +513,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			newElement(newComplexElementType, "ComplexElement_");
 
 			int row = elementsTableModel.add(newComplexElementType);
+			row = tbl_Elements.convertRowIndexToView(row);
 			tbl_Elements.getSelectionModel().setSelectionInterval(row, row);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -519,6 +523,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	public void copyElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
 
 		try {
@@ -536,6 +541,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			copyComplexElementType.setState(complexElementType.getState());
 			store.put(copyComplexElementType.getId(), copyComplexElementType);
 			int copyrow = elementsTableModel.add(copyComplexElementType);
+			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
 			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -546,6 +552,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
+		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
 
 		try {
