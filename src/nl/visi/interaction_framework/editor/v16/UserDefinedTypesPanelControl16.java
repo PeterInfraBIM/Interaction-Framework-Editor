@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -14,6 +15,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
@@ -27,6 +30,8 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 	private JComboBox<String> cbx_BaseType;
 	private JTable tbl_XsdEnumerations;
 	private XsdEnumerationsTableModel xsdEnumerationsTableModel;
+	private JTextField tfd_ItemText;
+	private JButton btn_ItemAdd, btn_ItemRemove, btn_ItemUp, btn_ItemDown;
 
 	private enum UserDefinedTypesTableColumns {
 		Id, Description, State, BaseType, DateLamu, UserLamu;
@@ -143,6 +148,10 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			items.add(0, item);
 		}
 
+		public void removeItem(int index) {
+			items.remove(index);
+		}
+
 	}
 
 	public UserDefinedTypesPanelControl16() throws Exception {
@@ -157,6 +166,136 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		xsdEnumerationsTableModel = new XsdEnumerationsTableModel();
 		tbl_XsdEnumerations.setModel(xsdEnumerationsTableModel);
 		tbl_XsdEnumerations.setFillsViewportHeight(true);
+		tbl_XsdEnumerations.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+				updateEnumerationButtons();
+			}
+		});
+		tfd_ItemText.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				boolean notEmpty = tfd_ItemText.getText().length() > 0;
+				btn_ItemAdd.setEnabled(notEmpty);
+			}
+		});
+	}
+
+	private void updateEnumerationButtons() {
+		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
+		boolean rowSelected = selectedRow >= 0;
+		if (rowSelected) {
+			btn_ItemRemove.setEnabled(rowSelected);
+			boolean topSelected = selectedRow == 0;
+			btn_ItemUp.setEnabled(!topSelected);
+			boolean bottomSelected = selectedRow == xsdEnumerationsTableModel.getRowCount() - 1;
+			btn_ItemDown.setEnabled(!bottomSelected);
+		} else {
+			btn_ItemRemove.setEnabled(false);
+			btn_ItemUp.setEnabled(false);
+			btn_ItemDown.setEnabled(false);
+		}
+	}
+
+	public void itemAdd() throws BadLocationException {
+		String newItem = "<xs:enumeration value=\"" + tfd_ItemText.getText() + "\"/>";
+		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
+		boolean success = insertEnumerationElement(selectedRow + 1, newItem);
+		if (success) {
+			initXsdRestriction();
+			xsdEnumerationsTableModel.clear();
+			fillEnumerationTable();
+			tbl_XsdEnumerations.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
+			tbl_XsdEnumerations.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow + 1, 0, true));
+			tfd_ItemText.setText(null);
+		}
+	}
+
+	public void itemDown() throws BadLocationException {
+		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
+		String removedItem = removeEnumerationElement(selectedRow);
+		if (removedItem != null) {
+			boolean success = insertEnumerationElement(selectedRow + 1, removedItem);
+			if (success) {
+				initXsdRestriction();
+				xsdEnumerationsTableModel.clear();
+				fillEnumerationTable();
+				tbl_XsdEnumerations.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
+				tbl_XsdEnumerations.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow + 1, 0, true));
+			}
+		}
+	}
+
+	public void itemUp() throws BadLocationException {
+		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
+		String removedItem = removeEnumerationElement(selectedRow);
+		if (removedItem != null) {
+			boolean success = insertEnumerationElement(selectedRow - 1, removedItem);
+			if (success) {
+				initXsdRestriction();
+				xsdEnumerationsTableModel.clear();
+				fillEnumerationTable();
+				tbl_XsdEnumerations.setRowSelectionInterval(selectedRow, selectedRow - 1);
+				tbl_XsdEnumerations.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow - 1, 0, true));
+			}
+		}
+	}
+
+	public void itemRemove() throws BadLocationException {
+		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
+		String removedItem = removeEnumerationElement(selectedRow);
+		if (removedItem != null) {
+			initXsdRestriction();
+			xsdEnumerationsTableModel.removeItem(selectedRow);
+			xsdEnumerationsTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
+		}
+	}
+
+	private String removeEnumerationElement(int removeIndex) throws BadLocationException {
+		Document document = tfd_XsdRestriction.getDocument();
+		String text = document.getText(0, document.getLength());
+		int beginIndex = findBeginIndexEnumerationElement(text, removeIndex);
+		if (beginIndex == -1)
+			return null;
+		int endIndex = text.indexOf("\"/>", beginIndex);
+		if (endIndex == -1)
+			return null;
+		String removedItem = document.getText(beginIndex, endIndex + 3 - beginIndex);
+		document.remove(beginIndex, endIndex + 3 - beginIndex);
+		tfd_XsdRestriction.setDocument(document);
+		return removedItem;
+	}
+
+	private boolean insertEnumerationElement(int insertIndex, String insertItem) throws BadLocationException {
+		Document document = tfd_XsdRestriction.getDocument();
+		String text = document.getText(0, document.getLength());
+		int beginIndex = findBeginIndexEnumerationElement(text, insertIndex);
+		if (beginIndex == -1) {
+			document.insertString(document.getLength(), insertItem, null);
+		} else {
+			document.insertString(beginIndex, insertItem, null);
+		}
+		return true;
+
+	}
+
+	private int findBeginIndexEnumerationElement(String text, int findIndex) throws BadLocationException {
+		int beginIndex = 0;
+		int endIndex = 0;
+		for (int itemIndex = 0; itemIndex <= findIndex; itemIndex++) {
+			beginIndex = text.indexOf("<xs:enumeration", endIndex);
+			if (beginIndex < 0)
+				return -1;
+			endIndex = text.indexOf("\"/>", beginIndex);
+			if (endIndex < 0)
+				return -1;
+			if (itemIndex < findIndex) {
+				beginIndex = endIndex;
+			}
+		}
+		return beginIndex;
 	}
 
 	private void initXsdRestriction() {
@@ -220,7 +359,8 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
 		inSelection = true;
-		
+
+		updateEnumerationButtons();
 		selectedRow = tbl_Elements.getSelectedRow();
 		tbl_Elements.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow, 0, true));
 		if (selectedRow >= 0) {
@@ -237,6 +377,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_XsdRestriction.setEnabled(rowSelected);
 		tbl_XsdEnumerations.setEnabled(rowSelected);
+		tfd_ItemText.setEnabled(rowSelected);
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
 			tfd_Id.setText(selectedElement.getId());
@@ -313,7 +454,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();

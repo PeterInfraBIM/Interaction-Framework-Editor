@@ -2,6 +2,7 @@ package nl.visi.interaction_framework.editor;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.SplashScreen;
@@ -212,6 +213,7 @@ public class InteractionFrameworkEditor extends Control {
 		}
 		int returnVal = fileChooser.showOpenDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			frame.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 			frameworkFile = fileChooser.getSelectedFile();
 			checkOnVersion(frameworkFile);
 			tfd_Version.setText(version);
@@ -243,6 +245,7 @@ public class InteractionFrameworkEditor extends Control {
 				btn_Report.setEnabled(true);
 			}
 		}
+		frame.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 	}
 
 	private String checkOnVersion(final File frameworkFile) {
