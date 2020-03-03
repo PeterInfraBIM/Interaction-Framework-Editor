@@ -18,6 +18,7 @@ import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
+import nl.visi.schemas._20140331.UserDefinedTypeTypeRef;
 
 public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTypeType> {
 	private static final String SIMPLE_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/SimpleElementsPanel.xml";
@@ -116,8 +117,28 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-
+				if (inSelection)
+					return;
+				String idref = (String) cbx_UserDefinedType.getSelectedItem();
+				if (idref != null) {
+					UserDefinedTypeType definedType = Editor14.getStore14().getElement(UserDefinedTypeType.class,
+							idref);
+					SimpleElementTypeType.UserDefinedType value = objectFactory
+							.createSimpleElementTypeTypeUserDefinedType();
+					UserDefinedTypeTypeRef userDefinedTypeTypeRef = objectFactory.createUserDefinedTypeTypeRef();
+					userDefinedTypeTypeRef.setIdref(definedType);
+					value.setUserDefinedTypeRef(userDefinedTypeTypeRef);
+					selectedElement.setUserDefinedType(value);
+					updateLaMu(selectedElement, user);
+					elementsTableModel.update(selectedRow);
+				} else {
+					if (selectedElement != null) {
+						UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
+						if (userDefinedType != null) {
+							selectedElement.setUserDefinedType(null);
+						}
+					}
+				}
 			}
 		});
 	}
@@ -201,7 +222,7 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void copyElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
@@ -228,7 +249,7 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();

@@ -549,7 +549,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void deleteElement() {
 		int selectedMiscellaneousRow = tbl_Elements.getSelectedRow();
 		selectedMiscellaneousRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedMiscellaneousRow);
@@ -753,7 +753,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			cbx_ComplexElements.addItem(null);
 			List<ComplexElementTypeType> elements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
 			for (ComplexElementTypeType element : elements) {
-				cbx_ComplexElements.addItem(element.getId());
+				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
 		} else {
@@ -781,8 +781,10 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	}
 
 	public void addComplexElement() {
-		String ceId = (String) cbx_ComplexElements.getSelectedItem();
-		assert ceId != null;
+		String complexElement = (String) cbx_ComplexElements.getSelectedItem();
+		assert complexElement != null;
+		String ceId = complexElement.substring(1, complexElement.indexOf("]"));
+
 		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, ceId);
 		ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
 		ref.setIdref(element);

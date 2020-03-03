@@ -18,9 +18,12 @@ import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20160331.UserDefinedTypeType;
+import nl.visi.schemas._20160331.UserDefinedTypeTypeRef;
 
 public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTypeType> {
 	private static final String SIMPLE_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/SimpleElementsPanel.xml";
+
+	protected static final Class<Object> UserDefinedTypeType = null;
 
 	private JTextField tfd_InterfaceType, tfd_ValueList;
 	private JComboBox<String> cbx_UserDefinedType;
@@ -116,8 +119,28 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
-
+				if (inSelection)
+					return;
+				String idref = (String) cbx_UserDefinedType.getSelectedItem();
+				if (idref != null) {
+					UserDefinedTypeType definedType = Editor16.getStore16().getElement(UserDefinedTypeType.class,
+							idref);
+					SimpleElementTypeType.UserDefinedType value = objectFactory
+							.createSimpleElementTypeTypeUserDefinedType();
+					UserDefinedTypeTypeRef userDefinedTypeTypeRef = objectFactory.createUserDefinedTypeTypeRef();
+					userDefinedTypeTypeRef.setIdref(definedType);
+					value.setUserDefinedTypeRef(userDefinedTypeTypeRef);
+					selectedElement.setUserDefinedType(value);
+					updateLaMu(selectedElement, user);
+					elementsTableModel.update(selectedRow);
+				} else {
+					if (selectedElement != null) {
+						UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
+						if (userDefinedType != null) {
+							selectedElement.setUserDefinedType(null);
+						}
+					}
+				}
 			}
 		});
 	}

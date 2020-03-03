@@ -349,7 +349,7 @@ public class InteractionFrameworkEditor extends Control {
 			excelFile = new File(defaultExcelPath);
 			reportChooser.setSelectedFile(excelFile);
 		}
-		int returnVal = reportChooser.showOpenDialog(frame);
+		int returnVal = reportChooser.showSaveDialog(frame);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			excelFile = reportChooser.getSelectedFile();
 			userPrefs.put("ExcelFile", excelFile.getAbsolutePath());

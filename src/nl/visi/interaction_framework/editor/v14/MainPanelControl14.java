@@ -386,7 +386,9 @@ public class MainPanelControl14 extends Control14 {
 
 	public void xsdCheck(File frameworkFile, DefaultHandler defaultHandler)
 			throws ParserConfigurationException, SAXException, IOException {
-		InputSource schema = new InputSource(new FileInputStream("_3_14.xsd"));
+//		InputSource schema = new InputSource(new FileInputStream("_3_14.xsd"));
+		InputSource schema = new InputSource(
+				getClass().getClassLoader().getResourceAsStream("main/resource/20140331.xsd"));
 		Editor14.getLoader14().validate(schema, frameworkFile, defaultHandler);
 	}
 }

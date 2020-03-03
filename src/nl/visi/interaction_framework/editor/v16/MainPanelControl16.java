@@ -7,7 +7,6 @@ import java.awt.print.Printable;
 import java.awt.print.PrinterException;
 import java.awt.print.PrinterJob;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -385,7 +384,8 @@ public class MainPanelControl16 extends Control16 {
 
 	public void xsdCheck(File frameworkFile, DefaultHandler defaultHandler)
 			throws ParserConfigurationException, SAXException, IOException {
-		InputSource schema = new InputSource(new FileInputStream("_3_16.xsd"));
+//		InputSource schema = new InputSource(new FileInputStream("_3_16.xsd"));
+		InputSource schema = new InputSource(getClass().getClassLoader().getResourceAsStream("main/resource/20160331.xsd"));
 		Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
 	}
 }

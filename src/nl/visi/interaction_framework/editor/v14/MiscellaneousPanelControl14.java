@@ -753,7 +753,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 			cbx_ComplexElements.addItem(null);
 			List<ComplexElementTypeType> elements = Editor14.getStore14().getElements(ComplexElementTypeType.class);
 			for (ComplexElementTypeType element : elements) {
-				cbx_ComplexElements.addItem(element.getId());
+				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
 		} else {
@@ -781,8 +781,9 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 	}
 
 	public void addComplexElement() {
-		String ceId = (String) cbx_ComplexElements.getSelectedItem();
-		assert ceId != null;
+		String complexElement = (String) cbx_ComplexElements.getSelectedItem();
+		assert complexElement != null;
+		String ceId = complexElement.substring(1, complexElement.indexOf("]"));
 		ComplexElementTypeType element = Editor14.getStore14().getElement(ComplexElementTypeType.class, ceId);
 		ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
 		ref.setIdref(element);
