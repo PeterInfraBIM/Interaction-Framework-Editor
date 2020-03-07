@@ -671,7 +671,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 	}
 
 	private enum MessagesTableColumns {
-		Type, Id, Role, Transaction, Message, Navigate;
+		Type, Role, Id, Message, Transaction, Navigate;
 
 		@Override
 		public String toString() {
@@ -721,23 +721,23 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			case Role:
 				if (getValueAt(rowIndex, MessagesTableColumns.Type.ordinal()).equals("in")) {
 					if (initiatorToExecutor) {
-						return initiator != null ? initiator.getId() : null;
+						return initiator != null ? initiator.getDescription() : null;
 					} else {
-						return executor != null ? executor.getId() : null;
+						return executor != null ? executor.getDescription() : null;
 					}
 				} else {
 					if (!initiatorToExecutor) {
-						return initiator != null ? initiator.getId() : null;
+						return initiator != null ? initiator.getDescription() : null;
 					} else {
-						return executor != null ? executor.getId() : null;
+						return executor != null ? executor.getDescription() : null;
 					}
 				}
 			case Transaction:
 				TransactionTypeType transactionType = getTransaction(mitt);
-				return transactionType != null ? transactionType.getId() : null;
+				return transactionType != null ? transactionType.getDescription() : null;
 			case Message:
 				MessageTypeType messageType = getMessage(mitt);
-				return messageType != null ? messageType.getId() : null;
+				return messageType != null ? messageType.getDescription() : null;
 			default:
 				break;
 			}
@@ -1110,7 +1110,7 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void copyElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();

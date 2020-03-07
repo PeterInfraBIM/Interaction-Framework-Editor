@@ -9,6 +9,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumn;
 
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
@@ -70,7 +71,7 @@ public class SequenceTable extends Control14 {
 	}
 
 	private enum SequenceTableColumns {
-		Type, Id, Role, Transaction, Message;
+		Type, Role, Id, Message, Transaction;
 
 		@Override
 		public String toString() {
@@ -112,32 +113,32 @@ public class SequenceTable extends Control14 {
 					if (initiatorToExecutor) {
 						if (selectedElement != null) {
 							if (selectedElement.equals(initiator)) {
-								return executor != null ? executor.getId() : null;
+								return executor != null ? executor.getDescription() : null;
 							} else {
-								return initiator != null ? initiator.getId() : null;
+								return initiator != null ? initiator.getDescription() : null;
 							}
 						} else {
-							return initiator.getId() + " => " + executor.getId();
+							return initiator.getDescription() + " => " + executor.getDescription();
 						}
 					} else {
 						if (selectedElement != null) {
 							if (selectedElement.equals(executor)) {
-								return initiator != null ? initiator.getId() : null;
+								return initiator != null ? initiator.getDescription() : null;
 							} else {
-								return executor != null ? executor.getId() : null;
+								return executor != null ? executor.getDescription() : null;
 							}
 						} else {
-							return executor.getId() + " => " + initiator.getId();
+							return executor.getDescription() + " => " + initiator.getDescription();
 						}
 					}
 				}
 				break;
 			case Transaction:
 				TransactionTypeType transactionType = getTransaction(mitt);
-				return transactionType != null ? transactionType.getId() : null;
+				return transactionType != null ? transactionType.getDescription() : null;
 			case Message:
 				MessageTypeType messageType = getMessage(mitt);
-				return messageType != null ? messageType.getId() : null;
+				return messageType != null ? messageType.getDescription() : null;
 			}
 
 			return null;
@@ -150,6 +151,8 @@ public class SequenceTable extends Control14 {
 		tbl_Sequences.setModel(sequenceTableModel);
 		tbl_Sequences.setAutoCreateRowSorter(true);
 		tbl_Sequences.setFillsViewportHeight(true);
+		TableColumn typeColumn = tbl_Sequences.getColumnModel().getColumn(SequenceTableColumns.Type.ordinal());
+		typeColumn.setMaxWidth(80);
 		tbl_Sequences.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {

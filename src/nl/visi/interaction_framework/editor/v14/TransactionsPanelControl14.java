@@ -56,6 +56,7 @@ import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20140331.ElementConditionType;
+// import nl.visi.schemas._20140331.ElementConditionType.ComplexElements;
 import nl.visi.schemas._20140331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.GroupTypeType;
@@ -183,16 +184,17 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				this.canvas = canvas;
 				this.x = x;
 				this.y = y;
+
 				if (!printMode) {
 					activeLabel = new RotatingButton();
 					if (isInit) {
 						RoleTypeType initiator = getInitiator(selectedElement);
-						activeLabel.setText(initiator.getId());
-						activeLabel.setToolTipText(initiator.getDescription());
+						activeLabel.setText(initiator.getDescription());
+						activeLabel.setToolTipText(initiator.getId());
 					} else {
 						RoleTypeType executor = getExecutor(selectedElement);
-						activeLabel.setText(executor.getId());
-						activeLabel.setToolTipText(executor.getDescription());
+						activeLabel.setText(executor.getDescription());
+						activeLabel.setToolTipText(executor.getId());
 					}
 					activeLabel.setContentAreaFilled(false);
 					activeLabel.setBackground(Color.white);
@@ -254,10 +256,10 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			private String getLabel() {
 				if (this == init) {
 					RoleTypeType initiator = getInitiator(selectedElement);
-					return initiator != null ? initiator.getId() : null;
+					return initiator != null ? initiator.getDescription() : null;
 				} else {
 					RoleTypeType executor = getExecutor(selectedElement);
-					return executor != null ? executor.getId() : null;
+					return executor != null ? executor.getDescription() : null;
 				}
 			}
 
@@ -281,23 +283,29 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			private Font font;
 			private RotatingButton activeLabel;
 
-			public MessageItem(MessageInTransactionTypeType mitt) {
+			public MessageItem(final Canvas canvas, MessageInTransactionTypeType mitt) {
 				this.mitt = mitt;
 				MessageTypeType messageType = getMessage(mitt);
-				name = messageType != null ? messageType.getId() : null;
+				name = messageType != null ? messageType.getDescription() : null;
+				this.font = new Font("Dialog", Font.PLAIN, 11);
 				if (!printMode) {
 					activeLabel = new RotatingButton(name);
+					activeLabel.setToolTipText(mitt.getId());
+					activeLabel.setContentAreaFilled(false);
+					activeLabel.setBackground(Color.white);
+					activeLabel.setBorderPainted(false);
+					activeLabel.setFont(font);
 					activeLabel.addMouseListener(new MouseAdapter() {
 						@Override
 						public void mouseEntered(MouseEvent e) {
 							e.getComponent().setForeground(Color.red);
-							canvasPanel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+							canvas.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 						}
 
 						@Override
 						public void mouseExited(MouseEvent e) {
 							e.getComponent().setForeground(Color.black);
-							canvasPanel.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+							canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 
 						@Override
@@ -306,18 +314,18 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 						}
 					});
 				}
-				this.font = new Font("Dialog", Font.PLAIN, 11);
 				this.loop = false;
 				this.incomingConnections = new ArrayList<TransactionsPanelControl14.Canvas.MessageItem>();
 				this.outgoingConnections = new ArrayList<TransactionsPanelControl14.Canvas.MessageItem>();
 			}
 
 			public void showButton(final Canvas canvas) {
-				activeLabel.setToolTipText(getMessage(mitt).getDescription());
-				activeLabel.setContentAreaFilled(false);
-				activeLabel.setBackground(Color.white);
-				activeLabel.setBorderPainted(false);
-				activeLabel.setFont(font);
+//				activeLabel.setToolTipText(getMessage(mitt).getId());
+//				activeLabel.setToolTipText(mitt.getId());
+//				activeLabel.setContentAreaFilled(false);
+//				activeLabel.setBackground(Color.white);
+//				activeLabel.setBorderPainted(false);
+//				activeLabel.setFont(font);
 				activeLabel.setLocation(getX() - 10, getY() - 10);
 				List<Component> components = Arrays.asList(canvas.getComponents());
 				if (!components.contains(activeLabel)) {
@@ -437,8 +445,10 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 
 			private String getLabel(MessageInTransactionTypeType incomingMitt) {
-				String incomingTransaction = getTransaction(incomingMitt).getId();
-				String incomingMessage = getMessage(incomingMitt).getId();
+//				String incomingTransaction = getTransaction(incomingMitt).getId();
+//				String incomingMessage = getMessage(incomingMitt).getId();
+				String incomingTransaction = getTransaction(incomingMitt).getDescription();
+				String incomingMessage = getMessage(incomingMitt).getDescription();
 				String label = incomingTransaction.substring(0, Math.min(incomingTransaction.length(), 12));
 				label += incomingTransaction.length() > 12 ? ".../" : "/";
 				label += incomingMessage.substring(0, Math.min(incomingMessage.length(), 18));
@@ -457,6 +467,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		}
 
 		public Graphics2D g2d;
+		int previousMiddleMargin;
 
 		@Override
 		public Dimension getPreferredSize() {
@@ -470,6 +481,11 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			if (selectedElement == null) {
 				reset(g2d);
 				return;
+			} else {
+				int width = getWidth() / 3;
+				middleMargin = width > 300 ? width : 300;
+				leftMargin = (getWidth() - middleMargin) / 2;
+				rightMargin = (getWidth() - middleMargin) / 2;
 			}
 
 			boolean newDrawing = selectedElement != currentTransaction;
@@ -479,13 +495,14 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			boolean prevMitt = false;
 			boolean lastDirection = true;
 			if (newDrawing) {
+				previousMiddleMargin = middleMargin;
 				List<MessageInTransactionTypeType> initGroup = new ArrayList<MessageInTransactionTypeType>();
 				List<MessageInTransactionTypeType> execGroup = new ArrayList<MessageInTransactionTypeType>();
 				for (int index = 0; index < messagesTableModel.getRowCount(); index++) {
 					MessageInTransactionTypeType mitt = messagesTableModel.get(index);
 					MessageTypeType messageType = getMessage(mitt);
 					if (messageType != null) {
-						MessageItem item = new MessageItem(mitt);
+						MessageItem item = new MessageItem(this, mitt);
 						messages.add(item);
 						item.setStartMitt(TransactionsPanelControl14.this.isStart(mitt, selectedElement));
 						item.setEndMitt(isEndMitt(mitt));
@@ -537,7 +554,6 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 					}
 				}
 			}
-			int previousMiddleMargin = middleMargin;
 			endMitt = false;
 			prevMitt = false;
 
@@ -578,9 +594,12 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				int stringWidth = g.getFontMetrics().stringWidth(item.getName());
 				if (stringWidth + 100 > middleMargin) {
 					middleMargin = stringWidth + 100;
+					leftMargin = (getWidth() - middleMargin) / 2;
+					rightMargin = leftMargin;
 				}
 				item.setX((exec.x - init.x - stringWidth) / 2 + init.x + 50);
-				item.setY(y - 3);
+//				item.setY(y - 3);
+				item.setY(y);
 				g2d.drawString(item.getName(), item.getX(), item.getY());
 				item.showButton(this);
 				g2d.drawLine(init.x + 55, y, exec.x + 45, y);
@@ -631,7 +650,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								g2d.drawLine(x0 + 5, y, x1, y);
 								g2d.drawLine(x1 - 5, y - 3, x1, y);
 								g2d.drawLine(x1 - 5, y + 3, x1, y);
-								init_dx -= 5;
+//								init_dx -= 5;
+								init_dx -= 10;
 							}
 						}
 						Iterator<MessageItem> outgoingConnections = item.getOutgoingConnections();
@@ -648,7 +668,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								g2d.drawLine(x0 + 10, connectionY + 5, x0 + 10, y - 5);
 								g2d.drawArc(x0, y - 10, 10, 10, 270, 90);
 								g2d.drawLine(x0 + 5, y, x1, y);
-								exec_dx -= 5;
+//								exec_dx -= 5;
+								exec_dx -= 10;
 							}
 						}
 					}
@@ -663,7 +684,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 						g2d.drawLine(init.x + 5, y, xEnd, y);
 						g2d.drawLine(xEnd, y, xEnd - 5, y - 3);
 						g2d.drawLine(xEnd, y, xEnd - 5, y + 3);
-						drawInitExitPoint(g2d, y, init.x - 13, false);
+//						drawInitExitPoint(g2d, y, init.x - 13, false);
+						drawInitExitPoint(g2d, y, init.x - 3, false);
 					}
 					if (item.isEndMitt() && outgoingTransactions.size() == 0) {
 						xEnd = exec.x + 95;
@@ -688,9 +710,11 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, init.x + 5 - stringWidth, y);
 								} else {
+//									showButton(this, init.x + 5 - stringWidth, y, item.incomingMitts.get(i), label,
+//									getTransaction(item.incomingMitts.get(i)).getDescription() + "/"
+//											+ getMessage(item.incomingMitts.get(i)).getDescription());
 									showButton(this, init.x + 5 - stringWidth, y, item.incomingMitts.get(i), label,
-											getTransaction(item.incomingMitts.get(i)).getDescription() + "/"
-													+ getMessage(item.incomingMitts.get(i)).getDescription());
+											item.incomingMitts.get(i).getId());
 								}
 								if (50 + stringWidth > leftMargin) {
 									leftMargin = 50 + stringWidth;
@@ -706,9 +730,11 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, exec.x + 95, y);
 								} else {
+//									showButton(this, exec.x + 95, y, item.outgoingMitts.get(i), label,
+//									getTransaction(item.outgoingMitts.get(i)).getDescription() + "/"
+//											+ getMessage(item.outgoingMitts.get(i)).getDescription());
 									showButton(this, exec.x + 95, y, item.outgoingMitts.get(i), label,
-											getTransaction(item.outgoingMitts.get(i)).getDescription() + "/"
-													+ getMessage(item.outgoingMitts.get(i)).getDescription());
+											item.outgoingMitts.get(i).getId());
 								}
 								if (50 + stringWidth > rightMargin) {
 									rightMargin = 50 + stringWidth;
@@ -768,7 +794,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								g2d.drawLine(x0 - 5, y, x1, y);
 								g2d.drawLine(x1, y, x1 + 5, y - 3);
 								g2d.drawLine(x1, y, x1 + 5, y + 3);
-								exec_dx += 4;
+//								exec_dx += 4;
+								exec_dx += 15;
 							}
 						}
 						Iterator<MessageItem> outgoingConnections = item.getOutgoingConnections();
@@ -785,7 +812,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								g2d.drawLine(x0, connectionY + 5, x0, y - 5);
 								g2d.drawArc(x0, y - 10, 10, 10, 180, 90);
 								g2d.drawLine(x0 + 5, y, x1, y);
-								init_dx -= 5;
+//								init_dx -= 5;
+								init_dx -= 10;
 							}
 						}
 					}
@@ -807,7 +835,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 						g2d.drawLine(init.x + 45, y, xEnd, y);
 						g2d.drawLine(xEnd, y, xEnd + 5, y - 3);
 						g2d.drawLine(xEnd, y, xEnd + 5, y + 3);
-						drawInitExitPoint(g2d, y, xEnd - 18, true);
+//						drawInitExitPoint(g2d, y, xEnd - 18, true);
+						drawInitExitPoint(g2d, y, xEnd - 8, true);
 					}
 					int deltaY = 10;
 					int max = Math.max(incomingTransactions.size(), outgoingTransactions.size());
@@ -825,9 +854,11 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, exec.x + 95, y);
 								} else {
+//									showButton(this, exec.x + 95, y, item.incomingMitts.get(i), label,
+//									getTransaction(item.incomingMitts.get(i)).getDescription() + "/"
+//											+ getMessage(item.incomingMitts.get(i)).getDescription());
 									showButton(this, exec.x + 95, y, item.incomingMitts.get(i), label,
-											getTransaction(item.incomingMitts.get(i)).getDescription() + "/"
-													+ getMessage(item.incomingMitts.get(i)).getDescription());
+											item.incomingMitts.get(i).getId());
 								}
 								if (50 + stringWidth > rightMargin) {
 									rightMargin = 50 + stringWidth;
@@ -843,9 +874,11 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, xEnd - stringWidth, y);
 								} else {
+//									showButton(this, xEnd - stringWidth, y, item.outgoingMitts.get(i), label,
+//									getTransaction(item.outgoingMitts.get(i)).getDescription() + "/"
+//											+ getMessage(item.outgoingMitts.get(i)).getDescription());
 									showButton(this, xEnd - stringWidth, y, item.outgoingMitts.get(i), label,
-											getTransaction(item.outgoingMitts.get(i)).getDescription() + "/"
-													+ getMessage(item.outgoingMitts.get(i)).getDescription());
+											item.outgoingMitts.get(i).getId());
 								}
 								if (50 + stringWidth > leftMargin) {
 									leftMargin = 50 + stringWidth;
@@ -871,14 +904,17 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 			int height = preferredSize.height;
 			int width = preferredSize.width;
-			preferredSize = new Dimension(leftMargin + middleMargin + rightMargin, yInitStart + yInitHeight + 20);
+//			preferredSize = new Dimension(leftMargin + middleMargin + rightMargin, yInitStart + yInitHeight + 20);
+			preferredSize = new Dimension(scrollPane.getWidth(), yInitStart + yInitHeight + 20);
 
 			if (height != preferredSize.height || width != preferredSize.width
 					|| previousMiddleMargin != middleMargin) {
+				previousMiddleMargin = middleMargin;
+				System.out.println("width=" + width + " preferredSize.width=" + preferredSize.width);
 				removeAll();
 				tcMap.clear();
 				setSize(getPreferredSize());
-				canvasPanel.repaint();
+				canvasPanel.revalidate();
 			}
 		}
 
@@ -918,16 +954,20 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		}
 
 		private void drawInitExitPoint(Graphics2D g2d, int y, int xEnd, boolean exit) {
-			g2d.drawOval(xEnd, y - 9, 18, 18);
-			if (exit) {
-				double halfsqrt2 = 0.5 * Math.sqrt(2.0);
-				int x1 = (int) Math.round(xEnd + (1 - halfsqrt2) * 9);
-				int y1 = (int) Math.round(y - halfsqrt2 * 9);
-				int x2 = (int) Math.round(xEnd + (1 + halfsqrt2) * 9);
-				int y2 = (int) Math.round(y + halfsqrt2 * 9);
-				g2d.drawLine(x1, y1, x2, y2);
-				g2d.drawLine(x1, y2, x2, y1);
-			}
+//			g2d.drawOval(xEnd, y - 9, 18, 18);
+//			if (exit) {
+//				double halfsqrt2 = 0.5 * Math.sqrt(2.0);
+//				int x1 = (int) Math.round(xEnd + (1 - halfsqrt2) * 9);
+//				int y1 = (int) Math.round(y - halfsqrt2 * 9);
+//				int x2 = (int) Math.round(xEnd + (1 + halfsqrt2) * 9);
+//				int y2 = (int) Math.round(y + halfsqrt2 * 9);
+//				g2d.drawLine(x1, y1, x2, y2);
+//				g2d.drawLine(x1, y2, x2, y1);
+//			}
+			g2d.setColor(exit ? Color.red : Color.green);
+			g2d.fillOval(xEnd, y - 4, 8, 8);
+			g2d.setColor(Color.black);
+			g2d.drawOval(xEnd, y - 4, 8, 8);
 		}
 
 		private boolean isLoop(MessageInTransactionTypeType mitt, List<MessageInTransactionTypeType> group) {
@@ -962,9 +1002,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				currentTransaction = selectedElement;
 				successorMap = new HashMap<MessageInTransactionTypeType, List<MessageInTransactionTypeType>>();
 				initPrevMap();
-				leftMargin = 200;
-				rightMargin = 200;
-				middleMargin = 200;
+//				leftMargin = 200;
+//				rightMargin = 200;
+//				middleMargin = 200;
 			}
 		}
 
@@ -982,26 +1022,13 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			boolean selectedMessage = selectedRow >= 0;
 			btn_RemoveMessage.setEnabled(selectedMessage);
 			btn_Reverse.setEnabled(selectedMessage);
-//			cbx_PreviousMessages.setEnabled(selectedMessage);
-//			previousMessagesTableModel.clear();
-//			tbl_PreviousMessages.setEnabled(selectedMessage);
 			sequenceTable.clear();
 			elementConditionsTableModel.clear();
 			tbl_ElementConditions.setEnabled(selectedMessage);
 			btn_NewElementCondition.setEnabled(selectedMessage);
 			if (selectedMessage) {
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
-//				List<MessageInTransactionTypeType> previous = getPrevious(mitt);
-//				if (previous != null) {
-//					for (MessageInTransactionTypeType prev : previous) {
-//						previousMessagesTableModel.add(new PreviousMessage(prev));
-//					}
-//				}
-//				cbx_PreviousMessages.removeAllItems();
-//				cbx_PreviousMessages.addItem(null);
-
 				fillElementConditionsTable(mitt);
-//				fillSequencesTable(mitt);
 				sequenceTable.fillSequenceTable(null, "inOut", mitt);
 
 				cbx_ComplexElements.removeAllItems();
@@ -1017,51 +1044,6 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				for (SimpleElementTypeType se : seList) {
 					cbx_SimpleElements.addItem(se.getId());
 				}
-
-//				boolean initiatorToExecutor = mitt.isInitiatorToExecutor() != null ? mitt.isInitiatorToExecutor()
-//						: true;
-//				RoleTypeType roleType = null;
-//				if (initiatorToExecutor) {
-//					roleType = getInitiator(selectedElement);
-//				} else {
-//					roleType = getExecutor(selectedElement);
-//				}
-//				if (roleType != null) {
-//					List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
-//							.getElements(MessageInTransactionTypeType.class);
-//					List<PreviousMessage> cbxPrevs = new ArrayList<PreviousMessage>();
-//					for (MessageInTransactionTypeType element : mitts) {
-//						TransactionTypeType transactionType = getTransaction(element);
-//						if (transactionType != null) {
-//							boolean init2Exec = element.isInitiatorToExecutor() != null
-//									? element.isInitiatorToExecutor()
-//									: true;
-//							RoleTypeType roleType2 = null;
-//							if (init2Exec) {
-//								roleType2 = getExecutor(transactionType);
-//							} else {
-//								roleType2 = getInitiator(transactionType);
-//							}
-//							if (roleType.equals(roleType2)) {
-//								PreviousMessage previousMessage = new PreviousMessage(element);
-//								boolean inserted = false;
-//								for (int index = 0; !inserted && index < cbxPrevs.size(); index++) {
-//									PreviousMessage message = cbxPrevs.get(index);
-//									if (message.toString().compareTo(previousMessage.toString()) > 0) {
-//										inserted = true;
-//										cbxPrevs.add(index, previousMessage);
-//									}
-//								}
-//								if (!inserted) {
-//									cbxPrevs.add(previousMessage);
-//								}
-//							}
-//						}
-//					}
-//					for (PreviousMessage pm : cbxPrevs) {
-//						cbx_PreviousMessages.addItem(pm);
-//					}
-//				}
 			}
 		}
 
@@ -1144,10 +1126,10 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				return isMainTransaction(transaction);
 			case Initiator:
 				RoleTypeType initiator = getInitiator(transaction);
-				return initiator != null ? initiator.getId() : null;
+				return initiator != null ? initiator.getDescription() : null;
 			case Executor:
 				RoleTypeType executor = getExecutor(transaction);
-				return executor != null ? executor.getId() : null;
+				return executor != null ? executor.getDescription() : null;
 			case StartDate:
 				return getDate(transaction.getStartDate());
 			case EndDate:
@@ -1215,7 +1197,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	}
 
 	private enum MessagesTableColumns {
-		Id, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed, Start, Navigate;
+		Id, Message, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed, Start, Navigate;
 
 		@Override
 		public String toString() {
@@ -1246,7 +1228,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 			switch (MessagesTableColumns.values()[columnIndex]) {
 			case Id:
-				return messageType.getId();
+				return mitt.getId();
+			case Message:
+				return messageType.getDescription();
 			case TransactionPhase:
 				TransactionPhase transactionPhase = mitt.getTransactionPhase();
 				if (transactionPhase != null) {
@@ -1256,7 +1240,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 								.getIdref();
 					}
 					if (transactionPhaseType != null) {
-						return transactionPhaseType.getId();
+						return transactionPhaseType.getDescription();
 					}
 				}
 				return null;
@@ -1268,7 +1252,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 						groupType = (GroupTypeType) group.getGroupTypeRef().getIdref();
 					}
 					if (groupType != null) {
-						return groupType.getId();
+						return groupType.getDescription();
 					}
 				}
 				return null;
@@ -1295,6 +1279,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				return String.class;
 			case Id:
 				return String.class;
+			case Message:
+				return String.class;
 			case InitiatorToExecutor:
 				return Boolean.class;
 			case OpenSecondaryTransactionsAllowed:
@@ -1316,6 +1302,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				break;
 			case InitiatorToExecutor:
 				return true;
+			case Message:
+				break;
 			case Start:
 				return true;
 			case TransactionPhase:
@@ -1346,6 +1334,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				break;
 			case InitiatorToExecutor:
 				reverse();
+				break;
+			case Message:
 				break;
 			case OpenSecondaryTransactionsAllowed:
 				setOpenSecondaryTransactionsAllowed(rowIndex, mitt);
@@ -1846,7 +1836,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		initResultField();
 
 		drawingPlane = new Canvas();
-		scrollPane = new JScrollPane(drawingPlane);
+		scrollPane = new JScrollPane(drawingPlane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		canvasPanel.add(scrollPane, BorderLayout.CENTER);
 	}
 
@@ -2340,7 +2331,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		}
 
 	}
-	
+
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
@@ -2477,7 +2468,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
-		
+
 		fillMessageTable();
 	}
 

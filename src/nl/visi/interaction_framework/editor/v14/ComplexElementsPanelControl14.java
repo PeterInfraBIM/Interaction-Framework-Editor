@@ -441,10 +441,6 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
-//			tfd_MaxOccurs
-//					.setText(selectedElement.getMaxOccurs() != null ? selectedElement.getMaxOccurs().toString() : null);
-//			tfd_MinOccurs
-//					.setText(selectedElement.getMinOccurs() != null ? selectedElement.getMinOccurs().toString() : null);
 
 			subComplexElementsTableModel.clear();
 			ComplexElementTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
@@ -464,7 +460,8 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			cbx_ComplexElements.addItem(null);
 			List<ComplexElementTypeType> ceList = Editor14.getStore14().getElements(ComplexElementTypeType.class);
 			for (ComplexElementTypeType element : ceList) {
-				cbx_ComplexElements.addItem(element.getId());
+//				cbx_ComplexElements.addItem(element.getId());
+				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
 			simpleElementsTableModel.clear();
@@ -485,7 +482,8 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			cbx_SimpleElements.addItem(null);
 			List<SimpleElementTypeType> seList = Editor14.getStore14().getElements(SimpleElementTypeType.class);
 			for (SimpleElementTypeType element : seList) {
-				cbx_SimpleElements.addItem(element.getId());
+//				cbx_SimpleElements.addItem(element.getId());
+				cbx_SimpleElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 		} else {
 			selectedElement = null;
@@ -497,8 +495,6 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
-//			tfd_MaxOccurs.setText("");
-//			tfd_MinOccurs.setText("");
 			subComplexElementsTableModel.clear();
 			cbx_ComplexElements.removeAllItems();
 			simpleElementsTableModel.clear();
@@ -626,7 +622,8 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	}
 
 	public void addComplexElement() {
-		String ceId = (String) cbx_ComplexElements.getSelectedItem();
+		String complexElement = (String) cbx_ComplexElements.getSelectedItem();
+		String ceId = complexElement.substring(1, complexElement.indexOf("]"));
 		ComplexElementTypeType element = Editor14.getStore14().getElement(ComplexElementTypeType.class, ceId);
 		ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
 		ref.setIdref(element);
@@ -675,7 +672,8 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	}
 
 	public void addSimpleElement() {
-		String seId = (String) cbx_SimpleElements.getSelectedItem();
+		String simpleElement = (String) cbx_SimpleElements.getSelectedItem();
+		String seId = simpleElement.substring(1, simpleElement.indexOf("]"));
 		SimpleElementTypeType element = Editor14.getStore14().getElement(SimpleElementTypeType.class, seId);
 		SimpleElementTypeTypeRef ref = objectFactory.createSimpleElementTypeTypeRef();
 		ref.setIdref(element);
