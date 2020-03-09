@@ -13,6 +13,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.Control;
+import nl.visi.schemas._20140331.ComplexElementTypeType;
+import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
+import nl.visi.schemas._20140331.ElementConditionType;
+import nl.visi.schemas._20140331.ElementConditionType.ComplexElement;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendAfter;
@@ -25,6 +29,7 @@ import nl.visi.schemas._20140331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20140331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20140331.MessageTypeType;
+import nl.visi.schemas._20140331.MessageTypeType.ComplexElements;
 import nl.visi.schemas._20140331.ObjectFactory;
 import nl.visi.schemas._20140331.RoleTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType;
@@ -312,6 +317,64 @@ abstract class Control14 extends Control {
 			}
 		}
 		return size;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(ComplexElementTypeType complexElementParentType) {
+		if (complexElementParentType != null) {
+			ComplexElementTypeType.ComplexElements complexElements = complexElementParentType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static ComplexElementTypeType getComplexElement(ElementConditionType elementConditionType) {
+		if (elementConditionType != null) {
+			ComplexElement complexElement = elementConditionType.getComplexElement();
+			if (complexElement != null) {
+				ComplexElementTypeType complexElementType = complexElement.getComplexElementType();
+				if (complexElementType == null) {
+					complexElementType = (ComplexElementTypeType) complexElement.getComplexElementTypeRef().getIdref();
+				}
+				return complexElementType;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(MessageTypeType messageType) {
+		if (messageType != null) {
+			ComplexElements complexElements = messageType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
 	}
 
 	protected static List<MessageInTransactionTypeConditionType> getConditions(MessageInTransactionTypeType mitt) {
