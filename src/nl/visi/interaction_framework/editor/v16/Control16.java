@@ -13,6 +13,10 @@ import javax.swing.table.AbstractTableModel;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.Control;
+import nl.visi.schemas._20160331.ComplexElementTypeType;
+import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
+import nl.visi.schemas._20160331.ElementConditionType;
+import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendAfter;
@@ -25,6 +29,7 @@ import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20160331.MessageTypeType;
+import nl.visi.schemas._20160331.MessageTypeType.ComplexElements;
 import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
@@ -180,6 +185,22 @@ public abstract class Control16 extends Control {
 		return null;
 	}
 
+	protected static MessageInTransactionTypeType getMessageInTransaction(ElementConditionType elementConditionType) {
+		if (elementConditionType != null) {
+			MessageInTransaction messageInTransaction = elementConditionType.getMessageInTransaction();
+			if (messageInTransaction != null) {
+				MessageInTransactionTypeType messageInTransactionType = messageInTransaction
+						.getMessageInTransactionType();
+				if (messageInTransactionType == null) {
+					messageInTransactionType = (MessageInTransactionTypeType) messageInTransaction
+							.getMessageInTransactionTypeRef().getIdref();
+				}
+				return messageInTransactionType;
+			}
+		}
+		return null;
+	}
+
 	protected static MessageTypeType getMessage(MessageInTransactionTypeType mitt) {
 		if (mitt != null) {
 			Message messageValue = mitt.getMessage();
@@ -312,6 +333,72 @@ public abstract class Control16 extends Control {
 			}
 		}
 		return size;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(ComplexElementTypeType complexElementParentType) {
+		if (complexElementParentType != null) {
+			ComplexElementTypeType.ComplexElements complexElements = complexElementParentType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(ElementConditionType elementConditionType) {
+		if (elementConditionType != null) {
+			ElementConditionType.ComplexElements complexElements = elementConditionType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(MessageTypeType messageType) {
+		if (messageType != null) {
+			ComplexElements complexElements = messageType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
 	}
 
 	protected static List<MessageInTransactionTypeConditionType> getConditions(MessageInTransactionTypeType mitt) {

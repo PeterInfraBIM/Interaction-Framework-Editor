@@ -20,9 +20,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -54,10 +56,12 @@ import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
+import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementConditionType.ComplexElements;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
+import nl.visi.schemas._20160331.ElementConditionType.SimpleElement;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.GroupTypeType;
 import nl.visi.schemas._20160331.GroupTypeTypeRef;
@@ -91,7 +95,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private JTable tbl_Messages, tbl_ElementConditions, tbl_Subtransactions;
 	private JTextField tfd_Result;
 	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups,
-			cbx_Conditions, cbx_ComplexElements, cbx_SimpleElements;
+			cbx_Conditions, cbx_ComplexElements1, cbx_ComplexElements2, cbx_SimpleElements;
 	private MessagesTableModel messagesTableModel;
 	private ElementConditionsTableModel elementConditionsTableModel;
 	private SequenceTable sequenceTable;
@@ -906,7 +910,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			int width = preferredSize.width;
 //			preferredSize = new Dimension(leftMargin + middleMargin + rightMargin, yInitStart + yInitHeight + 20);
 			preferredSize = new Dimension(scrollPane.getWidth(), yInitStart + yInitHeight + 20);
-			
+
 			if (height != preferredSize.height || width != preferredSize.width
 					|| previousMiddleMargin != middleMargin) {
 				previousMiddleMargin = middleMargin;
@@ -1031,12 +1035,14 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				fillElementConditionsTable(mitt);
 				sequenceTable.fillSequenceTable(null, "inOut", mitt);
 
-				cbx_ComplexElements.removeAllItems();
-				cbx_ComplexElements.addItem(null);
-				List<ComplexElementTypeType> ceList = Editor16.getStore16().getElements(ComplexElementTypeType.class);
-				for (ComplexElementTypeType ce : ceList) {
-					cbx_ComplexElements.addItem(ce.getId());
-				}
+				cbx_ComplexElements1.removeAllItems();
+				cbx_ComplexElements1.addItem(null);
+				MessageTypeType message = getMessage(mitt);
+				fillComplexTypeCbx(message);
+//				List<ComplexElementTypeType> ceList = Editor16.getStore16().getElements(ComplexElementTypeType.class);
+//				for (ComplexElementTypeType ce : ceList) {
+//					cbx_ComplexElements1.addItem(ce.getId());
+//				}
 
 				cbx_SimpleElements.removeAllItems();
 				cbx_SimpleElements.addItem(null);
@@ -1047,26 +1053,85 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		}
 
-		private void fillElementConditionsTable(MessageInTransactionTypeType mitt) {
-			elementConditionsTableModel.clear();
-			List<ElementConditionType> elements = Editor16.getStore16().getElements(ElementConditionType.class);
-			for (ElementConditionType ec : elements) {
-				MessageInTransaction messageInTransaction = ec.getMessageInTransaction();
-				if (messageInTransaction != null) {
-					MessageInTransactionTypeType messageInTransactionType = messageInTransaction
-							.getMessageInTransactionType();
-					if (messageInTransactionType == null) {
-						messageInTransactionType = (MessageInTransactionTypeType) messageInTransaction
-								.getMessageInTransactionTypeRef().getIdref();
+		private void fillComplexTypeCbx(MessageTypeType message) {
+			Set<ComplexElementTypeType> complexElementSet = new HashSet<>();
+			MessageTypeType.ComplexElements messageComplexElements = message.getComplexElements();
+			if (messageComplexElements != null) {
+				List<Object> ecObjects = messageComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				if (ecObjects != null) {
+					for (Object object : ecObjects) {
+						ComplexElementTypeType complexElementType = null;
+						if (object instanceof ComplexElementTypeType) {
+							complexElementType = (ComplexElementTypeType) object;
+						} else {
+							complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
+									.getIdref();
+						}
+						complexElementSet.add(complexElementType);
+						cbx_ComplexElements1.addItem(complexElementType.getId());
 					}
-					if (messageInTransactionType != null && messageInTransactionType.equals(mitt)) {
-						elementConditionsTableModel.add(ec);
-					}
-				} else {
-					elementConditionsTableModel.add(ec);
 				}
 			}
 		}
+
+		private void fillElementConditionsTable(MessageInTransactionTypeType mitt) {
+			MessageTypeType message = getMessage(mitt);
+
+			elementConditionsTableModel.clear();
+			List<ElementConditionType> elements = Editor16.getStore16().getElements(ElementConditionType.class);
+
+			for (ElementConditionType ec : elements) {
+				MessageInTransactionTypeType ecMitt = getMessageInTransaction(ec);
+				if (ecMitt != null) {
+					if (ecMitt.equals(mitt)) {
+						elementConditionsTableModel.add(ec);
+					}
+				} else {
+					List<ComplexElementTypeType> msgComplexElements = getComplexElements(message);
+					List<ComplexElementTypeType> ecComplexElements = getComplexElements(ec);
+
+					// Complex elements
+					if (msgComplexElements != null && ecComplexElements != null) {
+						if (msgComplexElements.contains(ecComplexElements.get(0)) || (ecComplexElements.size() > 1
+								&& msgComplexElements.contains(ecComplexElements.get(1)))) {
+							elementConditionsTableModel.add(ec);
+						}
+					} else if (ecComplexElements == null) {
+						// Simple elements
+						SimpleElement ecSimpleElement = ec.getSimpleElement();
+						if (msgComplexElements != null && msgComplexElements.size() > 0 && ecSimpleElement != null) {
+							for (ComplexElementTypeType ce : msgComplexElements) {
+								SimpleElements msgSimpleElements = ce.getSimpleElements();
+								if (msgSimpleElements != null) {
+									Set<SimpleElementTypeType> seElementSet = new HashSet<SimpleElementTypeType>();
+									List<Object> seObjects = msgSimpleElements
+											.getSimpleElementTypeOrSimpleElementTypeRef();
+									SimpleElementTypeType simpleElementType = null;
+									for (Object seObject : seObjects) {
+										if (seObject instanceof SimpleElementTypeType) {
+											simpleElementType = (SimpleElementTypeType) seObject;
+										} else {
+											simpleElementType = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) seObject)
+													.getIdref();
+										}
+										seElementSet.add(simpleElementType);
+									}
+									SimpleElementTypeType ecSimpleElementType = ecSimpleElement.getSimpleElementType();
+									if (ecSimpleElementType == null) {
+										ecSimpleElementType = (SimpleElementTypeType) ecSimpleElement
+												.getSimpleElementTypeRef().getIdref();
+									}
+									if (seElementSet.contains(ecSimpleElementType)) {
+										elementConditionsTableModel.add(ec);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
 	};
 
 	@SuppressWarnings("serial")
@@ -1647,6 +1712,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 			return startSubMitts;
 		}
+
 	}
 
 	public MessagesTableModel getMessagesTableModel() {
@@ -1938,13 +2004,14 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				.getColumn(ElementConditionsTableColumns.Condition.ordinal());
 		conditionColumn.setCellEditor(new DefaultCellEditor(cbx_Conditions));
 
-		cbx_ComplexElements = new JComboBox<>(new DefaultComboBoxModel<String>());
+		cbx_ComplexElements1 = new JComboBox<>(new DefaultComboBoxModel<String>());
 		TableColumn complexElement1Column = tbl_ElementConditions.getColumnModel()
 				.getColumn(ElementConditionsTableColumns.ComplexElement1.ordinal());
-		complexElement1Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements));
+		complexElement1Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements1));
+		cbx_ComplexElements2 = new JComboBox<>(new DefaultComboBoxModel<String>());
 		TableColumn complexElement2Column = tbl_ElementConditions.getColumnModel()
 				.getColumn(ElementConditionsTableColumns.ComplexElement2.ordinal());
-		complexElement2Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements));
+		complexElement2Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements2));
 
 		cbx_SimpleElements = new JComboBox<>(new DefaultComboBoxModel<String>());
 		TableColumn simpleElementColumn = tbl_ElementConditions.getColumnModel()
