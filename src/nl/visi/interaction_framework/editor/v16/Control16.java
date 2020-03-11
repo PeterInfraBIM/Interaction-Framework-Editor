@@ -14,9 +14,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.Control;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
+import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
+import nl.visi.schemas._20160331.ElementConditionType.SimpleElement;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendAfter;
@@ -32,6 +34,8 @@ import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.MessageTypeType.ComplexElements;
 import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.RoleTypeType;
+import nl.visi.schemas._20160331.SimpleElementTypeType;
+import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
 import nl.visi.schemas._20160331.TransactionTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType.Executor;
 import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
@@ -352,6 +356,42 @@ public abstract class Control16 extends Control {
 					complexElementTypeList.add(complexElementType);
 				}
 				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<SimpleElementTypeType> getSimpleElements(ComplexElementTypeType complexElementParentType) {
+		if (complexElementParentType != null) {
+			SimpleElements simpleElements = complexElementParentType.getSimpleElements();
+			if (simpleElements != null) {
+				List<SimpleElementTypeType> simpleElementTypeList = new ArrayList<>();
+				SimpleElementTypeType simpleElementType = null;
+				List<Object> simpleElementObjects = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+				for (Object simpleElementObject : simpleElementObjects) {
+					if (simpleElementObject instanceof SimpleElementTypeType) {
+						simpleElementType = (SimpleElementTypeType) simpleElementObject;
+					} else {
+						simpleElementType = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) simpleElementObject)
+								.getIdref();
+					}
+					simpleElementTypeList.add(simpleElementType);
+				}
+				return simpleElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static SimpleElementTypeType getSimpleElement(ElementConditionType elementCondition) {
+		if (elementCondition != null) {
+			SimpleElement simpleElement = elementCondition.getSimpleElement();
+			if (simpleElement != null) {
+				SimpleElementTypeType simpleElementType = simpleElement.getSimpleElementType();
+				if (simpleElementType == null) {
+					simpleElementType = (SimpleElementTypeType) simpleElement.getSimpleElementTypeRef().getIdref();
+				}
+				return simpleElementType;
 			}
 		}
 		return null;

@@ -324,12 +324,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 
 			public void showButton(final Canvas canvas) {
-//				activeLabel.setToolTipText(getMessage(mitt).getId());
-//				activeLabel.setToolTipText(mitt.getId());
-//				activeLabel.setContentAreaFilled(false);
-//				activeLabel.setBackground(Color.white);
-//				activeLabel.setBorderPainted(false);
-//				activeLabel.setFont(font);
 				activeLabel.setLocation(getX() - 10, getY() - 10);
 				List<Component> components = Arrays.asList(canvas.getComponents());
 				if (!components.contains(activeLabel)) {
@@ -449,8 +443,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 
 			private String getLabel(MessageInTransactionTypeType incomingMitt) {
-//				String incomingTransaction = getTransaction(incomingMitt).getId();
-//				String incomingMessage = getMessage(incomingMitt).getId();
 				String incomingTransaction = getTransaction(incomingMitt).getDescription();
 				String incomingMessage = getMessage(incomingMitt).getDescription();
 				String label = incomingTransaction.substring(0, Math.min(incomingTransaction.length(), 12));
@@ -602,7 +594,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					rightMargin = leftMargin;
 				}
 				item.setX((exec.x - init.x - stringWidth) / 2 + init.x + 50);
-//				item.setY(y - 3);
 				item.setY(y);
 				g2d.drawString(item.getName(), item.getX(), item.getY());
 				item.showButton(this);
@@ -654,7 +645,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								g2d.drawLine(x0 + 5, y, x1, y);
 								g2d.drawLine(x1 - 5, y - 3, x1, y);
 								g2d.drawLine(x1 - 5, y + 3, x1, y);
-//								init_dx -= 5;
 								init_dx -= 10;
 							}
 						}
@@ -672,7 +662,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								g2d.drawLine(x0 + 10, connectionY + 5, x0 + 10, y - 5);
 								g2d.drawArc(x0, y - 10, 10, 10, 270, 90);
 								g2d.drawLine(x0 + 5, y, x1, y);
-//								exec_dx -= 5;
 								exec_dx -= 10;
 							}
 						}
@@ -688,7 +677,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						g2d.drawLine(init.x + 5, y, xEnd, y);
 						g2d.drawLine(xEnd, y, xEnd - 5, y - 3);
 						g2d.drawLine(xEnd, y, xEnd - 5, y + 3);
-//						drawInitExitPoint(g2d, y, init.x - 13, false);
 						drawInitExitPoint(g2d, y, init.x - 3, false);
 					}
 					if (item.isEndMitt() && outgoingTransactions.size() == 0) {
@@ -714,9 +702,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, init.x + 5 - stringWidth, y);
 								} else {
-//									showButton(this, init.x + 5 - stringWidth, y, item.incomingMitts.get(i), label,
-//											getTransaction(item.incomingMitts.get(i)).getDescription() + "/"
-//													+ getMessage(item.incomingMitts.get(i)).getDescription());
 									showButton(this, init.x + 5 - stringWidth, y, item.incomingMitts.get(i), label,
 											item.incomingMitts.get(i).getId());
 								}
@@ -734,9 +719,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, exec.x + 95, y);
 								} else {
-//									showButton(this, exec.x + 95, y, item.outgoingMitts.get(i), label,
-//											getTransaction(item.outgoingMitts.get(i)).getDescription() + "/"
-//													+ getMessage(item.outgoingMitts.get(i)).getDescription());
 									showButton(this, exec.x + 95, y, item.outgoingMitts.get(i), label,
 											item.outgoingMitts.get(i).getId());
 								}
@@ -798,7 +780,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								g2d.drawLine(x0 - 5, y, x1, y);
 								g2d.drawLine(x1, y, x1 + 5, y - 3);
 								g2d.drawLine(x1, y, x1 + 5, y + 3);
-//								exec_dx += 4;
 								exec_dx += 15;
 							}
 						}
@@ -816,7 +797,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								g2d.drawLine(x0, connectionY + 5, x0, y - 5);
 								g2d.drawArc(x0, y - 10, 10, 10, 180, 90);
 								g2d.drawLine(x0 + 5, y, x1, y);
-//								init_dx -= 5;
 								init_dx -= 10;
 							}
 						}
@@ -839,7 +819,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						g2d.drawLine(init.x + 45, y, xEnd, y);
 						g2d.drawLine(xEnd, y, xEnd + 5, y - 3);
 						g2d.drawLine(xEnd, y, xEnd + 5, y + 3);
-//						drawInitExitPoint(g2d, y, xEnd - 18, true);
 						drawInitExitPoint(g2d, y, xEnd - 8, true);
 					}
 					int deltaY = 10;
@@ -858,9 +837,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, exec.x + 95, y);
 								} else {
-//									showButton(this, exec.x + 95, y, item.incomingMitts.get(i), label,
-//											getTransaction(item.incomingMitts.get(i)).getDescription() + "/"
-//													+ getMessage(item.incomingMitts.get(i)).getDescription());
 									showButton(this, exec.x + 95, y, item.incomingMitts.get(i), label,
 											item.incomingMitts.get(i).getId());
 								}
@@ -878,9 +854,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 								if (printMode) {
 									g2d.drawString(label, xEnd - stringWidth, y);
 								} else {
-//									showButton(this, xEnd - stringWidth, y, item.outgoingMitts.get(i), label,
-//											getTransaction(item.outgoingMitts.get(i)).getDescription() + "/"
-//													+ getMessage(item.outgoingMitts.get(i)).getDescription());
 									showButton(this, xEnd - stringWidth, y, item.outgoingMitts.get(i), label,
 											item.outgoingMitts.get(i).getId());
 								}
@@ -908,7 +881,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 			int height = preferredSize.height;
 			int width = preferredSize.width;
-//			preferredSize = new Dimension(leftMargin + middleMargin + rightMargin, yInitStart + yInitHeight + 20);
 			preferredSize = new Dimension(scrollPane.getWidth(), yInitStart + yInitHeight + 20);
 
 			if (height != preferredSize.height || width != preferredSize.width
@@ -958,16 +930,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		}
 
 		private void drawInitExitPoint(Graphics2D g2d, int y, int xEnd, boolean exit) {
-//			g2d.drawOval(xEnd, y - 9, 18, 18);
-//			if (exit) {
-//				double halfsqrt2 = 0.5 * Math.sqrt(2.0);
-//				int x1 = (int) Math.round(xEnd + (1 - halfsqrt2) * 9);
-//				int y1 = (int) Math.round(y - halfsqrt2 * 9);
-//				int x2 = (int) Math.round(xEnd + (1 + halfsqrt2) * 9);
-//				int y2 = (int) Math.round(y + halfsqrt2 * 9);
-//				g2d.drawLine(x1, y1, x2, y2);
-//				g2d.drawLine(x1, y2, x2, y1);
-//			}
 			g2d.setColor(exit ? Color.red : Color.green);
 			g2d.fillOval(xEnd, y - 4, 8, 8);
 			g2d.setColor(Color.black);
@@ -1006,9 +968,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				currentTransaction = selectedElement;
 				successorMap = new HashMap<MessageInTransactionTypeType, List<MessageInTransactionTypeType>>();
 				initPrevMap();
-//				leftMargin = 200;
-//				rightMargin = 200;
-//				middleMargin = 200;
 			}
 		}
 
@@ -1019,58 +978,24 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	}
 
 	private List<MessageInTransactionTypeType> startMitt;
+	private MessageTypeType selectedMessage;
 	private ListSelectionListener messageTableSelectionListener = new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			int selectedRow = tbl_Messages.getSelectedRow();
-			boolean selectedMessage = selectedRow >= 0;
-			btn_RemoveMessage.setEnabled(selectedMessage);
-			btn_Reverse.setEnabled(selectedMessage);
+			boolean isSelectedMessage = selectedRow >= 0;
+			btn_RemoveMessage.setEnabled(isSelectedMessage);
+			btn_Reverse.setEnabled(isSelectedMessage);
 			sequenceTable.clear();
 			elementConditionsTableModel.clear();
-			tbl_ElementConditions.setEnabled(selectedMessage);
-			btn_NewElementCondition.setEnabled(selectedMessage);
-			if (selectedMessage) {
+			tbl_ElementConditions.setEnabled(isSelectedMessage);
+			btn_NewElementCondition.setEnabled(isSelectedMessage);
+			if (isSelectedMessage) {
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
 				fillElementConditionsTable(mitt);
 				sequenceTable.fillSequenceTable(null, "inOut", mitt);
 
-				cbx_ComplexElements1.removeAllItems();
-				cbx_ComplexElements1.addItem(null);
-				MessageTypeType message = getMessage(mitt);
-				fillComplexTypeCbx(message);
-//				List<ComplexElementTypeType> ceList = Editor16.getStore16().getElements(ComplexElementTypeType.class);
-//				for (ComplexElementTypeType ce : ceList) {
-//					cbx_ComplexElements1.addItem(ce.getId());
-//				}
-
-				cbx_SimpleElements.removeAllItems();
-				cbx_SimpleElements.addItem(null);
-				List<SimpleElementTypeType> seList = Editor16.getStore16().getElements(SimpleElementTypeType.class);
-				for (SimpleElementTypeType se : seList) {
-					cbx_SimpleElements.addItem(se.getId());
-				}
-			}
-		}
-
-		private void fillComplexTypeCbx(MessageTypeType message) {
-			Set<ComplexElementTypeType> complexElementSet = new HashSet<>();
-			MessageTypeType.ComplexElements messageComplexElements = message.getComplexElements();
-			if (messageComplexElements != null) {
-				List<Object> ecObjects = messageComplexElements.getComplexElementTypeOrComplexElementTypeRef();
-				if (ecObjects != null) {
-					for (Object object : ecObjects) {
-						ComplexElementTypeType complexElementType = null;
-						if (object instanceof ComplexElementTypeType) {
-							complexElementType = (ComplexElementTypeType) object;
-						} else {
-							complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
-									.getIdref();
-						}
-						complexElementSet.add(complexElementType);
-						cbx_ComplexElements1.addItem(complexElementType.getId());
-					}
-				}
+				selectedMessage = getMessage(mitt);
 			}
 		}
 
@@ -1131,7 +1056,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				}
 			}
 		}
-
 	};
 
 	@SuppressWarnings("serial")
@@ -1752,16 +1676,15 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					List<Object> objects = complexElement1s.getComplexElementTypeOrComplexElementTypeRef();
 					if (objects != null && objects.size() > 0) {
 						Object object = objects.get(0);
+						ComplexElementTypeType complexElementType = null;
 						if (object != null && object instanceof ComplexElementTypeTypeRef) {
-							ComplexElementTypeType complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
+							complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
 									.getIdref();
-							return complexElementType.getId();
 						}
 						if (object != null && object instanceof ComplexElementTypeType) {
-							ComplexElementTypeType complexElementType = (ComplexElementTypeType) object;
-							return complexElementType.getId();
+							complexElementType = (ComplexElementTypeType) object;
 						}
-
+						return complexElementType.getId();
 					}
 				}
 				break;
@@ -1780,7 +1703,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 							ComplexElementTypeType complexElementType = (ComplexElementTypeType) object;
 							return complexElementType.getId();
 						}
-
 					}
 				}
 				break;
@@ -1832,6 +1754,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 		@Override
 		public void setValueAt(Object value, int rowIndex, int columnIndex) {
+			if (inValueChangeElementConditionTable)
+				return;
 			ElementConditionType elementConditionType = elementConditionsTableModel.get(rowIndex);
 
 			switch (ElementConditionsTableColumns.values()[columnIndex]) {
@@ -1844,11 +1768,55 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			case ComplexElement1:
 				if (value == null) {
 					elementConditionType.setComplexElements(null);
+				} else {
+					ComplexElements complexElement1s = elementConditionType.getComplexElements();
+					if (complexElement1s == null) {
+						complexElement1s = objectFactory.createElementConditionTypeComplexElements();
+					}
+					String idref = (String) value;
+					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
+					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
+					ceRef.setIdref(ce);
+					List<Object> complexElementObjects = complexElement1s
+							.getComplexElementTypeOrComplexElementTypeRef();
+					if (complexElementObjects.size() > 0) {
+						complexElementObjects.set(0, ceRef);
+					} else {
+						complexElementObjects.add(0, ceRef);
+					}
+					elementConditionType.setComplexElements(complexElement1s);
+					elementConditionTableListener.valueChanged(null);
+					break;
 				}
-				break;
 			case ComplexElement2:
 				if (value == null) {
-					elementConditionType.setComplexElements(null);
+					List<ComplexElementTypeType> complexElementTypes = getComplexElements(elementConditionType);
+					if (complexElementTypes != null) {
+						ComplexElements complexElements = elementConditionType.getComplexElements();
+						List<Object> complexElementObjects = complexElements
+								.getComplexElementTypeOrComplexElementTypeRef();
+						if (complexElementObjects.size() > 1) {
+							complexElementObjects.remove(1);
+						}
+					}
+				} else {
+					ComplexElements complexElement1s = elementConditionType.getComplexElements();
+					if (complexElement1s == null) {
+						break;
+					}
+					String idref = (String) value;
+					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
+					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
+					ceRef.setIdref(ce);
+					List<Object> complexElementObjects = complexElement1s
+							.getComplexElementTypeOrComplexElementTypeRef();
+					if (complexElementObjects.size() == 1) {
+						complexElementObjects.add(1, ceRef);
+					} else {
+						complexElementObjects.set(1, ceRef);
+					}
+					elementConditionType.setComplexElements(complexElement1s);
+					elementConditionTableListener.valueChanged(null);
 				}
 				break;
 			case SimpleElement:
@@ -1990,6 +1958,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		endDateField.setEnabled(false);
 	}
 
+	private boolean inValueChangeElementConditionTable = false;
+
 	private void initElementConditionsTable() {
 		elementConditionsTableModel = new ElementConditionsTableModel();
 		tbl_ElementConditions.setModel(elementConditionsTableModel);
@@ -2009,6 +1979,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				.getColumn(ElementConditionsTableColumns.ComplexElement1.ordinal());
 		complexElement1Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements1));
 		cbx_ComplexElements2 = new JComboBox<>(new DefaultComboBoxModel<String>());
+		cbx_ComplexElements2.addItem(null);
 		TableColumn complexElement2Column = tbl_ElementConditions.getColumnModel()
 				.getColumn(ElementConditionsTableColumns.ComplexElement2.ordinal());
 		complexElement2Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements2));
@@ -2018,14 +1989,147 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				.getColumn(ElementConditionsTableColumns.SimpleElement.ordinal());
 		simpleElementColumn.setCellEditor(new DefaultCellEditor(cbx_SimpleElements));
 
-		tbl_ElementConditions.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				int selectedElementConditionRow = tbl_ElementConditions.getSelectedRow();
-				boolean rowSelected = selectedElementConditionRow >= 0;
-				btn_RemoveElementCondition.setEnabled(rowSelected);
+		tbl_ElementConditions.getSelectionModel().addListSelectionListener(elementConditionTableListener);
+	}
+
+	private ListSelectionListener elementConditionTableListener = new ListSelectionListener() {
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			inValueChangeElementConditionTable = true;
+
+			int selectedElementConditionRow = tbl_ElementConditions.getSelectedRow();
+			boolean rowSelected = selectedElementConditionRow >= 0;
+			btn_RemoveElementCondition.setEnabled(rowSelected);
+			if (rowSelected) {
+				selectedElementConditionRow = tbl_ElementConditions.getRowSorter()
+						.convertRowIndexToModel(selectedElementConditionRow);
+				ElementConditionType ec = elementConditionsTableModel.get(selectedElementConditionRow);
+				List<ComplexElementTypeType> complexElements = getComplexElements(ec);
+
+				cbx_ComplexElements1.removeAllItems();
+				cbx_ComplexElements1.addItem(null);
+				fillComplexTypeCbx1(selectedMessage);
+				if (complexElements != null && complexElements.size() > 0) {
+					cbx_ComplexElements1.setSelectedItem(complexElements.get(0).getId());
+				} else {
+					cbx_ComplexElements1.setSelectedItem(null);
+				}
+				cbx_ComplexElements2.removeAllItems();
+				cbx_ComplexElements2.addItem(null);
+				fillComplexTypeCbx2((String) cbx_ComplexElements1.getSelectedItem());
+				if (complexElements != null && complexElements.size() > 1) {
+					cbx_ComplexElements2.setSelectedItem(complexElements.get(1).getId());
+				} else {
+					cbx_ComplexElements2.setSelectedItem(null);
+				}
+				cbx_SimpleElements.removeAllItems();
+				cbx_SimpleElements.addItem(null);
+				fillSimpleTypeCbx((String) cbx_ComplexElements1.getSelectedItem(),
+						(String) cbx_ComplexElements2.getSelectedItem());
+				SimpleElementTypeType simpleElement = getSimpleElement(ec);
+				if (simpleElement != null) {
+					int indexOf = ((DefaultComboBoxModel<String>) (cbx_SimpleElements.getModel()))
+							.getIndexOf(simpleElement.getId());
+					cbx_SimpleElements.setSelectedItem(indexOf > 0 ? simpleElement.getId() : null);
+					if (indexOf > 0) {
+						SimpleElement simpleElementObject = ec.getSimpleElement();
+						SimpleElementTypeTypeRef simpleElementTypeTypeRef = objectFactory
+								.createSimpleElementTypeTypeRef();
+						simpleElementTypeTypeRef.setIdref(simpleElement);
+						simpleElementObject.setSimpleElementTypeRef(simpleElementTypeTypeRef);
+					} else {
+						ec.setSimpleElement(null);
+					}
+				} else {
+					cbx_SimpleElements.setSelectedItem(null);
+					ec.setSimpleElement(null);
+				}
+				elementConditionsTableModel.fireTableCellUpdated(selectedElementConditionRow,
+						ElementConditionsTableColumns.SimpleElement.ordinal());
 			}
-		});
+
+			inValueChangeElementConditionTable = false;
+		}
+
+	};
+
+	private void fillComplexTypeCbx1(MessageTypeType message) {
+		List<ComplexElementTypeType> complexElements = getComplexElements(message);
+		if (complexElements != null) {
+			for (ComplexElementTypeType ce : complexElements) {
+				cbx_ComplexElements1.addItem(ce.getId());
+			}
+		}
+	}
+
+	private void fillComplexTypeCbx2(String complexElementId) {
+		if (complexElementId != null) {
+			ComplexElementTypeType parentCE = Editor16.getStore16().getElement(ComplexElementTypeType.class,
+					complexElementId);
+			List<ComplexElementTypeType> childCEs = getComplexElements(parentCE);
+			if (childCEs != null) {
+				for (ComplexElementTypeType ce : childCEs) {
+					cbx_ComplexElements2.addItem(ce.getId());
+				}
+			}
+		}
+	}
+
+	private void fillSimpleTypeCbx(String complexElement1Id, String complexElement2Id) {
+		if (complexElement1Id != null) {
+			ComplexElementTypeType parentCE = Editor16.getStore16().getElement(ComplexElementTypeType.class,
+					complexElement1Id);
+			List<SimpleElementTypeType> simpleElements1 = getSimpleElements(parentCE);
+			if (simpleElements1 != null) {
+				for (SimpleElementTypeType se : simpleElements1) {
+					cbx_SimpleElements.addItem(se.getId());
+				}
+			}
+			if (complexElement2Id != null) {
+				ComplexElementTypeType childCE = Editor16.getStore16().getElement(ComplexElementTypeType.class,
+						complexElement2Id);
+				List<SimpleElementTypeType> simpleElements2 = getSimpleElements(childCE);
+				if (simpleElements2 != null) {
+					for (SimpleElementTypeType se : simpleElements2) {
+						if (((DefaultComboBoxModel<String>) cbx_SimpleElements.getModel()).getIndexOf(se.getId()) < 0) {
+							cbx_SimpleElements.addItem(se.getId());
+						}
+					}
+
+				}
+			}
+		} else {
+			List<ComplexElementTypeType> parentComplexElements = getComplexElements(selectedMessage);
+			if (parentComplexElements != null) {
+				for (ComplexElementTypeType parentCE : parentComplexElements) {
+					List<SimpleElementTypeType> parentSimpleElements = getSimpleElements(parentCE);
+					if (parentSimpleElements != null) {
+						for (SimpleElementTypeType se : parentSimpleElements) {
+							if (((DefaultComboBoxModel<String>) cbx_SimpleElements.getModel())
+									.getIndexOf(se.getId()) < 0) {
+								cbx_SimpleElements.addItem(se.getId());
+							}
+						}
+					}
+					List<ComplexElementTypeType> childComplexElements = getComplexElements(parentCE);
+					if (childComplexElements != null) {
+						for (ComplexElementTypeType childCe : childComplexElements) {
+							List<SimpleElementTypeType> childSimpleElements = getSimpleElements(childCe);
+							if (childSimpleElements != null) {
+								for (SimpleElementTypeType se : childSimpleElements) {
+									if (((DefaultComboBoxModel<String>) cbx_SimpleElements.getModel())
+											.getIndexOf(se.getId()) < 0) {
+										cbx_SimpleElements.addItem(se.getId());
+									}
+								}
+							}
+						}
+					}
+
+				}
+			}
+		}
+
 	}
 
 	private void initSequenceTable() throws Exception {
