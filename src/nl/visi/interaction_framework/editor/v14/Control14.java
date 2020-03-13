@@ -17,6 +17,7 @@ import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.ElementConditionType.ComplexElement;
+import nl.visi.schemas._20140331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendAfter;
@@ -32,6 +33,8 @@ import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.MessageTypeType.ComplexElements;
 import nl.visi.schemas._20140331.ObjectFactory;
 import nl.visi.schemas._20140331.RoleTypeType;
+import nl.visi.schemas._20140331.SimpleElementTypeType;
+import nl.visi.schemas._20140331.SimpleElementTypeTypeRef;
 import nl.visi.schemas._20140331.TransactionTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType.Executor;
 import nl.visi.schemas._20140331.TransactionTypeType.Initiator;
@@ -180,6 +183,22 @@ abstract class Control14 extends Control {
 					transactionType = (TransactionTypeType) transactionValue.getTransactionTypeRef().getIdref();
 				}
 				return transactionType;
+			}
+		}
+		return null;
+	}
+
+	protected static MessageInTransactionTypeType getMessageInTransaction(ElementConditionType elementConditionType) {
+		if (elementConditionType != null) {
+			MessageInTransaction messageInTransaction = elementConditionType.getMessageInTransaction();
+			if (messageInTransaction != null) {
+				MessageInTransactionTypeType messageInTransactionType = messageInTransaction
+						.getMessageInTransactionType();
+				if (messageInTransactionType == null) {
+					messageInTransactionType = (MessageInTransactionTypeType) messageInTransaction
+							.getMessageInTransactionTypeRef().getIdref();
+				}
+				return messageInTransactionType;
 			}
 		}
 		return null;
@@ -340,7 +359,43 @@ abstract class Control14 extends Control {
 		}
 		return null;
 	}
-
+	
+	protected static List<SimpleElementTypeType> getSimpleElements(ComplexElementTypeType complexElementParentType) {
+		if (complexElementParentType != null) {
+			ComplexElementTypeType.SimpleElements simpleElements = complexElementParentType.getSimpleElements();
+			if (simpleElements != null) {
+				List<SimpleElementTypeType> simpleElementTypeList = new ArrayList<>();
+				SimpleElementTypeType simpleElementType = null;
+				List<Object> simpleElementObjects = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+				for (Object simpleElementObject : simpleElementObjects) {
+					if (simpleElementObject instanceof SimpleElementTypeType) {
+						simpleElementType = (SimpleElementTypeType) simpleElementObject;
+					} else {
+						simpleElementType = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) simpleElementObject)
+								.getIdref();
+					}
+					simpleElementTypeList.add(simpleElementType);
+				}
+				return simpleElementTypeList;
+			}
+		}
+		return null;
+	}
+	
+	protected static SimpleElementTypeType getSimpleElement(ElementConditionType elementCondition) {
+		if (elementCondition != null) {
+			ElementConditionType.SimpleElement simpleElement = elementCondition.getSimpleElement();
+			if (simpleElement != null) {
+				SimpleElementTypeType simpleElementType = simpleElement.getSimpleElementType();
+				if (simpleElementType == null) {
+					simpleElementType = (SimpleElementTypeType) simpleElement.getSimpleElementTypeRef().getIdref();
+				}
+				return simpleElementType;
+			}
+		}
+		return null;
+	}
+	
 	protected static ComplexElementTypeType getComplexElement(ElementConditionType elementConditionType) {
 		if (elementConditionType != null) {
 			ComplexElement complexElement = elementConditionType.getComplexElement();
@@ -354,7 +409,7 @@ abstract class Control14 extends Control {
 		}
 		return null;
 	}
-
+	
 	protected static List<ComplexElementTypeType> getComplexElements(MessageTypeType messageType) {
 		if (messageType != null) {
 			ComplexElements complexElements = messageType.getComplexElements();

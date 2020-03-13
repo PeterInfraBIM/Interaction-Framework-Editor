@@ -37,7 +37,8 @@
 					<gridbagconstraints
 						Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
 						Insets="2,0,2,2" Weightx="1.0" />
-				</button>			</panel>
+				</button>
+			</panel>
 		</panel>
 		<splitpane ContinuousLayout="true" DividerLocation="280"
 			OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT">
@@ -235,38 +236,15 @@
 									PreferredScrollableViewportSize="200,50" />
 							</scrollpane>
 						</panel>
-						<panel id="sequencePanel" Border="TitledBorder(lbl_Sequence)" Layout="BorderLayout">
+						<tabbedpane Titles="lbl_Sequence,lbl_ElementConditions">
 							<gridbagconstraints
-								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="1"
-								Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
-							<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
-								<scrollpane>
-									<gridbagconstraints
-										Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
-										Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
-									<table id="tbl_Sequences"
-										SelectionMode="ListSelectionModel.SINGLE_SELECTION"
-										PreferredScrollableViewportSize="200,50" />
-								</scrollpane>
-								<panel Layout="GridBagLayout">
-									<gridbagconstraints
-										Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
-									<button id="btn_RemoveSequenceElement"
-										Action="removeSequenceElement" Enabled="false" Text="lbl_Remove"
-										ToolTipText="lbl_RemoveSequenceElement">
-										<gridbagconstraints
-											Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
-											Insets="0,2,2,2" Weightx="1.0" />
-									</button>
-									<button id="btn_AddSequenceElement" Action="addSequenceElement"
-										Text="lbl_Add" ToolTipText="lbl_AddSequenceElement" Enabled="false">
-										<gridbagconstraints
-											Anchor="GridBagConstraints.EAST" Gridx="1" Gridy="0"
-											Insets="0,2,2,2" Weightx="1.0" />
-									</button>
-								</panel>
+								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="2" Weightx="1.0"
+								Weighty="1.0" />
+							<panel id="sequencePanel" Layout="BorderLayout">
 							</panel>
-						</panel>
+							<panel id="elementConditionPanel" Layout="BorderLayout">
+							</panel>
+						</tabbedpane>
 					</panel>
 					<panel id="canvas" Border="EmptyBorder(4,4,4,4)"
 						Layout="BorderLayout" />

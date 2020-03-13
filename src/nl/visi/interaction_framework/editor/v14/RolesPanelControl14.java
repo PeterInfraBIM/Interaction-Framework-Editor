@@ -41,6 +41,7 @@ import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
+import nl.visi.interaction_framework.editor.v14.ElementConditionTable;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.RoleTypeType;
@@ -50,12 +51,13 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 	private static final String ROLES_PANEL = "nl/visi/interaction_framework/editor/swixml/RolesPanel16.xml";
 
 	private JTabbedPane relationsTabs;
-	private JPanel startDatePanel, endDatePanel, canvas, sequencePanel;
+	private JPanel startDatePanel, endDatePanel, canvas, sequencePanel, elementConditionPanel;
 	private JTable tbl_Transactions;
 
 	JTable tbl_Messages;
 
 	private SequenceTable sequenceTable;
+	private ElementConditionTable elementConditionTable;
 	private JTextField tfd_ResponsibilityScope, tfd_ResponsibilityTask, tfd_ResponsibilitySupportTask,
 			tfd_ResponsibilityFeedback;
 	private TransactionsTableModel transactionsTableModel;
@@ -352,7 +354,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 				}
 			} else {
 				int transactionsRowCount = transactionsTableModel.getRowCount();
-//				int transactionWidth = (getWidth() - offsetLeft) / transactionsRowCount;
 				int transactionWidth = transactionsRowCount > 0 ? (getWidth() - offsetLeft) / transactionsRowCount
 						: getWidth() - offsetLeft;
 				for (int index = 0; index < transactionsRowCount; index++) {
@@ -408,7 +409,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 								boolean sameTransaction = transaction == actionTransaction;
 								int disp = 0;
 								if (sameTransaction) {
-									// disp = 3 * transaction.routeCount++;
 									if (lineY < actionY) {
 										disp = 4 * transaction.addInterval(lineY + 4, actionY - 4);
 										g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
@@ -430,7 +430,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 									if (lineY < actionY) {
 										if (transaction.x > actionTransaction.x) {
 											disp = 4 * transaction.addInterval(lineY + 4, actionY - 4);
-											// disp = 3 * transaction.routeCount++;
 											g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
 											g2d.drawArc(transaction.x - 4 + disp, lineY, 8, 8, 90, -90);
 											g2d.drawLine(transaction.x + 4 + disp, lineY + 4, transaction.x + 4 + disp,
@@ -443,7 +442,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 											g2d.fillPolygon(xPoints, yPoints, 3);
 										} else {
 											disp = 4 * actionTransaction.addInterval(lineY + 4, actionY - 4);
-											// disp = 3 * actionTransaction.routeCount++;
 											g2d.drawLine(transaction.x + 4, lineY, actionTransaction.x + disp, lineY);
 											g2d.drawArc(actionTransaction.x - 4 + disp, lineY, 8, 8, 90, -90);
 											g2d.drawLine(actionTransaction.x + 4 + disp, lineY + 4,
@@ -457,7 +455,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 									} else if (lineY > actionY) {
 										if (transaction.x > actionTransaction.x) {
 											disp = 4 * transaction.addInterval(lineY - 4, actionY + 4);
-											// disp = 3 * transaction.routeCount++;
 											g2d.drawLine(transaction.x, lineY, transaction.x + disp, lineY);
 											g2d.drawArc(transaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
 											g2d.drawLine(transaction.x + 4 + disp, lineY - 4, transaction.x + 4 + disp,
@@ -470,7 +467,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 											g2d.fillPolygon(xPoints, yPoints, 3);
 										} else {
 											disp = 4 * actionTransaction.addInterval(lineY - 4, actionY + 4);
-											// disp = 3 * actionTransaction.routeCount++;
 											g2d.drawLine(transaction.x, lineY, actionTransaction.x + disp, lineY);
 											g2d.drawArc(actionTransaction.x - 4 + disp, lineY - 8, 8, 8, -90, 90);
 											g2d.drawLine(actionTransaction.x + 4 + disp, lineY - 4,
@@ -766,6 +762,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 		initTransactionsTable();
 		initMessagesTable();
 		initSequenceTable();
+		initElementConditionTable();
 		initStartDateField();
 		initEndDateField();
 		initResponsibilityScope();
@@ -939,6 +936,11 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 				String inOut = (String) messagesTableModel.getValueAt(selectedRow, MessagesTableColumns.Type.ordinal());
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
 				sequenceTable.fillSequenceTable(selectedElement, inOut, mitt);
+				elementConditionTable.fillElementConditionsTable(mitt);
+				elementConditionTable.setSelectedMitt(mitt);
+			} else {
+				elementConditionTable.clear();
+				elementConditionTable.setSelectedMitt(null);
 			}
 		}
 	};
@@ -948,6 +950,13 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 		sequencePanel.removeAll();
 		sequencePanel.add(sequenceTable.getPanel());
 		sequencePanel.revalidate();
+	}
+
+	private void initElementConditionTable() throws Exception {
+		elementConditionTable = new ElementConditionTable(tbl_Messages);
+		elementConditionPanel.removeAll();
+		elementConditionPanel.add(elementConditionTable.getPanel());
+		elementConditionPanel.revalidate();
 	}
 
 	private void initRolesTable() {
@@ -1057,6 +1066,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 			transactionsTableModel.clear();
 			messagesTableModel.clear();
 			sequenceTable.clear();
+			elementConditionTable.clear();
 		}
 
 		canvas.repaint();

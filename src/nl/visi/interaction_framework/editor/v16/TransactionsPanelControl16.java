@@ -20,11 +20,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
@@ -55,14 +53,8 @@ import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
-import nl.visi.schemas._20160331.ComplexElementTypeType;
-import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
-import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType;
-import nl.visi.schemas._20160331.ElementConditionType.ComplexElements;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
-import nl.visi.schemas._20160331.ElementConditionType.SimpleElement;
-import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.GroupTypeType;
 import nl.visi.schemas._20160331.GroupTypeTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
@@ -71,14 +63,11 @@ import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.TransactionPhase;
-import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.MessageTypeTypeRef;
 import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.RoleTypeTypeRef;
-import nl.visi.schemas._20160331.SimpleElementTypeType;
-import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
 import nl.visi.schemas._20160331.TransactionPhaseTypeType;
 import nl.visi.schemas._20160331.TransactionPhaseTypeTypeRef;
 import nl.visi.schemas._20160331.TransactionTypeType;
@@ -90,18 +79,16 @@ import nl.visi.schemas._20160331.TransactionTypeTypeRef;
 public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel;
 	private JTabbedPane transactionTabs;
-	private JTable tbl_Messages, tbl_ElementConditions, tbl_Subtransactions;
+	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
-	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups,
-			cbx_Conditions, cbx_ComplexElements1, cbx_ComplexElements2, cbx_SimpleElements;
+	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups;
 	private MessagesTableModel messagesTableModel;
-	private ElementConditionsTableModel elementConditionsTableModel;
 	private SequenceTable sequenceTable;
+	private ElementConditionTable elementConditionTable;
 	private SubtransactionsTableModel subtransactionsTableModel;
-	private JButton btn_AddMessage, btn_RemoveMessage, btn_Reverse, btn_NewElementCondition, btn_RemoveElementCondition,
-			btn_NavigateInitiator, btn_NavigateExecutor;
+	private JButton btn_AddMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator, btn_NavigateExecutor;
 	private JTextArea tar_Initiator, tar_Executor;
 	private JScrollPane scrollPane;
 	private Canvas drawingPlane;
@@ -978,7 +965,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	}
 
 	private List<MessageInTransactionTypeType> startMitt;
-	private MessageTypeType selectedMessage;
 	private ListSelectionListener messageTableSelectionListener = new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
@@ -987,73 +973,16 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			btn_RemoveMessage.setEnabled(isSelectedMessage);
 			btn_Reverse.setEnabled(isSelectedMessage);
 			sequenceTable.clear();
-			elementConditionsTableModel.clear();
-			tbl_ElementConditions.setEnabled(isSelectedMessage);
-			btn_NewElementCondition.setEnabled(isSelectedMessage);
+			elementConditionTable.clear();
 			if (isSelectedMessage) {
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
-				fillElementConditionsTable(mitt);
+
 				sequenceTable.fillSequenceTable(null, "inOut", mitt);
+				elementConditionTable.fillElementConditionsTable(mitt);
 
-				selectedMessage = getMessage(mitt);
-			}
-		}
-
-		private void fillElementConditionsTable(MessageInTransactionTypeType mitt) {
-			MessageTypeType message = getMessage(mitt);
-
-			elementConditionsTableModel.clear();
-			List<ElementConditionType> elements = Editor16.getStore16().getElements(ElementConditionType.class);
-
-			for (ElementConditionType ec : elements) {
-				MessageInTransactionTypeType ecMitt = getMessageInTransaction(ec);
-				if (ecMitt != null) {
-					if (ecMitt.equals(mitt)) {
-						elementConditionsTableModel.add(ec);
-					}
-				} else {
-					List<ComplexElementTypeType> msgComplexElements = getComplexElements(message);
-					List<ComplexElementTypeType> ecComplexElements = getComplexElements(ec);
-
-					// Complex elements
-					if (msgComplexElements != null && ecComplexElements != null) {
-						if (msgComplexElements.contains(ecComplexElements.get(0)) || (ecComplexElements.size() > 1
-								&& msgComplexElements.contains(ecComplexElements.get(1)))) {
-							elementConditionsTableModel.add(ec);
-						}
-					} else if (ecComplexElements == null) {
-						// Simple elements
-						SimpleElement ecSimpleElement = ec.getSimpleElement();
-						if (msgComplexElements != null && msgComplexElements.size() > 0 && ecSimpleElement != null) {
-							for (ComplexElementTypeType ce : msgComplexElements) {
-								SimpleElements msgSimpleElements = ce.getSimpleElements();
-								if (msgSimpleElements != null) {
-									Set<SimpleElementTypeType> seElementSet = new HashSet<SimpleElementTypeType>();
-									List<Object> seObjects = msgSimpleElements
-											.getSimpleElementTypeOrSimpleElementTypeRef();
-									SimpleElementTypeType simpleElementType = null;
-									for (Object seObject : seObjects) {
-										if (seObject instanceof SimpleElementTypeType) {
-											simpleElementType = (SimpleElementTypeType) seObject;
-										} else {
-											simpleElementType = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) seObject)
-													.getIdref();
-										}
-										seElementSet.add(simpleElementType);
-									}
-									SimpleElementTypeType ecSimpleElementType = ecSimpleElement.getSimpleElementType();
-									if (ecSimpleElementType == null) {
-										ecSimpleElementType = (SimpleElementTypeType) ecSimpleElement
-												.getSimpleElementTypeRef().getIdref();
-									}
-									if (seElementSet.contains(ecSimpleElementType)) {
-										elementConditionsTableModel.add(ec);
-									}
-								}
-							}
-						}
-					}
-				}
+				elementConditionTable.setSelectedMitt(mitt);
+			} else {
+				elementConditionTable.setSelectedMitt(null);
 			}
 		}
 	};
@@ -1267,6 +1196,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			case TransactionPhase:
 				return String.class;
 			case Id:
+				return String.class;
+			case Message:
 				return String.class;
 			case InitiatorToExecutor:
 				return Boolean.class;
@@ -1643,231 +1574,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		return messagesTableModel;
 	}
 
-	private enum ElementConditionsTableColumns {
-		Id, Description, Condition, ComplexElement1, ComplexElement2, SimpleElement, Global;
-
-		@Override
-		public String toString() {
-			return getBundle().getString("lbl_" + name());
-		}
-	}
-
-	@SuppressWarnings("serial")
-	private class ElementConditionsTableModel extends ElementsTableModel<ElementConditionType> {
-
-		@Override
-		public int getColumnCount() {
-			return ElementConditionsTableColumns.values().length;
-		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			return ElementConditionsTableColumns.values()[columnIndex].toString();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			ElementConditionType elementConditionType = get(rowIndex);
-
-			switch (ElementConditionsTableColumns.values()[columnIndex]) {
-			case ComplexElement1:
-				ComplexElements complexElement1s = elementConditionType.getComplexElements();
-				if (complexElement1s != null) {
-					List<Object> objects = complexElement1s.getComplexElementTypeOrComplexElementTypeRef();
-					if (objects != null && objects.size() > 0) {
-						Object object = objects.get(0);
-						ComplexElementTypeType complexElementType = null;
-						if (object != null && object instanceof ComplexElementTypeTypeRef) {
-							complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
-									.getIdref();
-						}
-						if (object != null && object instanceof ComplexElementTypeType) {
-							complexElementType = (ComplexElementTypeType) object;
-						}
-						return complexElementType.getId();
-					}
-				}
-				break;
-			case ComplexElement2:
-				ComplexElements complexElement2s = elementConditionType.getComplexElements();
-				if (complexElement2s != null) {
-					List<Object> objects = complexElement2s.getComplexElementTypeOrComplexElementTypeRef();
-					if (objects != null && objects.size() > 1) {
-						Object object = objects.get(1);
-						if (object != null && object instanceof ComplexElementTypeTypeRef) {
-							ComplexElementTypeType complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
-									.getIdref();
-							return complexElementType.getId();
-						}
-						if (object != null && object instanceof ComplexElementTypeType) {
-							ComplexElementTypeType complexElementType = (ComplexElementTypeType) object;
-							return complexElementType.getId();
-						}
-					}
-				}
-				break;
-			case Condition:
-				return elementConditionType.getCondition();
-			case Description:
-				return elementConditionType.getDescription();
-			case Id:
-				return elementConditionType.getId();
-			case SimpleElement:
-				ElementConditionType.SimpleElement simpleElement = elementConditionType.getSimpleElement();
-				if (simpleElement != null) {
-					SimpleElementTypeType simpleElementType = simpleElement.getSimpleElementType();
-					if (simpleElementType == null) {
-						simpleElementType = (SimpleElementTypeType) simpleElement.getSimpleElementTypeRef().getIdref();
-					}
-					if (simpleElementType != null) {
-						return simpleElementType.getId();
-					}
-				}
-				break;
-			case Global:
-				return elementConditionType.getMessageInTransaction() == null;
-			default:
-			}
-			return null;
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			switch (ElementConditionsTableColumns.values()[columnIndex]) {
-			case ComplexElement1:
-				return true;
-			case ComplexElement2:
-				return true;
-			case Condition:
-				return true;
-			case Description:
-				return true;
-			case Id:
-				break;
-			case SimpleElement:
-				return true;
-			case Global:
-				return true;
-			}
-			return false;
-		}
-
-		@Override
-		public void setValueAt(Object value, int rowIndex, int columnIndex) {
-			if (inValueChangeElementConditionTable)
-				return;
-			ElementConditionType elementConditionType = elementConditionsTableModel.get(rowIndex);
-
-			switch (ElementConditionsTableColumns.values()[columnIndex]) {
-			case Description:
-				elementConditionType.setDescription((String) value);
-				break;
-			case Condition:
-				elementConditionType.setCondition((String) value);
-				break;
-			case ComplexElement1:
-				if (value == null) {
-					elementConditionType.setComplexElements(null);
-				} else {
-					ComplexElements complexElement1s = elementConditionType.getComplexElements();
-					if (complexElement1s == null) {
-						complexElement1s = objectFactory.createElementConditionTypeComplexElements();
-					}
-					String idref = (String) value;
-					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
-					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-					ceRef.setIdref(ce);
-					List<Object> complexElementObjects = complexElement1s
-							.getComplexElementTypeOrComplexElementTypeRef();
-					if (complexElementObjects.size() > 0) {
-						complexElementObjects.set(0, ceRef);
-					} else {
-						complexElementObjects.add(0, ceRef);
-					}
-					elementConditionType.setComplexElements(complexElement1s);
-					elementConditionTableListener.valueChanged(null);
-					break;
-				}
-			case ComplexElement2:
-				if (value == null) {
-					List<ComplexElementTypeType> complexElementTypes = getComplexElements(elementConditionType);
-					if (complexElementTypes != null) {
-						ComplexElements complexElements = elementConditionType.getComplexElements();
-						List<Object> complexElementObjects = complexElements
-								.getComplexElementTypeOrComplexElementTypeRef();
-						if (complexElementObjects.size() > 1) {
-							complexElementObjects.remove(1);
-						}
-					}
-				} else {
-					ComplexElements complexElement1s = elementConditionType.getComplexElements();
-					if (complexElement1s == null) {
-						break;
-					}
-					String idref = (String) value;
-					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
-					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-					ceRef.setIdref(ce);
-					List<Object> complexElementObjects = complexElement1s
-							.getComplexElementTypeOrComplexElementTypeRef();
-					if (complexElementObjects.size() == 1) {
-						complexElementObjects.add(1, ceRef);
-					} else {
-						complexElementObjects.set(1, ceRef);
-					}
-					elementConditionType.setComplexElements(complexElement1s);
-					elementConditionTableListener.valueChanged(null);
-				}
-				break;
-			case SimpleElement:
-				if (value == null) {
-					elementConditionType.setSimpleElement(null);
-				} else {
-					String idref = (String) value;
-					SimpleElementTypeType se = Editor16.getStore16().getElement(SimpleElementTypeType.class, idref);
-					SimpleElementTypeTypeRef seRef = objectFactory.createSimpleElementTypeTypeRef();
-					seRef.setIdref(se);
-					ElementConditionType.SimpleElement set = objectFactory.createElementConditionTypeSimpleElement();
-					set.setSimpleElementTypeRef(seRef);
-					elementConditionType.setSimpleElement(set);
-				}
-				break;
-			case Global:
-				if ((Boolean) value) {
-					elementConditionType.setMessageInTransaction(null);
-				} else {
-					int selectedMessageRow = tbl_Messages.getSelectedRow();
-					MessageInTransactionTypeType mitt = messagesTableModel.get(selectedMessageRow);
-					setElementConditionTypeMessageInTransaction(elementConditionType, mitt);
-				}
-				break;
-			default:
-				break;
-			}
-		}
-
-		@Override
-		public Class<?> getColumnClass(int columnIndex) {
-			switch (ElementConditionsTableColumns.values()[columnIndex]) {
-			case ComplexElement1:
-				return ElementType.class;
-			case ComplexElement2:
-				return ElementType.class;
-			case Condition:
-				return String.class;
-			case Description:
-				return String.class;
-			case Id:
-				return String.class;
-			case SimpleElement:
-				return ElementType.class;
-			case Global:
-				return Boolean.class;
-			}
-			return Object.class;
-		}
-	}
-
 	public TransactionsPanelControl16() throws Exception {
 		super(TRANSACTIONS_PANEL);
 
@@ -1884,7 +1590,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		// Initialize tables and fields
 		initTransactionsTable();
 		initMessagesTable();
-		initElementConditionsTable();
+		initElementConditionTable();
 		initSequenceTable();
 		initSubtransactionsTable();
 		initStartDateField();
@@ -1958,185 +1664,18 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		endDateField.setEnabled(false);
 	}
 
-	private boolean inValueChangeElementConditionTable = false;
-
-	private void initElementConditionsTable() {
-		elementConditionsTableModel = new ElementConditionsTableModel();
-		tbl_ElementConditions.setModel(elementConditionsTableModel);
-		tbl_ElementConditions.setAutoCreateRowSorter(true);
-		tbl_ElementConditions.setFillsViewportHeight(true);
-
-		cbx_Conditions = new JComboBox<>(new DefaultComboBoxModel<String>());
-		cbx_Conditions.addItem("FIXED");
-		cbx_Conditions.addItem("FREE");
-		cbx_Conditions.addItem("EMPTY");
-		TableColumn conditionColumn = tbl_ElementConditions.getColumnModel()
-				.getColumn(ElementConditionsTableColumns.Condition.ordinal());
-		conditionColumn.setCellEditor(new DefaultCellEditor(cbx_Conditions));
-
-		cbx_ComplexElements1 = new JComboBox<>(new DefaultComboBoxModel<String>());
-		TableColumn complexElement1Column = tbl_ElementConditions.getColumnModel()
-				.getColumn(ElementConditionsTableColumns.ComplexElement1.ordinal());
-		complexElement1Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements1));
-		cbx_ComplexElements2 = new JComboBox<>(new DefaultComboBoxModel<String>());
-		cbx_ComplexElements2.addItem(null);
-		TableColumn complexElement2Column = tbl_ElementConditions.getColumnModel()
-				.getColumn(ElementConditionsTableColumns.ComplexElement2.ordinal());
-		complexElement2Column.setCellEditor(new DefaultCellEditor(cbx_ComplexElements2));
-
-		cbx_SimpleElements = new JComboBox<>(new DefaultComboBoxModel<String>());
-		TableColumn simpleElementColumn = tbl_ElementConditions.getColumnModel()
-				.getColumn(ElementConditionsTableColumns.SimpleElement.ordinal());
-		simpleElementColumn.setCellEditor(new DefaultCellEditor(cbx_SimpleElements));
-
-		tbl_ElementConditions.getSelectionModel().addListSelectionListener(elementConditionTableListener);
-	}
-
-	private ListSelectionListener elementConditionTableListener = new ListSelectionListener() {
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			inValueChangeElementConditionTable = true;
-
-			int selectedElementConditionRow = tbl_ElementConditions.getSelectedRow();
-			boolean rowSelected = selectedElementConditionRow >= 0;
-			btn_RemoveElementCondition.setEnabled(rowSelected);
-			if (rowSelected) {
-				selectedElementConditionRow = tbl_ElementConditions.getRowSorter()
-						.convertRowIndexToModel(selectedElementConditionRow);
-				ElementConditionType ec = elementConditionsTableModel.get(selectedElementConditionRow);
-				List<ComplexElementTypeType> complexElements = getComplexElements(ec);
-
-				cbx_ComplexElements1.removeAllItems();
-				cbx_ComplexElements1.addItem(null);
-				fillComplexTypeCbx1(selectedMessage);
-				if (complexElements != null && complexElements.size() > 0) {
-					cbx_ComplexElements1.setSelectedItem(complexElements.get(0).getId());
-				} else {
-					cbx_ComplexElements1.setSelectedItem(null);
-				}
-				cbx_ComplexElements2.removeAllItems();
-				cbx_ComplexElements2.addItem(null);
-				fillComplexTypeCbx2((String) cbx_ComplexElements1.getSelectedItem());
-				if (complexElements != null && complexElements.size() > 1) {
-					cbx_ComplexElements2.setSelectedItem(complexElements.get(1).getId());
-				} else {
-					cbx_ComplexElements2.setSelectedItem(null);
-				}
-				cbx_SimpleElements.removeAllItems();
-				cbx_SimpleElements.addItem(null);
-				fillSimpleTypeCbx((String) cbx_ComplexElements1.getSelectedItem(),
-						(String) cbx_ComplexElements2.getSelectedItem());
-				SimpleElementTypeType simpleElement = getSimpleElement(ec);
-				if (simpleElement != null) {
-					int indexOf = ((DefaultComboBoxModel<String>) (cbx_SimpleElements.getModel()))
-							.getIndexOf(simpleElement.getId());
-					cbx_SimpleElements.setSelectedItem(indexOf > 0 ? simpleElement.getId() : null);
-					if (indexOf > 0) {
-						SimpleElement simpleElementObject = ec.getSimpleElement();
-						SimpleElementTypeTypeRef simpleElementTypeTypeRef = objectFactory
-								.createSimpleElementTypeTypeRef();
-						simpleElementTypeTypeRef.setIdref(simpleElement);
-						simpleElementObject.setSimpleElementTypeRef(simpleElementTypeTypeRef);
-					} else {
-						ec.setSimpleElement(null);
-					}
-				} else {
-					cbx_SimpleElements.setSelectedItem(null);
-					ec.setSimpleElement(null);
-				}
-				elementConditionsTableModel.fireTableCellUpdated(selectedElementConditionRow,
-						ElementConditionsTableColumns.SimpleElement.ordinal());
-			}
-
-			inValueChangeElementConditionTable = false;
-		}
-
-	};
-
-	private void fillComplexTypeCbx1(MessageTypeType message) {
-		List<ComplexElementTypeType> complexElements = getComplexElements(message);
-		if (complexElements != null) {
-			for (ComplexElementTypeType ce : complexElements) {
-				cbx_ComplexElements1.addItem(ce.getId());
-			}
-		}
-	}
-
-	private void fillComplexTypeCbx2(String complexElementId) {
-		if (complexElementId != null) {
-			ComplexElementTypeType parentCE = Editor16.getStore16().getElement(ComplexElementTypeType.class,
-					complexElementId);
-			List<ComplexElementTypeType> childCEs = getComplexElements(parentCE);
-			if (childCEs != null) {
-				for (ComplexElementTypeType ce : childCEs) {
-					cbx_ComplexElements2.addItem(ce.getId());
-				}
-			}
-		}
-	}
-
-	private void fillSimpleTypeCbx(String complexElement1Id, String complexElement2Id) {
-		if (complexElement1Id != null) {
-			ComplexElementTypeType parentCE = Editor16.getStore16().getElement(ComplexElementTypeType.class,
-					complexElement1Id);
-			List<SimpleElementTypeType> simpleElements1 = getSimpleElements(parentCE);
-			if (simpleElements1 != null) {
-				for (SimpleElementTypeType se : simpleElements1) {
-					cbx_SimpleElements.addItem(se.getId());
-				}
-			}
-			if (complexElement2Id != null) {
-				ComplexElementTypeType childCE = Editor16.getStore16().getElement(ComplexElementTypeType.class,
-						complexElement2Id);
-				List<SimpleElementTypeType> simpleElements2 = getSimpleElements(childCE);
-				if (simpleElements2 != null) {
-					for (SimpleElementTypeType se : simpleElements2) {
-						if (((DefaultComboBoxModel<String>) cbx_SimpleElements.getModel()).getIndexOf(se.getId()) < 0) {
-							cbx_SimpleElements.addItem(se.getId());
-						}
-					}
-
-				}
-			}
-		} else {
-			List<ComplexElementTypeType> parentComplexElements = getComplexElements(selectedMessage);
-			if (parentComplexElements != null) {
-				for (ComplexElementTypeType parentCE : parentComplexElements) {
-					List<SimpleElementTypeType> parentSimpleElements = getSimpleElements(parentCE);
-					if (parentSimpleElements != null) {
-						for (SimpleElementTypeType se : parentSimpleElements) {
-							if (((DefaultComboBoxModel<String>) cbx_SimpleElements.getModel())
-									.getIndexOf(se.getId()) < 0) {
-								cbx_SimpleElements.addItem(se.getId());
-							}
-						}
-					}
-					List<ComplexElementTypeType> childComplexElements = getComplexElements(parentCE);
-					if (childComplexElements != null) {
-						for (ComplexElementTypeType childCe : childComplexElements) {
-							List<SimpleElementTypeType> childSimpleElements = getSimpleElements(childCe);
-							if (childSimpleElements != null) {
-								for (SimpleElementTypeType se : childSimpleElements) {
-									if (((DefaultComboBoxModel<String>) cbx_SimpleElements.getModel())
-											.getIndexOf(se.getId()) < 0) {
-										cbx_SimpleElements.addItem(se.getId());
-									}
-								}
-							}
-						}
-					}
-
-				}
-			}
-		}
-
-	}
-
 	private void initSequenceTable() throws Exception {
 		sequenceTable = new SequenceTable();
 		sequencePanel.removeAll();
 		sequencePanel.add(sequenceTable.getPanel());
 		sequencePanel.revalidate();
+	}
+
+	private void initElementConditionTable() throws Exception {
+		elementConditionTable = new ElementConditionTable(tbl_Messages);
+		elementConditionPanel.removeAll();
+		elementConditionPanel.add(elementConditionTable.getPanel());
+		elementConditionPanel.revalidate();
 	}
 
 	private void initSubtransactionsTable() {
@@ -2256,7 +1795,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tar_Executor.setEnabled(rowSelected);
 		tbl_Messages.setEnabled(rowSelected);
 		cbx_Messages.setEnabled(rowSelected);
-		tbl_ElementConditions.setEnabled(rowSelected);
 		tbl_Subtransactions.setEnabled(rowSelected);
 
 		successorMap = new HashMap<MessageInTransactionTypeType, List<MessageInTransactionTypeType>>();
@@ -2361,7 +1899,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			btn_NavigateExecutor.setEnabled(false);
 			messagesTableModel.clear();
 			cbx_Messages.removeAllItems();
-			elementConditionsTableModel.clear();
+			elementConditionTable.clear();
 			sequenceTable.clear();
 			subtransactionsTableModel.clear();
 		}
@@ -2738,39 +2276,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		}
 		return false;
-	}
-
-	public void newElementCondition() {
-		try {
-			ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
-			newElement(newElementConditionType, "ElementCondition_");
-			newElementConditionType.setCondition("FREE");
-			int selectedMessageRow = tbl_Messages.getSelectedRow();
-			MessageInTransactionTypeType mitt = messagesTableModel.get(selectedMessageRow);
-			setElementConditionTypeMessageInTransaction(newElementConditionType, mitt);
-			int row = elementConditionsTableModel.add(newElementConditionType);
-			tbl_ElementConditions.getSelectionModel().setSelectionInterval(row, row);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void removeElementCondition() {
-		int row = tbl_ElementConditions.getSelectedRow();
-		ElementConditionType elementConditionType = elementConditionsTableModel.get(row);
-		Editor16.getStore16().remove(elementConditionType.getId());
-		elementConditionsTableModel.remove(row);
-	}
-
-	private void setElementConditionTypeMessageInTransaction(ElementConditionType elementConditionType,
-			MessageInTransactionTypeType mitt) {
-		ElementConditionType.MessageInTransaction messageInTransaction = objectFactory
-				.createElementConditionTypeMessageInTransaction();
-		MessageInTransactionTypeTypeRef messageInTransactionTypeTypeRef = objectFactory
-				.createMessageInTransactionTypeTypeRef();
-		messageInTransactionTypeTypeRef.setIdref(mitt);
-		messageInTransaction.setMessageInTransactionTypeRef(messageInTransactionTypeTypeRef);
-		elementConditionType.setMessageInTransaction(messageInTransaction);
 	}
 
 	private boolean isStart(MessageInTransactionTypeType mitt, TransactionTypeType trns) {
