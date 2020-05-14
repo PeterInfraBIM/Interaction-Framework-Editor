@@ -6,6 +6,12 @@
 	id="userDefinedTypesPanel"
 	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel"
 	layout="BorderLayout">
+	<popupmenu id="popupMenu">
+		<menuitem id="alphaMenuItem" Text="lbl_Alphabetize"
+			Action="alphabetizeAction"></menuitem>
+		<menuitem id="pasteMenuItem" Text="lbl_PasteItemList"
+			Action="pasteAction"></menuitem>
+	</popupmenu>
 	<splitpane constraints="BorderLayout.CENTER"
 		ContinuousLayout="true" DividerLocation="220"
 		OneTouchExpandable="true" Orientation="JSplitPane.VERTICAL_SPLIT">
@@ -169,14 +175,26 @@
 							<gridbagconstraints Gridx="3" Gridy="0"
 								Insets="2,2,2,2" />
 						</button>
+						<button id="btn_Paste" Action="pasteAction" Enabled="false"
+							Text="lbl_Paste" ToolTipText="lbl_PasteItemList">
+							<gridbagconstraints
+								Fill="GridBagConstraints.NONE" Gridx="4" Gridy="0"
+								Insets="2,2,2,2" />
+						</button>
+						<button id="btn_Alpha" Action="alphabetizeAction"
+							Enabled="false" Text="lbl_Alpha" ToolTipText="lbl_Alphabetize">
+							<gridbagconstraints
+								Fill="GridBagConstraints.NONE" Gridx="5" Gridy="0"
+								Insets="2,2,2,2" />
+						</button>
 						<button id="btn_ItemUp" Action="itemUp" Enabled="false"
 							Icon="img_Upward" ToolTipText="lbl_MoveUpward">
-							<gridbagconstraints Gridx="4" Gridy="0"
+							<gridbagconstraints Gridx="6" Gridy="0"
 								Insets="2,2,2,2" />
 						</button>
 						<button id="btn_ItemDown" Action="itemDown" Enabled="false"
 							Icon="img_Downward" ToolTipText="lbl_MoveDownward">
-							<gridbagconstraints Gridx="5" Gridy="0"
+							<gridbagconstraints Gridx="7" Gridy="0"
 								Insets="2,2,2,2" />
 						</button>
 					</panel>

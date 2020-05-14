@@ -41,7 +41,6 @@ import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
-import nl.visi.interaction_framework.editor.v14.ElementConditionTable;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.RoleTypeType;

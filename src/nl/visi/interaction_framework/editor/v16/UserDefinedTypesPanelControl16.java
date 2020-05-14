@@ -1,15 +1,30 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -31,7 +46,9 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 	private JTable tbl_XsdEnumerations;
 	private XsdEnumerationsTableModel xsdEnumerationsTableModel;
 	private JTextField tfd_ItemText;
-	private JButton btn_ItemAdd, btn_ItemRemove, btn_ItemUp, btn_ItemDown;
+	private JButton btn_ItemAdd, btn_ItemRemove, btn_Paste, btn_Alpha, btn_ItemUp, btn_ItemDown;
+	private JPopupMenu popupMenu;
+	private JMenuItem alphaMenuItem, pasteMenuItem;
 
 	private enum UserDefinedTypesTableColumns {
 		Id, Description, State, BaseType, DateLamu, UserLamu;
@@ -166,6 +183,29 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		xsdEnumerationsTableModel = new XsdEnumerationsTableModel();
 		tbl_XsdEnumerations.setModel(xsdEnumerationsTableModel);
 		tbl_XsdEnumerations.setFillsViewportHeight(true);
+		ActionMap map = tbl_XsdEnumerations.getActionMap();
+		map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
+		tbl_XsdEnumerations.add(popupMenu);
+		tbl_XsdEnumerations.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				showPopup(e);
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent e) {
+				showPopup(e);
+			}
+
+			private void showPopup(MouseEvent e) {
+				boolean elementSelected = selectedElement != null;
+				alphaMenuItem.setEnabled(elementSelected);
+				pasteMenuItem.setEnabled(elementSelected);
+				if (e.isPopupTrigger()) {
+					popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 		tbl_XsdEnumerations.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -181,6 +221,70 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 				btn_ItemAdd.setEnabled(notEmpty);
 			}
 		});
+	}
+
+	public void pasteAction() {
+		Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
+		Transferable t = c.getContents(this);
+		try {
+			String content = (String) t.getTransferData(DataFlavor.stringFlavor);
+			JOptionPane.showMessageDialog(this.panel, content);
+			String[] items = content.split("\n");
+			for (String item : items) {
+				item = "<xs:enumeration value=\"" + item + "\"/>";
+				int selectedRow = tbl_XsdEnumerations.getSelectedRow();
+				if (selectedRow == -1) {
+					selectedRow = tbl_XsdEnumerations.getRowCount() - 1;
+				}
+				boolean success = insertEnumerationElement(selectedRow + 1, item);
+				if (success) {
+					initXsdRestriction();
+					xsdEnumerationsTableModel.clear();
+					fillEnumerationTable();
+					tbl_XsdEnumerations.setRowSelectionInterval(selectedRow + 1, selectedRow + 1);
+					tbl_XsdEnumerations.scrollRectToVisible(tbl_Elements.getCellRect(selectedRow + 1, 0, true));
+					tfd_ItemText.setText(null);
+				}
+			}
+		} catch (UnsupportedFlavorException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void alphabetizeAction() {
+		JOptionPane.showMessageDialog(this.panel, "The alphabetize action is under construction");
+		//
+		String restrictionString = tfd_XsdRestriction.getText();
+		List<String> items = new ArrayList<>();
+		int index = -1;
+		int posStart = 0;
+		try {
+			while (posStart >= 0) {
+				posStart = findBeginIndexEnumerationElement(restrictionString, ++index);
+				System.out.println("position = " + posStart + " index = " + index);
+				if (posStart >= 0) {
+					int posEnd = restrictionString.indexOf("/>", posStart);
+					String item = restrictionString.substring(posStart + 23, posEnd - 1);
+					items.add(item);
+					System.out.println("item = \"" + item + "\"");
+				}
+			}
+			Collections.sort(items);
+
+			StringBuffer buffer = new StringBuffer();
+			for (String item : items) {
+				buffer.append("<xs:enumeration value=\"" + item + "\"/>");
+			}
+			tfd_XsdRestriction.setText(buffer.toString());
+			xsdEnumerationsTableModel.clear();
+			fillEnumerationTable();
+		} catch (BadLocationException e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void updateEnumerationButtons() {
@@ -278,7 +382,6 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			document.insertString(beginIndex, insertItem, null);
 		}
 		return true;
-
 	}
 
 	private int findBeginIndexEnumerationElement(String text, int findIndex) throws BadLocationException {
@@ -378,6 +481,8 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		tfd_XsdRestriction.setEnabled(rowSelected);
 		tbl_XsdEnumerations.setEnabled(rowSelected);
 		tfd_ItemText.setEnabled(rowSelected);
+		btn_Paste.setEnabled(rowSelected);
+		btn_Alpha.setEnabled(rowSelected);
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
 			tfd_Id.setText(selectedElement.getId());
