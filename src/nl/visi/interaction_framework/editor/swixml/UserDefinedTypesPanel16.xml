@@ -7,10 +7,20 @@
 	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel"
 	layout="BorderLayout">
 	<popupmenu id="popupMenu">
-		<menuitem id="alphaMenuItem" Text="lbl_Alphabetize"
-			Action="alphabetizeAction"></menuitem>
-		<menuitem id="pasteMenuItem" Text="lbl_PasteItemList"
-			Action="pasteAction"></menuitem>
+		<menuitem id="alphaMenuItem" Enabled="false"
+			Text="lbl_Alphabetize" Action="alphabetizeAction"></menuitem>
+		<separator></separator>
+		<menuitem id="addMenuItem" Enabled="false" Text="lbl_Add"
+			Action="itemAdd"></menuitem>
+		<menuitem id="removeMenuItem" Enabled="false"
+			Text="lbl_Remove" Action="itemRemove"></menuitem>
+		<menuitem id="pasteMenuItem" Enabled="false"
+			Text="lbl_PasteItemList" Action="pasteAction"></menuitem>
+		<separator></separator>
+		<menuitem id="moveUpMenuItem" Enabled="false" Icon="img_Upward"
+			Text="lbl_MoveUpward" Action="itemUp"></menuitem>
+		<menuitem id="moveDownMenuItem" Enabled="false" Icon="img_Downward"
+			Text="lbl_MoveDownward" Action="itemDown"></menuitem>
 	</popupmenu>
 	<splitpane constraints="BorderLayout.CENTER"
 		ContinuousLayout="true" DividerLocation="220"

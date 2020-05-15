@@ -20,7 +20,6 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -48,7 +47,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 	private JTextField tfd_ItemText;
 	private JButton btn_ItemAdd, btn_ItemRemove, btn_Paste, btn_Alpha, btn_ItemUp, btn_ItemDown;
 	private JPopupMenu popupMenu;
-	private JMenuItem alphaMenuItem, pasteMenuItem;
+	private JMenuItem alphaMenuItem, addMenuItem, removeMenuItem, pasteMenuItem, moveUpMenuItem, moveDownMenuItem;
 
 	private enum UserDefinedTypesTableColumns {
 		Id, Description, State, BaseType, DateLamu, UserLamu;
@@ -219,6 +218,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			protected void update(DocumentEvent e) {
 				boolean notEmpty = tfd_ItemText.getText().length() > 0;
 				btn_ItemAdd.setEnabled(notEmpty);
+				addMenuItem.setEnabled(notEmpty);
 			}
 		});
 	}
@@ -228,7 +228,6 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		Transferable t = c.getContents(this);
 		try {
 			String content = (String) t.getTransferData(DataFlavor.stringFlavor);
-			JOptionPane.showMessageDialog(this.panel, content);
 			String[] items = content.split("\n");
 			for (String item : items) {
 				item = "<xs:enumeration value=\"" + item + "\"/>";
@@ -256,8 +255,6 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 	}
 
 	public void alphabetizeAction() {
-		JOptionPane.showMessageDialog(this.panel, "The alphabetize action is under construction");
-		//
 		String restrictionString = tfd_XsdRestriction.getText();
 		List<String> items = new ArrayList<>();
 		int index = -1;
@@ -265,12 +262,11 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		try {
 			while (posStart >= 0) {
 				posStart = findBeginIndexEnumerationElement(restrictionString, ++index);
-				System.out.println("position = " + posStart + " index = " + index);
 				if (posStart >= 0) {
 					int posEnd = restrictionString.indexOf("/>", posStart);
-					String item = restrictionString.substring(posStart + 23, posEnd - 1);
+					int startLabel = restrictionString.indexOf("\"", posStart);
+					String item = restrictionString.substring(startLabel + 1, posEnd - 1);
 					items.add(item);
-					System.out.println("item = \"" + item + "\"");
 				}
 			}
 			Collections.sort(items);
@@ -292,14 +288,20 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		boolean rowSelected = selectedRow >= 0;
 		if (rowSelected) {
 			btn_ItemRemove.setEnabled(rowSelected);
+			removeMenuItem.setEnabled(rowSelected);
 			boolean topSelected = selectedRow == 0;
 			btn_ItemUp.setEnabled(!topSelected);
+			moveUpMenuItem.setEnabled(!topSelected);
 			boolean bottomSelected = selectedRow == xsdEnumerationsTableModel.getRowCount() - 1;
 			btn_ItemDown.setEnabled(!bottomSelected);
+			moveDownMenuItem.setEnabled(!bottomSelected);
 		} else {
 			btn_ItemRemove.setEnabled(false);
+			removeMenuItem.setEnabled(false);
 			btn_ItemUp.setEnabled(false);
+			moveUpMenuItem.setEnabled(false);
 			btn_ItemDown.setEnabled(false);
+			moveDownMenuItem.setEnabled(false);
 		}
 	}
 
