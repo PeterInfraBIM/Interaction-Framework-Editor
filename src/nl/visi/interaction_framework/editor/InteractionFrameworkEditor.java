@@ -134,7 +134,7 @@ public class InteractionFrameworkEditor extends Control {
 				@Override
 				public void windowClosing(WindowEvent e) {
 					if (mainPanel.getComponentCount() != 0) {
-						int selectedOption = JOptionPane.showConfirmDialog(null,
+						int selectedOption = JOptionPane.showConfirmDialog(frame,
 								getBundle().getString("lbl_SaveBeforeClosing"));
 						if (selectedOption == JOptionPane.YES_OPTION) {
 							System.out.println("YES");
