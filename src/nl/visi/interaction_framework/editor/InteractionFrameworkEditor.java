@@ -6,6 +6,8 @@ import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.SplashScreen;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -87,7 +89,7 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	static void renderSplashFrame(Graphics2D g) {
-		final String version = "Release candidate: 2.04 - release date: 2020-05-15";
+		final String version = "Release candidate: 2.05 - release date: 2020-07-07";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();
@@ -110,11 +112,11 @@ public class InteractionFrameworkEditor extends Control {
 					System.out.println("g is null");
 					return;
 				}
-					renderSplashFrame(g);
-					splash.update();
-					try {
-						Thread.sleep(2000);
-					} catch (InterruptedException e) {
+				renderSplashFrame(g);
+				splash.update();
+				try {
+					Thread.sleep(2000);
+				} catch (InterruptedException e) {
 				}
 				splash.close();
 			}
@@ -128,6 +130,27 @@ public class InteractionFrameworkEditor extends Control {
 			UIManager.put("Table.font", font);
 
 			frame = (JFrame) render(TOP_LEVEL);
+			frame.addWindowListener(new WindowAdapter() {
+				@Override
+				public void windowClosing(WindowEvent e) {
+					if (mainPanel.getComponentCount() != 0) {
+						int selectedOption = JOptionPane.showConfirmDialog(null,
+								getBundle().getString("lbl_SaveBeforeClosing"));
+						if (selectedOption == JOptionPane.YES_OPTION) {
+							System.out.println("YES");
+							saveFramework();
+							frame.dispose();
+						} else if (selectedOption == JOptionPane.NO_OPTION) {
+							System.out.println("NO");
+							frame.dispose();
+						} else if (selectedOption == JOptionPane.CANCEL_OPTION) {
+							System.out.println("CANCEL");
+						}
+					} else {
+						frame.dispose();
+					}
+				}
+			});
 			frame.setVisible(true);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e.getMessage(), "Exception", JOptionPane.ERROR_MESSAGE);

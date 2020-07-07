@@ -2,7 +2,7 @@
 <!-- This XML file is used to create a Swing container using the SwiXml rendering 
 	engine. org.jvnet.substance.SubstanceLookAndFeel com.jgoodies.looks.plastic.PlasticXPLookAndFeel 
 	org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel a03.swing.plaf/A03LookAndFeel -->
-<frame id="mainFrame" DefaultCloseOperation="JFrame.EXIT_ON_CLOSE"
+<frame id="mainFrame" DefaultCloseOperation="JFrame.DO_NOTHING_ON_CLOSE"
 	Size="900,680" Title="lbl_InteractionFrameworkEditor"
 	bundle="nl.visi.interaction_framework.editor.locale.Editor"
 	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel">
