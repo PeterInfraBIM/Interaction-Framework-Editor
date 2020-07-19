@@ -28,16 +28,20 @@ import nl.visi.schemas._20140331.MessageInTransactionTypeType.Conditions;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Message;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Transaction;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.TransactionPhase;
 import nl.visi.schemas._20140331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.MessageTypeType.ComplexElements;
 import nl.visi.schemas._20140331.ObjectFactory;
 import nl.visi.schemas._20140331.RoleTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
+import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20140331.SimpleElementTypeTypeRef;
+import nl.visi.schemas._20140331.TransactionPhaseTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType.Executor;
 import nl.visi.schemas._20140331.TransactionTypeType.Initiator;
+import nl.visi.schemas._20140331.UserDefinedTypeType;
 
 abstract class Control14 extends Control {
 	static final java.text.DateFormat sdfDate = new SimpleDateFormat("d MMM yyyy");
@@ -183,6 +187,21 @@ abstract class Control14 extends Control {
 					transactionType = (TransactionTypeType) transactionValue.getTransactionTypeRef().getIdref();
 				}
 				return transactionType;
+			}
+		}
+		return null;
+	}
+
+	protected static TransactionPhaseTypeType getTransactionPhase(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			TransactionPhase transactionPhase = mitt.getTransactionPhase();
+			if (transactionPhase != null) {
+				TransactionPhaseTypeType transactionPhaseType = transactionPhase.getTransactionPhaseType();
+				if (transactionPhaseType == null) {
+					transactionPhaseType = (TransactionPhaseTypeType) transactionPhase.getTransactionPhaseTypeRef()
+							.getIdref();
+				}
+				return transactionPhaseType;
 			}
 		}
 		return null;
@@ -359,7 +378,7 @@ abstract class Control14 extends Control {
 		}
 		return null;
 	}
-	
+
 	protected static List<SimpleElementTypeType> getSimpleElements(ComplexElementTypeType complexElementParentType) {
 		if (complexElementParentType != null) {
 			ComplexElementTypeType.SimpleElements simpleElements = complexElementParentType.getSimpleElements();
@@ -381,7 +400,7 @@ abstract class Control14 extends Control {
 		}
 		return null;
 	}
-	
+
 	protected static SimpleElementTypeType getSimpleElement(ElementConditionType elementCondition) {
 		if (elementCondition != null) {
 			ElementConditionType.SimpleElement simpleElement = elementCondition.getSimpleElement();
@@ -395,7 +414,21 @@ abstract class Control14 extends Control {
 		}
 		return null;
 	}
-	
+
+	protected static UserDefinedTypeType getUserDefinedType(SimpleElementTypeType simpleElement) {
+		if (simpleElement != null) {
+			UserDefinedType userDefined = simpleElement.getUserDefinedType();
+			if (userDefined != null) {
+				UserDefinedTypeType userDefinedType = userDefined.getUserDefinedType();
+				if (userDefinedType == null) {
+					userDefinedType = (UserDefinedTypeType) userDefined.getUserDefinedTypeRef().getIdref();
+				}
+				return userDefinedType;
+			}
+		}
+		return null;
+	}
+
 	protected static ComplexElementTypeType getComplexElement(ElementConditionType elementConditionType) {
 		if (elementConditionType != null) {
 			ComplexElement complexElement = elementConditionType.getComplexElement();
@@ -409,7 +442,7 @@ abstract class Control14 extends Control {
 		}
 		return null;
 	}
-	
+
 	protected static List<ComplexElementTypeType> getComplexElements(MessageTypeType messageType) {
 		if (messageType != null) {
 			ComplexElements complexElements = messageType.getComplexElements();
@@ -658,6 +691,140 @@ abstract class Control14 extends Control {
 				}
 			}
 		}
+	}
+
+	protected static String getCondition(MessageInTransactionTypeType mitt, ComplexElementTypeType ce,
+			SimpleElementTypeType se) {
+		List<ElementConditionType> elementConditions = Editor14.getStore14().getElements(ElementConditionType.class);
+		for (ElementConditionType ec : elementConditions) {
+			MessageInTransactionTypeType messageInTransaction = getMessageInTransaction(ec);
+			ComplexElementTypeType complexElement = getComplexElement(ec);
+			SimpleElementTypeType simpleElement = getSimpleElement(ec);
+			String condition = ec.getCondition();
+			if (mitt != null) {
+				if (messageInTransaction != null && messageInTransaction.getId().equals(mitt.getId())) {
+					if (ce != null) {
+						if (complexElement != null) {
+							if (complexElement.getId().equals(ce.getId())) {
+								if (se != null) {
+									if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
+										return condition;
+									}
+								} else {
+									if (simpleElement == null) {
+										return condition;
+									}
+								}
+							} else {
+								List<ComplexElementTypeType> parents = getParents(ce);
+								if (parents != null) {
+									for (ComplexElementTypeType parent : parents) {
+										if (parent.getId().equals(complexElement.getId())) {
+											if (se != null) {
+												if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
+													return condition;
+												}
+											} else {
+												if (simpleElement == null) {
+													return condition;
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					} else {
+						if (complexElement == null) {
+							if (se != null) {
+								if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
+									return condition;
+								}
+							} else {
+								if (simpleElement == null) {
+									return condition;
+								}
+							}
+						}
+					}
+				}
+			} else {
+				if (messageInTransaction == null) {
+					if (ce != null) {
+						if (complexElement != null && complexElement.getId().equals(ce.getId())) {
+							if (se != null) {
+								if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
+									return condition;
+								}
+							} else {
+								if (simpleElement == null) {
+									return condition;
+								}
+							}
+						}
+					} else {
+						if (complexElement == null) {
+							if (se != null) {
+								if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
+									return condition;
+								}
+							} else {
+								if (simpleElement == null) {
+									return condition;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	protected static String getFinalCondition(MessageInTransactionTypeType mitt, ComplexElementTypeType ce,
+			SimpleElementTypeType se) {
+		String condition = getCondition(mitt, ce, se);
+		if (condition == null) {
+			condition = getCondition(mitt, ce, null);
+			if (condition == null) {
+				condition = getCondition(mitt, null, se);
+				if (condition == null) {
+					condition = getCondition(mitt, null, null);
+					if (condition == null) {
+						condition = getCondition(null, ce, se);
+						if (condition == null) {
+							condition = getCondition(null, ce, null);
+							if (condition == null) {
+								condition = getCondition(null, null, se);
+								if (condition == null) {
+									condition = getCondition(null, null, null);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return condition;
+	}
+
+	protected static List<ComplexElementTypeType> getParents(ComplexElementTypeType ce) {
+		List<ComplexElementTypeType> parents = null;
+		List<ComplexElementTypeType> elements = Editor14.getStore14().getElements(ComplexElementTypeType.class);
+		if (elements != null) {
+			for (ComplexElementTypeType element : elements) {
+				List<ComplexElementTypeType> childElements = getComplexElements(element);
+				if (childElements != null) {
+					if (childElements.contains(ce)) {
+						if (parents == null) {
+							parents = new ArrayList<>();
+						}
+						parents.add(element);
+					}
+				}
+			}
+		}
+		return parents;
 	}
 
 }

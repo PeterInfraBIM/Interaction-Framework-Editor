@@ -180,12 +180,12 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					activeLabel = new RotatingButton();
 					if (isInit) {
 						RoleTypeType initiator = getInitiator(selectedElement);
-						activeLabel.setText(initiator.getDescription());
-						activeLabel.setToolTipText(initiator.getId());
+						activeLabel.setText(initiator != null ? initiator.getDescription() : "?");
+						activeLabel.setToolTipText(initiator != null ? initiator.getId() : "?");
 					} else {
 						RoleTypeType executor = getExecutor(selectedElement);
-						activeLabel.setText(executor.getDescription());
-						activeLabel.setToolTipText(executor.getId());
+						activeLabel.setText(executor != null ? executor.getDescription() : "?");
+						activeLabel.setToolTipText(executor != null ? executor.getId() : "?");
 					}
 					activeLabel.setContentAreaFilled(false);
 					activeLabel.setBackground(Color.white);
@@ -247,10 +247,10 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			private String getLabel() {
 				if (this == init) {
 					RoleTypeType initiator = getInitiator(selectedElement);
-					return initiator != null ? initiator.getDescription() : null;
+					return initiator != null ? initiator.getDescription() : "?";
 				} else {
 					RoleTypeType executor = getExecutor(selectedElement);
-					return executor != null ? executor.getDescription() : null;
+					return executor != null ? executor.getDescription() : "?";
 				}
 			}
 

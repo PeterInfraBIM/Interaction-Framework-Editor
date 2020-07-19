@@ -88,7 +88,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private SequenceTable sequenceTable;
 	private ElementConditionTable elementConditionTable;
 	private SubtransactionsTableModel subtransactionsTableModel;
-	private JButton btn_AddMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator, btn_NavigateExecutor;
+	private JButton btn_AddMessage, btn_EditMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator,
+			btn_NavigateExecutor;
 	private JTextArea tar_Initiator, tar_Executor;
 	private JScrollPane scrollPane;
 	private Canvas drawingPlane;
@@ -180,12 +181,12 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 					activeLabel = new RotatingButton();
 					if (isInit) {
 						RoleTypeType initiator = getInitiator(selectedElement);
-						activeLabel.setText(initiator.getDescription());
-						activeLabel.setToolTipText(initiator.getId());
+						activeLabel.setText(initiator != null ? initiator.getDescription() : "?");
+						activeLabel.setToolTipText(initiator != null ? initiator.getId() : "?");
 					} else {
 						RoleTypeType executor = getExecutor(selectedElement);
-						activeLabel.setText(executor.getDescription());
-						activeLabel.setToolTipText(executor.getId());
+						activeLabel.setText(executor != null ? executor.getDescription() : "?");
+						activeLabel.setToolTipText(executor != null ? executor.getId() : "?");
 					}
 					activeLabel.setContentAreaFilled(false);
 					activeLabel.setBackground(Color.white);
@@ -247,10 +248,10 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			private String getLabel() {
 				if (this == init) {
 					RoleTypeType initiator = getInitiator(selectedElement);
-					return initiator != null ? initiator.getDescription() : null;
+					return initiator != null ? initiator.getDescription() : "?";
 				} else {
 					RoleTypeType executor = getExecutor(selectedElement);
-					return executor != null ? executor.getDescription() : null;
+					return executor != null ? executor.getDescription() : "?";
 				}
 			}
 
@@ -970,12 +971,15 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		public void valueChanged(ListSelectionEvent e) {
 			int selectedRow = tbl_Messages.getSelectedRow();
 			boolean isSelectedMessage = selectedRow >= 0;
+			btn_EditMessage.setEnabled(isSelectedMessage);
 			btn_RemoveMessage.setEnabled(isSelectedMessage);
 			btn_Reverse.setEnabled(isSelectedMessage);
 			sequenceTable.clear();
 			elementConditionTable.clear();
 			if (isSelectedMessage) {
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
+				TransactionPhaseTypeType transactionPhase = getTransactionPhase(mitt);
+				cbx_TransactionPhases.setSelectedItem(transactionPhase != null ? transactionPhase.getId() : null);
 
 				sequenceTable.fillSequenceTable(null, "inOut", mitt);
 				elementConditionTable.fillElementConditionsTable(mitt);
@@ -1193,8 +1197,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			switch (MessagesTableColumns.values()[columnIndex]) {
-			case TransactionPhase:
-				return String.class;
+//			case TransactionPhase:
+//				return String.class;
 			case Id:
 				return String.class;
 			case Message:
@@ -1671,7 +1675,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		sequencePanel.add(sequenceTable.getPanel());
 		sequencePanel.revalidate();
 	}
-	
+
 	private void initElementConditionTable() throws Exception {
 		elementConditionTable = new ElementConditionTable(tbl_Messages);
 		elementConditionPanel.removeAll();
@@ -1853,8 +1857,6 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				tar_Executor.setText(roleType.getDescription());
 			}
 
-			fillMessageTable();
-
 			DefaultComboBoxModel<String> transactionPhasesModel = (DefaultComboBoxModel<String>) cbx_TransactionPhases
 					.getModel();
 			transactionPhasesModel.removeAllElements();
@@ -1871,6 +1873,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			for (GroupTypeType group : groupsList) {
 				groupsModel.addElement(group.getId());
 			}
+
+			fillMessageTable();
 
 			cbx_Messages.removeAllItems();
 			cbx_Messages.addItem(null);
@@ -2205,6 +2209,19 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
 
 		fillMessageTable();
+	}
+
+	public void editMessage() {
+		int row = tbl_Messages.getSelectedRow();
+		MessageInTransactionTypeType mitt = messagesTableModel.get(row);
+		try {
+			final MessageInTransactionDialogControl14 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl14();
+			messageInTransactionDialogControl14.fillTree(mitt);
+			messageInTransactionDialogControl14.getDialog().setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	public void reverse() {
