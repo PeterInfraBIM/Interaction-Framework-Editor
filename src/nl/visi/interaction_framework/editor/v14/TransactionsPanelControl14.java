@@ -2215,7 +2215,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		int row = tbl_Messages.getSelectedRow();
 		MessageInTransactionTypeType mitt = messagesTableModel.get(row);
 		try {
-			final MessageInTransactionDialogControl14 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl14();
+			final MessageInTransactionDialogControl14 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl14(elementConditionTable);
 			messageInTransactionDialogControl14.fillTree(mitt);
 			messageInTransactionDialogControl14.getDialog().setVisible(true);
 		} catch (Exception e) {

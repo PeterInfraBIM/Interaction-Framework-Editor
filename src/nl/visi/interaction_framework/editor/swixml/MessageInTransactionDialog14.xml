@@ -8,7 +8,19 @@
 		<scrollpane>
 			<gridbagconstraints Fill="GridBagConstraints.BOTH"
 				Gridx="0" Gridy="0" Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
-			<tree id="tree_Elements" />
+			<tree id="tree_Elements">
+				<popupmenu id="popupMenu">
+					<radiobuttonmenuitem id="rbt_EmptyItem"
+						action="setEmpty" text="EMPTY" />
+					<radiobuttonmenuitem id="rbt_FixedItem"
+						action="setFixed" text="FIXED" />
+					<radiobuttonmenuitem id="rbt_FreeItem"
+						action="setFree" text="FREE" />
+					<separator />
+					<menuitem id="mit_Remove" action="removeElementCondition"
+						text="lbl_Remove" />
+				</popupmenu>
+			</tree>
 		</scrollpane>
 	</panel>
 </dialog>

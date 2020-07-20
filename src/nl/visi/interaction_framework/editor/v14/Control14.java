@@ -827,4 +827,32 @@ abstract class Control14 extends Control {
 		return parents;
 	}
 
+	protected static void setElementConditionTypeMessageInTransaction(ElementConditionType elementConditionType,
+			MessageInTransactionTypeType mitt) {
+		ElementConditionType.MessageInTransaction messageInTransaction = objectFactory
+				.createElementConditionTypeMessageInTransaction();
+		MessageInTransactionTypeTypeRef messageInTransactionTypeTypeRef = objectFactory
+				.createMessageInTransactionTypeTypeRef();
+		messageInTransactionTypeTypeRef.setIdref(mitt);
+		messageInTransaction.setMessageInTransactionTypeRef(messageInTransactionTypeTypeRef);
+		elementConditionType.setMessageInTransaction(messageInTransaction);
+	}
+
+	protected static void setElementConditionTypeComplexElement(ElementConditionType elementConditionType,
+			ComplexElementTypeType ce) {
+		ElementConditionType.ComplexElement complexElement = objectFactory.createElementConditionTypeComplexElement();
+		ComplexElementTypeTypeRef complexElementTypeTypeRef = objectFactory.createComplexElementTypeTypeRef();
+		complexElementTypeTypeRef.setIdref(ce);
+		complexElement.setComplexElementTypeRef(complexElementTypeTypeRef);
+		elementConditionType.setComplexElement(complexElement);
+	}
+
+	protected static void setElementConditionTypeSimpleElement(ElementConditionType elementConditionType,
+			SimpleElementTypeType se) {
+		ElementConditionType.SimpleElement simpleElement = objectFactory.createElementConditionTypeSimpleElement();
+		SimpleElementTypeTypeRef simpleElementTypeTypeRef = objectFactory.createSimpleElementTypeTypeRef();
+		simpleElementTypeTypeRef.setIdref(se);
+		simpleElement.setSimpleElementTypeRef(simpleElementTypeTypeRef);
+		elementConditionType.setSimpleElement(simpleElement);
+	}
 }

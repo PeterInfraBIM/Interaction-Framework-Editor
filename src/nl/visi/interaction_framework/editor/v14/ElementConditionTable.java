@@ -22,7 +22,6 @@ import nl.visi.schemas._20140331.ElementConditionType.ComplexElement;
 import nl.visi.schemas._20140331.ElementConditionType.SimpleElement;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
-import nl.visi.schemas._20140331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeTypeRef;
@@ -408,16 +407,16 @@ public class ElementConditionTable extends Control14 {
 		elementConditionsTableModel.remove(row);
 	}
 
-	private void setElementConditionTypeMessageInTransaction(ElementConditionType elementConditionType,
-			MessageInTransactionTypeType mitt) {
-		ElementConditionType.MessageInTransaction messageInTransaction = objectFactory
-				.createElementConditionTypeMessageInTransaction();
-		MessageInTransactionTypeTypeRef messageInTransactionTypeTypeRef = objectFactory
-				.createMessageInTransactionTypeTypeRef();
-		messageInTransactionTypeTypeRef.setIdref(mitt);
-		messageInTransaction.setMessageInTransactionTypeRef(messageInTransactionTypeTypeRef);
-		elementConditionType.setMessageInTransaction(messageInTransaction);
-	}
+//	private void setElementConditionTypeMessageInTransaction(ElementConditionType elementConditionType,
+//			MessageInTransactionTypeType mitt) {
+//		ElementConditionType.MessageInTransaction messageInTransaction = objectFactory
+//				.createElementConditionTypeMessageInTransaction();
+//		MessageInTransactionTypeTypeRef messageInTransactionTypeTypeRef = objectFactory
+//				.createMessageInTransactionTypeTypeRef();
+//		messageInTransactionTypeTypeRef.setIdref(mitt);
+//		messageInTransaction.setMessageInTransactionTypeRef(messageInTransactionTypeTypeRef);
+//		elementConditionType.setMessageInTransaction(messageInTransaction);
+//	}
 
 	public ElementConditionTable(JTable tbl_Messages) throws Exception {
 		super();
