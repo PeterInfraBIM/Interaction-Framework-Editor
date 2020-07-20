@@ -3,6 +3,7 @@ package nl.visi.interaction_framework.editor.v14;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import nl.visi.schemas._20140331.ComplexElementTypeType;
@@ -48,6 +50,10 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			return this.ce;
 		}
 
+		SimpleElementTypeType getSe() {
+			return this.se;
+		}
+
 		public String getId() {
 			return se.getId();
 		}
@@ -72,20 +78,10 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				setElementConditionTypeSimpleElement(newElementCondition, se);
 				Editor14.getStore14().put(newId, newElementCondition);
 			} else {
-				List<ElementConditionType> ecs = Editor14.getStore14().getElements(ElementConditionType.class);
-				for (ElementConditionType ec : ecs) {
-					MessageInTransactionTypeType messageInTransaction = getMessageInTransaction(ec);
-					if (messageInTransaction != null && messageInTransaction.getId().equals(mitt.getId())) {
-						ComplexElementTypeType complexElement = getComplexElement(ec);
-						if (complexElement != null && complexElement.getId().equals(ce.getId())) {
-							SimpleElementTypeType simpleElement = getSimpleElement(ec);
-							if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
-								ec.setCondition(condition);
-								Editor14.getStore14().put(ec.getId(), ec);
-								break;
-							}
-						}
-					}
+				ElementConditionType ec = getElementConditionType(mitt, ce, se);
+				if (ec != null) {
+					ec.setCondition(condition);
+					Editor14.getStore14().put(ec.getId(), ec);
 				}
 			}
 		}
@@ -112,8 +108,35 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			return ce.getDescription();
 		}
 
+		MessageInTransactionTypeType getMitt() {
+			return this.mitt;
+		}
+
+		ComplexElementTypeType getCe() {
+			return this.ce;
+		}
+
 		public String getCondition() {
 			return Control14.getCondition(mitt, ce, null);
+		}
+
+		public void setCondition(String condition) {
+			if (getCondition() == null) {
+				ElementConditionType newElementCondition = objectFactory.createElementConditionType();
+				String newId = Editor14.getStore14().getNewId("ec_");
+				newElementCondition.setId(newId);
+				newElementCondition.setDescription("Description of " + newId);
+				newElementCondition.setCondition(condition);
+				setElementConditionTypeMessageInTransaction(newElementCondition, mitt);
+				setElementConditionTypeComplexElement(newElementCondition, ce);
+				Editor14.getStore14().put(newId, newElementCondition);
+			} else {
+				ElementConditionType ec = getElementConditionType(mitt, ce, null);
+				if (ec != null) {
+					ec.setCondition(condition);
+					Editor14.getStore14().put(ec.getId(), ec);
+				}
+			}
 		}
 
 		public String getFinalCondition() {
@@ -160,19 +183,39 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 					Object userObject = selectedNode.getUserObject();
 					if (selectedNode.getUserObject() instanceof SimpleElementTreeNode) {
 						SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
-						switch (seNode.getFinalCondition()) {
-						case "FREE":
-							rbt_FreeItem.setSelected(true);
-							break;
-						case "FIXED":
-							rbt_FixedItem.setSelected(true);
-							break;
-						case "EMPTY":
-							rbt_EmptyItem.setSelected(true);
-							break;
+						String finalCondition = seNode.getFinalCondition();
+						if (finalCondition != null) {
+							switch (finalCondition) {
+							case "FREE":
+								rbt_FreeItem.setSelected(true);
+								break;
+							case "FIXED":
+								rbt_FixedItem.setSelected(true);
+								break;
+							case "EMPTY":
+								rbt_EmptyItem.setSelected(true);
+								break;
+							}
 						}
+						popupMenu.show(e.getComponent(), e.getX(), e.getY());
+					} else if (selectedNode.getUserObject() instanceof ComplexElementTreeNode) {
+						ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
+						String finalCondition = ceNode.getFinalCondition();
+						if (finalCondition != null) {
+							switch (finalCondition) {
+							case "FREE":
+								rbt_FreeItem.setSelected(true);
+								break;
+							case "FIXED":
+								rbt_FixedItem.setSelected(true);
+								break;
+							case "EMPTY":
+								rbt_EmptyItem.setSelected(true);
+								break;
+							}
+						}
+						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					}
-					popupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
@@ -283,6 +326,47 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				fillTree(seNode.getMitt());
 				elementConditionTable.fillElementConditionsTable(seNode.getMitt());
 				tree_Elements.expandPath(new TreePath(selectedNode.getPath()).getParentPath());
+				treeModel.nodeChanged(selectedNode);
+			} else if (userObject instanceof ComplexElementTreeNode) {
+				ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
+				ceNode.setCondition(condition);
+				fillTree(ceNode.getMitt());
+				elementConditionTable.fillElementConditionsTable(ceNode.getMitt());
+				tree_Elements.expandPath(new TreePath(selectedNode.getPath()).getParentPath());
+				treeModel.nodeChanged(selectedNode);
+				Enumeration<TreeNode> children = selectedNode.children();
+				while (children.hasMoreElements()) {
+					treeModel.nodeChanged(children.nextElement());
+				}
+			}
+		}
+	}
+
+	public void removeElementCondition() {
+		Object userObject = selectedNode.getUserObject();
+		if (userObject != null) {
+			if (userObject instanceof SimpleElementTreeNode) {
+				SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
+				ElementConditionType ec = getElementConditionType(seNode.getMitt(), seNode.getCe(), seNode.getSe());
+				Editor14.getStore14().remove(ec.getId());
+				fillTree(seNode.getMitt());
+				elementConditionTable.fillElementConditionsTable(seNode.getMitt());
+				TreePath parentPath = new TreePath(selectedNode.getPath()).getParentPath();
+				tree_Elements.expandPath(parentPath);
+				treeModel.nodeChanged(selectedNode);
+			} else if (userObject instanceof ComplexElementTreeNode) {
+				ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
+				ElementConditionType ec = getElementConditionType(ceNode.getMitt(), ceNode.getCe(), null);
+				Editor14.getStore14().remove(ec.getId());
+				fillTree(ceNode.getMitt());
+				elementConditionTable.fillElementConditionsTable(ceNode.getMitt());
+				TreePath nodePath = new TreePath(selectedNode.getPath());
+				tree_Elements.expandPath(nodePath);
+				treeModel.nodeChanged(selectedNode);
+				Enumeration<TreeNode> children = selectedNode.children();
+				while (children.hasMoreElements()) {
+					treeModel.nodeChanged(children.nextElement());
+				}
 			}
 		}
 	}

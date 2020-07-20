@@ -855,4 +855,41 @@ abstract class Control14 extends Control {
 		simpleElement.setSimpleElementTypeRef(simpleElementTypeTypeRef);
 		elementConditionType.setSimpleElement(simpleElement);
 	}
+
+	protected static ElementConditionType getElementConditionType(MessageInTransactionTypeType mitt,
+			ComplexElementTypeType ce, SimpleElementTypeType se) {
+		List<ElementConditionType> ecs = Editor14.getStore14().getElements(ElementConditionType.class);
+		for (ElementConditionType ec : ecs) {
+			MessageInTransactionTypeType messageInTransaction = getMessageInTransaction(ec);
+			if ((messageInTransaction != null && messageInTransaction.getId().equals(mitt.getId()))
+					|| (messageInTransaction == null && mitt == null)) {
+				ComplexElementTypeType complexElement = getComplexElement(ec);
+				if ((complexElement != null && complexElement.getId().equals(ce.getId()))
+						|| (complexElement == null && ce == null)) {
+					SimpleElementTypeType simpleElement = getSimpleElement(ec);
+					if ((simpleElement != null && se != null && simpleElement.getId().equals(se.getId()))
+							|| (simpleElement == null && se == null)) {
+						return ec;
+					}
+				} else {
+					SimpleElementTypeType simpleElement = getSimpleElement(ec);
+					List<ComplexElementTypeType> parents = getParents(ce);
+					if (parents != null) {
+						for (ComplexElementTypeType parent : parents) {
+							if (parent.getId().equals(complexElement.getId())) {
+								if (se != null) {
+									if ((simpleElement != null && se != null
+											&& simpleElement.getId().equals(se.getId()))
+											|| (simpleElement == null && se == null)) {
+										return ec;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
 }
