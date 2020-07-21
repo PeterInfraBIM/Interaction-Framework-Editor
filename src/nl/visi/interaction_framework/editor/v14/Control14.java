@@ -798,6 +798,9 @@ abstract class Control14 extends Control {
 								condition = getCondition(null, null, se);
 								if (condition == null) {
 									condition = getCondition(null, null, null);
+									if (condition == null) {
+										condition = "FIXED";
+									}
 								}
 							}
 						}

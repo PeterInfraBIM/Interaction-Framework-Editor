@@ -79,14 +79,15 @@ import nl.visi.schemas._20140331.TransactionTypeTypeRef;
 public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel, elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
 	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups;
 	private MessagesTableModel messagesTableModel;
 	private SequenceTable sequenceTable;
-	private ElementConditionTable elementConditionTable;
+	ElementConditionTable elementConditionTable;
+	private MessageInTransactionDialogControl14 messageInTransactionDialogControl;
 	private SubtransactionsTableModel subtransactionsTableModel;
 	private JButton btn_AddMessage, btn_EditMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator,
 			btn_NavigateExecutor;
@@ -965,7 +966,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 	}
 
-	private List<MessageInTransactionTypeType> startMitt;
+	List<MessageInTransactionTypeType> startMitt;
 	private ListSelectionListener messageTableSelectionListener = new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
@@ -985,8 +986,12 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				elementConditionTable.fillElementConditionsTable(mitt);
 
 				elementConditionTable.setSelectedMitt(mitt);
+
+				messageInTransactionDialogControl.fillTree(mitt);
 			} else {
 				elementConditionTable.setSelectedMitt(null);
+				
+				messageInTransactionDialogControl.clearTree();
 			}
 		}
 	};
@@ -1597,6 +1602,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		initMessagesTable();
 		initElementConditionTable();
 		initSequenceTable();
+		initElementsTree();
 		initSubtransactionsTable();
 		initStartDateField();
 		initEndDateField();
@@ -1681,6 +1687,14 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		elementConditionPanel.removeAll();
 		elementConditionPanel.add(elementConditionTable.getPanel());
 		elementConditionPanel.revalidate();
+	}
+
+	private void initElementsTree() throws Exception {
+		messageInTransactionDialogControl = new MessageInTransactionDialogControl14(this);
+		elementsTreePanel.removeAll();
+		elementsTreePanel.add(messageInTransactionDialogControl.getPanel());
+		elementsTreePanel.revalidate();
+		messageInTransactionDialogControl.clearTree();
 	}
 
 	private void initSubtransactionsTable() {
@@ -2215,7 +2229,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		int row = tbl_Messages.getSelectedRow();
 		MessageInTransactionTypeType mitt = messagesTableModel.get(row);
 		try {
-			final MessageInTransactionDialogControl14 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl14(elementConditionTable);
+			final MessageInTransactionDialogControl14 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl14(
+					this);
 			messageInTransactionDialogControl14.fillTree(mitt);
 			messageInTransactionDialogControl14.getDialog().setVisible(true);
 		} catch (Exception e) {

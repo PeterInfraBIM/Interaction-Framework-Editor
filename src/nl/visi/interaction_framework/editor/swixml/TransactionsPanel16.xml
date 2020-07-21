@@ -279,12 +279,13 @@
 									Insets="0,2,2,2" />
 							</button>
 						</panel>
-						<tabbedpane Titles="lbl_Sequence,lbl_ElementConditions">
+						<tabbedpane Titles="lbl_Sequence,lbl_ElementConditions,lbl_ElementsTree">
 							<gridbagconstraints
 								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="2" Weightx="1.0"
 								Weighty="1.0" />
 							<panel id="sequencePanel" Layout="BorderLayout" />
 							<panel id="elementConditionPanel" Layout="BorderLayout" />
+							<panel id="elementsTreePanel" Layout="BorderLayout" />
 						</tabbedpane>
 					</panel>
 					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">

@@ -10,6 +10,8 @@ import java.util.Map;
 
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTree;
@@ -87,6 +89,16 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		}
 
 		public String getFinalCondition() {
+			Boolean firstMessage = mitt.isFirstMessage();
+			if (firstMessage == null) {
+				firstMessage = startMitt != null ? startMitt.contains(mitt) : false;
+			}
+			if (firstMessage) {
+				return "FREE";
+			}
+			if (isNewElement(mitt, ce)) {
+				return "FREE";
+			}
 			return Control14.getFinalCondition(mitt, ce, se);
 		}
 	}
@@ -140,29 +152,48 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		}
 
 		public String getFinalCondition() {
+			Boolean firstMessage = mitt.isFirstMessage();
+			if (firstMessage == null) {
+				firstMessage = startMitt != null ? startMitt.contains(mitt) : false;
+			}
+			if (firstMessage) {
+				return "FREE";
+			}
+			if (isNewElement(mitt, ce)) {
+				return "FREE";
+			}
 			return Control14.getFinalCondition(mitt, ce, null);
 		}
 
 	}
 
 	private JDialog dialog;
+	private JPanel elementsTreePanel;
 	private JTree tree_Elements;
 	private DefaultTreeModel treeModel;
 	private DefaultMutableTreeNode root;
 	private JPopupMenu popupMenu;
 	private JRadioButtonMenuItem rbt_EmptyItem, rbt_FixedItem, rbt_FreeItem;
+	private JMenuItem mit_Remove;
 	private DefaultMutableTreeNode selectedNode;
 	private ElementConditionTable elementConditionTable;
+	private List<MessageInTransactionTypeType> startMitt;
+	private MessageInTransactionTypeType currentMitt;
 
-	public MessageInTransactionDialogControl14(ElementConditionTable elementConditionTable) throws Exception {
+	public MessageInTransactionDialogControl14(TransactionsPanelControl14 transactionsPanelControl) throws Exception {
 		super();
 		dialog = (JDialog) render(MESSAGE_IN_TRANSACTION_DIALOG);
-		this.elementConditionTable = elementConditionTable;
+		this.elementConditionTable = transactionsPanelControl.elementConditionTable;
+		this.startMitt = transactionsPanelControl.startMitt;
 		initTreeElements();
 	}
 
 	JDialog getDialog() {
 		return dialog;
+	}
+
+	JPanel getPanel() {
+		return elementsTreePanel;
 	}
 
 	@SuppressWarnings("serial")
@@ -197,6 +228,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 								break;
 							}
 						}
+						mit_Remove.setEnabled(seNode.getCondition() != null);
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					} else if (selectedNode.getUserObject() instanceof ComplexElementTreeNode) {
 						ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
@@ -214,6 +246,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 								break;
 							}
 						}
+						mit_Remove.setEnabled(ceNode.getCondition() != null);
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					}
 				}
@@ -271,6 +304,11 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		if (treeMap == null) {
 			treeMap = new Hashtable<>();
 		}
+		if (mitt != currentMitt) {
+			treeMap.clear();
+			currentMitt = mitt;
+		}
+
 		MessageTypeType message = getMessage(mitt);
 		root = getTreeMap(message.getId(), message, null);
 
@@ -300,9 +338,15 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		tree_Elements.expandPath(new TreePath(root));
 	}
 
+	void clearTree() {
+		if (treeMap != null)
+			treeMap.clear();
+		tree_Elements.setModel(null);
+	}
+
 	private void addSimpleElement(MessageInTransactionTypeType mitt, ComplexElementTypeType ce,
 			DefaultMutableTreeNode parentNode, SimpleElementTypeType se) {
-		getTreeMap(se.getId(), new SimpleElementTreeNode(mitt, ce, se), parentNode);
+		getTreeMap(ce.getId() + se.getId(), new SimpleElementTreeNode(mitt, ce, se), parentNode);
 	}
 
 	public void setEmpty() {
@@ -371,4 +415,19 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		}
 	}
 
+	private boolean isNewElement(MessageInTransactionTypeType mitt, ComplexElementTypeType ce) {
+		List<MessageInTransactionTypeType> previous = getPrevious(mitt);
+		if (previous != null) {
+			for (MessageInTransactionTypeType prevMitt : previous) {
+				MessageTypeType prevMessage = getMessage(prevMitt);
+				List<ComplexElementTypeType> prevElements = getComplexElements(prevMessage);
+				for (ComplexElementTypeType prevElement : prevElements) {
+					if (prevElement.getId().equals(ce.getId())) {
+						return false;
+					}
+				}
+			}
+		}
+		return true;
+	}
 }
