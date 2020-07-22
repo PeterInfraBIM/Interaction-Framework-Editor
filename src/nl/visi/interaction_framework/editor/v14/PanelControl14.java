@@ -31,16 +31,13 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import nl.visi.interaction_framework.editor.v14.Editor14;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
-import nl.visi.interaction_framework.editor.v14.Control14;
-import nl.visi.interaction_framework.editor.v14.Store14;
+import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.ElementTypeRef;
 import nl.visi.schemas._20140331.ProjectTypeType;
-import nl.visi.schemas._20140331.ElementConditionType;
 
 abstract class PanelControl14<E extends ElementType> extends Control14 {
 	enum Fields {

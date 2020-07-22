@@ -29,11 +29,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -79,6 +81,7 @@ import nl.visi.schemas._20140331.TransactionTypeTypeRef;
 public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
+	private JPopupMenu popupMenu;
 	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel, elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
@@ -94,6 +97,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private JTextArea tar_Initiator, tar_Executor;
 	private JScrollPane scrollPane;
 	private Canvas drawingPlane;
+	private Canvas.MessageItem activeItem;
 
 	private Map<MessageInTransactionTypeType, List<MessageInTransactionTypeType>> successorMap;
 
@@ -303,7 +307,12 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
+							if (SwingUtilities.isRightMouseButton(e)) {
+								activeItem = MessageItem.this;
+								popupMenu.show(e.getComponent(), e.getX(), e.getY());
+							} else {
+								InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
+							}
 						}
 					});
 				}
@@ -990,7 +999,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				messageInTransactionDialogControl.fillTree(mitt);
 			} else {
 				elementConditionTable.setSelectedMitt(null);
-				
+
 				messageInTransactionDialogControl.clearTree();
 			}
 		}
@@ -2237,6 +2246,18 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			e.printStackTrace();
 		}
 
+	}
+
+	public void editMitt() {
+		MessageInTransactionTypeType mitt = activeItem.getMitt();
+		try {
+			final MessageInTransactionDialogControl14 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl14(
+					this);
+			messageInTransactionDialogControl14.fillTree(mitt);
+			messageInTransactionDialogControl14.getDialog().setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void reverse() {

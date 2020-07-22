@@ -407,17 +407,6 @@ public class ElementConditionTable extends Control14 {
 		elementConditionsTableModel.remove(row);
 	}
 
-//	private void setElementConditionTypeMessageInTransaction(ElementConditionType elementConditionType,
-//			MessageInTransactionTypeType mitt) {
-//		ElementConditionType.MessageInTransaction messageInTransaction = objectFactory
-//				.createElementConditionTypeMessageInTransaction();
-//		MessageInTransactionTypeTypeRef messageInTransactionTypeTypeRef = objectFactory
-//				.createMessageInTransactionTypeTypeRef();
-//		messageInTransactionTypeTypeRef.setIdref(mitt);
-//		messageInTransaction.setMessageInTransactionTypeRef(messageInTransactionTypeTypeRef);
-//		elementConditionType.setMessageInTransaction(messageInTransaction);
-//	}
-
 	public ElementConditionTable(JTable tbl_Messages) throws Exception {
 		super();
 		panel = (JPanel) render(ELEMENT_CONDITION_PANEL);
