@@ -16,13 +16,10 @@ import javax.swing.table.TableColumn;
 
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
-import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType;
-import nl.visi.schemas._20160331.ElementConditionType.ComplexElements;
 import nl.visi.schemas._20160331.ElementConditionType.SimpleElement;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
-import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
@@ -64,39 +61,15 @@ public class ElementConditionTable extends Control16 {
 
 			switch (ElementConditionsTableColumns.values()[columnIndex]) {
 			case ComplexElement1:
-				ComplexElements complexElement1s = elementConditionType.getComplexElements();
-				if (complexElement1s != null) {
-					List<Object> objects = complexElement1s.getComplexElementTypeOrComplexElementTypeRef();
-					if (objects != null && objects.size() > 0) {
-						Object object = objects.get(0);
-						ComplexElementTypeType complexElementType = null;
-						if (object != null && object instanceof ComplexElementTypeTypeRef) {
-							complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
-									.getIdref();
-						}
-						if (object != null && object instanceof ComplexElementTypeType) {
-							complexElementType = (ComplexElementTypeType) object;
-						}
-						return complexElementType.getId();
-					}
+				ComplexElementTypeType complexElement1 = getElementConditionTypeComplexElement1(elementConditionType);
+				if (complexElement1 != null) {
+					return complexElement1.getId();
 				}
 				break;
 			case ComplexElement2:
-				ComplexElements complexElement2s = elementConditionType.getComplexElements();
-				if (complexElement2s != null) {
-					List<Object> objects = complexElement2s.getComplexElementTypeOrComplexElementTypeRef();
-					if (objects != null && objects.size() > 1) {
-						Object object = objects.get(1);
-						if (object != null && object instanceof ComplexElementTypeTypeRef) {
-							ComplexElementTypeType complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object)
-									.getIdref();
-							return complexElementType.getId();
-						}
-						if (object != null && object instanceof ComplexElementTypeType) {
-							ComplexElementTypeType complexElementType = (ComplexElementTypeType) object;
-							return complexElementType.getId();
-						}
-					}
+				ComplexElementTypeType complexElement2 = getElementConditionTypeComplexElement2(elementConditionType);
+				if (complexElement2 != null) {
+					return complexElement2.getId();
 				}
 				break;
 			case Condition:
@@ -106,15 +79,9 @@ public class ElementConditionTable extends Control16 {
 			case Id:
 				return elementConditionType.getId();
 			case SimpleElement:
-				ElementConditionType.SimpleElement simpleElement = elementConditionType.getSimpleElement();
+				SimpleElementTypeType simpleElement = getElementConditionTypeSimpleElement(elementConditionType);
 				if (simpleElement != null) {
-					SimpleElementTypeType simpleElementType = simpleElement.getSimpleElementType();
-					if (simpleElementType == null) {
-						simpleElementType = (SimpleElementTypeType) simpleElement.getSimpleElementTypeRef().getIdref();
-					}
-					if (simpleElementType != null) {
-						return simpleElementType.getId();
-					}
+					return simpleElement.getId();
 				}
 				break;
 			case Global:
@@ -162,53 +129,19 @@ public class ElementConditionTable extends Control16 {
 				if (value == null) {
 					elementConditionType.setComplexElements(null);
 				} else {
-					ComplexElements complexElement1s = elementConditionType.getComplexElements();
-					if (complexElement1s == null) {
-						complexElement1s = objectFactory.createElementConditionTypeComplexElements();
-					}
 					String idref = (String) value;
 					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
-					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-					ceRef.setIdref(ce);
-					List<Object> complexElementObjects = complexElement1s
-							.getComplexElementTypeOrComplexElementTypeRef();
-					if (complexElementObjects.size() > 0) {
-						complexElementObjects.set(0, ceRef);
-					} else {
-						complexElementObjects.add(0, ceRef);
-					}
-					elementConditionType.setComplexElements(complexElement1s);
+					setElementConditionTypeComplexElement1(elementConditionType, ce);
 					elementConditionTableListener.valueChanged(null);
 				}
 				break;
 			case ComplexElement2:
 				if (value == null) {
-					List<ComplexElementTypeType> complexElementTypes = getComplexElements(elementConditionType);
-					if (complexElementTypes != null) {
-						ComplexElements complexElements = elementConditionType.getComplexElements();
-						List<Object> complexElementObjects = complexElements
-								.getComplexElementTypeOrComplexElementTypeRef();
-						if (complexElementObjects.size() > 1) {
-							complexElementObjects.remove(1);
-						}
-					}
+					setElementConditionTypeComplexElement2(elementConditionType, null);
 				} else {
-					ComplexElements complexElement1s = elementConditionType.getComplexElements();
-					if (complexElement1s == null) {
-						break;
-					}
 					String idref = (String) value;
 					ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
-					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-					ceRef.setIdref(ce);
-					List<Object> complexElementObjects = complexElement1s
-							.getComplexElementTypeOrComplexElementTypeRef();
-					if (complexElementObjects.size() == 1) {
-						complexElementObjects.add(1, ceRef);
-					} else {
-						complexElementObjects.set(1, ceRef);
-					}
-					elementConditionType.setComplexElements(complexElement1s);
+					setElementConditionTypeComplexElement2(elementConditionType, ce);
 					elementConditionTableListener.valueChanged(null);
 				}
 				break;
@@ -218,11 +151,7 @@ public class ElementConditionTable extends Control16 {
 				} else {
 					String idref = (String) value;
 					SimpleElementTypeType se = Editor16.getStore16().getElement(SimpleElementTypeType.class, idref);
-					SimpleElementTypeTypeRef seRef = objectFactory.createSimpleElementTypeTypeRef();
-					seRef.setIdref(se);
-					ElementConditionType.SimpleElement set = objectFactory.createElementConditionTypeSimpleElement();
-					set.setSimpleElementTypeRef(seRef);
-					elementConditionType.setSimpleElement(set);
+					setElementConditionTypeSimpleElement(elementConditionType, se);
 				}
 				break;
 			case Global:
@@ -442,7 +371,7 @@ public class ElementConditionTable extends Control16 {
 		for (ElementConditionType ec : elements) {
 			MessageInTransactionTypeType ecMitt = getMessageInTransaction(ec);
 			if (ecMitt != null) {
-				if (ecMitt.equals(mitt)) {
+				if (ecMitt.getId().equals(mitt.getId())) {
 					elementConditionsTableModel.add(ec);
 				}
 			} else {
@@ -511,17 +440,6 @@ public class ElementConditionTable extends Control16 {
 		ElementConditionType elementConditionType = elementConditionsTableModel.get(row);
 		Editor16.getStore16().remove(elementConditionType.getId());
 		elementConditionsTableModel.remove(row);
-	}
-
-	private void setElementConditionTypeMessageInTransaction(ElementConditionType elementConditionType,
-			MessageInTransactionTypeType mitt) {
-		ElementConditionType.MessageInTransaction messageInTransaction = objectFactory
-				.createElementConditionTypeMessageInTransaction();
-		MessageInTransactionTypeTypeRef messageInTransactionTypeTypeRef = objectFactory
-				.createMessageInTransactionTypeTypeRef();
-		messageInTransactionTypeTypeRef.setIdref(mitt);
-		messageInTransaction.setMessageInTransactionTypeRef(messageInTransactionTypeTypeRef);
-		elementConditionType.setMessageInTransaction(messageInTransaction);
 	}
 
 	public ElementConditionTable(JTable tbl_Messages) throws Exception {

@@ -16,9 +16,7 @@ import javax.swing.table.TableColumn;
 
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeType.SimpleElements;
-import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20140331.ElementConditionType;
-import nl.visi.schemas._20140331.ElementConditionType.ComplexElement;
 import nl.visi.schemas._20140331.ElementConditionType.SimpleElement;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
@@ -63,16 +61,9 @@ public class ElementConditionTable extends Control14 {
 
 			switch (ElementConditionsTableColumns.values()[columnIndex]) {
 			case ComplexElement:
-				ElementConditionType.ComplexElement complexElement = elementConditionType.getComplexElement();
+				ComplexElementTypeType complexElement = getComplexElement(elementConditionType);
 				if (complexElement != null) {
-					ComplexElementTypeType complexElementType = complexElement.getComplexElementType();
-					if (complexElementType == null) {
-						complexElementType = (ComplexElementTypeType) complexElement.getComplexElementTypeRef()
-								.getIdref();
-					}
-					if (complexElementType != null) {
-						return complexElementType.getId();
-					}
+					complexElement.getId();
 				}
 				break;
 			case Condition:
@@ -82,15 +73,9 @@ public class ElementConditionTable extends Control14 {
 			case Id:
 				return elementConditionType.getId();
 			case SimpleElement:
-				ElementConditionType.SimpleElement simpleElement = elementConditionType.getSimpleElement();
+				SimpleElementTypeType simpleElement = getSimpleElement(elementConditionType);
 				if (simpleElement != null) {
-					SimpleElementTypeType simpleElementType = simpleElement.getSimpleElementType();
-					if (simpleElementType == null) {
-						simpleElementType = (SimpleElementTypeType) simpleElement.getSimpleElementTypeRef().getIdref();
-					}
-					if (simpleElementType != null) {
-						return simpleElementType.getId();
-					}
+					return simpleElement.getId();
 				}
 				break;
 			case Global:
@@ -136,16 +121,21 @@ public class ElementConditionTable extends Control14 {
 				if (value == null) {
 					elementConditionType.setComplexElement(null);
 				} else {
-					ComplexElement complexElement = elementConditionType.getComplexElement();
-					if (complexElement == null) {
-						complexElement = objectFactory.createElementConditionTypeComplexElement();
-					}
 					String idref = (String) value;
 					ComplexElementTypeType ce = Editor14.getStore14().getElement(ComplexElementTypeType.class, idref);
-					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-					ceRef.setIdref(ce);
-					complexElement.setComplexElementTypeRef(ceRef);
-					elementConditionType.setComplexElement(complexElement);
+					setElementConditionTypeComplexElement(elementConditionType, ce);
+					
+//					ComplexElement complexElement = elementConditionType.getComplexElement();
+//					if (complexElement == null) {
+//						complexElement = objectFactory.createElementConditionTypeComplexElement();
+//					}
+//					String idref = (String) value;
+//					ComplexElementTypeType ce = Editor14.getStore14().getElement(ComplexElementTypeType.class, idref);
+//					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
+//					ceRef.setIdref(ce);
+//					complexElement.setComplexElementTypeRef(ceRef);
+//					elementConditionType.setComplexElement(complexElement);
+					
 					elementConditionTableListener.valueChanged(null);
 				}
 				break;
@@ -155,11 +145,15 @@ public class ElementConditionTable extends Control14 {
 				} else {
 					String idref = (String) value;
 					SimpleElementTypeType se = Editor14.getStore14().getElement(SimpleElementTypeType.class, idref);
-					SimpleElementTypeTypeRef seRef = objectFactory.createSimpleElementTypeTypeRef();
-					seRef.setIdref(se);
-					ElementConditionType.SimpleElement set = objectFactory.createElementConditionTypeSimpleElement();
-					set.setSimpleElementTypeRef(seRef);
-					elementConditionType.setSimpleElement(set);
+					setElementConditionTypeSimpleElement(elementConditionType, se);
+
+//					String idref = (String) value;
+//					SimpleElementTypeType se = Editor14.getStore14().getElement(SimpleElementTypeType.class, idref);
+//					SimpleElementTypeTypeRef seRef = objectFactory.createSimpleElementTypeTypeRef();
+//					seRef.setIdref(se);
+//					ElementConditionType.SimpleElement set = objectFactory.createElementConditionTypeSimpleElement();
+//					set.setSimpleElementTypeRef(seRef);
+//					elementConditionType.setSimpleElement(set);
 				}
 				break;
 			case Global:

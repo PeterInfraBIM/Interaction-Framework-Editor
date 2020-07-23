@@ -29,11 +29,13 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -79,19 +81,23 @@ import nl.visi.schemas._20160331.TransactionTypeTypeRef;
 public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel;
+	private JPopupMenu popupMenu;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel, elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
 	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups;
 	private MessagesTableModel messagesTableModel;
 	private SequenceTable sequenceTable;
-	private ElementConditionTable elementConditionTable;
+	ElementConditionTable elementConditionTable;
+	private MessageInTransactionDialogControl16 messageInTransactionDialogControl;
 	private SubtransactionsTableModel subtransactionsTableModel;
-	private JButton btn_AddMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator, btn_NavigateExecutor;
+	private JButton btn_AddMessage, btn_EditMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator,
+			btn_NavigateExecutor;
 	private JTextArea tar_Initiator, tar_Executor;
 	private JScrollPane scrollPane;
 	private Canvas drawingPlane;
+	private Canvas.MessageItem activeItem;
 
 	private Map<MessageInTransactionTypeType, List<MessageInTransactionTypeType>> successorMap;
 
@@ -301,7 +307,12 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 						@Override
 						public void mouseClicked(MouseEvent e) {
-							InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
+							if (SwingUtilities.isRightMouseButton(e)) {
+								activeItem = MessageItem.this;
+								popupMenu.show(e.getComponent(), e.getX(), e.getY());
+							} else {
+								InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
+							}
 						}
 					});
 				}
@@ -964,25 +975,32 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 	}
 
-	private List<MessageInTransactionTypeType> startMitt;
+	List<MessageInTransactionTypeType> startMitt;
 	private ListSelectionListener messageTableSelectionListener = new ListSelectionListener() {
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
 			int selectedRow = tbl_Messages.getSelectedRow();
 			boolean isSelectedMessage = selectedRow >= 0;
+			btn_EditMessage.setEnabled(isSelectedMessage);
 			btn_RemoveMessage.setEnabled(isSelectedMessage);
 			btn_Reverse.setEnabled(isSelectedMessage);
 			sequenceTable.clear();
 			elementConditionTable.clear();
 			if (isSelectedMessage) {
 				MessageInTransactionTypeType mitt = messagesTableModel.get(selectedRow);
+				TransactionPhaseTypeType transactionPhase = getTransactionPhase(mitt);
+				cbx_TransactionPhases.setSelectedItem(transactionPhase != null ? transactionPhase.getId() : null);
 
 				sequenceTable.fillSequenceTable(null, "inOut", mitt);
 				elementConditionTable.fillElementConditionsTable(mitt);
 
 				elementConditionTable.setSelectedMitt(mitt);
+
+				messageInTransactionDialogControl.fillTree(mitt);
 			} else {
 				elementConditionTable.setSelectedMitt(null);
+
+				messageInTransactionDialogControl.clearTree();
 			}
 		}
 	};
@@ -1193,8 +1211,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
 			switch (MessagesTableColumns.values()[columnIndex]) {
-			case TransactionPhase:
-				return String.class;
+//			case TransactionPhase:
+//				return String.class;
 			case Id:
 				return String.class;
 			case Message:
@@ -1592,6 +1610,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		initMessagesTable();
 		initElementConditionTable();
 		initSequenceTable();
+		initElementsTree();
 		initSubtransactionsTable();
 		initStartDateField();
 		initEndDateField();
@@ -1676,6 +1695,14 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		elementConditionPanel.removeAll();
 		elementConditionPanel.add(elementConditionTable.getPanel());
 		elementConditionPanel.revalidate();
+	}
+
+	private void initElementsTree() throws Exception {
+		messageInTransactionDialogControl = new MessageInTransactionDialogControl16(this);
+		elementsTreePanel.removeAll();
+		elementsTreePanel.add(messageInTransactionDialogControl.getPanel());
+		elementsTreePanel.revalidate();
+		messageInTransactionDialogControl.clearTree();
 	}
 
 	private void initSubtransactionsTable() {
@@ -2204,6 +2231,32 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
 
 		fillMessageTable();
+	}
+
+	public void editMessage() {
+		int row = tbl_Messages.getSelectedRow();
+		MessageInTransactionTypeType mitt = messagesTableModel.get(row);
+		try {
+			final MessageInTransactionDialogControl16 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl16(
+					this);
+			messageInTransactionDialogControl14.fillTree(mitt);
+			messageInTransactionDialogControl14.getDialog().setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	public void editMitt() {
+		MessageInTransactionTypeType mitt = activeItem.getMitt();
+		try {
+			final MessageInTransactionDialogControl16 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl16(
+					this);
+			messageInTransactionDialogControl14.fillTree(mitt);
+			messageInTransactionDialogControl14.getDialog().setVisible(true);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void reverse() {

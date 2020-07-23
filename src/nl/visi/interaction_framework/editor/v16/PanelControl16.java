@@ -31,12 +31,9 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import nl.visi.interaction_framework.editor.v16.Editor16;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
-import nl.visi.interaction_framework.editor.v16.Control16;
-import nl.visi.interaction_framework.editor.v16.Store16;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
