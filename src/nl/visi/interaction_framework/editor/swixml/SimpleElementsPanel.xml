@@ -135,9 +135,20 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="7"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
+					<label Text="lbl_GlobalElementCondition">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="8"
+							Insets="2,2,2,2" />
+					</label>
+					<combobox id="cbx_GlobalElementCondition" enabled="false">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="8"
+							Fill="GridBagConstraints.HORIZONTAL" Insets="2,2,2,2"
+							Weightx="1.0" />
+					</combobox>
 					<panel>
 						<gridbagconstraints
-							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="8" GridWidth="2"
+							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="9" GridWidth="2"
 							Weighty="1.0" />
 					</panel>
 				</panel>

@@ -864,10 +864,10 @@ abstract class Control14 extends Control {
 		List<ElementConditionType> ecs = Editor14.getStore14().getElements(ElementConditionType.class);
 		for (ElementConditionType ec : ecs) {
 			MessageInTransactionTypeType messageInTransaction = getMessageInTransaction(ec);
-			if ((messageInTransaction != null && messageInTransaction.getId().equals(mitt.getId()))
+			if ((messageInTransaction != null && mitt != null && messageInTransaction.getId().equals(mitt.getId()))
 					|| (messageInTransaction == null && mitt == null)) {
 				ComplexElementTypeType complexElement = getComplexElement(ec);
-				if ((complexElement != null && complexElement.getId().equals(ce.getId()))
+				if ((complexElement != null && ce != null && complexElement.getId().equals(ce.getId()))
 						|| (complexElement == null && ce == null)) {
 					SimpleElementTypeType simpleElement = getSimpleElement(ec);
 					if ((simpleElement != null && se != null && simpleElement.getId().equals(se.getId()))

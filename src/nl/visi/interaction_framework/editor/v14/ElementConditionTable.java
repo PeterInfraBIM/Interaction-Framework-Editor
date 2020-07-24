@@ -15,7 +15,6 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 
 import nl.visi.schemas._20140331.ComplexElementTypeType;
-import nl.visi.schemas._20140331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.ElementConditionType.SimpleElement;
 import nl.visi.schemas._20140331.ElementType;
@@ -63,7 +62,7 @@ public class ElementConditionTable extends Control14 {
 			case ComplexElement:
 				ComplexElementTypeType complexElement = getComplexElement(elementConditionType);
 				if (complexElement != null) {
-					complexElement.getId();
+					return complexElement.getId();
 				}
 				break;
 			case Condition:
@@ -124,7 +123,7 @@ public class ElementConditionTable extends Control14 {
 					String idref = (String) value;
 					ComplexElementTypeType ce = Editor14.getStore14().getElement(ComplexElementTypeType.class, idref);
 					setElementConditionTypeComplexElement(elementConditionType, ce);
-					
+
 //					ComplexElement complexElement = elementConditionType.getComplexElement();
 //					if (complexElement == null) {
 //						complexElement = objectFactory.createElementConditionTypeComplexElement();
@@ -135,7 +134,7 @@ public class ElementConditionTable extends Control14 {
 //					ceRef.setIdref(ce);
 //					complexElement.setComplexElementTypeRef(ceRef);
 //					elementConditionType.setComplexElement(complexElement);
-					
+
 					elementConditionTableListener.valueChanged(null);
 				}
 				break;
@@ -326,11 +325,17 @@ public class ElementConditionTable extends Control14 {
 		MessageTypeType message = getMessage(mitt);
 
 		elementConditionsTableModel.clear();
+
+		ElementConditionType universalCondition = getElementConditionType(null, null, null);
+		if (universalCondition != null) {
+			elementConditionsTableModel.add(universalCondition);
+		}
 		List<ElementConditionType> elements = Editor14.getStore14().getElements(ElementConditionType.class);
 
 		for (ElementConditionType ec : elements) {
 			MessageInTransactionTypeType ecMitt = getMessageInTransaction(ec);
 			if (ecMitt != null) {
+				// Always add element conditions for this specific MITT
 				if (ecMitt.equals(mitt)) {
 					elementConditionsTableModel.add(ec);
 				}
@@ -345,32 +350,17 @@ public class ElementConditionTable extends Control14 {
 					}
 				} else if (ecComplexElement == null) {
 					// Simple elements
-					SimpleElement ecSimpleElement = ec.getSimpleElement();
+					SimpleElementTypeType ecSimpleElement = getSimpleElement(ec);
 					if (msgComplexElements != null && msgComplexElements.size() > 0 && ecSimpleElement != null) {
+						Set<SimpleElementTypeType> seElementSet = new HashSet<SimpleElementTypeType>();
 						for (ComplexElementTypeType ce : msgComplexElements) {
-							SimpleElements msgSimpleElements = ce.getSimpleElements();
-							if (msgSimpleElements != null) {
-								Set<SimpleElementTypeType> seElementSet = new HashSet<SimpleElementTypeType>();
-								List<Object> seObjects = msgSimpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
-								SimpleElementTypeType simpleElementType = null;
-								for (Object seObject : seObjects) {
-									if (seObject instanceof SimpleElementTypeType) {
-										simpleElementType = (SimpleElementTypeType) seObject;
-									} else {
-										simpleElementType = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) seObject)
-												.getIdref();
-									}
-									seElementSet.add(simpleElementType);
-								}
-								SimpleElementTypeType ecSimpleElementType = ecSimpleElement.getSimpleElementType();
-								if (ecSimpleElementType == null) {
-									ecSimpleElementType = (SimpleElementTypeType) ecSimpleElement
-											.getSimpleElementTypeRef().getIdref();
-								}
-								if (seElementSet.contains(ecSimpleElementType)) {
-									elementConditionsTableModel.add(ec);
-								}
+							List<SimpleElementTypeType> simpleElements = getSimpleElements(ce);
+							for (SimpleElementTypeType simpleElement : simpleElements) {
+								seElementSet.add(simpleElement);
 							}
+						}
+						if (seElementSet.contains(ecSimpleElement)) {
+							elementConditionsTableModel.add(ec);
 						}
 					}
 				}
@@ -380,7 +370,7 @@ public class ElementConditionTable extends Control14 {
 
 	public void newElementCondition() {
 		try {
-			String newId = Editor14.getStore14().getNewId("ElementCondition_");
+			String newId = Editor14.getStore14().getNewId("ec_");
 			ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
 			Editor14.getStore14().put(newId, newElementConditionType);
 			newElementConditionType.setId(newId);

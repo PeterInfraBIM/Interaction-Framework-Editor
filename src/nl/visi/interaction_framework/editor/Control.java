@@ -14,6 +14,7 @@ import org.swixml.SwingEngine;
 public class Control {
 	public static final String RESOURCE_BUNDLE = "nl.visi.interaction_framework.editor.locale.Editor";
 	private static final ResourceBundle bundle = ResourceBundle.getBundle(RESOURCE_BUNDLE);
+	protected static final String[] CONDITION_VALUES = { null, "EMPTY", "FIXED", "FREE" };
 	protected static Preferences userPrefs = Preferences.userNodeForPackage(Control.class);
 	protected static String user = "???";
 	private final SwingEngine swingEngine;

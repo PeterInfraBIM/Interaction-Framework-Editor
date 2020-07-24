@@ -1,5 +1,7 @@
 package nl.visi.interaction_framework.editor.v14;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -27,6 +29,7 @@ import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeType.ComplexElements;
 import nl.visi.schemas._20140331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
+import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.OrganisationTypeType;
@@ -44,7 +47,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	private JTable tbl_SubComplexElements, tbl_SimpleElements;
 	private SubComplexElementsTableModel subComplexElementsTableModel;
 	private SimpleElementsTableModel simpleElementsTableModel;
-	private JComboBox<String> cbx_ComplexElements, cbx_SimpleElements;
+	private JComboBox<String> cbx_GlobalElementCondition, cbx_ComplexElements, cbx_SimpleElements;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddSimpleElement, btn_RemoveSimpleElement;
 
 	private enum ComplexElementsTableColumns {
@@ -211,8 +214,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		initSimpleElementsTable();
 		initStartDateField();
 		initEndDateField();
-//		initMinOccurs();
-//		initMaxOccurs();
+		initGlobalElementCondition();
 	}
 
 	private void initEndDateField() {
@@ -265,52 +267,39 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		startDateField.setEnabled(false);
 	}
 
-//	private void initMinOccurs() {
-//		tfd_MinOccurs.getDocument().addDocumentListener(new DocumentAdapter14() {
-//			@Override
-//			protected synchronized void update(DocumentEvent e) {
-//				if (inSelection)
-//					return;
-//
-//				if (tfd_MinOccurs.getText().equals("")) {
-//					selectedElement.setMinOccurs(null);
-//				} else {
-//					try {
-//						int intValue = Integer.parseInt(tfd_MinOccurs.getText());
-//						selectedElement.setMinOccurs(BigInteger.valueOf(intValue));
-//						updateLaMu(selectedElement, user);
-//						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-//					} catch (NumberFormatException exception) {
-//						JOptionPane.showMessageDialog(panel, exception.getMessage(),
-//								getBundle().getString("lbl_ValidationError"), JOptionPane.ERROR_MESSAGE);
-//					}
-//				}
-//			}
-//		});
-//	}
-//
-//	private void initMaxOccurs() {
-//		tfd_MaxOccurs.getDocument().addDocumentListener(new DocumentAdapter14() {
-//			@Override
-//			protected synchronized void update(DocumentEvent e) {
-//				if (inSelection)
-//					return;
-//				if (tfd_MaxOccurs.getText().equals("")) {
-//					selectedElement.setMaxOccurs(null);
-//				} else {
-//					try {
-//						int intValue = Integer.parseInt(tfd_MaxOccurs.getText());
-//						selectedElement.setMaxOccurs(BigInteger.valueOf(intValue));
-//						updateLaMu(selectedElement, user);
-//						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
-//					} catch (NumberFormatException exception) {
-//						JOptionPane.showMessageDialog(panel, exception.getMessage(),
-//								getBundle().getString("lbl_ValidationError"), JOptionPane.ERROR_MESSAGE);
-//					}
-//				}
-//			}
-//		});
-//	}
+	private void initGlobalElementCondition() {
+		for (String conditionValue : CONDITION_VALUES) {
+			cbx_GlobalElementCondition.addItem(conditionValue);
+		}
+		cbx_GlobalElementCondition.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (inSelection)
+					return;
+				String condition = (String) cbx_GlobalElementCondition.getSelectedItem();
+				ElementConditionType elementConditionType = getElementConditionType(null, selectedElement, null);
+				if (elementConditionType != null) {
+					if (condition != null) {
+						elementConditionType.setCondition(condition);
+					} else {
+						Editor14.getStore14().remove(elementConditionType);
+					}
+					updateLaMu(selectedElement, user);
+				} else {
+					if (condition != null) {
+						String newId = Editor14.getStore14().getNewId("ec_");
+						ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
+						Editor14.getStore14().put(newId, newElementConditionType);
+						newElementConditionType.setId(newId);
+						newElementConditionType.setDescription("Decription of " + newId);
+						newElementConditionType.setCondition(condition);
+						setElementConditionTypeComplexElement(newElementConditionType, selectedElement);
+						updateLaMu(selectedElement, user);
+					}
+				}
+			}
+		});
+	}
 
 	@SuppressWarnings("serial")
 	private void initSimpleElementsTable() {
@@ -421,6 +410,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
+		cbx_GlobalElementCondition.setEnabled(rowSelected);
 		tbl_SubComplexElements.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
 		tbl_SimpleElements.setEnabled(rowSelected);
@@ -441,6 +431,8 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
+			ElementConditionType ec = getElementConditionType(null, selectedElement, null);
+			cbx_GlobalElementCondition.setSelectedItem(ec != null ? ec.getCondition() : null);
 
 			subComplexElementsTableModel.clear();
 			ComplexElementTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
@@ -495,6 +487,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
+			cbx_GlobalElementCondition.setSelectedIndex(0);
 			subComplexElementsTableModel.clear();
 			cbx_ComplexElements.removeAllItems();
 			simpleElementsTableModel.clear();
