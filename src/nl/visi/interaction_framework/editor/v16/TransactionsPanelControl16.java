@@ -13,6 +13,8 @@ import java.awt.Insets;
 import java.awt.Stroke;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.math.BigInteger;
@@ -301,13 +303,20 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 						@Override
 						public void mouseExited(MouseEvent e) {
-							e.getComponent().setForeground(Color.black);
+							if (activeItem != null && e.getComponent() == activeItem.activeLabel) {
+								e.getComponent().setForeground(Color.blue);
+							} else {
+								e.getComponent().setForeground(Color.black);
+							}
 							canvas.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 						}
 
 						@Override
 						public void mouseClicked(MouseEvent e) {
 							if (SwingUtilities.isRightMouseButton(e)) {
+								if (activeItem != null) {
+									activeItem.activeLabel.setForeground(Color.black);
+								}
 								activeItem = MessageItem.this;
 								popupMenu.show(e.getComponent(), e.getX(), e.getY());
 							} else {
@@ -2247,13 +2256,28 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 	}
 
+	private MessageInTransactionDialogControl16 messageInTransactionDialogControl16;
+
 	public void editMitt() {
 		MessageInTransactionTypeType mitt = activeItem.getMitt();
 		try {
-			final MessageInTransactionDialogControl16 messageInTransactionDialogControl14 = new MessageInTransactionDialogControl16(
-					this);
-			messageInTransactionDialogControl14.fillTree(mitt);
-			messageInTransactionDialogControl14.getDialog().setVisible(true);
+			if (messageInTransactionDialogControl16 == null) {
+				messageInTransactionDialogControl16 = new MessageInTransactionDialogControl16(this);
+				messageInTransactionDialogControl16.getDialog().setModal(false);
+				messageInTransactionDialogControl16.getDialog().addWindowListener(new WindowAdapter() {
+
+					@Override
+					public void windowClosing(WindowEvent e) {
+						super.windowClosed(e);
+						activeItem.activeLabel.setForeground(Color.black);
+						activeItem = null;
+					}
+
+				});
+			}
+			messageInTransactionDialogControl16.fillTree(mitt);
+			activeItem.activeLabel.setForeground(Color.blue);
+			messageInTransactionDialogControl16.getDialog().setVisible(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

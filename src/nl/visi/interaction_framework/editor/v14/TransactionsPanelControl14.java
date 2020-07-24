@@ -318,7 +318,6 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 									activeItem.activeLabel.setForeground(Color.black);
 								}
 								activeItem = MessageItem.this;
-								// e.getComponent().setForeground(Color.blue);
 								popupMenu.show(e.getComponent(), e.getX(), e.getY());
 							} else {
 								InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));

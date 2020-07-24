@@ -420,10 +420,20 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		if (previous != null) {
 			for (MessageInTransactionTypeType prevMitt : previous) {
 				MessageTypeType prevMessage = getMessage(prevMitt);
-				List<ComplexElementTypeType> prevElements = getComplexElements(prevMessage);
-				for (ComplexElementTypeType prevElement : prevElements) {
-					if (prevElement.getId().equals(ce.getId())) {
-						return false;
+				List<ComplexElementTypeType> prevPElements = getComplexElements(prevMessage);
+				if (prevPElements != null) {
+					for (ComplexElementTypeType prevPElement : prevPElements) {
+						if (prevPElement.getId().equals(ce.getId())) {
+							return false;
+						}
+						List<ComplexElementTypeType> prevCElements = getComplexElements(prevPElement);
+						if (prevCElements != null) {
+							for (ComplexElementTypeType prevCElement : prevCElements) {
+								if (prevCElement.getId().equals(ce.getId())) {
+									return false;
+								}
+							}
+						}
 					}
 				}
 			}
