@@ -994,7 +994,7 @@ public abstract class Control16 extends Control {
 		List<ElementConditionType> ecs = Editor16.getStore16().getElements(ElementConditionType.class);
 		for (ElementConditionType ec : ecs) {
 			MessageInTransactionTypeType messageInTransaction = getMessageInTransaction(ec);
-			if ((messageInTransaction != null && messageInTransaction.getId().equals(mitt.getId()))
+			if ((messageInTransaction != null && mitt != null && messageInTransaction.getId().equals(mitt.getId()))
 					|| (messageInTransaction == null && mitt == null)) {
 				List<ComplexElementTypeType> complexElements = getComplexElements(ec);
 				if ((complexElements != null && complexElements.size() == 1
@@ -1010,8 +1010,8 @@ public abstract class Control16 extends Control {
 				} else {
 					if ((complexElements != null && complexElements.size() == 2
 							&& complexElements.get(0).getId().equals(pce.getId())
-							&& complexElements.get(1).getId().equals(cce.getId()))
-							|| (complexElements == null && pce == null)) {
+							&& cce != null && complexElements.get(1).getId().equals(cce.getId()))
+							|| (complexElements == null && pce == null && cce == null)) {
 
 						SimpleElementTypeType simpleElement = getSimpleElement(ec);
 						if ((simpleElement != null && se != null && simpleElement.getId().equals(se.getId()))

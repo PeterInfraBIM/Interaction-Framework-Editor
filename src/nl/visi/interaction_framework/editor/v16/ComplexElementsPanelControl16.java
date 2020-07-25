@@ -1,5 +1,7 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.lang.reflect.InvocationTargetException;
@@ -8,6 +10,8 @@ import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -32,13 +36,13 @@ import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.ComplexElements;
 import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
+import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.OrganisationTypeType;
 import nl.visi.schemas._20160331.PersonTypeType;
 import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
-import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
 import nl.visi.schemas._20160331.UserDefinedTypeType;
 
@@ -49,7 +53,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	private JTable tbl_SubComplexElements, tbl_SimpleElements;
 	private SubComplexElementsTableModel subComplexElementsTableModel;
 	private SimpleElementsTableModel simpleElementsTableModel;
-	private JComboBox<String> cbx_ComplexElements, cbx_SimpleElements;
+	private JComboBox<String> cbx_GlobalElementCondition, cbx_SimpleElementConditions, cbx_ComplexElementConditions,
+			cbx_ComplexElements, cbx_SimpleElements;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddSimpleElement, btn_RemoveSimpleElement;
 	private JTextField tfd_MinOccurs, tfd_MaxOccurs;
 
@@ -105,7 +110,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	}
 
 	private enum SubComplexElementsTableColumns {
-		Id, Description, Navigate;
+		Id, Description, Condition, Navigate;
 
 		@Override
 		public String toString() {
@@ -135,6 +140,9 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				return complexElement != null ? complexElement.getId() : null;
 			case Description:
 				return complexElement != null ? complexElement.getDescription() : null;
+			case Condition:
+				ElementConditionType ec = getElementConditionType(null, selectedElement, complexElement, null);
+				return ec != null ? ec.getCondition() : "";
 			default:
 				break;
 			}
@@ -143,13 +151,49 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == SubComplexElementsTableColumns.Navigate.ordinal();
+			switch (SubComplexElementsTableColumns.values()[columnIndex]) {
+			case Condition:
+				return true;
+			case Navigate:
+				return true;
+			default:
+				return false;
+			}
 		}
 
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			ComplexElementTypeType complexElement = get(rowIndex);
+
+			switch (SubComplexElementsTableColumns.values()[columnIndex]) {
+			case Condition:
+				ElementConditionType ec = getElementConditionType(null, selectedElement, complexElement, null);
+				if (ec != null) {
+					if (aValue != null) {
+						ec.setCondition((String) aValue);
+					} else {
+						Editor16.getStore16().remove(ec);
+					}
+				} else {
+					if (aValue != null) {
+						String newId = Editor16.getStore16().getNewId("ec_");
+						ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
+						Editor16.getStore16().put(newId, newElementConditionType);
+						newElementConditionType.setId(newId);
+						newElementConditionType.setDescription("Decription of " + newId);
+						newElementConditionType.setCondition((String) aValue);
+						setElementConditionTypeComplexElement1(newElementConditionType, selectedElement);
+						setElementConditionTypeComplexElement2(newElementConditionType, complexElement);
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	private enum SimpleElementsTableColumns {
-		Id, Description, UserDefinedType, Navigate;
+		Id, Description, UserDefinedType, Condition, Navigate;
 
 		@Override
 		public String toString() {
@@ -181,28 +225,93 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			case Description:
 				return simpleElement.getDescription();
 			case UserDefinedType:
-				UserDefinedType userDefinedType = simpleElement.getUserDefinedType();
+				UserDefinedTypeType userDefinedType = getUserDefinedType(simpleElement);
 				if (userDefinedType != null) {
-					UserDefinedTypeType type = userDefinedType.getUserDefinedType();
-					if (type == null) {
-						type = (UserDefinedTypeType) userDefinedType.getUserDefinedTypeRef().getIdref();
-					}
-					if (type != null) {
-						return type.getId();
-					}
+					return userDefinedType.getId();
 				}
-				return simpleElement.getInterfaceType();
+				break;
+			case Condition:
+				ElementConditionType ec = getElementCondition(simpleElement);
+				return ec != null ? ec.getCondition() : "";
 			default:
 				break;
 			}
 			return null;
 		}
 
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == SimpleElementsTableColumns.Navigate.ordinal();
+		private ElementConditionType getElementCondition(SimpleElementTypeType simpleElement) {
+			ElementConditionType ec = null;
+			List<SimpleElementTypeType> simpleElements = getSimpleElements(selectedElement);
+			if (simpleElements != null && simpleElements.contains(simpleElement)) {
+				ec = getElementConditionType(null, selectedElement, null, simpleElement);
+			} else {
+				ComplexElementTypeType subComplexElement = getSubComplexElement(simpleElement);
+				if (subComplexElement != null) {
+					ec = getElementConditionType(null, selectedElement, subComplexElement, simpleElement);
+				}
+			}
+			return ec;
 		}
 
+		private ComplexElementTypeType getSubComplexElement(SimpleElementTypeType simpleElement) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(selectedElement);
+			if (complexElements != null) {
+				for (ComplexElementTypeType ce : complexElements) {
+					List<SimpleElementTypeType> subSimpleElements = getSimpleElements(ce);
+					if (subSimpleElements != null && subSimpleElements.contains(simpleElement)) {
+						return ce;
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			switch (SimpleElementsTableColumns.values()[columnIndex]) {
+			case Condition:
+				return true;
+			case Navigate:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			SimpleElementTypeType simpleElement = get(rowIndex);
+
+			switch (SimpleElementsTableColumns.values()[columnIndex]) {
+			case Condition:
+				ElementConditionType ec = getElementCondition(simpleElement);
+				if (ec != null) {
+					if (aValue != null) {
+						ec.setCondition((String) aValue);
+					} else {
+						Editor16.getStore16().remove(ec);
+					}
+				} else {
+					if (aValue != null) {
+						String newId = Editor16.getStore16().getNewId("ec_");
+						ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
+						Editor16.getStore16().put(newId, newElementConditionType);
+						newElementConditionType.setId(newId);
+						newElementConditionType.setDescription("Decription of " + newId);
+						newElementConditionType.setCondition((String) aValue);
+						setElementConditionTypeComplexElement1(newElementConditionType, selectedElement);
+						ComplexElementTypeType subComplexElement = getSubComplexElement(simpleElement);
+						if (subComplexElement != null) {
+							setElementConditionTypeComplexElement2(newElementConditionType, subComplexElement);
+						}
+						setElementConditionTypeSimpleElement(newElementConditionType, simpleElement);
+					}
+				}
+				break;
+			default:
+				break;
+			}
+		}
 	}
 
 	SimpleElementsTableModel getSimpleElementsTableModel() {
@@ -219,6 +328,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		initEndDateField();
 		initMinOccurs();
 		initMaxOccurs();
+		initGlobalElementCondition();
 	}
 
 	private void initEndDateField() {
@@ -318,6 +428,40 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		});
 	}
 
+	private void initGlobalElementCondition() {
+		for (String conditionValue : CONDITION_VALUES) {
+			cbx_GlobalElementCondition.addItem(conditionValue);
+		}
+		cbx_GlobalElementCondition.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (inSelection)
+					return;
+				String condition = (String) cbx_GlobalElementCondition.getSelectedItem();
+				ElementConditionType elementConditionType = getElementConditionType(null, selectedElement, null, null);
+				if (elementConditionType != null) {
+					if (condition != null) {
+						elementConditionType.setCondition(condition);
+					} else {
+						Editor16.getStore16().remove(elementConditionType);
+					}
+					updateLaMu(selectedElement, user);
+				} else {
+					if (condition != null) {
+						String newId = Editor16.getStore16().getNewId("ec_");
+						ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
+						Editor16.getStore16().put(newId, newElementConditionType);
+						newElementConditionType.setId(newId);
+						newElementConditionType.setDescription("Decription of " + newId);
+						newElementConditionType.setCondition(condition);
+						setElementConditionTypeComplexElement1(newElementConditionType, selectedElement);
+						updateLaMu(selectedElement, user);
+					}
+				}
+			}
+		});
+	}
+
 	@SuppressWarnings("serial")
 	private void initSimpleElementsTable() {
 		simpleElementsTableModel = new SimpleElementsTableModel();
@@ -331,9 +475,26 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				int selectedRow = tbl_SimpleElements.getSelectedRow();
-				btn_RemoveSimpleElement.setEnabled(selectedRow >= 0);
+				if (selectedRow >= 0) {
+					List<SimpleElementTypeType> simpleElements = getSimpleElements(selectedElement);
+					SimpleElementTypeType se = simpleElementsTableModel.elements.get(selectedRow);
+					btn_RemoveSimpleElement.setEnabled(simpleElements != null && simpleElements.contains(se));
+					Object conditionValue = tbl_SimpleElements.getValueAt(selectedRow,
+							SimpleElementsTableColumns.Condition.ordinal());
+					cbx_SimpleElementConditions.setSelectedItem(conditionValue == "" ? null : conditionValue);
+				} else {
+					btn_RemoveSimpleElement.setEnabled(false);
+				}
 			}
 		});
+		cbx_SimpleElementConditions = new JComboBox<>(new DefaultComboBoxModel<String>());
+		for (String conditionValue : CONDITION_VALUES) {
+			cbx_SimpleElementConditions.addItem(conditionValue);
+		}
+		TableColumn conditionColumn = tbl_SimpleElements.getColumnModel()
+				.getColumn(SimpleElementsTableColumns.Condition.ordinal());
+		conditionColumn.setCellEditor(new DefaultCellEditor(cbx_SimpleElementConditions));
+
 		TableColumn navigateColumn = tbl_SimpleElements.getColumnModel()
 				.getColumn(SimpleElementsTableColumns.Navigate.ordinal());
 		navigateColumn.setMaxWidth(50);
@@ -364,9 +525,26 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				int selectedRow = tbl_SubComplexElements.getSelectedRow();
-				btn_RemoveComplexElement.setEnabled(selectedRow >= 0);
+				if (selectedRow >= 0) {
+					List<ComplexElementTypeType> complexElements = getComplexElements(selectedElement);
+					ComplexElementTypeType ce = subComplexElementsTableModel.elements.get(selectedRow);
+					btn_RemoveSimpleElement.setEnabled(complexElements != null && complexElements.contains(ce));
+					Object conditionValue = tbl_SubComplexElements.getValueAt(selectedRow,
+							SubComplexElementsTableColumns.Condition.ordinal());
+					cbx_ComplexElementConditions.setSelectedItem(conditionValue == "" ? null : conditionValue);
+				} else {
+					btn_RemoveComplexElement.setEnabled(false);
+				}
 			}
 		});
+		cbx_ComplexElementConditions = new JComboBox<>(new DefaultComboBoxModel<String>());
+		for (String conditionValue : CONDITION_VALUES) {
+			cbx_ComplexElementConditions.addItem(conditionValue);
+		}
+		TableColumn conditionColumn = tbl_SubComplexElements.getColumnModel()
+				.getColumn(SubComplexElementsTableColumns.Condition.ordinal());
+		conditionColumn.setCellEditor(new DefaultCellEditor(cbx_ComplexElementConditions));
+
 		TableColumn navigateColumn = tbl_SubComplexElements.getColumnModel()
 				.getColumn(SubComplexElementsTableColumns.Navigate.ordinal());
 		navigateColumn.setMaxWidth(50);
@@ -429,6 +607,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_MaxOccurs.setEnabled(rowSelected);
 		tfd_MinOccurs.setEnabled(rowSelected);
+		cbx_GlobalElementCondition.setEnabled(rowSelected);
+		cbx_ComplexElements.setEnabled(rowSelected);
 		tbl_SubComplexElements.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
 		tbl_SimpleElements.setEnabled(rowSelected);
@@ -453,40 +633,13 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 					.setText(selectedElement.getMaxOccurs() != null ? selectedElement.getMaxOccurs().toString() : null);
 			tfd_MinOccurs
 					.setText(selectedElement.getMinOccurs() != null ? selectedElement.getMinOccurs().toString() : null);
-
-			subComplexElementsTableModel.clear();
-			ComplexElementTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-			if (complexElements != null) {
-				List<Object> ceList = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-				for (Object object : ceList) {
-					ComplexElementTypeType element = null;
-					if (object instanceof ComplexElementTypeTypeRef) {
-						element = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object).getIdref();
-					} else {
-						element = (ComplexElementTypeType) object;
-					}
-					subComplexElementsTableModel.add(element);
-				}
-			}
-			cbx_ComplexElements.removeAllItems();
-			cbx_ComplexElements.addItem(null);
-			List<ComplexElementTypeType> ceList = Editor16.getStore16().getElements(ComplexElementTypeType.class);
-			for (ComplexElementTypeType element : ceList) {
-//				cbx_ComplexElements.addItem(element.getId());
-				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
-			}
+			ElementConditionType ec = getElementConditionType(null, selectedElement, null, null);
+			cbx_GlobalElementCondition.setSelectedItem(ec != null ? ec.getCondition() : null);
 
 			simpleElementsTableModel.clear();
-			SimpleElements simpleElements = selectedElement.getSimpleElements();
+			List<SimpleElementTypeType> simpleElements = getSimpleElements(selectedElement);
 			if (simpleElements != null) {
-				List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
-				for (Object object : list) {
-					SimpleElementTypeType simpleElement = null;
-					if (object instanceof SimpleElementTypeType) {
-						simpleElement = (SimpleElementTypeType) object;
-					} else {
-						simpleElement = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) object).getIdref();
-					}
+				for (SimpleElementTypeType simpleElement : simpleElements) {
 					simpleElementsTableModel.add(simpleElement);
 				}
 			}
@@ -494,9 +647,29 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			cbx_SimpleElements.addItem(null);
 			List<SimpleElementTypeType> seList = Editor16.getStore16().getElements(SimpleElementTypeType.class);
 			for (SimpleElementTypeType element : seList) {
-//				cbx_SimpleElements.addItem(element.getId());
 				cbx_SimpleElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
+
+			subComplexElementsTableModel.clear();
+			List<ComplexElementTypeType> complexElements = getComplexElements(selectedElement);
+			if (complexElements != null) {
+				for (ComplexElementTypeType complexElement : complexElements) {
+					subComplexElementsTableModel.add(complexElement);
+					List<SimpleElementTypeType> subSimpleElements = getSimpleElements(complexElement);
+					if (subSimpleElements != null) {
+						for (SimpleElementTypeType subSimpleElement : subSimpleElements) {
+							simpleElementsTableModel.add(subSimpleElement);
+						}
+					}
+				}
+			}
+			cbx_ComplexElements.removeAllItems();
+			cbx_ComplexElements.addItem(null);
+			List<ComplexElementTypeType> ceList = Editor16.getStore16().getElements(ComplexElementTypeType.class);
+			for (ComplexElementTypeType element : ceList) {
+				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
+			}
+
 		} else {
 			selectedElement = null;
 			tfd_Id.setText("");
@@ -509,8 +682,9 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			tfd_HelpInfo.setText("");
 			tfd_MaxOccurs.setText("");
 			tfd_MinOccurs.setText("");
-			subComplexElementsTableModel.clear();
+			cbx_GlobalElementCondition.setSelectedIndex(0);
 			cbx_ComplexElements.removeAllItems();
+			subComplexElementsTableModel.clear();
 			simpleElementsTableModel.clear();
 			cbx_SimpleElements.removeAllItems();
 		}
@@ -529,7 +703,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void copyElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
@@ -559,7 +733,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			e.printStackTrace();
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();

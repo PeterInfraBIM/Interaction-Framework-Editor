@@ -38,7 +38,6 @@ import nl.visi.schemas._20140331.OrganisationTypeType;
 import nl.visi.schemas._20140331.PersonTypeType;
 import nl.visi.schemas._20140331.ProjectTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
-import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20140331.SimpleElementTypeTypeRef;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
 
@@ -180,17 +179,11 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			case Description:
 				return simpleElement.getDescription();
 			case UserDefinedType:
-				UserDefinedType userDefinedType = simpleElement.getUserDefinedType();
+				UserDefinedTypeType userDefinedType = getUserDefinedType(simpleElement);
 				if (userDefinedType != null) {
-					UserDefinedTypeType type = userDefinedType.getUserDefinedType();
-					if (type == null) {
-						type = (UserDefinedTypeType) userDefinedType.getUserDefinedTypeRef().getIdref();
-					}
-					if (type != null) {
-						return type.getId();
-					}
+					return userDefinedType.getId();
 				}
-				return simpleElement.getInterfaceType();
+				break;
 			case Condition:
 				ElementConditionType ec = getElementConditionType(null, selectedElement, simpleElement);
 				return ec != null ? ec.getCondition() : "";
@@ -471,8 +464,8 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
 		cbx_GlobalElementCondition.setEnabled(rowSelected);
-		tbl_SubComplexElements.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
+		tbl_SubComplexElements.setEnabled(rowSelected);
 		tbl_SimpleElements.setEnabled(rowSelected);
 		cbx_SimpleElements.setEnabled(rowSelected);
 		if (rowSelected) {
@@ -538,8 +531,8 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
 			cbx_GlobalElementCondition.setSelectedIndex(0);
-			subComplexElementsTableModel.clear();
 			cbx_ComplexElements.removeAllItems();
+			subComplexElementsTableModel.clear();
 			simpleElementsTableModel.clear();
 			cbx_SimpleElements.removeAllItems();
 		}
