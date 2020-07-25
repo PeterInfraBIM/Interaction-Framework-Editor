@@ -9,6 +9,8 @@ import java.lang.reflect.Method;
 import java.util.Date;
 import java.util.List;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -47,7 +49,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	private JTable tbl_SubComplexElements, tbl_SimpleElements;
 	private SubComplexElementsTableModel subComplexElementsTableModel;
 	private SimpleElementsTableModel simpleElementsTableModel;
-	private JComboBox<String> cbx_GlobalElementCondition, cbx_ComplexElements, cbx_SimpleElements;
+	private JComboBox<String> cbx_GlobalElementCondition, cbx_Conditions, cbx_ComplexElements, cbx_SimpleElements;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddSimpleElement, btn_RemoveSimpleElement;
 
 	private enum ComplexElementsTableColumns {
@@ -146,7 +148,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	}
 
 	private enum SimpleElementsTableColumns {
-		Id, Description, UserDefinedType, Navigate;
+		Id, Description, UserDefinedType, Condition, Navigate;
 
 		@Override
 		public String toString() {
@@ -189,6 +191,9 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 					}
 				}
 				return simpleElement.getInterfaceType();
+			case Condition:
+				ElementConditionType ec = getElementConditionType(null, selectedElement, simpleElement);
+				return ec != null ? ec.getCondition() : "";
 			default:
 				break;
 			}
@@ -197,7 +202,45 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == SimpleElementsTableColumns.Navigate.ordinal();
+			switch (SimpleElementsTableColumns.values()[columnIndex]) {
+			case Condition:
+				return true;
+			case Navigate:
+				return true;
+			default:
+				return false;
+			}
+		}
+
+		@Override
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			SimpleElementTypeType simpleElement = get(rowIndex);
+
+			switch (SimpleElementsTableColumns.values()[columnIndex]) {
+			case Condition:
+				ElementConditionType ec = getElementConditionType(null, selectedElement, simpleElement);
+				if (ec != null) {
+					if (aValue != null) {
+						ec.setCondition((String) aValue);
+					} else {
+						Editor14.getStore14().remove(ec);
+					}
+				} else {
+					if (aValue != null) {
+						String newId = Editor14.getStore14().getNewId("ec_");
+						ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
+						Editor14.getStore14().put(newId, newElementConditionType);
+						newElementConditionType.setId(newId);
+						newElementConditionType.setDescription("Decription of " + newId);
+						newElementConditionType.setCondition((String) aValue);
+						setElementConditionTypeComplexElement(newElementConditionType, selectedElement);
+						setElementConditionTypeSimpleElement(newElementConditionType, simpleElement);
+					}
+				}
+				break;
+			default:
+				break;
+			}
 		}
 
 	}
@@ -314,9 +357,26 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				int selectedRow = tbl_SimpleElements.getSelectedRow();
-				btn_RemoveSimpleElement.setEnabled(selectedRow >= 0);
+				if (selectedRow >= 0) {
+					List<SimpleElementTypeType> simpleElements = getSimpleElements(selectedElement);
+					SimpleElementTypeType se = simpleElementsTableModel.elements.get(selectedRow);
+					btn_RemoveSimpleElement.setEnabled(simpleElements != null && simpleElements.contains(se));
+					Object conditionValue = tbl_SimpleElements.getValueAt(selectedRow,
+							SimpleElementsTableColumns.Condition.ordinal());
+					cbx_Conditions.setSelectedItem(conditionValue == "" ? null : conditionValue);
+				} else {
+					btn_RemoveSimpleElement.setEnabled(false);
+				}
 			}
 		});
+		cbx_Conditions = new JComboBox<>(new DefaultComboBoxModel<String>());
+		for (String conditionValue : CONDITION_VALUES) {
+			cbx_Conditions.addItem(conditionValue);
+		}
+		TableColumn conditionColumn = tbl_SimpleElements.getColumnModel()
+				.getColumn(SimpleElementsTableColumns.Condition.ordinal());
+		conditionColumn.setCellEditor(new DefaultCellEditor(cbx_Conditions));
+
 		TableColumn navigateColumn = tbl_SimpleElements.getColumnModel()
 				.getColumn(SimpleElementsTableColumns.Navigate.ordinal());
 		navigateColumn.setMaxWidth(50);
@@ -434,39 +494,10 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			ElementConditionType ec = getElementConditionType(null, selectedElement, null);
 			cbx_GlobalElementCondition.setSelectedItem(ec != null ? ec.getCondition() : null);
 
-			subComplexElementsTableModel.clear();
-			ComplexElementTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-			if (complexElements != null) {
-				List<Object> ceList = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-				for (Object object : ceList) {
-					ComplexElementTypeType element = null;
-					if (object instanceof ComplexElementTypeTypeRef) {
-						element = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object).getIdref();
-					} else {
-						element = (ComplexElementTypeType) object;
-					}
-					subComplexElementsTableModel.add(element);
-				}
-			}
-			cbx_ComplexElements.removeAllItems();
-			cbx_ComplexElements.addItem(null);
-			List<ComplexElementTypeType> ceList = Editor14.getStore14().getElements(ComplexElementTypeType.class);
-			for (ComplexElementTypeType element : ceList) {
-//				cbx_ComplexElements.addItem(element.getId());
-				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
-			}
-
 			simpleElementsTableModel.clear();
-			SimpleElements simpleElements = selectedElement.getSimpleElements();
+			List<SimpleElementTypeType> simpleElements = getSimpleElements(selectedElement);
 			if (simpleElements != null) {
-				List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
-				for (Object object : list) {
-					SimpleElementTypeType simpleElement = null;
-					if (object instanceof SimpleElementTypeType) {
-						simpleElement = (SimpleElementTypeType) object;
-					} else {
-						simpleElement = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) object).getIdref();
-					}
+				for (SimpleElementTypeType simpleElement : simpleElements) {
 					simpleElementsTableModel.add(simpleElement);
 				}
 			}
@@ -474,8 +505,27 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 			cbx_SimpleElements.addItem(null);
 			List<SimpleElementTypeType> seList = Editor14.getStore14().getElements(SimpleElementTypeType.class);
 			for (SimpleElementTypeType element : seList) {
-//				cbx_SimpleElements.addItem(element.getId());
 				cbx_SimpleElements.addItem("[" + element.getId() + "] " + element.getDescription());
+			}
+
+			subComplexElementsTableModel.clear();
+			List<ComplexElementTypeType> complexElements = getComplexElements(selectedElement);
+			if (complexElements != null) {
+				for (ComplexElementTypeType complexElement : complexElements) {
+					subComplexElementsTableModel.add(complexElement);
+					List<SimpleElementTypeType> subSimpleElements = getSimpleElements(complexElement);
+					if (subSimpleElements != null) {
+						for (SimpleElementTypeType subSimpleElement : subSimpleElements) {
+							simpleElementsTableModel.add(subSimpleElement);
+						}
+					}
+				}
+			}
+			cbx_ComplexElements.removeAllItems();
+			cbx_ComplexElements.addItem(null);
+			List<ComplexElementTypeType> ceList = Editor14.getStore14().getElements(ComplexElementTypeType.class);
+			for (ComplexElementTypeType element : ceList) {
+				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 		} else {
 			selectedElement = null;

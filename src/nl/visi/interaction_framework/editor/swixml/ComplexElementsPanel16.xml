@@ -177,40 +177,7 @@
 			<scrollpane Border="TitledBorder(lbl_Relations)">
 				<tabbedpane id="relationsTabs"
 					Border="EmptyBorder(4,4,4,4)"
-					Titles="lbl_ComplexElements,lbl_SimpleElements">
-					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
-						<scrollpane>
-							<gridbagconstraints
-								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
-								Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
-							<table id="tbl_SubComplexElements" DragEnabled="true"
-								SelectionMode="ListSelectionModel.SINGLE_SELECTION"
-								PreferredScrollableViewportSize="200,50" />
-						</scrollpane>
-						<panel Layout="GridBagLayout">
-							<gridbagconstraints
-								Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
-							<combobox id="cbx_ComplexElements"
-								Action="selectComplexElement" Enabled="false">
-								<gridbagconstraints
-									Anchor="GridBagConstraints.WEST"
-									Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
-									Insets="0,2,2,2" Weightx="1.0" />
-							</combobox>
-							<button id="btn_AddComplexElement"
-								Action="addComplexElement" Enabled="false" Text="lbl_Add">
-								<gridbagconstraints
-									Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
-									Insets="0,2,2,2" />
-							</button>
-							<button id="btn_RemoveComplexElement"
-								Action="removeComplexElement" Enabled="false" Text="lbl_Remove">
-								<gridbagconstraints
-									Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
-									Insets="0,2,2,2" />
-							</button>
-						</panel>
-					</panel>
+					Titles="lbl_SimpleElements,lbl_ComplexElements">
 					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 						<scrollpane>
 							<gridbagconstraints
@@ -238,6 +205,39 @@
 							</button>
 							<button id="btn_RemoveSimpleElement"
 								Action="removeSimpleElement" Enabled="false" Text="lbl_Remove">
+								<gridbagconstraints
+									Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
+									Insets="0,2,2,2" />
+							</button>
+						</panel>
+					</panel>
+					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+						<scrollpane>
+							<gridbagconstraints
+								Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+								Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
+							<table id="tbl_SubComplexElements" DragEnabled="true"
+								SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+								PreferredScrollableViewportSize="200,50" />
+						</scrollpane>
+						<panel Layout="GridBagLayout">
+							<gridbagconstraints
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1" />
+							<combobox id="cbx_ComplexElements"
+								Action="selectComplexElement" Enabled="false">
+								<gridbagconstraints
+									Anchor="GridBagConstraints.WEST"
+									Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
+									Insets="0,2,2,2" Weightx="1.0" />
+							</combobox>
+							<button id="btn_AddComplexElement"
+								Action="addComplexElement" Enabled="false" Text="lbl_Add">
+								<gridbagconstraints
+									Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
+									Insets="0,2,2,2" />
+							</button>
+							<button id="btn_RemoveComplexElement"
+								Action="removeComplexElement" Enabled="false" Text="lbl_Remove">
 								<gridbagconstraints
 									Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
 									Insets="0,2,2,2" />

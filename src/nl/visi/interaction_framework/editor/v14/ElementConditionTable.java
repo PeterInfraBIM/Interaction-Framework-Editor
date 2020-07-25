@@ -123,18 +123,6 @@ public class ElementConditionTable extends Control14 {
 					String idref = (String) value;
 					ComplexElementTypeType ce = Editor14.getStore14().getElement(ComplexElementTypeType.class, idref);
 					setElementConditionTypeComplexElement(elementConditionType, ce);
-
-//					ComplexElement complexElement = elementConditionType.getComplexElement();
-//					if (complexElement == null) {
-//						complexElement = objectFactory.createElementConditionTypeComplexElement();
-//					}
-//					String idref = (String) value;
-//					ComplexElementTypeType ce = Editor14.getStore14().getElement(ComplexElementTypeType.class, idref);
-//					ComplexElementTypeTypeRef ceRef = objectFactory.createComplexElementTypeTypeRef();
-//					ceRef.setIdref(ce);
-//					complexElement.setComplexElementTypeRef(ceRef);
-//					elementConditionType.setComplexElement(complexElement);
-
 					elementConditionTableListener.valueChanged(null);
 				}
 				break;
@@ -145,14 +133,6 @@ public class ElementConditionTable extends Control14 {
 					String idref = (String) value;
 					SimpleElementTypeType se = Editor14.getStore14().getElement(SimpleElementTypeType.class, idref);
 					setElementConditionTypeSimpleElement(elementConditionType, se);
-
-//					String idref = (String) value;
-//					SimpleElementTypeType se = Editor14.getStore14().getElement(SimpleElementTypeType.class, idref);
-//					SimpleElementTypeTypeRef seRef = objectFactory.createSimpleElementTypeTypeRef();
-//					seRef.setIdref(se);
-//					ElementConditionType.SimpleElement set = objectFactory.createElementConditionTypeSimpleElement();
-//					set.setSimpleElementTypeRef(seRef);
-//					elementConditionType.setSimpleElement(set);
 				}
 				break;
 			case Global:
