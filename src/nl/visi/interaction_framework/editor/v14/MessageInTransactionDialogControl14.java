@@ -28,6 +28,7 @@ import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
+import nl.visi.schemas._20140331.TransactionTypeType;
 
 public class MessageInTransactionDialogControl14 extends Control14 {
 	private static final String MESSAGE_IN_TRANSACTION_DIALOG = "nl/visi/interaction_framework/editor/swixml/MessageInTransactionDialog14.xml";
@@ -89,11 +90,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		}
 
 		public String getFinalCondition() {
-			Boolean firstMessage = mitt.isFirstMessage();
-			if (firstMessage == null) {
-				firstMessage = startMitt != null ? startMitt.contains(mitt) : false;
-			}
-			if (firstMessage) {
+			if (isStartMessage(mitt)) {
 				return "FREE";
 			}
 			if (isNewElement(mitt, ce)) {
@@ -152,11 +149,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		}
 
 		public String getFinalCondition() {
-			Boolean firstMessage = mitt.isFirstMessage();
-			if (firstMessage == null) {
-				firstMessage = startMitt != null ? startMitt.contains(mitt) : false;
-			}
-			if (firstMessage) {
+			if (isStartMessage(mitt)) {
 				return "FREE";
 			}
 			if (isNewElement(mitt, ce)) {
@@ -177,14 +170,12 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	private JMenuItem mit_Remove;
 	private DefaultMutableTreeNode selectedNode;
 	private ElementConditionTable elementConditionTable;
-	private List<MessageInTransactionTypeType> startMitt;
 	private MessageInTransactionTypeType currentMitt;
 
 	public MessageInTransactionDialogControl14(TransactionsPanelControl14 transactionsPanelControl) throws Exception {
 		super();
 		dialog = (JDialog) render(MESSAGE_IN_TRANSACTION_DIALOG);
 		this.elementConditionTable = transactionsPanelControl.elementConditionTable;
-		this.startMitt = transactionsPanelControl.startMitt;
 		initTreeElements();
 	}
 
@@ -415,22 +406,40 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		}
 	}
 
-	private boolean isNewElement(MessageInTransactionTypeType mitt, ComplexElementTypeType ce) {
+	private boolean isStartMessage(MessageInTransactionTypeType mitt) {
+		TransactionTypeType transaction = getTransaction(mitt);
 		List<MessageInTransactionTypeType> previous = getPrevious(mitt);
 		if (previous != null) {
 			for (MessageInTransactionTypeType prevMitt : previous) {
-				MessageTypeType prevMessage = getMessage(prevMitt);
-				List<ComplexElementTypeType> prevPElements = getComplexElements(prevMessage);
-				if (prevPElements != null) {
-					for (ComplexElementTypeType prevPElement : prevPElements) {
-						if (prevPElement.getId().equals(ce.getId())) {
-							return false;
-						}
-						List<ComplexElementTypeType> prevCElements = getComplexElements(prevPElement);
-						if (prevCElements != null) {
-							for (ComplexElementTypeType prevCElement : prevCElements) {
-								if (prevCElement.getId().equals(ce.getId())) {
-									return false;
+				TransactionTypeType prevMittTransaction = getTransaction(prevMitt);
+				if (prevMittTransaction.getId().equals(transaction.getId())) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean isNewElement(MessageInTransactionTypeType mitt, ComplexElementTypeType ce) {
+		TransactionTypeType selectedTransaction = getTransaction(mitt);
+		List<MessageInTransactionTypeType> previous = getPrevious(mitt);
+		if (previous != null) {
+			for (MessageInTransactionTypeType prevMitt : previous) {
+				TransactionTypeType prevMittTransaction = getTransaction(prevMitt);
+				if (prevMittTransaction.getId().equals(selectedTransaction.getId())) {
+					MessageTypeType prevMessage = getMessage(prevMitt);
+					List<ComplexElementTypeType> prevPElements = getComplexElements(prevMessage);
+					if (prevPElements != null) {
+						for (ComplexElementTypeType prevPElement : prevPElements) {
+							if (prevPElement.getId().equals(ce.getId())) {
+								return false;
+							}
+							List<ComplexElementTypeType> prevCElements = getComplexElements(prevPElement);
+							if (prevCElements != null) {
+								for (ComplexElementTypeType prevCElement : prevCElements) {
+									if (prevCElement.getId().equals(ce.getId())) {
+										return false;
+									}
 								}
 							}
 						}
