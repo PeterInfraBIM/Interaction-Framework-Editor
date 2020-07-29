@@ -8,6 +8,13 @@
 	layout="BorderLayout">
 	<popupmenu id="popupMenu">
 		<menuitem id="mit_Edit" action="editMitt" text="lbl_Edit" />
+		<separator />
+		<menuitem text="addNewResponse" />
+		<menuitem text="addExistingResponse" />
+		<menuitem text="addNewRequest" />
+		<menuitem text="addExistingRequest" />
+		<separator />
+		<menuitem text="remove" />
 	</popupmenu>
 	<splitpane constraints="BorderLayout.CENTER"
 		ContinuousLayout="true" DividerLocation="220"

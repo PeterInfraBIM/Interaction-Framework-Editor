@@ -26,7 +26,7 @@ import nl.visi.schemas._20140331.TransactionPhaseTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
 
-class Store14 {
+public class Store14 {
 	enum ElementTypeType {
 		AppendixTypeType, //
 		ComplexElementTypeType, //

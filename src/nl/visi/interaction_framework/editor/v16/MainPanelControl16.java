@@ -137,12 +137,7 @@ public class MainPanelControl16 extends Control16 {
 		projectType.setNamespace(newFrameworkDialogControl.getNamespace());
 		try {
 			Editor16.getStore16().clear();
-//			frameworkFile = null;
-//			buildTabs();
 			return miscellaneousPC.newElement(projectType, "ProjectType_");
-//			Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
-//			tabs.repaint();
-//			MainFrameControl16.this.setMainframeText(projectType.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

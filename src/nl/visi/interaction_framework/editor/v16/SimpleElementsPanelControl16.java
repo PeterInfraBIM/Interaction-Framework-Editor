@@ -15,6 +15,7 @@ import javax.swing.table.TableRowSorter;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
+import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20160331.UserDefinedTypeType;
@@ -26,7 +27,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 	protected static final Class<Object> UserDefinedTypeType = null;
 
 	private JTextField tfd_InterfaceType, tfd_ValueList;
-	private JComboBox<String> cbx_UserDefinedType;
+	private JComboBox<String> cbx_GlobalElementCondition, cbx_UserDefinedType;
 	private JButton btn_NavigateUserDefinedType;
 
 	private enum SimpleElementsTableColumns {
@@ -115,6 +116,39 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			}
 		});
 
+		for (String conditionValue : CONDITION_VALUES) {
+			cbx_GlobalElementCondition.addItem(conditionValue);
+		}
+		cbx_GlobalElementCondition.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (inSelection)
+					return;
+				String condition = (String) cbx_GlobalElementCondition.getSelectedItem();
+				ElementConditionType elementConditionType = getElementConditionType(null, null, null, selectedElement);
+				if (elementConditionType != null) {
+					if (condition != null) {
+						elementConditionType.setCondition(condition);
+					} else {
+						Editor16.getStore16().remove(elementConditionType);
+					}
+					updateLaMu(selectedElement, user);
+				} else {
+					if (condition != null) {
+						String newId = Editor16.getStore16().getNewId("ec_");
+						ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
+						Editor16.getStore16().put(newId, newElementConditionType);
+						newElementConditionType.setId(newId);
+						newElementConditionType.setDescription("Decription of " + newId);
+						newElementConditionType.setCondition(condition);
+						setElementConditionTypeSimpleElement(newElementConditionType, selectedElement);
+						updateLaMu(selectedElement, user);
+					}
+				}
+			}
+		});
+		
+		
 		cbx_UserDefinedType.addActionListener(new ActionListener() {
 
 			@Override
@@ -168,6 +202,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_ValueList.setEnabled(rowSelected);
+		cbx_GlobalElementCondition.setEnabled(rowSelected);
 		cbx_UserDefinedType.setEnabled(rowSelected);
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
@@ -180,6 +215,8 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
 			tfd_ValueList.setText(selectedElement.getValueList());
 
+			ElementConditionType ec = getElementConditionType(null, null, null, selectedElement);
+			cbx_GlobalElementCondition.setSelectedItem(ec != null ? ec.getCondition() : null);
 			cbx_UserDefinedType.removeAllItems();
 			cbx_UserDefinedType.addItem(null);
 			List<UserDefinedTypeType> elements = Editor16.getStore16().getElements(UserDefinedTypeType.class);

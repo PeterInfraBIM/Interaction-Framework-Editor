@@ -348,6 +348,12 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	public void saveAsFramework() {
+		Translator14to16 translator14to16 = new Translator14to16();
+		try {
+			translator14to16.translate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		frameworkFile = null;
 		saveFramework();
 	}

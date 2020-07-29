@@ -997,7 +997,7 @@ public abstract class Control16 extends Control {
 			if ((messageInTransaction != null && mitt != null && messageInTransaction.getId().equals(mitt.getId()))
 					|| (messageInTransaction == null && mitt == null)) {
 				List<ComplexElementTypeType> complexElements = getComplexElements(ec);
-				if ((complexElements != null && complexElements.size() == 1
+				if ((complexElements != null && complexElements.size() == 1 && pce != null
 						&& complexElements.get(0).getId().equals(pce.getId()))
 						|| (complexElements == null && pce == null)) {
 
@@ -1009,8 +1009,9 @@ public abstract class Control16 extends Control {
 
 				} else {
 					if ((complexElements != null && complexElements.size() == 2
-							&& complexElements.get(0).getId().equals(pce.getId())
-							&& cce != null && complexElements.get(1).getId().equals(cce.getId()))
+							&& pce != null
+							&& complexElements.get(0).getId().equals(pce.getId()) && cce != null
+							&& complexElements.get(1).getId().equals(cce.getId()))
 							|| (complexElements == null && pce == null && cce == null)) {
 
 						SimpleElementTypeType simpleElement = getSimpleElement(ec);

@@ -13,18 +13,21 @@ import javax.swing.table.AbstractTableModel;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.Control;
+import nl.visi.schemas._20140331.AppendixTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.ElementConditionType.ComplexElement;
 import nl.visi.schemas._20140331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20140331.ElementType;
+import nl.visi.schemas._20140331.GroupTypeType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendAfter;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType.SendBefore;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionTypeRef;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Conditions;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.Group;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Message;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Transaction;
@@ -43,7 +46,7 @@ import nl.visi.schemas._20140331.TransactionTypeType.Executor;
 import nl.visi.schemas._20140331.TransactionTypeType.Initiator;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
 
-abstract class Control14 extends Control {
+public abstract class Control14 extends Control {
 	static final java.text.DateFormat sdfDate = new SimpleDateFormat("d MMM yyyy");
 	static final java.text.DateFormat sdfDateTime = new SimpleDateFormat("d MMM yyyy HH:mm:ss");
 	protected static final ObjectFactory objectFactory = new ObjectFactory();
@@ -443,6 +446,28 @@ abstract class Control14 extends Control {
 		return null;
 	}
 
+	protected static List<ComplexElementTypeType> getComplexElements(AppendixTypeType appendixType) {
+		if (appendixType != null) {
+			AppendixTypeType.ComplexElements complexElements = appendixType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
 	protected static List<ComplexElementTypeType> getComplexElements(MessageTypeType messageType) {
 		if (messageType != null) {
 			ComplexElements complexElements = messageType.getComplexElements();
@@ -510,6 +535,26 @@ abstract class Control14 extends Control {
 					return sendAfters;
 				}
 			}
+		}
+		return null;
+	}
+
+	protected static List<MessageInTransactionTypeType> getSendAfters(MessageInTransactionTypeConditionType mittCond) {
+		SendAfter sendAfterValue = mittCond.getSendAfter();
+		if (sendAfterValue != null) {
+			List<MessageInTransactionTypeType> sendAfters = new ArrayList<>();
+			List<Object> sendAftersList = sendAfterValue.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+			for (Object sendAfterObject : sendAftersList) {
+				MessageInTransactionTypeType sendAfter = null;
+				if (sendAfterObject instanceof MessageInTransactionTypeType) {
+					sendAfter = (MessageInTransactionTypeType) sendAfterObject;
+				} else {
+					sendAfter = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) sendAfterObject)
+							.getIdref();
+				}
+				sendAfters.add(sendAfter);
+			}
+			return sendAfters;
 		}
 		return null;
 	}
@@ -612,6 +657,26 @@ abstract class Control14 extends Control {
 					return sendBefores;
 				}
 			}
+		}
+		return null;
+	}
+
+	protected static List<MessageInTransactionTypeType> getSendBefores(MessageInTransactionTypeConditionType mittCond) {
+		SendBefore sendBeforeValue = mittCond.getSendBefore();
+		if (sendBeforeValue != null) {
+			List<MessageInTransactionTypeType> sendBefores = new ArrayList<>();
+			List<Object> sendBeforesList = sendBeforeValue.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
+			for (Object sendBeforeObject : sendBeforesList) {
+				MessageInTransactionTypeType sendBefore = null;
+				if (sendBeforeObject instanceof MessageInTransactionTypeType) {
+					sendBefore = (MessageInTransactionTypeType) sendBeforeObject;
+				} else {
+					sendBefore = (MessageInTransactionTypeType) ((MessageInTransactionTypeTypeRef) sendBeforeObject)
+							.getIdref();
+				}
+				sendBefores.add(sendBefore);
+			}
+			return sendBefores;
 		}
 		return null;
 	}
@@ -881,8 +946,8 @@ abstract class Control14 extends Control {
 						for (ComplexElementTypeType parent : parents) {
 							if (complexElement != null && parent.getId().equals(complexElement.getId())) {
 								if (se != null) {
-									if ((simpleElement != null && se != null && simpleElement.getId()
-											.equals(se.getId()))
+									if ((simpleElement != null && se != null
+											&& simpleElement.getId().equals(se.getId()))
 											|| (simpleElement == null && se == null)) {
 										return ec;
 									}
@@ -895,4 +960,19 @@ abstract class Control14 extends Control {
 		}
 		return null;
 	}
+
+	protected static GroupTypeType getGroup(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			Group group = mitt.getGroup();
+			if (group != null) {
+				GroupTypeType groupType = group.getGroupType();
+				if (groupType == null) {
+					groupType = (GroupTypeType) group.getGroupTypeRef().getIdref();
+				}
+				return groupType;
+			}
+		}
+		return null;
+	}
+
 }
