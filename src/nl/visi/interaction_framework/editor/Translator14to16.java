@@ -15,10 +15,15 @@ import nl.visi.schemas._20140331.GroupTypeType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageTypeType;
+import nl.visi.schemas._20140331.OrganisationTypeType;
+import nl.visi.schemas._20140331.PersonTypeType;
+import nl.visi.schemas._20140331.ProjectTypeType;
 import nl.visi.schemas._20140331.RoleTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
+import nl.visi.schemas._20140331.TransactionPhaseTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
+import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType.ComplexElements;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
@@ -28,11 +33,13 @@ import nl.visi.schemas._20160331.MessageInTransactionTypeType.Group;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.TransactionPhase;
 import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20160331.MessageTypeTypeRef;
 import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.RoleTypeTypeRef;
 import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
+import nl.visi.schemas._20160331.TransactionPhaseTypeTypeRef;
 import nl.visi.schemas._20160331.TransactionTypeTypeRef;
 import nl.visi.schemas._20160331.UserDefinedTypeTypeRef;
 
@@ -50,8 +57,12 @@ public class Translator14to16 extends Control14 {
 		translateMessageInTransactionTypeAttributes(object16Factory);
 		translateMessageInTransactionTypeConditionAttributes(object16Factory);
 		translateMessageTypeAttributes(object16Factory);
+		translateOrganisationTypeAttributes(object16Factory);
+		translatePersonTypeAttributes(object16Factory);
+		translateProjectTypeAttributes(object16Factory);
 		translateRoleTypeAttributes(object16Factory);
 		translateSimpleElementTypeAttributes(object16Factory);
+		translateTransactionPhaseTypeAttributes(object16Factory);
 		translateTransactionTypeAttributes(object16Factory);
 		translateUserDefinedTypeAttributes(object16Factory);
 		translateAppendixTypeLinks(object16Factory);
@@ -60,6 +71,9 @@ public class Translator14to16 extends Control14 {
 		translateMessageInTransactionTypeConditionLinks(object16Factory);
 		translateMessageInTransactionTypeLinks(object16Factory);
 		translateMessageTypeLinks(object16Factory);
+		translateOrganisationTypeLinks(object16Factory);
+		translatePersonTypeLinks(object16Factory);
+		translateProjectTypeLinks(object16Factory);
 		translateSimpleElementTypeLinks(object16Factory);
 		translateTransactionTypeLinks(object16Factory);
 
@@ -464,6 +478,19 @@ public class Translator14to16 extends Control14 {
 				messageInTransaction16Type.setMessage(messageTypeTypeGroup);
 			}
 
+			TransactionPhaseTypeType transactionPhaseType = getTransactionPhase(messageInTransaction14Type);
+			if (transactionPhaseType != null) {
+				TransactionPhase messageInTransactionTypeTypeTransactionPhase = object16Factory
+						.createMessageInTransactionTypeTypeTransactionPhase();
+				nl.visi.schemas._20160331.TransactionPhaseTypeType transactionPhase = Editor16.getStore16().getElement(
+						nl.visi.schemas._20160331.TransactionPhaseTypeType.class, transactionPhaseType.getId());
+				TransactionPhaseTypeTypeRef transactionTypeTypeRef = object16Factory
+						.createTransactionPhaseTypeTypeRef();
+				transactionTypeTypeRef.setIdref(transactionPhase);
+				messageInTransactionTypeTypeTransactionPhase.setTransactionPhaseTypeRef(transactionTypeTypeRef);
+				messageInTransaction16Type.setTransactionPhase(messageInTransactionTypeTypeTransactionPhase);
+			}
+
 			GroupTypeType groupType = getGroup(messageInTransaction14Type);
 			if (groupType != null) {
 				Group messageInTransactionTypeTypeGroup = object16Factory.createMessageInTransactionTypeTypeGroup();
@@ -618,6 +645,7 @@ public class Translator14to16 extends Control14 {
 		for (MessageTypeType message14Type : message14Types) {
 			nl.visi.schemas._20160331.MessageTypeType complexElement16Type = Editor16.getStore16()
 					.getElement(nl.visi.schemas._20160331.MessageTypeType.class, message14Type.getId());
+
 			List<ComplexElementTypeType> complexElements = getComplexElements(message14Type);
 			if (complexElements != null) {
 				nl.visi.schemas._20160331.MessageTypeType.ComplexElements messageTypeComplexElements = object16Factory
@@ -634,7 +662,250 @@ public class Translator14to16 extends Control14 {
 				}
 			}
 
+			List<AppendixTypeType> appendices = getAppendices(message14Type);
+			if (appendices != null) {
+				nl.visi.schemas._20160331.MessageTypeType.AppendixTypes messageTypeAppendixTypes = object16Factory
+						.createMessageTypeTypeAppendixTypes();
+				for (AppendixTypeType appendix14 : appendices) {
+					nl.visi.schemas._20160331.AppendixTypeType appendix16 = Editor16.getStore16()
+							.getElement(nl.visi.schemas._20160331.AppendixTypeType.class, appendix14.getId());
+					AppendixTypeTypeRef appendixTypeTypeRef = object16Factory.createAppendixTypeTypeRef();
+					appendixTypeTypeRef.setIdref(appendix16);
+					messageTypeAppendixTypes.getAppendixTypeOrAppendixTypeRef().add(appendixTypeTypeRef);
+					complexElement16Type.setAppendixTypes(messageTypeAppendixTypes);
+				}
+			}
+
 			Editor16.getStore16().put(complexElement16Type.getId(), complexElement16Type);
+		}
+	}
+
+	private void translateOrganisationTypeAttributes(ObjectFactory object16Factory) {
+		List<OrganisationTypeType> organisation14Types = Editor14.getStore14().getElements(OrganisationTypeType.class);
+		for (OrganisationTypeType organisation14Type : organisation14Types) {
+			nl.visi.schemas._20160331.OrganisationTypeType organisation16Type = object16Factory
+					.createOrganisationTypeType();
+			organisation16Type.setId(organisation14Type.getId());
+			Method[] declared14Methods = nl.visi.schemas._20160331.OrganisationTypeType.class.getDeclaredMethods();
+			try {
+				for (Method method : declared14Methods) {
+					switch (method.getName()) {
+					case "getCategory":
+						organisation16Type.setCategory(organisation14Type.getCategory());
+						break;
+					case "getCode":
+						organisation16Type.setCode(organisation14Type.getCode());
+						break;
+					case "getDescription":
+						organisation16Type.setDescription(organisation14Type.getDescription());
+						break;
+					case "getDateLaMu":
+						organisation16Type.setDateLaMu(organisation14Type.getDateLaMu());
+						break;
+					case "getEndDate":
+						organisation16Type.setEndDate(organisation14Type.getEndDate());
+						break;
+					case "getHelpInfo":
+						organisation16Type.setHelpInfo(organisation14Type.getHelpInfo());
+						break;
+					case "getLanguage":
+						organisation16Type.setLanguage(organisation14Type.getLanguage());
+						break;
+					case "getStartDate":
+						organisation16Type.setStartDate(organisation14Type.getStartDate());
+						break;
+					case "getState":
+						organisation16Type.setState(organisation14Type.getState());
+						break;
+					case "getUserLaMu":
+						organisation16Type.setUserLaMu(organisation14Type.getUserLaMu());
+						break;
+					default:
+						System.out.println(method.getName());
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Editor16.getStore16().put(organisation16Type.getId(), organisation16Type);
+		}
+	}
+
+	private void translateOrganisationTypeLinks(ObjectFactory object16Factory) {
+		List<OrganisationTypeType> organisation14Types = Editor14.getStore14().getElements(OrganisationTypeType.class);
+		for (OrganisationTypeType organisation14Type : organisation14Types) {
+			nl.visi.schemas._20160331.OrganisationTypeType complexElement16Type = Editor16.getStore16()
+					.getElement(nl.visi.schemas._20160331.OrganisationTypeType.class, organisation14Type.getId());
+			List<ComplexElementTypeType> complexElements = getComplexElements(organisation14Type);
+			if (complexElements != null) {
+				nl.visi.schemas._20160331.OrganisationTypeType.ComplexElements messageTypeComplexElements = object16Factory
+						.createOrganisationTypeTypeComplexElements();
+				for (ComplexElementTypeType complexElement : complexElements) {
+					nl.visi.schemas._20160331.ComplexElementTypeType ce = Editor16.getStore16()
+							.getElement(nl.visi.schemas._20160331.ComplexElementTypeType.class, complexElement.getId());
+					ComplexElementTypeTypeRef complexElementTypeTypeRef = object16Factory
+							.createComplexElementTypeTypeRef();
+					complexElementTypeTypeRef.setIdref(ce);
+					messageTypeComplexElements.getComplexElementTypeOrComplexElementTypeRef()
+							.add(complexElementTypeTypeRef);
+					complexElement16Type.setComplexElements(messageTypeComplexElements);
+				}
+			}
+
+			Editor16.getStore16().put(complexElement16Type.getId(), complexElement16Type);
+		}
+	}
+
+	private void translatePersonTypeAttributes(ObjectFactory object16Factory) {
+		List<PersonTypeType> person14Types = Editor14.getStore14().getElements(PersonTypeType.class);
+		for (PersonTypeType person14Type : person14Types) {
+			nl.visi.schemas._20160331.PersonTypeType person16Type = object16Factory.createPersonTypeType();
+			person16Type.setId(person14Type.getId());
+			Method[] declared14Methods = nl.visi.schemas._20160331.PersonTypeType.class.getDeclaredMethods();
+			try {
+				for (Method method : declared14Methods) {
+					switch (method.getName()) {
+					case "getCategory":
+						person16Type.setCategory(person14Type.getCategory());
+						break;
+					case "getCode":
+						person16Type.setCode(person14Type.getCode());
+						break;
+					case "getDescription":
+						person16Type.setDescription(person14Type.getDescription());
+						break;
+					case "getDateLaMu":
+						person16Type.setDateLaMu(person14Type.getDateLaMu());
+						break;
+					case "getEndDate":
+						person16Type.setEndDate(person14Type.getEndDate());
+						break;
+					case "getHelpInfo":
+						person16Type.setHelpInfo(person14Type.getHelpInfo());
+						break;
+					case "getLanguage":
+						person16Type.setLanguage(person14Type.getLanguage());
+						break;
+					case "getStartDate":
+						person16Type.setStartDate(person14Type.getStartDate());
+						break;
+					case "getState":
+						person16Type.setState(person14Type.getState());
+						break;
+					case "getUserLaMu":
+						person16Type.setUserLaMu(person14Type.getUserLaMu());
+						break;
+					default:
+						System.out.println(method.getName());
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Editor16.getStore16().put(person16Type.getId(), person16Type);
+		}
+	}
+
+	private void translatePersonTypeLinks(ObjectFactory object16Factory) {
+		List<PersonTypeType> person14Types = Editor14.getStore14().getElements(PersonTypeType.class);
+		for (PersonTypeType person14Type : person14Types) {
+			nl.visi.schemas._20160331.PersonTypeType person16Type = Editor16.getStore16()
+					.getElement(nl.visi.schemas._20160331.PersonTypeType.class, person14Type.getId());
+			List<ComplexElementTypeType> complexElements = getComplexElements(person14Type);
+			if (complexElements != null) {
+				nl.visi.schemas._20160331.PersonTypeType.ComplexElements messageTypeComplexElements = object16Factory
+						.createPersonTypeTypeComplexElements();
+				for (ComplexElementTypeType complexElement : complexElements) {
+					nl.visi.schemas._20160331.ComplexElementTypeType ce = Editor16.getStore16()
+							.getElement(nl.visi.schemas._20160331.ComplexElementTypeType.class, complexElement.getId());
+					ComplexElementTypeTypeRef complexElementTypeTypeRef = object16Factory
+							.createComplexElementTypeTypeRef();
+					complexElementTypeTypeRef.setIdref(ce);
+					messageTypeComplexElements.getComplexElementTypeOrComplexElementTypeRef()
+							.add(complexElementTypeTypeRef);
+					person16Type.setComplexElements(messageTypeComplexElements);
+				}
+			}
+
+			Editor16.getStore16().put(person16Type.getId(), person16Type);
+		}
+	}
+
+	private void translateProjectTypeAttributes(ObjectFactory object16Factory) {
+		List<ProjectTypeType> project14Types = Editor14.getStore14().getElements(ProjectTypeType.class);
+		for (ProjectTypeType project14Type : project14Types) {
+			nl.visi.schemas._20160331.ProjectTypeType project16Type = object16Factory.createProjectTypeType();
+			project16Type.setId(project14Type.getId());
+			Method[] declared14Methods = nl.visi.schemas._20160331.ProjectTypeType.class.getDeclaredMethods();
+			try {
+				for (Method method : declared14Methods) {
+					switch (method.getName()) {
+					case "getCategory":
+						project16Type.setCategory(project14Type.getCategory());
+						break;
+					case "getCode":
+						project16Type.setCode(project14Type.getCode());
+						break;
+					case "getDescription":
+						project16Type.setDescription(project14Type.getDescription());
+						break;
+					case "getDateLaMu":
+						project16Type.setDateLaMu(project14Type.getDateLaMu());
+						break;
+					case "getEndDate":
+						project16Type.setEndDate(project14Type.getEndDate());
+						break;
+					case "getHelpInfo":
+						project16Type.setHelpInfo(project14Type.getHelpInfo());
+						break;
+					case "getLanguage":
+						project16Type.setLanguage(project14Type.getLanguage());
+						break;
+					case "getNamespace":
+						project16Type.setNamespace(project14Type.getNamespace());
+						break;
+					case "getStartDate":
+						project16Type.setStartDate(project14Type.getStartDate());
+						break;
+					case "getState":
+						project16Type.setState(project14Type.getState());
+						break;
+					case "getUserLaMu":
+						project16Type.setUserLaMu(project14Type.getUserLaMu());
+						break;
+					default:
+						System.out.println(method.getName());
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Editor16.getStore16().put(project16Type.getId(), project16Type);
+		}
+	}
+
+	private void translateProjectTypeLinks(ObjectFactory object16Factory) {
+		List<ProjectTypeType> project14Types = Editor14.getStore14().getElements(ProjectTypeType.class);
+		for (ProjectTypeType project14Type : project14Types) {
+			nl.visi.schemas._20160331.ProjectTypeType project16Type = Editor16.getStore16()
+					.getElement(nl.visi.schemas._20160331.ProjectTypeType.class, project14Type.getId());
+			List<ComplexElementTypeType> complexElements = getComplexElements(project14Type);
+			if (complexElements != null) {
+				nl.visi.schemas._20160331.ProjectTypeType.ComplexElements messageTypeComplexElements = object16Factory
+						.createProjectTypeTypeComplexElements();
+				for (ComplexElementTypeType complexElement : complexElements) {
+					nl.visi.schemas._20160331.ComplexElementTypeType ce = Editor16.getStore16()
+							.getElement(nl.visi.schemas._20160331.ComplexElementTypeType.class, complexElement.getId());
+					ComplexElementTypeTypeRef complexElementTypeTypeRef = object16Factory
+							.createComplexElementTypeTypeRef();
+					complexElementTypeTypeRef.setIdref(ce);
+					messageTypeComplexElements.getComplexElementTypeOrComplexElementTypeRef()
+							.add(complexElementTypeTypeRef);
+					project16Type.setComplexElements(messageTypeComplexElements);
+				}
+			}
+
+			Editor16.getStore16().put(project16Type.getId(), project16Type);
 		}
 	}
 
@@ -767,6 +1038,58 @@ public class Translator14to16 extends Control14 {
 				simpleElement16Type.setUserDefinedType(simpleElementTypeUserDefinedType);
 			}
 			Editor16.getStore16().put(simpleElement16Type.getId(), simpleElement16Type);
+		}
+	}
+
+	private void translateTransactionPhaseTypeAttributes(ObjectFactory object16Factory) {
+		List<TransactionPhaseTypeType> TransactionPhase14Types = Editor14.getStore14()
+				.getElements(TransactionPhaseTypeType.class);
+		for (TransactionPhaseTypeType TransactionPhase14Type : TransactionPhase14Types) {
+			nl.visi.schemas._20160331.TransactionPhaseTypeType transactionPhase16Type = object16Factory
+					.createTransactionPhaseTypeType();
+			transactionPhase16Type.setId(TransactionPhase14Type.getId());
+			Method[] declared14Methods = nl.visi.schemas._20160331.TransactionPhaseTypeType.class.getDeclaredMethods();
+			try {
+				for (Method method : declared14Methods) {
+					switch (method.getName()) {
+					case "getCategory":
+						transactionPhase16Type.setCategory(TransactionPhase14Type.getCategory());
+						break;
+					case "getCode":
+						transactionPhase16Type.setCode(TransactionPhase14Type.getCode());
+						break;
+					case "getDescription":
+						transactionPhase16Type.setDescription(TransactionPhase14Type.getDescription());
+						break;
+					case "getDateLaMu":
+						transactionPhase16Type.setDateLaMu(TransactionPhase14Type.getDateLaMu());
+						break;
+					case "getEndDate":
+						transactionPhase16Type.setEndDate(TransactionPhase14Type.getEndDate());
+						break;
+					case "getHelpInfo":
+						transactionPhase16Type.setHelpInfo(TransactionPhase14Type.getHelpInfo());
+						break;
+					case "getLanguage":
+						transactionPhase16Type.setLanguage(TransactionPhase14Type.getLanguage());
+						break;
+					case "getStartDate":
+						transactionPhase16Type.setStartDate(TransactionPhase14Type.getStartDate());
+						break;
+					case "getState":
+						transactionPhase16Type.setState(TransactionPhase14Type.getState());
+						break;
+					case "getUserLaMu":
+						transactionPhase16Type.setUserLaMu(TransactionPhase14Type.getUserLaMu());
+						break;
+					default:
+						System.out.println(method.getName());
+					}
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			Editor16.getStore16().put(transactionPhase16Type.getId(), transactionPhase16Type);
 		}
 	}
 

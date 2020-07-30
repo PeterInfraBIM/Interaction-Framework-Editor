@@ -14,6 +14,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.Control;
 import nl.visi.schemas._20140331.AppendixTypeType;
+import nl.visi.schemas._20140331.AppendixTypeTypeRef;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20140331.ElementConditionType;
@@ -34,8 +35,12 @@ import nl.visi.schemas._20140331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.TransactionPhase;
 import nl.visi.schemas._20140331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20140331.MessageTypeType;
+import nl.visi.schemas._20140331.MessageTypeType.AppendixTypes;
 import nl.visi.schemas._20140331.MessageTypeType.ComplexElements;
 import nl.visi.schemas._20140331.ObjectFactory;
+import nl.visi.schemas._20140331.OrganisationTypeType;
+import nl.visi.schemas._20140331.PersonTypeType;
+import nl.visi.schemas._20140331.ProjectTypeType;
 import nl.visi.schemas._20140331.RoleTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
@@ -471,6 +476,93 @@ public abstract class Control14 extends Control {
 	protected static List<ComplexElementTypeType> getComplexElements(MessageTypeType messageType) {
 		if (messageType != null) {
 			ComplexElements complexElements = messageType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<AppendixTypeType> getAppendices(MessageTypeType messageType) {
+		if (messageType != null) {
+			AppendixTypes appendixTypes = messageType.getAppendixTypes();
+			if (appendixTypes != null) {
+				List<AppendixTypeType> appendixTypeList = new ArrayList<>();
+				AppendixTypeType appendixType = null;
+				List<Object> appendixObjects = appendixTypes.getAppendixTypeOrAppendixTypeRef();
+				for (Object appendixObject : appendixObjects) {
+					if (appendixObject instanceof AppendixTypeType) {
+						appendixType = (AppendixTypeType) appendixObject;
+					} else {
+						appendixType = (AppendixTypeType) ((AppendixTypeTypeRef) appendixObject).getIdref();
+					}
+					appendixTypeList.add(appendixType);
+				}
+				return appendixTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(OrganisationTypeType organisationType) {
+		if (organisationType != null) {
+			OrganisationTypeType.ComplexElements complexElements = organisationType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(PersonTypeType personType) {
+		if (personType != null) {
+			PersonTypeType.ComplexElements complexElements = personType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(ProjectTypeType projectType) {
+		if (projectType != null) {
+			ProjectTypeType.ComplexElements complexElements = projectType.getComplexElements();
 			if (complexElements != null) {
 				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
 				ComplexElementTypeType complexElementType = null;
