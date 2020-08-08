@@ -179,7 +179,7 @@
 				Layout="BorderLayout">
 				<tabbedpane id="transactionTabs"
 					Border="EmptyBorder(4,4,4,4)"
-					Titles="lbl_Roles,lbl_Messages,lbl_Subtransactions,lbl_SequenceDiagram">
+					Titles="lbl_Roles,lbl_Messages,lbl_Subtransactions,lbl_SequenceDiagram,lbl_SequenceDiagram">
 					<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 						<label Text="lbl_Initiator">
 							<gridbagconstraints
@@ -310,6 +310,8 @@
 						</scrollpane>
 					</panel>
 					<panel id="canvasPanel" Border="EmptyBorder(4,4,4,4)"
+						Layout="BorderLayout" />
+					<panel id="canvas2Panel" Border="EmptyBorder(4,4,4,4)"
 						Layout="BorderLayout" />
 				</tabbedpane>
 			</panel>

@@ -84,7 +84,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
 	private JPopupMenu popupMenu;
-	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel, elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel, elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
@@ -97,8 +97,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private JButton btn_AddMessage, btn_EditMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator,
 			btn_NavigateExecutor;
 	private JTextArea tar_Initiator, tar_Executor;
-	private JScrollPane scrollPane;
+	private JScrollPane scrollPane, scrollPane2;
 	private Canvas drawingPlane;
+	private Canvas14 canvas14Plane;
 	private Canvas.MessageItem activeItem;
 
 	private Map<MessageInTransactionTypeType, List<MessageInTransactionTypeType>> successorMap;
@@ -304,7 +305,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 						@Override
 						public void mouseExited(MouseEvent e) {
 							if (activeItem != null && e.getComponent() == activeItem.activeLabel) {
-								e.getComponent().setForeground(Color.blue);
+								e.getComponent().setBackground(Color.MAGENTA);
 							} else {
 								e.getComponent().setForeground(Color.black);
 							}
@@ -313,14 +314,49 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 						@Override
 						public void mouseClicked(MouseEvent e) {
+							if (activeItem != null) {
+								activeItem.activeLabel.setBackground(Color.WHITE);
+							}
+							activeItem = MessageItem.this;
 							if (SwingUtilities.isRightMouseButton(e)) {
-								if (activeItem != null) {
-									activeItem.activeLabel.setForeground(Color.black);
-								}
-								activeItem = MessageItem.this;
 								popupMenu.show(e.getComponent(), e.getX(), e.getY());
 							} else {
-								InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
+								// Reset all previous active labels
+								for (MessageItem message : messages) {
+									if (message.activeLabel.getBackground().equals(Color.CYAN)
+											|| message.activeLabel.getBackground().equals(Color.YELLOW)
+											|| message.activeLabel.getBackground().equals(Color.GREEN)) {
+										message.activeLabel.setBackground(Color.WHITE);
+									}
+								}
+								List<MessageInTransactionTypeType> incomingMitts = getPrevious(activeItem.mitt);
+								if (incomingMitts != null) {
+									for (MessageInTransactionTypeType incominggMitt : incomingMitts) {
+										for (MessageItem messageItem : messages) {
+											if (messageItem.mitt.getId().equals(incominggMitt.getId())) {
+												messageItem.activeLabel.setBackground(Color.CYAN);
+												break;
+											}
+										}
+									}
+								}
+								List<MessageInTransactionTypeType> outgoingMitts = getNext(activeItem.mitt);
+								if (outgoingMitts != null) {
+									for (MessageInTransactionTypeType outgoingMitt : outgoingMitts) {
+										for (MessageItem messageItem : messages) {
+											if (messageItem.mitt.getId().equals(outgoingMitt.getId())) {
+												if (messageItem.activeLabel.getBackground().equals(Color.CYAN)) {
+													messageItem.activeLabel.setBackground(Color.GREEN);
+												} else {
+													messageItem.activeLabel.setBackground(Color.YELLOW);
+												}
+												break;
+											}
+										}
+									}
+								}
+
+//								InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
 							}
 						}
 					});
@@ -1630,6 +1666,10 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		scrollPane = new JScrollPane(drawingPlane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		canvasPanel.add(scrollPane, BorderLayout.CENTER);
+		canvas14Plane = new Canvas14(this);
+		scrollPane2 = new JScrollPane(canvas14Plane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		canvas2Panel.add(scrollPane2, BorderLayout.CENTER);
 	}
 
 	private void initResultField() {
@@ -1916,6 +1956,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 
 			fillSubtransactionsTable();
+			
+			// canvas14Plane.selectedTransaction = selectedElement;
 		} else {
 			selectedElement = null;
 			tfd_Id.setText("");
