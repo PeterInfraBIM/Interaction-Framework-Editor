@@ -136,11 +136,10 @@ public class Canvas14 extends JPanel {
 			this.x = x;
 			this.y = y;
 			activeLabel = new RotatingButton();
-			activeLabel.setContentAreaFilled(false);
+			resetActiveLabel();
+			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
+					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			activeLabel.setBackground(LIGHT_YELLOW_4);
-			activeLabel.setMargin(new Insets(0, 4, 0, 4));
-			activeLabel.setBorderPainted(true);
-			activeLabel.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
 			activeLabel.addMouseListener(new MouseAdapter() {
 
 				@Override
@@ -160,115 +159,141 @@ public class Canvas14 extends JPanel {
 					Canvas14.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				}
 			});
+
 			Canvas14.this.add(activeLabel);
+		}
+
+		private void resetActiveLabel() {
+			activeLabel.setContentAreaFilled(false);
+			activeLabel.setMargin(new Insets(0, 4, 0, 4));
+			activeLabel.setBorderPainted(true);
+			activeLabel.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
 		}
 
 		MessageState getState() {
 			return state;
 		}
 
-		void setState(MessageState state) {
-			switch (state) {
-			case History:
-				this.state = state;
-				activeLabel.setBackground(Color.WHITE);
-				break;
-			case Next:
-				this.state = state;
-				activeLabel.setBackground(LIGHT_YELLOW_4);
-				break;
-			case Previous:
-				this.state = state;
-				activeLabel.setBackground(LIGHT_BLUE_3);
-				break;
-			case Selected:
-				MessageState previousState = this.state;
-				if (previousState.equals(MessageState.Next)) {
-					TransactionTypeType transaction = Control14.getTransaction(mitt);
-					if (transaction.getId().equals(selectedTransaction.getId())) {
-						for (Message msg : historyAfter) {
+		void setState(MessageState newState) {
+			if (newState != this.state) {
+				switch (newState) {
+				case History:
+					this.state = newState;
+					activeLabel.setBackground(Color.WHITE);
+					break;
+				case Next:
+					this.state = newState;
+					activeLabel.setBackground(LIGHT_YELLOW_4);
+					break;
+				case Previous:
+					this.state = newState;
+					activeLabel.setBackground(LIGHT_BLUE_3);
+					break;
+				case Selected:
+					MessageState previousState = this.state;
+					switch (previousState) {
+					case History:
+						break;
+					case Next:
+						TransactionTypeType transaction = Control14.getTransaction(mitt);
+						if (transaction.getId().equals(selectedTransaction.getId())) {
+							for (Message msg : historyAfter) {
+								Canvas14.this.remove(msg.activeLabel);
+							}
+							historyAfter.clear();
+						} else {
+							int index = transactionPanel.elementsTableModel.elements.indexOf(transaction);
+							transactionPanel.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
+							selectedTransaction = transaction;
+							initNewDiagram();
+						}
+						break;
+					case Previous:
+						for (Message msg : historyBefore) {
 							Canvas14.this.remove(msg.activeLabel);
 						}
-						historyAfter.clear();
-					} else {
-						int index = transactionPanel.elementsTableModel.elements.indexOf(transaction);
-						transactionPanel.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
-						selectedTransaction = transaction;
-						initNewDiagram();
+						historyBefore.clear();
+						break;
+					case Selected:
+						break;
+					default:
+						break;
 					}
-				} else if (previousState.equals(MessageState.Previous)) {
-					for (Message msg : historyBefore) {
+
+					if (selectedMessage != null) {
+						selectedMessage.setState(MessageState.History);
+						selectedMessage.activeLabel.setBorder(
+								BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
+										BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+						if (selectedMessage.isIn(historyBefore)) {
+							selectedMessage.move(historyBefore, historyAfter);
+						} else if (selectedMessage.isIn(historyAfter)) {
+							selectedMessage.move(historyAfter, historyBefore);
+						}
+						historyBefore.add(selectedMessage);
+					}
+					if (isIn(historyBefore)) {
+						move(historyBefore, historyAfter);
+						historyBefore.remove(this);
+					} else if (isIn(historyAfter)) {
+						move(historyAfter, historyBefore);
+						historyAfter.remove(this);
+					}
+					this.state = newState;
+
+					for (Message msg : selectedPrev) {
 						Canvas14.this.remove(msg.activeLabel);
 					}
-					historyBefore.clear();
-				}
-				if (selectedMessage != null) {
-					selectedMessage.setState(MessageState.History);
-					if (selectedMessage.isIn(historyBefore)) {
-						selectedMessage.move(historyBefore, historyAfter);
-					} else if (selectedMessage.isIn(historyAfter)) {
-						selectedMessage.move(historyAfter, historyBefore);
+					selectedPrev.clear();
+					for (Message msg : selectedNext) {
+						Canvas14.this.remove(msg.activeLabel);
 					}
-					historyBefore.add(selectedMessage);
-				}
-				if (isIn(historyBefore)) {
-					move(historyBefore, historyAfter);
-					historyBefore.remove(this);
-				} else if (isIn(historyAfter)) {
-					move(historyAfter, historyBefore);
-					historyAfter.remove(this);
-				}
-				this.state = state;
+					selectedNext.clear();
+					for (Message msg : selectedRequest) {
+						Canvas14.this.remove(msg.activeLabel);
+					}
+					selectedRequest.clear();
+					for (Message msg : selectedResponse) {
+						Canvas14.this.remove(msg.activeLabel);
+					}
+					selectedResponse.clear();
 
-				for (Message msg : selectedPrev) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedPrev.clear();
-				for (Message msg : selectedNext) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedNext.clear();
-				for (Message msg : selectedRequest) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedRequest.clear();
-				for (Message msg : selectedResponse) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedResponse.clear();
-
-				selectedMessage = this;
-				if (previousState.equals(MessageState.Previous) || previousState.equals(MessageState.Next)) {
-					Canvas14.this.add(selectedMessage.activeLabel);
-				}
-				List<MessageInTransactionTypeType> prevList = Control14.getPrevious(mitt);
-				if (prevList != null) {
-					for (MessageInTransactionTypeType prev : prevList) {
-						Message prevMessage = new Message(prev);
-						prevMessage.setState(MessageState.Previous);
-						if (Control14.getTransaction(prev).getId().equals(selectedTransaction.getId())) {
-							selectedPrev.add(prevMessage);
-						} else {
-							selectedResponse.add(prevMessage);
+					selectedMessage = this;
+					if (previousState.equals(MessageState.Previous) || previousState.equals(MessageState.Next)) {
+						Canvas14.this.add(selectedMessage.activeLabel);
+					}
+					List<MessageInTransactionTypeType> prevList = Control14.getPrevious(mitt);
+					if (prevList != null) {
+						for (MessageInTransactionTypeType prev : prevList) {
+							Message prevMessage = new Message(prev);
+							prevMessage.setState(MessageState.Previous);
+							if (Control14.getTransaction(prev).getId().equals(selectedTransaction.getId())) {
+								selectedPrev.add(prevMessage);
+							} else {
+								selectedResponse.add(prevMessage);
+							}
 						}
 					}
-				}
-				List<MessageInTransactionTypeType> nextList = Control14.getNext(mitt);
-				if (nextList != null) {
-					for (MessageInTransactionTypeType next : nextList) {
-						Message nextMessage = new Message(next);
-						nextMessage.setState(MessageState.Next);
-						if (Control14.getTransaction(next).getId().equals(selectedTransaction.getId())) {
-							selectedNext.add(nextMessage);
-						} else {
-							selectedRequest.add(nextMessage);
+					List<MessageInTransactionTypeType> nextList = Control14.getNext(mitt);
+					if (nextList != null) {
+						for (MessageInTransactionTypeType next : nextList) {
+							Message nextMessage = new Message(next);
+							nextMessage.setState(MessageState.Next);
+							if (Control14.getTransaction(next).getId().equals(selectedTransaction.getId())) {
+								selectedNext.add(nextMessage);
+							} else {
+								selectedRequest.add(nextMessage);
+							}
 						}
 					}
+					activeLabel.setBorder(
+							BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 2),
+									BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+					activeLabel.setBackground(LIGHT_GOLD_4);
+					break;
+				default:
+					break;
 				}
-				activeLabel.setBackground(LIGHT_GOLD_4);
-				break;
-			default:
-				break;
 			}
 		}
 
@@ -310,11 +335,14 @@ public class Canvas14 extends JPanel {
 			String label = mitt != null ? Control14.getMessage(mitt).getDescription() : "?";
 			activeLabel.setText(label);
 			activeLabel.setToolTipText(mitt != null ? Control14.getMessage(mitt).getId() : "?");
+
 			if (isStartMessage()) {
-				activeLabel.setBorder(BorderFactory.createLineBorder(LIGHT_GREEN_1, 2));
+				activeLabel.setBorder(BorderFactory.createCompoundBorder(
+						BorderFactory.createLineBorder(LIGHT_GREEN_1, 2), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			}
 			if (isEndMessage()) {
-				activeLabel.setBorder(BorderFactory.createLineBorder(LIGHT_RED_1, 2));
+				activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_RED_1, 2),
+						BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			}
 			TransactionTypeType transaction = Control14.getTransaction(mitt);
 			int stringWidth = g2d.getFontMetrics().stringWidth(label);
@@ -447,7 +475,6 @@ public class Canvas14 extends JPanel {
 		selectedPrev = new ArrayList<>();
 		selectedRequest = new ArrayList<>();
 		selectedResponse = new ArrayList<>();
-
 	}
 
 	public Canvas14(TransactionsPanelControl14 transactionPanel, boolean printMode) {
@@ -498,6 +525,9 @@ public class Canvas14 extends JPanel {
 		int lastY = topMargin;
 		Message lastMessage = null;
 		if (selectedMessage != null) {
+			//
+			// History before messages
+			//
 			for (Message message : historyBefore) {
 				message.paint(y);
 				y += MESSAGE_LINE_HEIGHT;
@@ -505,6 +535,9 @@ public class Canvas14 extends JPanel {
 			lastY = drawConnectorBoxes(historyBefore, lastMessage, lastY);
 			lastMessage = !historyBefore.isEmpty() ? historyBefore.get(historyBefore.size() - 1) : lastMessage;
 
+			//
+			// Internal previous messages
+			//
 			int saveY = y;
 			List<Message> actualSelectedPrev = new ArrayList<>();
 			for (Message message : selectedPrev) {
@@ -518,9 +551,11 @@ public class Canvas14 extends JPanel {
 					: lastMessage;
 			lastY = drawConnectorBoxes(actualSelectedPrev, lastMessage, lastY);
 
+			//
+			// External previous messages
+			//
 			if (!selectedResponse.isEmpty()) {
 				y = saveY;
-//				y += MESSAGE_LINE_HEIGHT;
 				for (Message message : selectedResponse) {
 					message.paint(y);
 					y += MESSAGE_LINE_HEIGHT;
@@ -530,13 +565,25 @@ public class Canvas14 extends JPanel {
 			lastY = drawConnectorBoxes(selectedResponse, lastMessage,
 					y - (!selectedResponse.isEmpty() ? selectedResponse.size() + 1 : 0) * MESSAGE_LINE_HEIGHT);
 			y = lastY;
+
+			//
+			// Selected message
+			//
 			selectedMessage.paint(y);
 			lastY = drawConnectorBoxes(null, lastMessage, lastY);
 			saveY = y;
+
+			//
+			// External next messages
+			//
 			for (Message message : selectedRequest) {
 				message.paint(y);
 				y += MESSAGE_LINE_HEIGHT;
 			}
+
+			//
+			// Internal next messages
+			//
 			y = saveY;
 			y += MESSAGE_LINE_HEIGHT;
 			List<Message> actualSelectedNext = new ArrayList<>();
@@ -549,10 +596,16 @@ public class Canvas14 extends JPanel {
 			}
 			lastMessage = selectedMessage != null ? selectedMessage : lastMessage;
 			lastY = drawConnectorBoxes(actualSelectedNext, lastMessage, lastY);
+
+			//
+			// History after messages
+			//
 			for (Message message : historyAfter) {
 				message.paint(y);
 				y += MESSAGE_LINE_HEIGHT;
 			}
+			lastY = drawConnectorBoxes(historyAfter, selectedMessage, lastY);
+
 		} else {
 			for (Message message : selectedNext) {
 				message.paint(y);
@@ -572,7 +625,8 @@ public class Canvas14 extends JPanel {
 	private int drawConnectorBoxes(List<Message> messageList, Message lastMsg, int lastY) {
 		if (messageList == null) {
 			drawConnectorBox(getStartX(selectedMessage), lastY, 1, lastMsg == null ? BoxType.CLOSED : BoxType.OPEN_TOP);
-			drawConnectorBox(getEndX(selectedMessage), lastY, 1, BoxType.OPEN_BOTTOM);
+			drawConnectorBox(getEndX(selectedMessage), lastY, 1,
+					selectedMessage.isEndMessage() ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
 			lastY += MESSAGE_LINE_HEIGHT;
 		} else if (!messageList.isEmpty()) {
 			for (int index = 0; index < messageList.size(); index++) {
