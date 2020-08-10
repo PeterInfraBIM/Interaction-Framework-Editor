@@ -9,6 +9,8 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -17,7 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
@@ -42,6 +47,7 @@ public class Canvas14 extends JPanel {
 	private Graphics2D g2d;
 	private int leftMargin, rightMargin, middleMargin, topMargin, initiatorFlow, executorFlow;
 	private boolean printMode;
+	private JPopupMenu popupMenu;
 
 	class ResizeListener extends ComponentAdapter {
 
@@ -475,6 +481,29 @@ public class Canvas14 extends JPanel {
 		selectedPrev = new ArrayList<>();
 		selectedRequest = new ArrayList<>();
 		selectedResponse = new ArrayList<>();
+
+		popupMenu = new JPopupMenu();
+		JMenuItem jMenuItem = new JMenuItem("Voorstel Akkoord met financiele consequenties");
+		jMenuItem.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MessageInTransactionTypeType mitt = Editor14.getStore14().getElement(MessageInTransactionTypeType.class,
+						"mit26681");
+				Message message = new Message(mitt);
+				message.state = MessageState.Next;
+			}
+		});
+		popupMenu.add(jMenuItem);
+		addMouseListener(new MouseAdapter() {
+
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (SwingUtilities.isRightMouseButton(e)) {
+					popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 	}
 
 	public Canvas14(TransactionsPanelControl14 transactionPanel, boolean printMode) {
@@ -533,7 +562,9 @@ public class Canvas14 extends JPanel {
 				y += MESSAGE_LINE_HEIGHT;
 			}
 			lastY = drawConnectorBoxes(historyBefore, lastMessage, lastY);
-			lastMessage = !historyBefore.isEmpty() ? historyBefore.get(historyBefore.size() - 1) : lastMessage;
+			Message lastHistoryBeforeMessage = !historyBefore.isEmpty() ? historyBefore.get(historyBefore.size() - 1)
+					: null;
+			lastMessage = lastHistoryBeforeMessage;
 
 			//
 			// Internal previous messages
@@ -545,11 +576,15 @@ public class Canvas14 extends JPanel {
 					actualSelectedPrev.add(message);
 					message.paint(y);
 					y += MESSAGE_LINE_HEIGHT;
+				} else {
+					message.activeLabel.setVisible(false);
 				}
 			}
-			lastMessage = !actualSelectedPrev.isEmpty() ? actualSelectedPrev.get(actualSelectedPrev.size() - 1)
-					: lastMessage;
 			lastY = drawConnectorBoxes(actualSelectedPrev, lastMessage, lastY);
+			Message lastSelectedPrevMessage = !actualSelectedPrev.isEmpty()
+					? actualSelectedPrev.get(actualSelectedPrev.size() - 1)
+					: null;
+			lastMessage = lastSelectedPrevMessage != null ? lastSelectedPrevMessage : lastHistoryBeforeMessage;
 
 			//
 			// External previous messages
@@ -562,8 +597,12 @@ public class Canvas14 extends JPanel {
 				}
 			}
 			// lastY = drawConnectorBoxes(selectedResponse, lastMessage, lastY);
-			lastY = drawConnectorBoxes(selectedResponse, lastMessage,
-					y - (!selectedResponse.isEmpty() ? selectedResponse.size() + 1 : 0) * MESSAGE_LINE_HEIGHT);
+			lastY = drawConnectorBoxes(selectedResponse, lastHistoryBeforeMessage,
+					y - (!selectedResponse.isEmpty() ? selectedResponse.size() : 0) * MESSAGE_LINE_HEIGHT);
+			Message lastSelectedResponseMessage = !selectedResponse.isEmpty()
+					? selectedResponse.get(selectedResponse.size() - 1)
+					: null;
+			lastMessage = lastSelectedResponseMessage != null ? lastSelectedResponseMessage : lastMessage;
 			y = lastY;
 
 			//
@@ -576,10 +615,14 @@ public class Canvas14 extends JPanel {
 			//
 			// External next messages
 			//
+			y += MESSAGE_LINE_HEIGHT;
 			for (Message message : selectedRequest) {
 				message.paint(y);
 				y += MESSAGE_LINE_HEIGHT;
 			}
+			lastMessage = selectedMessage != null ? selectedMessage : lastMessage;
+			int saveLastY = lastY;
+			lastY = drawConnectorBoxes(selectedRequest, lastMessage, lastY);
 
 			//
 			// Internal next messages
@@ -595,7 +638,7 @@ public class Canvas14 extends JPanel {
 				}
 			}
 			lastMessage = selectedMessage != null ? selectedMessage : lastMessage;
-			lastY = drawConnectorBoxes(actualSelectedNext, lastMessage, lastY);
+			lastY = drawConnectorBoxes(actualSelectedNext, lastMessage, saveLastY);
 
 			//
 			// History after messages
@@ -624,9 +667,11 @@ public class Canvas14 extends JPanel {
 
 	private int drawConnectorBoxes(List<Message> messageList, Message lastMsg, int lastY) {
 		if (messageList == null) {
+			g2d.setColor(Color.GREEN);
 			drawConnectorBox(getStartX(selectedMessage), lastY, 1, lastMsg == null ? BoxType.CLOSED : BoxType.OPEN_TOP);
 			drawConnectorBox(getEndX(selectedMessage), lastY, 1,
-					selectedMessage.isEndMessage() ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
+					selectedMessage.isEndMessage() && selectedRequest.isEmpty() ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
+			g2d.setColor(Color.BLACK);
 			lastY += MESSAGE_LINE_HEIGHT;
 		} else if (!messageList.isEmpty()) {
 			for (int index = 0; index < messageList.size(); index++) {
@@ -655,7 +700,7 @@ public class Canvas14 extends JPanel {
 									nextMsg == null ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
 
 						} else {
-							drawConnectorBox(getEndX(currMsg), lastY, 1, BoxType.OPEN_TOP_BOTTOM);
+							drawConnectorBox(getEndX(currMsg), lastY, 1, BoxType.OPEN_BOTTOM);
 						}
 						break;
 					default:
@@ -664,17 +709,23 @@ public class Canvas14 extends JPanel {
 				} else {
 					switch (currMsg.getState()) {
 					case History:
+						g2d.setColor(Color.RED);
 						drawConnectorBox(getStartX(currMsg), lastY, 1, BoxType.OPEN_TOP);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
+						g2d.setColor(Color.BLACK);
 						break;
 					case Next:
+						g2d.setColor(Color.CYAN);
 						drawConnectorBox(getStartX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM);
+						g2d.setColor(Color.BLACK);
 						break;
 					case Previous:
+						g2d.setColor(Color.PINK);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM);
+						g2d.setColor(Color.BLACK);
 						break;
 					default:
 						break;
