@@ -17,15 +17,20 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
 
+import nl.visi.interaction_framework.editor.Control;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
+import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.RoleTypeType;
 import nl.visi.schemas._20140331.TransactionTypeType;
 
@@ -143,6 +148,10 @@ public class Canvas14 extends JPanel {
 			this.y = y;
 			activeLabel = new RotatingButton();
 			resetActiveLabel();
+			String label = mitt != null ? Control14.getMessage(mitt).getDescription() : "?";
+			activeLabel.setText(label);
+			activeLabel.setToolTipText(mitt != null ? Control14.getMessage(mitt).getId() : "?");
+
 			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
 					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			activeLabel.setBackground(LIGHT_YELLOW_4);
@@ -235,15 +244,27 @@ public class Canvas14 extends JPanel {
 							selectedMessage.move(historyBefore, historyAfter);
 						} else if (selectedMessage.isIn(historyAfter)) {
 							selectedMessage.move(historyAfter, historyBefore);
+						} else {
+							if (this.state.equals(MessageState.Previous)) {
+								historyAfter.add(0, selectedMessage);
+							} else if (this.state.equals(MessageState.Next)) {
+								historyBefore.add(selectedMessage);
+							}
 						}
-						historyBefore.add(selectedMessage);
 					}
 					if (isIn(historyBefore)) {
-						move(historyBefore, historyAfter);
+						if (selectedMessage != null) {
+							historyAfter.add(0, selectedMessage);
+						}
+						moveBeforeToAfter();
 						historyBefore.remove(this);
 					} else if (isIn(historyAfter)) {
-						move(historyAfter, historyBefore);
+						if (selectedMessage != null) {
+							historyBefore.add(selectedMessage);
+						}
+						moveAfterToBefore();
 						historyAfter.remove(this);
+
 					}
 					this.state = newState;
 
@@ -313,6 +334,34 @@ public class Canvas14 extends JPanel {
 				for (Message message : toBeMoved) {
 					to.add(0, message);
 					from.remove(message);
+				}
+			}
+		}
+
+		private void moveBeforeToAfter() {
+			int indexOfThis = historyBefore.indexOf(this);
+			if (indexOfThis < historyBefore.size() - 1) {
+				List<Message> toBeMoved = new ArrayList<>();
+				for (int i = historyBefore.size() - 1; i > indexOfThis; i--) {
+					toBeMoved.add(historyBefore.get(i));
+				}
+				for (Message message : toBeMoved) {
+					historyAfter.add(0, message);
+					historyBefore.remove(message);
+				}
+			}
+		}
+
+		private void moveAfterToBefore() {
+			int indexOfThis = historyAfter.indexOf(this);
+			if (indexOfThis > -1) {
+				List<Message> toBeMoved = new ArrayList<>();
+				for (int i = 0; i < indexOfThis; i++) {
+					toBeMoved.add(historyAfter.get(i));
+				}
+				for (Message message : toBeMoved) {
+					historyBefore.add(message);
+					historyAfter.remove(message);
 				}
 			}
 		}
@@ -467,7 +516,7 @@ public class Canvas14 extends JPanel {
 		}
 	}
 
-	public Canvas14(TransactionsPanelControl14 transactionPanel) {
+	public Canvas14(final TransactionsPanelControl14 transactionPanel) {
 		addComponentListener(new ResizeListener());
 		this.transactionPanel = transactionPanel;
 		this.printMode = false;
@@ -483,27 +532,44 @@ public class Canvas14 extends JPanel {
 		selectedResponse = new ArrayList<>();
 
 		popupMenu = new JPopupMenu();
-		JMenuItem jMenuItem = new JMenuItem("Voorstel Akkoord met financiele consequenties");
-		jMenuItem.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				MessageInTransactionTypeType mitt = Editor14.getStore14().getElement(MessageInTransactionTypeType.class,
-						"mit26681");
-				Message message = new Message(mitt);
-				message.state = MessageState.Next;
-			}
-		});
-		popupMenu.add(jMenuItem);
+		ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
+		final JMenu selectMenu = new JMenu(bundle.getString("lbl_SelectMessage"));
+		popupMenu.add(selectMenu);
 		addMouseListener(new MouseAdapter() {
-
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (SwingUtilities.isRightMouseButton(e)) {
+					fillSelectMenu(selectMenu);
+
 					popupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
 		});
+	}
+
+	private void fillSelectMenu(JMenu selectMenu) {
+		selectMenu.removeAll();
+		List<MessageInTransactionTypeType> messageList = transactionPanel.getMessagesTableModel().elements;
+		if (messageList != null) {
+			for (final MessageInTransactionTypeType mitt : messageList) {
+				MessageTypeType message = Control14.getMessage(mitt);
+				JMenuItem msgItem = new JMenuItem(
+						new AbstractAction(message.getDescription() + " [" + mitt.getId() + "]") {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								selectMessage(mitt);
+							}
+						});
+				selectMenu.add(msgItem);
+			}
+		}
+	}
+
+	private void selectMessage(MessageInTransactionTypeType mitt) {
+		Message message = new Message(mitt);
+		message.state = MessageState.Next;
+		selectedNext.add(message);
+		message.setState(MessageState.Selected);
 	}
 
 	public Canvas14(TransactionsPanelControl14 transactionPanel, boolean printMode) {
