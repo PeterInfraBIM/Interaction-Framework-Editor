@@ -701,6 +701,8 @@ public class Canvas14 extends JPanel {
 					actualSelectedNext.add(message);
 					message.paint(y);
 					y += MESSAGE_LINE_HEIGHT;
+				} else {
+					message.activeLabel.setVisible(false);
 				}
 			}
 			lastMessage = selectedMessage != null ? selectedMessage : lastMessage;
