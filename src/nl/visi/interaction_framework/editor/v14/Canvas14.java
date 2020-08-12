@@ -469,9 +469,9 @@ public class Canvas14 extends JPanel {
 						} else {
 							RoleTypeType executor = Control14.getExecutor(mitt);
 							if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-								activeLabel.setLocation(executorFlow + 50, y);
-							} else {
 								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							} else {
+								activeLabel.setLocation(executorFlow + 50, y);
 							}
 						}
 //						if (mitt.isInitiatorToExecutor()) {
@@ -544,11 +544,11 @@ public class Canvas14 extends JPanel {
 					} else {
 						RoleTypeType executor = Control14.getExecutor(mitt);
 						if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+							g2d.drawLine(initiatorFlow + 50, y + 8, initiatorFlow + 10, y + 8);
+							drawArrowPoint(initiatorFlow + 10, y + 8, 10, 0);
+						} else {
 							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
 							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-						} else {
-							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
-							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
 						}
 					}
 //					if (mitt.isInitiatorToExecutor()) {
