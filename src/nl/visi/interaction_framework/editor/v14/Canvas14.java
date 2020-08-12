@@ -224,10 +224,18 @@ public class Canvas14 extends JPanel {
 						}
 						break;
 					case Previous:
-						for (Message msg : historyBefore) {
-							Canvas14.this.remove(msg.activeLabel);
+						transaction = Control14.getTransaction(mitt);
+						if (transaction.getId().equals(selectedTransaction.getId())) {
+							for (Message msg : historyBefore) {
+								Canvas14.this.remove(msg.activeLabel);
+							}
+							historyBefore.clear();
+						} else {
+							int index = transactionPanel.elementsTableModel.elements.indexOf(transaction);
+							transactionPanel.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
+							selectedTransaction = transaction;
+							initNewDiagram();
 						}
-						historyBefore.clear();
 						break;
 					case Selected:
 						break;
@@ -427,9 +435,19 @@ public class Canvas14 extends JPanel {
 						}
 					} else {
 						if (mitt.isInitiatorToExecutor()) {
-							activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							RoleTypeType initiator = Control14.getInitiator(mitt);
+							if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							} else {
+								activeLabel.setLocation(executorFlow + 50, y);
+							}
 						} else {
-							activeLabel.setLocation(executorFlow + 50, y);
+							RoleTypeType executor = Control14.getExecutor(mitt);
+							if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+								activeLabel.setLocation(executorFlow + 50, y);
+							} else {
+								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							}
 						}
 					}
 					break;
@@ -442,10 +460,25 @@ public class Canvas14 extends JPanel {
 						}
 					} else {
 						if (mitt.isInitiatorToExecutor()) {
-							activeLabel.setLocation(executorFlow + 50, y);
+							RoleTypeType initiator = Control14.getInitiator(mitt);
+							if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+								activeLabel.setLocation(executorFlow + 50, y);
+							} else {
+								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							}
 						} else {
-							activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							RoleTypeType executor = Control14.getExecutor(mitt);
+							if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+								activeLabel.setLocation(executorFlow + 50, y);
+							} else {
+								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							}
 						}
+//						if (mitt.isInitiatorToExecutor()) {
+//							activeLabel.setLocation(executorFlow + 50, y);
+//						} else {
+//							activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+//						}
 					}
 					break;
 				case Selected:
@@ -470,11 +503,23 @@ public class Canvas14 extends JPanel {
 					}
 				} else {
 					if (mitt.isInitiatorToExecutor()) {
-						g2d.drawLine(initiatorFlow - 10, y + 8, initiatorFlow - 50, y + 8);
-						drawArrowPoint(initiatorFlow - 50, y + 8, 10, 180);
+						RoleTypeType initiator = Control14.getInitiator(mitt);
+						if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+							g2d.drawLine(initiatorFlow - 10, y + 8, initiatorFlow - 50, y + 8);
+							drawArrowPoint(initiatorFlow - 50, y + 8, 10, 180);
+						} else {
+							g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
+							drawArrowPoint(executorFlow + 50, y + 8, 10, 0);
+						}
 					} else {
-						g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
-						drawArrowPoint(executorFlow + 50, y + 8, 10, 0);
+						RoleTypeType executor = Control14.getExecutor(mitt);
+						if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+							g2d.drawLine(executorFlow + 10, y + 8, initiatorFlow + 50, y + 8);
+							drawArrowPoint(executorFlow + 50, y + 8, 10, 0);
+						} else {
+							g2d.drawLine(initiatorFlow - 10, y + 8, initiatorFlow - 50, y + 8);
+							drawArrowPoint(initiatorFlow - 50, y + 8, 10, 180);
+						}
 					}
 				}
 			} else if (state.equals(MessageState.Previous)) {
@@ -488,12 +533,31 @@ public class Canvas14 extends JPanel {
 					}
 				} else {
 					if (mitt.isInitiatorToExecutor()) {
-						g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
-						drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+						RoleTypeType initiator = Control14.getInitiator(mitt);
+						if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
+							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+						} else {
+							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
+							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
+						}
 					} else {
-						g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
-						drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
+						RoleTypeType executor = Control14.getExecutor(mitt);
+						if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
+							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+						} else {
+							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
+							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
+						}
 					}
+//					if (mitt.isInitiatorToExecutor()) {
+//						g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
+//						drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+//					} else {
+//						g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
+//						drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
+//					}
 				}
 			} else {
 				if (mitt.isInitiatorToExecutor()) {
@@ -806,11 +870,48 @@ public class Canvas14 extends JPanel {
 	}
 
 	private int getEndX(Message currMsg) {
-		return currMsg.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;
+//		return currMsg.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;
+		TransactionTypeType transaction = Control14.getTransaction(currMsg.mitt);
+		if (transaction.getId().equals(selectedTransaction.getId())) {
+			return currMsg.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;
+		} else {
+			RoleTypeType selectedInitiator = Control14.getInitiator(selectedTransaction);
+			RoleTypeType selectedExecutor = Control14.getExecutor(selectedTransaction);
+			RoleTypeType initiator = Control14.getInitiator(currMsg.mitt);
+			RoleTypeType executor = Control14.getExecutor(currMsg.mitt);
+			if (initiator.getId().equals(selectedInitiator.getId())) {
+				return initiatorFlow;
+			} else if (initiator.getId().equals(selectedExecutor.getId())) {
+				return executorFlow;
+			} else if (executor.getId().equals(selectedInitiator.getId())) {
+				return initiatorFlow;
+			} else if (executor.getId().equals(selectedExecutor.getId())) {
+				return executorFlow;
+			}
+			return 0;
+		}
 	}
 
 	private int getStartX(Message currMsg) {
-		return currMsg.mitt.isInitiatorToExecutor() ? initiatorFlow : executorFlow;
+		TransactionTypeType transaction = Control14.getTransaction(currMsg.mitt);
+		if (transaction.getId().equals(selectedTransaction.getId())) {
+			return currMsg.mitt.isInitiatorToExecutor() ? initiatorFlow : executorFlow;
+		} else {
+			RoleTypeType selectedInitiator = Control14.getInitiator(selectedTransaction);
+			RoleTypeType selectedExecutor = Control14.getExecutor(selectedTransaction);
+			RoleTypeType initiator = Control14.getInitiator(currMsg.mitt);
+			RoleTypeType executor = Control14.getExecutor(currMsg.mitt);
+			if (initiator.getId().equals(selectedInitiator.getId())) {
+				return initiatorFlow;
+			} else if (initiator.getId().equals(selectedExecutor.getId())) {
+				return executorFlow;
+			} else if (executor.getId().equals(selectedInitiator.getId())) {
+				return initiatorFlow;
+			} else if (executor.getId().equals(selectedExecutor.getId())) {
+				return executorFlow;
+			}
+			return 0;
+		}
 	}
 
 	private enum BoxType {
