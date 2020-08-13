@@ -25,6 +25,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 
 import nl.visi.interaction_framework.editor.Control;
@@ -136,6 +137,7 @@ public class Canvas14 extends JPanel {
 		private RotatingButton activeLabel;
 		private int x;
 		private int y;
+		private JPopupMenu popupMenu;
 
 		public Message(MessageInTransactionTypeType mitt) {
 			this(mitt, 0, 0);
@@ -148,18 +150,24 @@ public class Canvas14 extends JPanel {
 			this.y = y;
 			activeLabel = new RotatingButton();
 			resetActiveLabel();
-			String label = mitt != null ? Control14.getMessage(mitt).getDescription() : "?";
-			activeLabel.setText(label);
-			activeLabel.setToolTipText(mitt != null ? Control14.getMessage(mitt).getId() : "?");
 
+			setTitleAndToolTip(mitt);
+			popupMenu = new JPopupMenu();
+			ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
+			final JMenuItem addNewResponse = new JMenuItem(bundle.getString("lbl_AddNewResponse"));
+			popupMenu.add(addNewResponse);
 			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
 					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			activeLabel.setBackground(LIGHT_YELLOW_4);
 			activeLabel.addMouseListener(new MouseAdapter() {
-
 				@Override
 				public void mouseClicked(MouseEvent e) {
-					Message.this.setState(MessageState.Selected);
+					if (SwingUtilities.isRightMouseButton(e)) {
+						addNewResponse.setEnabled(state != null && state.equals(MessageState.Selected));
+						popupMenu.show(e.getComponent(), e.getX(), e.getY());
+					} else {
+						Message.this.setState(MessageState.Selected);
+					}
 				}
 
 				@Override
@@ -176,6 +184,22 @@ public class Canvas14 extends JPanel {
 			});
 
 			Canvas14.this.add(activeLabel);
+		}
+
+		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
+			String label = "?";
+			String toolTip = "?";
+			if (mitt != null) {
+				toolTip = mitt.getId();
+				TransactionTypeType transaction = Control14.getTransaction(mitt);
+				if (transaction.getId().equals(selectedTransaction.getId())) {
+					label = Control14.getMessage(mitt).getDescription();
+				} else {
+					label = transaction.getDescription() + ":" + Control14.getMessage(mitt).getDescription();
+				}
+			}
+			activeLabel.setText(label);
+			activeLabel.setToolTipText(toolTip);
 		}
 
 		private void resetActiveLabel() {
@@ -248,25 +272,21 @@ public class Canvas14 extends JPanel {
 						selectedMessage.activeLabel.setBorder(
 								BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
 										BorderFactory.createEmptyBorder(2, 5, 2, 5)));
-						if (selectedMessage.isIn(historyBefore)) {
-							selectedMessage.move(historyBefore, historyAfter);
-						} else if (selectedMessage.isIn(historyAfter)) {
-							selectedMessage.move(historyAfter, historyBefore);
-						} else {
-							if (this.state.equals(MessageState.Previous)) {
-								historyAfter.add(0, selectedMessage);
-							} else if (this.state.equals(MessageState.Next)) {
-								historyBefore.add(selectedMessage);
-							}
+						if (this.state.equals(MessageState.Previous)) {
+							historyAfter.add(0, selectedMessage);
+						} else if (this.state.equals(MessageState.Next)) {
+							historyBefore.add(selectedMessage);
 						}
 					}
-					if (isIn(historyBefore)) {
+//					if (isIn(historyBefore)) {
+					if (historyBefore.contains(this)) {
 						if (selectedMessage != null) {
 							historyAfter.add(0, selectedMessage);
 						}
 						moveBeforeToAfter();
 						historyBefore.remove(this);
-					} else if (isIn(historyAfter)) {
+//					} else if (isIn(historyAfter)) {
+					} else if (historyAfter.contains(this)) {
 						if (selectedMessage != null) {
 							historyBefore.add(selectedMessage);
 						}
@@ -347,7 +367,14 @@ public class Canvas14 extends JPanel {
 		}
 
 		private void moveBeforeToAfter() {
-			int indexOfThis = historyBefore.indexOf(this);
+			int indexOfThis = -1;
+			for (int i = 0; i < historyBefore.size(); i++) {
+				if (historyBefore.get(i) == this) {
+					indexOfThis = i;
+					break;
+				}
+			}
+//			int indexOfThis = historyBefore.indexOf(this);
 			if (indexOfThis < historyBefore.size() - 1) {
 				List<Message> toBeMoved = new ArrayList<>();
 				for (int i = historyBefore.size() - 1; i > indexOfThis; i--) {
@@ -361,7 +388,14 @@ public class Canvas14 extends JPanel {
 		}
 
 		private void moveAfterToBefore() {
-			int indexOfThis = historyAfter.indexOf(this);
+			int indexOfThis = -1;
+			for (int i = 0; i < historyAfter.size(); i++) {
+				if (historyAfter.get(i) == this) {
+					indexOfThis = i;
+					break;
+				}
+			}
+//			int indexOfThis = historyAfter.indexOf(this);
 			if (indexOfThis > -1) {
 				List<Message> toBeMoved = new ArrayList<>();
 				for (int i = 0; i < indexOfThis; i++) {
@@ -395,9 +429,11 @@ public class Canvas14 extends JPanel {
 		}
 
 		void paint(int y) {
-			String label = mitt != null ? Control14.getMessage(mitt).getDescription() : "?";
-			activeLabel.setText(label);
-			activeLabel.setToolTipText(mitt != null ? Control14.getMessage(mitt).getId() : "?");
+			setTitleAndToolTip(mitt);
+
+//			String label = mitt != null ? Control14.getMessage(mitt).getDescription() : "?";
+//			activeLabel.setText(label);
+//			activeLabel.setToolTipText(mitt != null ? Control14.getMessage(mitt).getId() : "?");
 
 			if (isStartMessage()) {
 				activeLabel.setBorder(BorderFactory.createCompoundBorder(
@@ -408,7 +444,7 @@ public class Canvas14 extends JPanel {
 						BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			}
 			TransactionTypeType transaction = Control14.getTransaction(mitt);
-			int stringWidth = g2d.getFontMetrics().stringWidth(label);
+			int stringWidth = g2d.getFontMetrics().stringWidth(this.activeLabel.getText());
 			if (printMode) {
 				Paint paint = g2d.getPaint();
 				g2d.setPaint(LIGHT_YELLOW_4);
@@ -416,8 +452,12 @@ public class Canvas14 extends JPanel {
 				g2d.setPaint(paint);
 				g2d.drawRect(x, y, 100, 25);
 				g2d.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
-				g2d.drawString(label, x + 50 - (stringWidth / 2), y + 25);
+				g2d.drawString(this.activeLabel.getText(), x + 50 - (stringWidth / 2), y + 25);
 			} else {
+				String internalInitiator = Control14.getInitiator(selectedTransaction).getId();
+				String internalExecutor = Control14.getExecutor(selectedTransaction).getId();
+				String externalInitiator = Control14.getInitiator(mitt).getId();
+				String externalExecutor = Control14.getExecutor(mitt).getId();
 				switch (state) {
 				case History:
 					if (mitt.isInitiatorToExecutor()) {
@@ -435,21 +475,36 @@ public class Canvas14 extends JPanel {
 						}
 					} else {
 						if (mitt.isInitiatorToExecutor()) {
-							RoleTypeType initiator = Control14.getInitiator(mitt);
-							if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+							if (externalInitiator.equals(internalInitiator)) { // EI = II
 								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-							} else {
+							} else if (externalInitiator.equals(internalExecutor)) { // EI = IE
 								activeLabel.setLocation(executorFlow + 50, y);
 							}
 						} else {
-							RoleTypeType executor = Control14.getExecutor(mitt);
-							if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-								activeLabel.setLocation(executorFlow + 50, y);
-							} else {
+							if (externalExecutor.equals(internalInitiator)) { // EI = II
 								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							} else if (externalExecutor.equals(internalExecutor)) { // EE = IE
+								activeLabel.setLocation(executorFlow + 50, y);
 							}
 						}
 					}
+//					else {
+//						if (mitt.isInitiatorToExecutor()) {
+//							RoleTypeType initiator = Control14.getInitiator(mitt);
+//							if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+//								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+//							} else {
+//								activeLabel.setLocation(executorFlow + 50, y);
+//							}
+//						} else {
+//							RoleTypeType executor = Control14.getExecutor(mitt);
+//							if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+//								activeLabel.setLocation(executorFlow + 50, y);
+//							} else {
+//								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+//							}
+//						}
+//					}
 					break;
 				case Previous:
 					if (transaction.getId().equals(selectedTransaction.getId())) {
@@ -460,25 +515,18 @@ public class Canvas14 extends JPanel {
 						}
 					} else {
 						if (mitt.isInitiatorToExecutor()) {
-							RoleTypeType initiator = Control14.getInitiator(mitt);
-							if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
-								activeLabel.setLocation(executorFlow + 50, y);
-							} else {
+							if (externalExecutor.equals(internalInitiator)) { // EE = II
 								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
+							} else if (externalExecutor.equals(internalExecutor)) { // EE = IE
+								activeLabel.setLocation(executorFlow + 50, y);
 							}
 						} else {
-							RoleTypeType executor = Control14.getExecutor(mitt);
-							if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+							if (externalInitiator.equals(internalInitiator)) { // EI = II
 								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-							} else {
+							} else if (externalInitiator.equals(internalExecutor)) { // EI = IE
 								activeLabel.setLocation(executorFlow + 50, y);
 							}
 						}
-//						if (mitt.isInitiatorToExecutor()) {
-//							activeLabel.setLocation(executorFlow + 50, y);
-//						} else {
-//							activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-//						}
 					}
 					break;
 				case Selected:
@@ -542,14 +590,30 @@ public class Canvas14 extends JPanel {
 							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
 						}
 					} else {
+						RoleTypeType initiator = Control14.getInitiator(mitt);
 						RoleTypeType executor = Control14.getExecutor(mitt);
-						if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-							g2d.drawLine(initiatorFlow + 50, y + 8, initiatorFlow + 10, y + 8);
-							drawArrowPoint(initiatorFlow + 10, y + 8, 10, 0);
-						} else {
+						if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
+							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
+						} else if (initiator.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
+							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+						} else if (executor.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
+							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
+							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+						} else if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
 							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
 							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
 						}
+//						if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
+//							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
+//							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+//						} else {
+//							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
+//							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
+//							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
+//							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
+//						}
 					}
 //					if (mitt.isInitiatorToExecutor()) {
 //						g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
@@ -599,6 +663,14 @@ public class Canvas14 extends JPanel {
 		ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
 		final JMenu selectMenu = new JMenu(bundle.getString("lbl_SelectMessage"));
 		popupMenu.add(selectMenu);
+		popupMenu.add(new JSeparator());
+		final JMenuItem addStartMsg = new JMenuItem(new AbstractAction(bundle.getString("lbl_AddStartMessage")) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("AddStartMessage");
+			}
+		});
+		popupMenu.add(addStartMsg);
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -630,6 +702,7 @@ public class Canvas14 extends JPanel {
 	}
 
 	private void selectMessage(MessageInTransactionTypeType mitt) {
+		initNewDiagram();
 		Message message = new Message(mitt);
 		message.state = MessageState.Next;
 		selectedNext.add(message);

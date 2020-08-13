@@ -1984,6 +1984,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		}
 
 		canvasPanel.repaint();
+		canvas2Panel.repaint();
 
 		inSelection = false;
 	}
