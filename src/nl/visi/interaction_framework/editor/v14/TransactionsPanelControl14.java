@@ -88,7 +88,13 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
-	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups;
+	private JComboBox<String> cbx_Initiator, cbx_Executor;
+
+	JComboBox<String> cbx_Messages;
+
+	private JComboBox<String> cbx_TransactionPhases;
+
+	private JComboBox<String> cbx_Groups;
 	private MessagesTableModel messagesTableModel;
 	private SequenceTable sequenceTable;
 	ElementConditionTable elementConditionTable;
@@ -2237,7 +2243,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		btn_AddMessage.setEnabled(selectedIndex > 0);
 	}
 
-	public void addMessage() {
+	public MessageInTransactionTypeType addMessage() {
 		Store14 store = Editor14.getStore14();
 
 		String msgId = (String) cbx_Messages.getSelectedItem();
@@ -2284,6 +2290,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
 
 		fillMessageTable();
+		
+		return mitt;
 	}
 
 	public void editMessage() {

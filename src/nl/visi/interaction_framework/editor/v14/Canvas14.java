@@ -154,8 +154,14 @@ public class Canvas14 extends JPanel {
 			setTitleAndToolTip(mitt);
 			popupMenu = new JPopupMenu();
 			ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
-			final JMenuItem addNewResponse = new JMenuItem(bundle.getString("lbl_AddNewResponse"));
+			final JMenu addNewResponse = new JMenu(bundle.getString("lbl_AddNewResponse"));
 			popupMenu.add(addNewResponse);
+			final JMenu addExistingResponse = new JMenu(bundle.getString("lbl_AddExistingResponse"));
+			popupMenu.add(addExistingResponse);
+			final JMenu addExternalRequest = new JMenu(bundle.getString("lbl_AddExternalRequest"));
+			popupMenu.add(addExternalRequest);
+			final JMenu addExternalResponse = new JMenu(bundle.getString("lbl_AddExternalResponse"));
+			popupMenu.add(addExternalResponse);
 			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
 					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			activeLabel.setBackground(LIGHT_YELLOW_4);
@@ -163,7 +169,17 @@ public class Canvas14 extends JPanel {
 				@Override
 				public void mouseClicked(MouseEvent e) {
 					if (SwingUtilities.isRightMouseButton(e)) {
-						addNewResponse.setEnabled(state != null && state.equals(MessageState.Selected));
+						boolean menuEnabled = state != null && state.equals(MessageState.Selected);
+						addNewResponse.setEnabled(menuEnabled);
+						addExistingResponse.setEnabled(menuEnabled);
+						addExternalRequest.setEnabled(menuEnabled);
+						addExternalResponse.setEnabled(menuEnabled);
+						if (menuEnabled) {
+							fillAddNewResponseMenu(addNewResponse);
+							fillAddExistingResponseMenu(addExistingResponse);
+							fillAddExternalRequestMenu(addExternalRequest);
+							fillAddExternalResponseMenu(addExternalResponse);
+						}
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					} else {
 						Message.this.setState(MessageState.Selected);
@@ -184,6 +200,158 @@ public class Canvas14 extends JPanel {
 			});
 
 			Canvas14.this.add(activeLabel);
+		}
+
+		protected void fillAddNewResponseMenu(JMenu addNewResponse) {
+			addNewResponse.removeAll();
+			List<MessageTypeType> transactionMessages = new ArrayList<>();
+			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			for (MessageInTransactionTypeType mitt : mitts) {
+				if (Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
+					transactionMessages.add(Control14.getMessage(mitt));
+				}
+			}
+			List<MessageTypeType> messages = Editor14.getStore14().getElements(MessageTypeType.class);
+			for (final MessageTypeType message : messages) {
+				if (!transactionMessages.contains(message)) {
+					addNewResponse.add(
+							new JMenuItem(new AbstractAction(message.getDescription() + " [" + message.getId() + "]") {
+								@Override
+								public void actionPerformed(ActionEvent e) {
+									transactionPanel.cbx_Messages.setSelectedItem(message.getId());
+									MessageInTransactionTypeType newMitt = transactionPanel.addMessage();
+									Control14.addPrevious(newMitt, Message.this.mitt);
+									newMitt.setInitiatorToExecutor(!Message.this.mitt.isInitiatorToExecutor());
+									Message message = new Message(newMitt);
+									message.state = MessageState.Next;
+									selectedNext.add(message);
+								}
+							}));
+				}
+			}
+		}
+
+		protected void fillAddExistingResponseMenu(JMenu addExistingResponse) {
+			addExistingResponse.removeAll();
+			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			for (final MessageInTransactionTypeType existingMitt : mitts) {
+				if (Control14.getTransaction(existingMitt).getId().equals(selectedTransaction.getId())) {
+					if (existingMitt.isInitiatorToExecutor() != Message.this.mitt.isInitiatorToExecutor()) {
+						MessageTypeType message = Control14.getMessage(existingMitt);
+						addExistingResponse.add(new JMenuItem(
+								new AbstractAction(message.getDescription() + " [" + existingMitt.getId() + "]") {
+									@Override
+									public void actionPerformed(ActionEvent e) {
+										Control14.addPrevious(existingMitt, Message.this.mitt);
+										Message message = new Message(existingMitt);
+										message.state = MessageState.Next;
+										selectedNext.add(message);
+									}
+								}));
+					}
+				}
+			}
+		}
+
+		protected void fillAddExternalRequestMenu(JMenu addExternalRequest) {
+			addExternalRequest.removeAll();
+			List<MessageInTransactionTypeType> messages = new ArrayList<>();
+			List<TransactionTypeType> transactions = Editor14.getStore14().getElements(TransactionTypeType.class);
+			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			for (TransactionTypeType transaction : transactions) {
+				if (!transaction.getId().equals(selectedTransaction.getId())) {
+					for (MessageInTransactionTypeType mitt : mitts) {
+						if (Control14.getTransaction(mitt).getId().equals(transaction.getId())) {
+							List<MessageInTransactionTypeType> previousList = Control14.getPrevious(mitt);
+							if (previousList == null) {
+								messages.add(mitt);
+							} else {
+								boolean isCandidate = true;
+								for (MessageInTransactionTypeType prev : previousList) {
+									if (Control14.getTransaction(prev).getId().equals(transaction.getId())) {
+										isCandidate = false;
+										break;
+									}
+								}
+								if (isCandidate) {
+									messages.add(mitt);
+								}
+							}
+						}
+					}
+				}
+			}
+			for (final MessageInTransactionTypeType externalMitt : messages) {
+				TransactionTypeType transaction = Control14.getTransaction(externalMitt);
+				MessageTypeType message = Control14.getMessage(externalMitt);
+				addExternalRequest.add(new JMenuItem(new AbstractAction(transaction.getDescription() + ":"
+						+ message.getDescription() + " [" + externalMitt.getId() + "]") {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Control14.addPrevious(externalMitt, Message.this.mitt);
+						Message message = new Message(externalMitt);
+						message.state = MessageState.Next;
+						selectedNext.add(message);
+					}
+				}));
+			}
+		}
+
+		protected void fillAddExternalResponseMenu(JMenu addExternalResponse) {
+			addExternalResponse.removeAll();
+			List<MessageInTransactionTypeType> messages = new ArrayList<>();
+			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			List<MessageInTransactionTypeType> previousList = Control14.getPrevious(Message.this.mitt);
+			if (previousList != null) {
+				for (MessageInTransactionTypeType prev : previousList) {
+					List<MessageInTransactionTypeType> nextList = Control14.getNext(prev);
+					if (nextList != null) {
+						for (MessageInTransactionTypeType next : nextList) {
+							TransactionTypeType transaction = Control14.getTransaction(next);
+							if (!transaction.getId().equals(selectedTransaction.getId())) {
+								for (MessageInTransactionTypeType externalMitt : mitts) {
+									if (Control14.getTransaction(externalMitt).getId().equals(transaction.getId())) {
+										List<MessageInTransactionTypeType> externalMittNextList = Control14.getNext(externalMitt);
+										if (externalMittNextList == null) {
+											messages.add(externalMitt);
+										} else {
+											boolean isCandidate = true;
+											for (MessageInTransactionTypeType externalMittNext : externalMittNextList) {
+												if (Control14.getTransaction(externalMittNext).getId().equals(transaction.getId())) {
+													isCandidate = false;
+													break;
+												}
+											}
+											if (isCandidate) {
+												messages.add(externalMitt);
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			for (final MessageInTransactionTypeType externalMitt : messages) {
+				TransactionTypeType transaction = Control14.getTransaction(externalMitt);
+				MessageTypeType message = Control14.getMessage(externalMitt);
+				addExternalResponse.add(new JMenuItem(new AbstractAction(transaction.getDescription() + ":"
+						+ message.getDescription() + " [" + externalMitt.getId() + "]") {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						Control14.addPrevious(Message.this.mitt, externalMitt);
+						Message message = new Message(externalMitt);
+						message.setState(MessageState.Previous);
+						selectedPrev.add(message);
+					}
+				}));
+			}
+
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -409,7 +577,20 @@ public class Canvas14 extends JPanel {
 		}
 
 		private boolean isStartMessage() {
-			return transactionPanel.startMitt.contains(mitt);
+//			return transactionPanel.startMitt.contains(mitt);
+			if (!Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
+				return false;
+			}
+			List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(mitt);
+			if (prevMitts == null) {
+				return true;
+			}
+			for (MessageInTransactionTypeType prev : prevMitts) {
+				if (Control14.getTransaction(prev).getId().equals(selectedTransaction.getId())) {
+					return false;
+				}
+			}
+			return true;
 		}
 
 		private boolean isEndMessage() {
@@ -664,19 +845,14 @@ public class Canvas14 extends JPanel {
 		final JMenu selectMenu = new JMenu(bundle.getString("lbl_SelectMessage"));
 		popupMenu.add(selectMenu);
 		popupMenu.add(new JSeparator());
-		final JMenuItem addStartMsg = new JMenuItem(new AbstractAction(bundle.getString("lbl_AddStartMessage")) {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.out.println("AddStartMessage");
-			}
-		});
+		final JMenu addStartMsg = new JMenu(bundle.getString("lbl_AddStartMessage"));
 		popupMenu.add(addStartMsg);
 		addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				if (SwingUtilities.isRightMouseButton(e)) {
 					fillSelectMenu(selectMenu);
-
+					fillAddStartMessageMenu(addStartMsg);
 					popupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
@@ -698,6 +874,24 @@ public class Canvas14 extends JPanel {
 						});
 				selectMenu.add(msgItem);
 			}
+		}
+	}
+
+	private void fillAddStartMessageMenu(JMenu addStartMsg) {
+		addStartMsg.removeAll();
+		List<MessageTypeType> messages = Editor14.getStore14().getElements(MessageTypeType.class);
+		for (final MessageTypeType message : messages) {
+			addStartMsg.add(new JMenuItem(new AbstractAction(message.getDescription() + " [" + message.getId() + "]") {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					transactionPanel.cbx_Messages.setSelectedItem(message.getId());
+					MessageInTransactionTypeType mitt = transactionPanel.addMessage();
+					initNewDiagram();
+					Message message = new Message(mitt);
+					message.state = MessageState.Next;
+					selectedNext.add(message);
+				}
+			}));
 		}
 	}
 
