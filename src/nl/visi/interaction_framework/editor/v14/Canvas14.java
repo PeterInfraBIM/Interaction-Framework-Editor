@@ -10,7 +10,6 @@ import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Stroke;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -38,6 +37,7 @@ import nl.visi.schemas._20140331.TransactionTypeType;
 @SuppressWarnings("serial")
 public class Canvas14 extends JPanel {
 	private static final Color LIGHT_GREEN_1 = new Color(63, 175, 70);
+	private static final Color LIGHT_GREEN_3 = new Color(175, 208, 149);
 	private static final Color LIGHT_RED_1 = new Color(255, 56, 56);
 	private static final Color LIGHT_RED_3 = new Color(255, 166, 166);
 	private static final Color LIGHT_BLUE_3 = new Color(180, 199, 220);
@@ -234,13 +234,14 @@ public class Canvas14 extends JPanel {
 
 		protected void fillAddExistingResponseMenu(JMenu addExistingResponse) {
 			addExistingResponse.removeAll();
+			List<MessageInTransactionTypeType> nextMitts = Control14.getNext(this.mitt);
 			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
 					.getElements(MessageInTransactionTypeType.class);
 			for (final MessageInTransactionTypeType existingMitt : mitts) {
 				if (Control14.getTransaction(existingMitt).getId().equals(selectedTransaction.getId())) {
 					if (existingMitt.isInitiatorToExecutor() != Message.this.mitt.isInitiatorToExecutor()) {
 						MessageTypeType message = Control14.getMessage(existingMitt);
-						addExistingResponse.add(new JMenuItem(
+						JMenuItem menuItem = new JMenuItem(
 								new AbstractAction(message.getDescription() + " [" + existingMitt.getId() + "]") {
 									@Override
 									public void actionPerformed(ActionEvent e) {
@@ -249,7 +250,9 @@ public class Canvas14 extends JPanel {
 										message.state = MessageState.Next;
 										selectedNext.add(message);
 									}
-								}));
+								});
+						addExistingResponse.add(menuItem);
+						menuItem.setEnabled(!nextMitts.contains(existingMitt));
 					}
 				}
 			}
@@ -302,6 +305,8 @@ public class Canvas14 extends JPanel {
 
 		protected void fillAddExternalResponseMenu(JMenu addExternalResponse) {
 			addExternalResponse.removeAll();
+			
+			List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(this.mitt);
 			List<MessageInTransactionTypeType> messages = new ArrayList<>();
 			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
 					.getElements(MessageInTransactionTypeType.class);
@@ -315,19 +320,25 @@ public class Canvas14 extends JPanel {
 							if (!transaction.getId().equals(selectedTransaction.getId())) {
 								for (MessageInTransactionTypeType externalMitt : mitts) {
 									if (Control14.getTransaction(externalMitt).getId().equals(transaction.getId())) {
-										List<MessageInTransactionTypeType> externalMittNextList = Control14.getNext(externalMitt);
+										List<MessageInTransactionTypeType> externalMittNextList = Control14
+												.getNext(externalMitt);
 										if (externalMittNextList == null) {
-											messages.add(externalMitt);
+											if (!messages.contains(externalMitt)) {
+												messages.add(externalMitt);
+											}
 										} else {
 											boolean isCandidate = true;
 											for (MessageInTransactionTypeType externalMittNext : externalMittNextList) {
-												if (Control14.getTransaction(externalMittNext).getId().equals(transaction.getId())) {
+												if (Control14.getTransaction(externalMittNext).getId()
+														.equals(transaction.getId())) {
 													isCandidate = false;
 													break;
 												}
 											}
 											if (isCandidate) {
-												messages.add(externalMitt);
+												if (!messages.contains(externalMitt)) {
+													messages.add(externalMitt);
+												}
 											}
 										}
 									}
@@ -340,7 +351,7 @@ public class Canvas14 extends JPanel {
 			for (final MessageInTransactionTypeType externalMitt : messages) {
 				TransactionTypeType transaction = Control14.getTransaction(externalMitt);
 				MessageTypeType message = Control14.getMessage(externalMitt);
-				addExternalResponse.add(new JMenuItem(new AbstractAction(transaction.getDescription() + ":"
+				JMenuItem menuItem = new JMenuItem(new AbstractAction(transaction.getDescription() + ":"
 						+ message.getDescription() + " [" + externalMitt.getId() + "]") {
 					@Override
 					public void actionPerformed(ActionEvent e) {
@@ -349,7 +360,9 @@ public class Canvas14 extends JPanel {
 						message.setState(MessageState.Previous);
 						selectedPrev.add(message);
 					}
-				}));
+				});
+				addExternalResponse.add(menuItem);
+				menuItem.setEnabled(!prevMitts.contains(externalMitt));
 			}
 
 		}
@@ -1066,11 +1079,11 @@ public class Canvas14 extends JPanel {
 
 	private int drawConnectorBoxes(List<Message> messageList, Message lastMsg, int lastY) {
 		if (messageList == null) {
-			g2d.setColor(Color.GREEN);
+//			g2d.setColor(Color.GREEN);
 			drawConnectorBox(getStartX(selectedMessage), lastY, 1, lastMsg == null ? BoxType.CLOSED : BoxType.OPEN_TOP);
 			drawConnectorBox(getEndX(selectedMessage), lastY, 1,
 					selectedMessage.isEndMessage() && selectedRequest.isEmpty() ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
-			g2d.setColor(Color.BLACK);
+//			g2d.setColor(Color.BLACK);
 			lastY += MESSAGE_LINE_HEIGHT;
 		} else if (!messageList.isEmpty()) {
 			for (int index = 0; index < messageList.size(); index++) {
@@ -1108,23 +1121,23 @@ public class Canvas14 extends JPanel {
 				} else {
 					switch (currMsg.getState()) {
 					case History:
-						g2d.setColor(Color.RED);
+//						g2d.setColor(Color.RED);
 						drawConnectorBox(getStartX(currMsg), lastY, 1, BoxType.OPEN_TOP);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
-						g2d.setColor(Color.BLACK);
+//						g2d.setColor(Color.BLACK);
 						break;
 					case Next:
-						g2d.setColor(Color.CYAN);
+//						g2d.setColor(Color.CYAN);
 						drawConnectorBox(getStartX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM);
-						g2d.setColor(Color.BLACK);
+//						g2d.setColor(Color.BLACK);
 						break;
 					case Previous:
-						g2d.setColor(Color.PINK);
+//						g2d.setColor(Color.PINK);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM);
-						g2d.setColor(Color.BLACK);
+//						g2d.setColor(Color.BLACK);
 						break;
 					default:
 						break;
@@ -1222,7 +1235,7 @@ public class Canvas14 extends JPanel {
 	private void initNewDiagram() {
 		Canvas14.this.removeAll();
 		initiator = new Role(Control14.getInitiator(selectedTransaction), leftMargin - 50, 25, LIGHT_RED_3);
-		executor = new Role(Control14.getExecutor(selectedTransaction), leftMargin + middleMargin, 25, LIGHT_BLUE_3);
+		executor = new Role(Control14.getExecutor(selectedTransaction), leftMargin + middleMargin, 25, LIGHT_GREEN_3);
 		historyAfter.clear();
 		historyBefore.clear();
 		selectedNext.clear();
