@@ -473,4 +473,8 @@ public class InteractionFrameworkEditor extends Control {
 			instance.btn_NavigateForward.setEnabled(!instance.mainPanelControl14.isForwardStackEmpty());
 		}
 	}
+
+	public static JFrame getApplicationFrame() {
+		return instance.frame;
+	}
 }

@@ -14,6 +14,8 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -26,8 +28,11 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import javax.swing.UnsupportedLookAndFeelException;
 
 import nl.visi.interaction_framework.editor.Control;
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.interaction_framework.editor.SelectBox;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageTypeType;
@@ -153,9 +158,34 @@ public class Canvas14 extends JPanel {
 
 			setTitleAndToolTip(mitt);
 			popupMenu = new JPopupMenu();
-			ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
-			final JMenu addNewResponse = new JMenu(bundle.getString("lbl_AddNewResponse"));
+			final ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
+			final JMenuItem addNewResponse = new JMenuItem(new AbstractAction(bundle.getString("lbl_AddNewResponse")) {
+
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					List<MessageTypeType> messages = Editor14.getStore14().getElements(MessageTypeType.class);
+					List<String> items = new ArrayList<>();
+					for (MessageTypeType message : messages) {
+						items.add(message.getDescription() + " [" + message.getId() + "]");
+					}
+					transactionPanel.getPanel().getParent();
+					try {
+						SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+								bundle.getString("lbl_AddNewResponse"), items);
+						selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+							@Override
+							public void propertyChange(PropertyChangeEvent evt) {
+								System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+							}
+						});
+					} catch (UnsupportedLookAndFeelException e1) {
+						e1.printStackTrace();
+					}
+				}
+			});
 			popupMenu.add(addNewResponse);
+			final JMenu addNewResponseMenu = new JMenu(bundle.getString("lbl_AddNewResponse"));
+			popupMenu.add(addNewResponseMenu);
 			final JMenu addExistingResponse = new JMenu(bundle.getString("lbl_AddExistingResponse"));
 			popupMenu.add(addExistingResponse);
 			final JMenu addExternalRequest = new JMenu(bundle.getString("lbl_AddExternalRequest"));
@@ -170,12 +200,12 @@ public class Canvas14 extends JPanel {
 				public void mouseClicked(MouseEvent e) {
 					if (SwingUtilities.isRightMouseButton(e)) {
 						boolean menuEnabled = state != null && state.equals(MessageState.Selected);
-						addNewResponse.setEnabled(menuEnabled);
+						addNewResponseMenu.setEnabled(menuEnabled);
 						addExistingResponse.setEnabled(menuEnabled);
 						addExternalRequest.setEnabled(menuEnabled);
 						addExternalResponse.setEnabled(menuEnabled);
 						if (menuEnabled) {
-							fillAddNewResponseMenu(addNewResponse);
+							fillAddNewResponseMenu(addNewResponseMenu);
 							fillAddExistingResponseMenu(addExistingResponse);
 							fillAddExternalRequestMenu(addExternalRequest);
 							fillAddExternalResponseMenu(addExternalResponse);
@@ -305,7 +335,7 @@ public class Canvas14 extends JPanel {
 
 		protected void fillAddExternalResponseMenu(JMenu addExternalResponse) {
 			addExternalResponse.removeAll();
-			
+
 			List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(this.mitt);
 			List<MessageInTransactionTypeType> messages = new ArrayList<>();
 			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
