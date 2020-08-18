@@ -28,7 +28,6 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
-import javax.swing.UnsupportedLookAndFeelException;
 
 import nl.visi.interaction_framework.editor.Control;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
@@ -49,6 +48,7 @@ public class Canvas14 extends JPanel {
 	private static final Color LIGHT_YELLOW_4 = new Color(255, 255, 215);
 	private static final Color LIGHT_GOLD_4 = new Color(255, 233, 148);
 	private static final int MESSAGE_LINE_HEIGHT = 24;
+	final private ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
 	private final TransactionsPanelControl14 transactionPanel;
 	TransactionTypeType selectedTransaction;
 	private Role executor, initiator;
@@ -158,39 +158,36 @@ public class Canvas14 extends JPanel {
 
 			setTitleAndToolTip(mitt);
 			popupMenu = new JPopupMenu();
-			final ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
 			final JMenuItem addNewResponse = new JMenuItem(new AbstractAction(bundle.getString("lbl_AddNewResponse")) {
-
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					List<MessageTypeType> messages = Editor14.getStore14().getElements(MessageTypeType.class);
-					List<String> items = new ArrayList<>();
-					for (MessageTypeType message : messages) {
-						items.add(message.getDescription() + " [" + message.getId() + "]");
-					}
-					transactionPanel.getPanel().getParent();
-					try {
-						SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
-								bundle.getString("lbl_AddNewResponse"), items);
-						selectBox.addPropertyChangeListener(new PropertyChangeListener() {
-							@Override
-							public void propertyChange(PropertyChangeEvent evt) {
-								System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
-							}
-						});
-					} catch (UnsupportedLookAndFeelException e1) {
-						e1.printStackTrace();
-					}
+					addNewResponse();
 				}
 			});
 			popupMenu.add(addNewResponse);
-			final JMenu addNewResponseMenu = new JMenu(bundle.getString("lbl_AddNewResponse"));
-			popupMenu.add(addNewResponseMenu);
-			final JMenu addExistingResponse = new JMenu(bundle.getString("lbl_AddExistingResponse"));
+			final JMenuItem addExistingResponse = new JMenuItem(
+					new AbstractAction(bundle.getString("lbl_AddExistingResponse")) {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							addExistingResponse();
+						}
+					});
 			popupMenu.add(addExistingResponse);
-			final JMenu addExternalRequest = new JMenu(bundle.getString("lbl_AddExternalRequest"));
+			final JMenuItem addExternalRequest = new JMenuItem(
+					new AbstractAction(bundle.getString("lbl_AddExternalRequest")) {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							addExternalRequest();
+						}
+					});
 			popupMenu.add(addExternalRequest);
-			final JMenu addExternalResponse = new JMenu(bundle.getString("lbl_AddExternalResponse"));
+			final JMenuItem addExternalResponse = new JMenuItem(
+					new AbstractAction(bundle.getString("lbl_AddExternalResponse")) {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							addExternalResponse();
+						}
+					});
 			popupMenu.add(addExternalResponse);
 			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
 					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
@@ -200,16 +197,10 @@ public class Canvas14 extends JPanel {
 				public void mouseClicked(MouseEvent e) {
 					if (SwingUtilities.isRightMouseButton(e)) {
 						boolean menuEnabled = state != null && state.equals(MessageState.Selected);
-						addNewResponseMenu.setEnabled(menuEnabled);
+						addNewResponse.setEnabled(menuEnabled);
 						addExistingResponse.setEnabled(menuEnabled);
 						addExternalRequest.setEnabled(menuEnabled);
 						addExternalResponse.setEnabled(menuEnabled);
-						if (menuEnabled) {
-							fillAddNewResponseMenu(addNewResponseMenu);
-							fillAddExistingResponseMenu(addExistingResponse);
-							fillAddExternalRequestMenu(addExternalRequest);
-							fillAddExternalResponseMenu(addExternalResponse);
-						}
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					} else {
 						Message.this.setState(MessageState.Selected);
@@ -394,7 +385,6 @@ public class Canvas14 extends JPanel {
 				addExternalResponse.add(menuItem);
 				menuItem.setEnabled(!prevMitts.contains(externalMitt));
 			}
-
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -489,14 +479,12 @@ public class Canvas14 extends JPanel {
 							historyBefore.add(selectedMessage);
 						}
 					}
-//					if (isIn(historyBefore)) {
 					if (historyBefore.contains(this)) {
 						if (selectedMessage != null) {
 							historyAfter.add(0, selectedMessage);
 						}
 						moveBeforeToAfter();
 						historyBefore.remove(this);
-//					} else if (isIn(historyAfter)) {
 					} else if (historyAfter.contains(this)) {
 						if (selectedMessage != null) {
 							historyBefore.add(selectedMessage);
@@ -563,19 +551,19 @@ public class Canvas14 extends JPanel {
 			}
 		}
 
-		private void move(List<Message> from, List<Message> to) {
-			int indexOfThis = from.indexOf(this);
-			if (indexOfThis < from.size() - 1) {
-				List<Message> toBeMoved = new ArrayList<>();
-				for (int i = from.size() - 1; i > indexOfThis; i--) {
-					toBeMoved.add(from.get(i));
-				}
-				for (Message message : toBeMoved) {
-					to.add(0, message);
-					from.remove(message);
-				}
-			}
-		}
+//		private void move(List<Message> from, List<Message> to) {
+//			int indexOfThis = from.indexOf(this);
+//			if (indexOfThis < from.size() - 1) {
+//				List<Message> toBeMoved = new ArrayList<>();
+//				for (int i = from.size() - 1; i > indexOfThis; i--) {
+//					toBeMoved.add(from.get(i));
+//				}
+//				for (Message message : toBeMoved) {
+//					to.add(0, message);
+//					from.remove(message);
+//				}
+//			}
+//		}
 
 		private void moveBeforeToAfter() {
 			int indexOfThis = -1;
@@ -585,7 +573,6 @@ public class Canvas14 extends JPanel {
 					break;
 				}
 			}
-//			int indexOfThis = historyBefore.indexOf(this);
 			if (indexOfThis < historyBefore.size() - 1) {
 				List<Message> toBeMoved = new ArrayList<>();
 				for (int i = historyBefore.size() - 1; i > indexOfThis; i--) {
@@ -606,7 +593,6 @@ public class Canvas14 extends JPanel {
 					break;
 				}
 			}
-//			int indexOfThis = historyAfter.indexOf(this);
 			if (indexOfThis > -1) {
 				List<Message> toBeMoved = new ArrayList<>();
 				for (int i = 0; i < indexOfThis; i++) {
@@ -620,7 +606,6 @@ public class Canvas14 extends JPanel {
 		}
 
 		private boolean isStartMessage() {
-//			return transactionPanel.startMitt.contains(mitt);
 			if (!Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
 				return false;
 			}
@@ -655,10 +640,6 @@ public class Canvas14 extends JPanel {
 		void paint(int y) {
 			setTitleAndToolTip(mitt);
 
-//			String label = mitt != null ? Control14.getMessage(mitt).getDescription() : "?";
-//			activeLabel.setText(label);
-//			activeLabel.setToolTipText(mitt != null ? Control14.getMessage(mitt).getId() : "?");
-
 			if (isStartMessage()) {
 				activeLabel.setBorder(BorderFactory.createCompoundBorder(
 						BorderFactory.createLineBorder(LIGHT_GREEN_1, 2), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
@@ -678,10 +659,6 @@ public class Canvas14 extends JPanel {
 				g2d.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
 				g2d.drawString(this.activeLabel.getText(), x + 50 - (stringWidth / 2), y + 25);
 			} else {
-				String internalInitiator = Control14.getInitiator(selectedTransaction).getId();
-				String internalExecutor = Control14.getExecutor(selectedTransaction).getId();
-				String externalInitiator = Control14.getInitiator(mitt).getId();
-				String externalExecutor = Control14.getExecutor(mitt).getId();
 				switch (state) {
 				case History:
 					if (mitt.isInitiatorToExecutor()) {
@@ -698,37 +675,12 @@ public class Canvas14 extends JPanel {
 							activeLabel.setLocation(executorFlow - activeLabel.getWidth() - 50, y);
 						}
 					} else {
-						if (mitt.isInitiatorToExecutor()) {
-							if (externalInitiator.equals(internalInitiator)) { // EI = II
-								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-							} else if (externalInitiator.equals(internalExecutor)) { // EI = IE
-								activeLabel.setLocation(executorFlow + 50, y);
-							}
+						if (selectedMessage.mitt.isInitiatorToExecutor()) {
+							activeLabel.setLocation(executorFlow + 50, y);
 						} else {
-							if (externalExecutor.equals(internalInitiator)) { // EI = II
-								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-							} else if (externalExecutor.equals(internalExecutor)) { // EE = IE
-								activeLabel.setLocation(executorFlow + 50, y);
-							}
+							activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
 						}
 					}
-//					else {
-//						if (mitt.isInitiatorToExecutor()) {
-//							RoleTypeType initiator = Control14.getInitiator(mitt);
-//							if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
-//								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-//							} else {
-//								activeLabel.setLocation(executorFlow + 50, y);
-//							}
-//						} else {
-//							RoleTypeType executor = Control14.getExecutor(mitt);
-//							if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-//								activeLabel.setLocation(executorFlow + 50, y);
-//							} else {
-//								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-//							}
-//						}
-//					}
 					break;
 				case Previous:
 					if (transaction.getId().equals(selectedTransaction.getId())) {
@@ -738,18 +690,10 @@ public class Canvas14 extends JPanel {
 							activeLabel.setLocation(initiatorFlow + 50, y);
 						}
 					} else {
-						if (mitt.isInitiatorToExecutor()) {
-							if (externalExecutor.equals(internalInitiator)) { // EE = II
-								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-							} else if (externalExecutor.equals(internalExecutor)) { // EE = IE
-								activeLabel.setLocation(executorFlow + 50, y);
-							}
+						if (selectedMessage.mitt.isInitiatorToExecutor()) {
+							activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
 						} else {
-							if (externalInitiator.equals(internalInitiator)) { // EI = II
-								activeLabel.setLocation(initiatorFlow - activeLabel.getWidth() - 50, y);
-							} else if (externalInitiator.equals(internalExecutor)) { // EI = IE
-								activeLabel.setLocation(executorFlow + 50, y);
-							}
+							activeLabel.setLocation(executorFlow + 50, y);
 						}
 					}
 					break;
@@ -774,24 +718,12 @@ public class Canvas14 extends JPanel {
 						drawArrowPoint(executorFlow - 50, y + 8, 10, 180);
 					}
 				} else {
-					if (mitt.isInitiatorToExecutor()) {
-						RoleTypeType initiator = Control14.getInitiator(mitt);
-						if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
-							g2d.drawLine(initiatorFlow - 10, y + 8, initiatorFlow - 50, y + 8);
-							drawArrowPoint(initiatorFlow - 50, y + 8, 10, 180);
-						} else {
-							g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
-							drawArrowPoint(executorFlow + 50, y + 8, 10, 0);
-						}
+					if (selectedMessage.mitt.isInitiatorToExecutor()) {
+						g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
+						drawArrowPoint(executorFlow + 50, y + 8, 10, 0);
 					} else {
-						RoleTypeType executor = Control14.getExecutor(mitt);
-						if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-							g2d.drawLine(executorFlow + 10, y + 8, initiatorFlow + 50, y + 8);
-							drawArrowPoint(executorFlow + 50, y + 8, 10, 0);
-						} else {
-							g2d.drawLine(initiatorFlow - 10, y + 8, initiatorFlow - 50, y + 8);
-							drawArrowPoint(initiatorFlow - 50, y + 8, 10, 180);
-						}
+						g2d.drawLine(initiatorFlow - 10, y + 8, initiatorFlow - 50, y + 8);
+						drawArrowPoint(initiatorFlow - 50, y + 8, 10, 180);
 					}
 				}
 			} else if (state.equals(MessageState.Previous)) {
@@ -804,48 +736,13 @@ public class Canvas14 extends JPanel {
 						drawArrowPoint(initiatorFlow + 10, y + 8, 10, 180);
 					}
 				} else {
-					if (mitt.isInitiatorToExecutor()) {
-						RoleTypeType initiator = Control14.getInitiator(mitt);
-						if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
-							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
-							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-						} else {
-							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
-							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
-						}
+					if (selectedMessage.mitt.isInitiatorToExecutor()) {
+						g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
+						drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
 					} else {
-						RoleTypeType initiator = Control14.getInitiator(mitt);
-						RoleTypeType executor = Control14.getExecutor(mitt);
-						if (initiator.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
-							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
-							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
-						} else if (initiator.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
-							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-						} else if (executor.getId().equals(Control14.getInitiator(selectedTransaction).getId())) {
-							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
-							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-						} else if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
-							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-						}
-//						if (executor.getId().equals(Control14.getExecutor(selectedTransaction).getId())) {
-//							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
-//							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-//						} else {
-//							g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
-//							drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
-//							g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
-//							drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-//						}
+						g2d.drawLine(executorFlow + 50, y + 8, executorFlow + 10, y + 8);
+						drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
 					}
-//					if (mitt.isInitiatorToExecutor()) {
-//						g2d.drawLine(executorFlow + 10, y + 8, executorFlow + 50, y + 8);
-//						drawArrowPoint(executorFlow + 10, y + 8, 10, 180);
-//					} else {
-//						g2d.drawLine(initiatorFlow - 50, y + 8, initiatorFlow - 10, y + 8);
-//						drawArrowPoint(initiatorFlow - 10, y + 8, 10, 0);
-//					}
 				}
 			} else {
 				if (mitt.isInitiatorToExecutor()) {
@@ -865,6 +762,198 @@ public class Canvas14 extends JPanel {
 				}
 			}
 			return false;
+		}
+
+		private void addNewResponse() {
+			List<String> items = new ArrayList<>();
+			List<MessageTypeType> messages = Editor14.getStore14().getElements(MessageTypeType.class);
+			for (MessageTypeType message : messages) {
+				items.add(message.getDescription() + " [" + message.getId() + "]");
+			}
+			transactionPanel.getPanel().getParent();
+			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+					bundle.getString("lbl_AddNewResponse"), items);
+			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+					String result = (String) evt.getNewValue();
+					int lastOpenBracket = result.lastIndexOf('[');
+					int lastCloseBracket = result.lastIndexOf(']');
+					String messageId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+					transactionPanel.cbx_Messages.setSelectedItem(messageId);
+					MessageInTransactionTypeType newMitt = transactionPanel.addMessage();
+					Control14.addPrevious(newMitt, Message.this.mitt);
+					newMitt.setInitiatorToExecutor(!Message.this.mitt.isInitiatorToExecutor());
+					Message message = new Message(newMitt);
+					message.state = MessageState.Next;
+					selectedNext.add(message);
+				}
+			});
+		}
+
+		private void addExistingResponse() {
+			List<String> items = new ArrayList<>();
+			List<MessageInTransactionTypeType> nextMitts = Control14.getNext(this.mitt);
+			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			for (final MessageInTransactionTypeType existingMitt : mitts) {
+				if (Control14.getTransaction(existingMitt).getId().equals(selectedTransaction.getId())) {
+					if (existingMitt.isInitiatorToExecutor() != Message.this.mitt.isInitiatorToExecutor()) {
+						if (!nextMitts.contains(existingMitt)) {
+							MessageTypeType message = Control14.getMessage(existingMitt);
+							items.add(message.getDescription() + " [" + existingMitt.getId() + "]");
+						}
+					}
+				}
+			}
+			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+					bundle.getString("lbl_AddExistingResponse"), items);
+			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+					String result = (String) evt.getNewValue();
+					int lastOpenBracket = result.lastIndexOf('[');
+					int lastCloseBracket = result.lastIndexOf(']');
+					String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+					MessageInTransactionTypeType existingMitt = Editor14.getStore14()
+							.getElement(MessageInTransactionTypeType.class, mittId);
+					Control14.addPrevious(existingMitt, Message.this.mitt);
+					Message message = new Message(existingMitt);
+					message.state = MessageState.Next;
+					selectedNext.add(message);
+				}
+			});
+		}
+
+		private void addExternalRequest() {
+			List<String> items = new ArrayList<>();
+			RoleTypeType role = mitt.isInitiatorToExecutor() ? Control14.getExecutor(mitt)
+					: Control14.getInitiator(mitt);
+			List<MessageInTransactionTypeType> messages = new ArrayList<>();
+			List<TransactionTypeType> transactions = Editor14.getStore14().getElements(TransactionTypeType.class);
+			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			for (TransactionTypeType transaction : transactions) {
+				if (!transaction.getId().equals(selectedTransaction.getId())) {
+					for (MessageInTransactionTypeType externalMitt : mitts) {
+						if (Control14.getTransaction(externalMitt).getId().equals(transaction.getId())) {
+							if (!role.getId().equals(Control14.getInitiator(externalMitt).getId())) {
+								List<MessageInTransactionTypeType> previousList = Control14.getPrevious(externalMitt);
+								if (previousList == null) {
+									messages.add(externalMitt);
+								} else {
+									boolean isCandidate = true;
+									for (MessageInTransactionTypeType prev : previousList) {
+										if (Control14.getTransaction(prev).getId().equals(transaction.getId())) {
+											isCandidate = false;
+											break;
+										}
+									}
+									if (isCandidate) {
+										messages.add(externalMitt);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			for (final MessageInTransactionTypeType externalMitt : messages) {
+				TransactionTypeType transaction = Control14.getTransaction(externalMitt);
+				MessageTypeType message = Control14.getMessage(externalMitt);
+				items.add(transaction.getDescription() + ":" + message.getDescription() + " [" + externalMitt.getId()
+						+ "]");
+			}
+			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+					bundle.getString("lbl_AddExternalRequest"), items);
+			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+					String result = (String) evt.getNewValue();
+					int lastOpenBracket = result.lastIndexOf('[');
+					int lastCloseBracket = result.lastIndexOf(']');
+					String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+					MessageInTransactionTypeType existingMitt = Editor14.getStore14()
+							.getElement(MessageInTransactionTypeType.class, mittId);
+					Control14.addPrevious(existingMitt, Message.this.mitt);
+					Message message = new Message(existingMitt);
+					message.state = MessageState.Next;
+					selectedRequest.add(message);
+				}
+			});
+		}
+
+		private void addExternalResponse() {
+			List<String> items = new ArrayList<>();
+			List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(this.mitt);
+			List<MessageInTransactionTypeType> messages = new ArrayList<>();
+			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
+					.getElements(MessageInTransactionTypeType.class);
+			List<MessageInTransactionTypeType> previousList = Control14.getPrevious(Message.this.mitt);
+			if (previousList != null) {
+				for (MessageInTransactionTypeType prev : previousList) {
+					List<MessageInTransactionTypeType> nextList = Control14.getNext(prev);
+					if (nextList != null) {
+						for (MessageInTransactionTypeType next : nextList) {
+							TransactionTypeType transaction = Control14.getTransaction(next);
+							if (!transaction.getId().equals(selectedTransaction.getId())) {
+								for (MessageInTransactionTypeType externalMitt : mitts) {
+									if (Control14.getTransaction(externalMitt).getId().equals(transaction.getId())) {
+										List<MessageInTransactionTypeType> externalMittNextList = Control14
+												.getNext(externalMitt);
+										if (externalMittNextList == null) {
+											if (!messages.contains(externalMitt)) {
+												messages.add(externalMitt);
+											}
+										} else {
+											boolean isCandidate = true;
+											for (MessageInTransactionTypeType externalMittNext : externalMittNextList) {
+												if (Control14.getTransaction(externalMittNext).getId()
+														.equals(transaction.getId())) {
+													isCandidate = false;
+													break;
+												}
+											}
+											if (isCandidate) {
+												if (!messages.contains(externalMitt)) {
+													messages.add(externalMitt);
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			for (final MessageInTransactionTypeType externalMitt : messages) {
+				TransactionTypeType transaction = Control14.getTransaction(externalMitt);
+				MessageTypeType message = Control14.getMessage(externalMitt);
+				items.add(transaction.getDescription() + ":" + message.getDescription() + " [" + externalMitt.getId()
+						+ "]");
+			}
+			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+					bundle.getString("lbl_AddExternalResponse"), items);
+			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+					String result = (String) evt.getNewValue();
+					int lastOpenBracket = result.lastIndexOf('[');
+					int lastCloseBracket = result.lastIndexOf(']');
+					String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+					MessageInTransactionTypeType externalMitt = Editor14.getStore14()
+							.getElement(MessageInTransactionTypeType.class, mittId);
+					Control14.addPrevious(Message.this.mitt, externalMitt);
+					Message message = new Message(externalMitt);
+					message.setState(MessageState.Previous);
+					selectedResponse.add(message);
+				}
+			});
 		}
 	}
 
@@ -1142,7 +1231,7 @@ public class Canvas14 extends JPanel {
 									nextMsg == null ? BoxType.CLOSED : BoxType.OPEN_BOTTOM);
 
 						} else {
-							drawConnectorBox(getEndX(currMsg), lastY, 1, BoxType.OPEN_BOTTOM);
+							drawConnectorBox(getEndX(currMsg), lastY, 1, BoxType.OPEN_TOP_BOTTOM);
 						}
 						break;
 					default:
@@ -1197,6 +1286,10 @@ public class Canvas14 extends JPanel {
 				return initiatorFlow;
 			} else if (executor.getId().equals(selectedExecutor.getId())) {
 				return executorFlow;
+			} else if (selectedRequest.contains(currMsg)) {
+				return selectedMessage.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;
+			} else if (selectedResponse.contains(currMsg)) {
+				return selectedMessage.mitt.isInitiatorToExecutor() ? initiatorFlow : executorFlow;
 			}
 			return 0;
 		}
@@ -1219,6 +1312,10 @@ public class Canvas14 extends JPanel {
 				return initiatorFlow;
 			} else if (executor.getId().equals(selectedExecutor.getId())) {
 				return executorFlow;
+			} else if (selectedRequest.contains(currMsg)) {
+				return selectedMessage.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;
+			} else if (selectedResponse.contains(currMsg)) {
+				return selectedMessage.mitt.isInitiatorToExecutor() ? initiatorFlow : executorFlow;
 			}
 			return 0;
 		}

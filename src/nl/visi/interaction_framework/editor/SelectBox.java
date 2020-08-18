@@ -42,17 +42,21 @@ public class SelectBox extends JDialog {
 	private JButton selectButton;
 	private Integer selectedIndex;
 
-	public SelectBox(JFrame owner, String title, List<String> items) throws UnsupportedLookAndFeelException {
+	public SelectBox(JFrame owner, String title, List<String> items) {
 		super((JFrame) owner, title);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		propertyChangeSupport = new PropertyChangeSupport(this);
 		this.items = items;
 
-		PlasticXPLookAndFeel laf = new PlasticXPLookAndFeel();
-		PlasticXPLookAndFeel.setCurrentTheme(new ExperienceRoyale());
-		PlasticXPLookAndFeel.setTabStyle(PlasticXPLookAndFeel.TAB_STYLE_METAL_VALUE);
-		PlasticXPLookAndFeel.set3DEnabled(true);
-		UIManager.setLookAndFeel(laf);
+		try {
+			PlasticXPLookAndFeel laf = new PlasticXPLookAndFeel();
+			PlasticXPLookAndFeel.setCurrentTheme(new ExperienceRoyale());
+			PlasticXPLookAndFeel.setTabStyle(PlasticXPLookAndFeel.TAB_STYLE_METAL_VALUE);
+			PlasticXPLookAndFeel.set3DEnabled(true);
+			UIManager.setLookAndFeel(laf);
+		} catch (UnsupportedLookAndFeelException e1) {
+			e1.printStackTrace();
+		}
 
 		JPanel mainPanel = new JPanel(new BorderLayout());
 		mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -148,11 +152,7 @@ public class SelectBox extends JDialog {
 				for (String item : TEST_ITEMS) {
 					testItems.add(item);
 				}
-				try {
-					new SelectBox((JFrame) null, "Test", testItems);
-				} catch (UnsupportedLookAndFeelException e) {
-					e.printStackTrace();
-				}
+				new SelectBox((JFrame) null, "Test", testItems);
 			}
 		});
 	}
