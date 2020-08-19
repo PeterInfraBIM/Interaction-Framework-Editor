@@ -11,6 +11,7 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
@@ -20,6 +21,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.DateField;
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
@@ -306,6 +308,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	public MessagesPanelControl16() throws Exception {
 		super(MESSAGES_PANEL);
+		
 		initMessagesTable();
 		initComplexElementsTable();
 		initTransactionsTable();
@@ -380,6 +383,25 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				if (e.getValueIsAdjusting())
 					return;
 				updateSelectionArea(e);
+			}
+		});
+		
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(MessageTypeType.class);
+				} else {
+					List<MessageTypeType> elements = Editor16.getStore16().getElements(MessageTypeType.class);
+					elementsTableModel.clear();
+					for (MessageTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
 			}
 		});
 	}

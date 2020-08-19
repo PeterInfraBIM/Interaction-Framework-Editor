@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
@@ -25,6 +26,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.DateField;
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20140331.AppendixTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
@@ -438,6 +440,27 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 				updateSelectionArea(e);
 			}
 		});
+
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(ComplexElementTypeType.class);
+				} else {
+					List<ComplexElementTypeType> elements = Editor14.getStore14()
+							.getElements(ComplexElementTypeType.class);
+					elementsTableModel.clear();
+					for (ComplexElementTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
+			}
+		});
+
 	}
 
 	@Override

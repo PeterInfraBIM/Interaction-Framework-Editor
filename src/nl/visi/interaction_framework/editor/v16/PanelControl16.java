@@ -50,7 +50,7 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 	protected ElementsTableModel<E> elementsTableModel;
 	protected JTable tbl_Elements;
 	protected JButton btn_NewElement, btn_CopyElement, btn_DeleteElement;
-	protected JTextField tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
+	protected JTextField tfd_Filter, tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
 	protected DateField startDateField, endDateField;
 	protected boolean inSelection = false;
 

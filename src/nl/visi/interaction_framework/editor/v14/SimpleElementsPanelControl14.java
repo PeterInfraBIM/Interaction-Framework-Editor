@@ -24,7 +24,7 @@ import nl.visi.schemas._20140331.UserDefinedTypeTypeRef;
 public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTypeType> {
 	private static final String SIMPLE_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/SimpleElementsPanel.xml";
 
-	private JTextField tfd_InterfaceType, tfd_ValueList;
+	private JTextField tfd_Filter, tfd_InterfaceType, tfd_ValueList;
 	private JComboBox<String> cbx_GlobalElementCondition, cbx_UserDefinedType;
 	private JButton btn_NavigateUserDefinedType;
 
@@ -91,7 +91,25 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 				updateSelectionArea(e);
 			}
 		});
-
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(SimpleElementTypeType.class);
+				} else {
+					List<SimpleElementTypeType> elements = Editor14.getStore14()
+							.getElements(SimpleElementTypeType.class);
+					elementsTableModel.clear();
+					for (SimpleElementTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
+			}
+		});
 		tfd_InterfaceType.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {

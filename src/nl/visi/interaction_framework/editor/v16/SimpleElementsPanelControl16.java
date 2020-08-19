@@ -94,6 +94,26 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			}
 		});
 
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(SimpleElementTypeType.class);
+				} else {
+					List<SimpleElementTypeType> elements = Editor16.getStore16()
+							.getElements(SimpleElementTypeType.class);
+					elementsTableModel.clear();
+					for (SimpleElementTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
+			}
+		});
+		
 		tfd_InterfaceType.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {

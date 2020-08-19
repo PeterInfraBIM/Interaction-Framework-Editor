@@ -976,6 +976,25 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 				updateSelectionArea(e);
 			}
 		});
+		
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(RoleTypeType.class);
+				} else {
+					List<RoleTypeType> elements = Editor14.getStore14().getElements(RoleTypeType.class);
+					elementsTableModel.clear();
+					for (RoleTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
+			}
+		});
 	}
 
 	public void fillTable() {

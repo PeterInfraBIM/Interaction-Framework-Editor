@@ -34,6 +34,7 @@ import javax.swing.text.Document;
 
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
+import nl.visi.schemas._20140331.TransactionTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
 
@@ -455,6 +456,25 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 				if (e.getValueIsAdjusting())
 					return;
 				updateSelectionArea(e);
+			}
+		});
+		
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(UserDefinedTypeType.class);
+				} else {
+					List<UserDefinedTypeType> elements = Editor14.getStore14().getElements(UserDefinedTypeType.class);
+					elementsTableModel.clear();
+					for (UserDefinedTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
 			}
 		});
 	}

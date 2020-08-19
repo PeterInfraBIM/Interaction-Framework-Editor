@@ -47,8 +47,18 @@
 					Enabled="false" Text="lbl_Remove">
 					<gridbagconstraints
 						Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
-						Insets="2,0,2,2" Weightx="1.0" />
+						Insets="2,0,2,2" />
 				</button>
+				<label Text="lbl_Filter">
+					<gridbagconstraints
+						Anchor="GridBagConstraints.WEST" Gridx="3" Gridy="0"
+						Insets="2,0,2,2" />
+				</label>
+				<textfield id="tfd_Filter" enabled="true" Columns="16">
+					<gridbagconstraints
+						Anchor="GridBagConstraints.WEST" Gridx="4" Gridy="0"
+						Insets="2,0,2,2" Weightx="1.0" />
+				</textfield>
 			</panel>
 		</panel>
 		<!-- HorizontalScrollBarPolicy="HORIZONTAL_SCROLLBAR_NEVER" -->

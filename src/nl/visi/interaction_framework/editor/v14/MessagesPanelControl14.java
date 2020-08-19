@@ -10,6 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
@@ -19,6 +20,7 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.DateField;
+import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
@@ -300,6 +302,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 
 	public MessagesPanelControl14() throws Exception {
 		super(MESSAGES_PANEL);
+
 		initMessagesTable();
 		initComplexElementsTable();
 		initTransactionsTable();
@@ -374,6 +377,25 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 				if (e.getValueIsAdjusting())
 					return;
 				updateSelectionArea(e);
+			}
+		});
+
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(MessageTypeType.class);
+				} else {
+					List<MessageTypeType> elements = Editor14.getStore14().getElements(MessageTypeType.class);
+					elementsTableModel.clear();
+					for (MessageTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
 			}
 		});
 	}
@@ -606,7 +628,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void copyElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
@@ -636,7 +658,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		}
 
 	}
-	
+
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();

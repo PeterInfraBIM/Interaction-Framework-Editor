@@ -1800,6 +1800,25 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				updateSelectionArea(e);
 			}
 		});
+		
+		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected void update(DocumentEvent e) {
+				String filterString = tfd_Filter.getText().toUpperCase();
+				if (filterString.isEmpty()) {
+					fillTable(TransactionTypeType.class);
+				} else {
+					List<TransactionTypeType> elements = Editor14.getStore14().getElements(TransactionTypeType.class);
+					elementsTableModel.clear();
+					for (TransactionTypeType element : elements) {
+						if (element.getDescription().toUpperCase().contains(filterString)
+								|| element.getId().toUpperCase().contains(filterString)) {
+							elementsTableModel.add(element);
+						}
+					}
+				}
+			}
+		});
 	}
 
 	@SuppressWarnings("serial")
