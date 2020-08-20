@@ -84,11 +84,17 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
 	private JPopupMenu popupMenu;
-	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel, elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel, elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
-	private JComboBox<String> cbx_Initiator, cbx_Executor, cbx_Messages, cbx_TransactionPhases, cbx_Groups;
+	private JComboBox<String> cbx_Initiator, cbx_Executor;
+
+	JComboBox<String> cbx_Messages;
+
+	private JComboBox<String> cbx_TransactionPhases;
+
+	private JComboBox<String> cbx_Groups;
 	private MessagesTableModel messagesTableModel;
 	private SequenceTable sequenceTable;
 	ElementConditionTable elementConditionTable;
@@ -97,8 +103,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private JButton btn_AddMessage, btn_EditMessage, btn_RemoveMessage, btn_Reverse, btn_NavigateInitiator,
 			btn_NavigateExecutor;
 	private JTextArea tar_Initiator, tar_Executor;
-	private JScrollPane scrollPane;
+	private JScrollPane scrollPane, scrollPane2;
 	private Canvas drawingPlane;
+	private Canvas16 canvas16Plane;
 	private Canvas.MessageItem activeItem;
 
 	private Map<MessageInTransactionTypeType, List<MessageInTransactionTypeType>> successorMap;
@@ -1629,6 +1636,10 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		scrollPane = new JScrollPane(drawingPlane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 		canvasPanel.add(scrollPane, BorderLayout.CENTER);
+		canvas16Plane = new Canvas16(this);
+		scrollPane2 = new JScrollPane(canvas16Plane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		canvas2Panel.add(scrollPane2, BorderLayout.CENTER);
 	}
 
 	private void initResultField() {
@@ -1753,7 +1764,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				updateSelectionArea(e);
 			}
 		});
-		
+
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
@@ -2212,7 +2223,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		btn_AddMessage.setEnabled(selectedIndex > 0);
 	}
 
-	public void addMessage() {
+	public MessageInTransactionTypeType addMessage() {
 		Store16 store = Editor16.getStore16();
 
 		String msgId = (String) cbx_Messages.getSelectedItem();
@@ -2259,6 +2270,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
 
 		fillMessageTable();
+		return mitt;
 	}
 
 	public void editMessage() {

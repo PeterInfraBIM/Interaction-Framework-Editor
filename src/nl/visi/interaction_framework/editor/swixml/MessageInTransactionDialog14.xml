@@ -1,26 +1,82 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<dialog id="messageInTransactionDialog" Size="480,360"
+<dialog id="messageInTransactionDialog" Size="480,480"
 	Title="lbl_MessageInTransactionDialog" Modal="true"
 	DefaultCloseOperation="JFrame.EXIT_ON_CLOSE"
 	bundle="nl.visi.interaction_framework.editor.locale.Editor"
 	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel">
-	<panel id="elementsTreePanel" layout="GridBagLayout" border="EmptyBorder(8,8,8,8)">
-		<scrollpane>
-			<gridbagconstraints Fill="GridBagConstraints.BOTH"
-				Gridx="0" Gridy="0" Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
-			<tree id="tree_Elements">
-				<popupmenu id="popupMenu">
-					<radiobuttonmenuitem id="rbt_EmptyItem"
-						action="setEmpty" text="EMPTY" />
-					<radiobuttonmenuitem id="rbt_FixedItem"
-						action="setFixed" text="FIXED" />
-					<radiobuttonmenuitem id="rbt_FreeItem"
-						action="setFree" text="FREE" />
-					<separator />
-					<menuitem id="mit_Remove" action="removeElementCondition"
-						text="lbl_Remove" />
-				</popupmenu>
-			</tree>
-		</scrollpane>
-	</panel>
+	<tabbedpane id="tabs" Border="EmptyBorder(4,4,4,4)"
+		Titles="lbl_ElementsTree,lbl_Sequence">
+		<panel id="elementsTreePanel" layout="GridBagLayout"
+			border="EmptyBorder(8,8,8,8)">
+			<scrollpane>
+				<gridbagconstraints
+					Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Insets="2,2,1,2"
+					Weightx="1.0" Weighty="1.0" />
+				<tree id="tree_Elements">
+					<popupmenu id="popupMenu">
+						<radiobuttonmenuitem id="rbt_EmptyItem"
+							action="setEmpty" text="EMPTY" />
+						<radiobuttonmenuitem id="rbt_FixedItem"
+							action="setFixed" text="FIXED" />
+						<radiobuttonmenuitem id="rbt_FreeItem"
+							action="setFree" text="FREE" />
+						<separator />
+						<menuitem id="mit_Remove" action="removeElementCondition"
+							text="lbl_Remove" />
+					</popupmenu>
+				</tree>
+			</scrollpane>
+		</panel>
+		<panel id="sequencePanel" layout="GridBagLayout"
+			border="EmptyBorder(8,8,8,8)">
+			<panel id="prevNextPanel" layout="GridBagLayout">
+				<gridbagconstraints
+					Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Weightx="1.0"
+					Weighty="1.0" />
+				<panel layout="BorderLayout"
+					border="TitledBorder(lbl_PreviousMessages)">
+					<gridbagconstraints
+						Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+						Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+					<scrollpane>
+						<table id="tbl_Prev" />
+					</scrollpane>
+				</panel>
+				<panel layout="BorderLayout"
+					border="TitledBorder(lbl_NextMessages)">
+					<gridbagconstraints
+						Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="1"
+						Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
+					<scrollpane>
+						<table id="tbl_Next" />
+					</scrollpane>
+				</panel>
+			</panel>
+			<panel id="checkboxPanel" layout="GridBagLayout">
+				<gridbagconstraints
+					Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="1" Weightx="1.0" />
+				<checkbox id="chb_FirstMessage" text="lbl_FirstMessage">
+					<gridbagconstraints
+						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
+						Insets="2,2,2,2" Weightx="1.0" />
+				</checkbox>
+				<checkbox id="chb_Direction" text="lbl_InitiatorToExecutor">
+					<gridbagconstraints
+						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1"
+						Insets="2,2,2,2" Weightx="1.0" />
+				</checkbox>
+				<checkbox id="chb_OpenSecondaryTransactionsAllowed"
+					text="lbl_OpenSecondaryTransactionsAllowed">
+					<gridbagconstraints
+						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="2"
+						Insets="2,2,2,2" Weightx="1.0" />
+				</checkbox>
+				<panel>
+					<gridbagconstraints
+						Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="3" Weightx="1.0"
+						Weighty="1.0" />
+				</panel>
+			</panel>
+		</panel>
+	</tabbedpane>
 </dialog>

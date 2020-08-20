@@ -3,20 +3,24 @@ package nl.visi.interaction_framework.editor.v14;
 import java.awt.Component;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -171,6 +175,54 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	private DefaultMutableTreeNode selectedNode;
 	private ElementConditionTable elementConditionTable;
 	private MessageInTransactionTypeType currentMitt;
+	private JTable tbl_Prev, tbl_Next;
+	private PrevNextTableModel prevTableModel, nextTableModel;
+	private JCheckBox chb_FirstMessage, chb_Direction, chb_OpenSecondaryTransactionsAllowed;
+
+	private enum PrevNextTableColumns {
+		Id, Description, Transaction;
+
+		@Override
+		public String toString() {
+			return getBundle().getString("lbl_" + name());
+		}
+	}
+
+	@SuppressWarnings("serial")
+	private class PrevNextTableModel extends AbstractTableModel {
+		public List<MessageInTransactionTypeType> elements = new ArrayList<>();
+
+		@Override
+		public int getRowCount() {
+			return elements.size();
+		}
+
+		@Override
+		public int getColumnCount() {
+			return PrevNextTableColumns.values().length;
+		}
+
+		@Override
+		public String getColumnName(int columnIndex) {
+			return PrevNextTableColumns.values()[columnIndex].toString();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			MessageInTransactionTypeType mittElement = elements.get(rowIndex);
+			switch (PrevNextTableColumns.values()[columnIndex]) {
+			case Id:
+				return mittElement.getId();
+			case Description:
+				MessageTypeType message = getMessage(mittElement);
+				return message.getDescription();
+			case Transaction:
+				TransactionTypeType transaction = getTransaction(mittElement);
+				return transaction.getDescription();
+			}
+			return null;
+		}
+	}
 
 	public MessageInTransactionDialogControl14(TransactionsPanelControl14 transactionsPanelControl) throws Exception {
 		super();
@@ -272,6 +324,32 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				return label;
 			}
 		});
+	}
+
+	void initSequenceElements() {
+		prevTableModel = new PrevNextTableModel();
+		tbl_Prev.setModel(prevTableModel);
+		tbl_Prev.setFillsViewportHeight(true);
+		nextTableModel = new PrevNextTableModel();
+		tbl_Next.setModel(nextTableModel);
+		tbl_Next.setFillsViewportHeight(true);
+	}
+
+	void fillSequenceElements(MessageInTransactionTypeType mitt) {
+		List<MessageInTransactionTypeType> prevList = getPrevious(mitt);
+		if (prevList != null) {
+			prevTableModel.elements.addAll(prevList);
+			prevTableModel.fireTableDataChanged();
+		}
+		List<MessageInTransactionTypeType> nextList = getNext(mitt);
+		if (nextList != null) {
+			nextTableModel.elements.addAll(nextList);
+			nextTableModel.fireTableDataChanged();
+		}
+		chb_FirstMessage.setSelected(mitt.isFirstMessage() != null ? mitt.isFirstMessage() : false);
+		chb_Direction.setSelected(mitt.isInitiatorToExecutor() != null ? mitt.isInitiatorToExecutor() : false);
+		chb_OpenSecondaryTransactionsAllowed.setSelected(
+				mitt.isOpenSecondaryTransactionsAllowed() != null ? mitt.isOpenSecondaryTransactionsAllowed() : false);
 	}
 
 	private Map<String, DefaultMutableTreeNode> treeMap;
