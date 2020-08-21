@@ -48,8 +48,8 @@ public class InteractionFrameworkEditor extends Control {
 	private MainPanelControl16 mainPanelControl16;
 
 	private JFrame frame;
-	private JButton btn_NewFramework, btn_SaveFramework, btn_SaveAsFramework, btn_XsdCheck, btn_Print, btn_Report,
-			btn_NavigateBackward, btn_NavigateForward;
+	private JButton btn_NewFramework, btn_SaveFramework, btn_SaveAsFramework, btn_Translate14to16, btn_XsdCheck,
+			btn_Print, btn_Report, btn_NavigateBackward, btn_NavigateForward;
 	private JTextField tfd_User, tfd_Version;
 	private JPanel mainPanel;
 
@@ -89,7 +89,7 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	static void renderSplashFrame(Graphics2D g) {
-		final String version = "Release candidate: 2.05 - release date: 2020-07-07";
+		final String version = "Release candidate: 2.06 - release date: 2020-08-21";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();
@@ -188,6 +188,7 @@ public class InteractionFrameworkEditor extends Control {
 								String newProjectId = mainPanelControl16.newFramework(newFrameworkDialogControl);
 								btn_SaveFramework.setEnabled(true);
 								btn_SaveAsFramework.setEnabled(true);
+								btn_Translate14to16.setEnabled(false);
 								btn_XsdCheck.setEnabled(false);
 								btn_Print.setEnabled(true);
 								btn_Report.setEnabled(true);
@@ -205,6 +206,7 @@ public class InteractionFrameworkEditor extends Control {
 								String newProjectId = mainPanelControl14.newFramework(newFrameworkDialogControl);
 								btn_SaveFramework.setEnabled(true);
 								btn_SaveAsFramework.setEnabled(true);
+								btn_Translate14to16.setEnabled(true);
 								btn_XsdCheck.setEnabled(false);
 								btn_Print.setEnabled(true);
 								btn_Report.setEnabled(true);
@@ -250,6 +252,7 @@ public class InteractionFrameworkEditor extends Control {
 				mainPanelControl16.openFramework(frameworkFile, defaultHandler);
 				btn_SaveFramework.setEnabled(true);
 				btn_SaveAsFramework.setEnabled(true);
+				btn_Translate14to16.setEnabled(false);
 				btn_XsdCheck.setEnabled(true);
 				btn_Print.setEnabled(true);
 				btn_Report.setEnabled(true);
@@ -263,6 +266,7 @@ public class InteractionFrameworkEditor extends Control {
 				mainPanelControl14.openFramework(frameworkFile, defaultHandler);
 				btn_SaveFramework.setEnabled(true);
 				btn_SaveAsFramework.setEnabled(true);
+				btn_Translate14to16.setEnabled(true);
 				btn_XsdCheck.setEnabled(true);
 				btn_Print.setEnabled(true);
 				btn_Report.setEnabled(true);
@@ -348,14 +352,35 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	public void saveAsFramework() {
+		frameworkFile = null;
+		saveFramework();
+	}
+
+	public void translate14To16() {
 		Translator14to16 translator14to16 = new Translator14to16();
 		try {
 			translator14to16.translate();
+			frameworkFile = null;
+			version = "1.6";
+			tfd_Version.setText(version);
+			
+			mainPanelControl16 = new MainPanelControl16();
+			
+			saveFramework();
+			
+			mainPanel.removeAll();
+			mainPanel.add(mainPanelControl16.getMainPanel());
+			mainPanel.revalidate();
+			mainPanelControl16.openFramework(frameworkFile, defaultHandler);
+			btn_SaveFramework.setEnabled(true);
+			btn_SaveAsFramework.setEnabled(true);
+			btn_Translate14to16.setEnabled(false);
+			btn_XsdCheck.setEnabled(true);
+			btn_Print.setEnabled(true);
+			btn_Report.setEnabled(true);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		frameworkFile = null;
-		saveFramework();
 	}
 
 	public void print() {

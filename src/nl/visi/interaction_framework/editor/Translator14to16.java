@@ -77,7 +77,7 @@ public class Translator14to16 extends Control14 {
 		translateSimpleElementTypeLinks(object16Factory);
 		translateTransactionTypeLinks(object16Factory);
 
-		Editor16.getLoader16().marshal(new PrintStream("test.xml"));
+		// Editor16.getLoader16().marshal(new PrintStream("test.xml"));
 	}
 
 	private void translateAppendixTypeAttributes(ObjectFactory object16Factory) {

@@ -2,8 +2,9 @@
 <!-- This XML file is used to create a Swing container using the SwiXml rendering 
 	engine. org.jvnet.substance.SubstanceLookAndFeel com.jgoodies.looks.plastic.PlasticXPLookAndFeel 
 	org.jdesktop.swingx.plaf.nimbus.NimbusLookAndFeel a03.swing.plaf/A03LookAndFeel -->
-<frame id="mainFrame" DefaultCloseOperation="JFrame.DO_NOTHING_ON_CLOSE"
-	Size="900,680" Title="lbl_InteractionFrameworkEditor"
+<frame id="mainFrame"
+	DefaultCloseOperation="JFrame.DO_NOTHING_ON_CLOSE" Size="900,680"
+	Title="lbl_InteractionFrameworkEditor"
 	bundle="nl.visi.interaction_framework.editor.locale.Editor"
 	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel">
 
@@ -46,6 +47,9 @@
 
 			<button id="btn_XsdCheck" Action="xsdCheck" Enabled="false"
 				Text="lbl_XsdCheck" />
+
+			<button id="btn_Translate14to16" Action="translate14To16"
+				Enabled="false" Text="1.4 => 1.6" ToolTipText="lbl_Translate14to16" />
 
 			<separator />
 
