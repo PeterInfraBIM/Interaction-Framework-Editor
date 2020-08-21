@@ -1971,6 +1971,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		}
 
 		canvasPanel.repaint();
+		canvas2Panel.repaint();
 
 		inSelection = false;
 	}

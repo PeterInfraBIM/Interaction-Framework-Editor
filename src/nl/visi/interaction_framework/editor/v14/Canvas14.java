@@ -420,20 +420,6 @@ public class Canvas14 extends JPanel {
 			}
 		}
 
-//		private void move(List<Message> from, List<Message> to) {
-//			int indexOfThis = from.indexOf(this);
-//			if (indexOfThis < from.size() - 1) {
-//				List<Message> toBeMoved = new ArrayList<>();
-//				for (int i = from.size() - 1; i > indexOfThis; i--) {
-//					toBeMoved.add(from.get(i));
-//				}
-//				for (Message message : toBeMoved) {
-//					to.add(0, message);
-//					from.remove(message);
-//				}
-//			}
-//		}
-
 		private void moveBeforeToAfter() {
 			int indexOfThis = -1;
 			for (int i = 0; i < historyBefore.size(); i++) {
