@@ -41,7 +41,7 @@ import nl.visi.schemas._20140331.ProjectTypeType;
 
 abstract class PanelControl14<E extends ElementType> extends Control14 {
 	enum Fields {
-		Id, Description, State, Language, Category, HelpInfo, Code;
+		Id, Description, State, DateLaMu, UserLaMu, Language, Category, HelpInfo, Code;
 	}
 
 	protected JPanel panel;
@@ -50,7 +50,8 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 	protected ElementsTableModel<E> elementsTableModel;
 	protected JTable tbl_Elements;
 	protected JButton btn_NewElement, btn_CopyElement, btn_DeleteElement;
-	protected JTextField tfd_Filter, tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
+	protected JTextField tfd_Filter, tfd_Id, tfd_Description, tfd_State, tfd_DateLamu, tfd_UserLamu, tfd_Language,
+			tfd_Category, tfd_HelpInfo, tfd_Code;
 	protected DateField startDateField, endDateField;
 	protected boolean inSelection = false;
 
@@ -293,14 +294,16 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			setDateLaMu.invoke(element, xgcal);
 			Method setUserLaMu = element.getClass().getMethod("setUserLaMu", new Class[] { String.class });
 			setUserLaMu.invoke(element, user);
-			int row = 0;
-			for (ElementType elem : elementsTableModel.elements) {
-				if (elem.getId().equals(element.getId())) {
-					elementsTableModel.update(row);
-					break;
-				}
-				row++;
-			}
+//			int row = 0;
+//			for (ElementType elem : elementsTableModel.elements) {
+//				if (elem.getId().equals(element.getId())) {
+//					elementsTableModel.update(row);
+//					break;
+//				}
+//				row++;
+//			}
+			tfd_DateLamu.setText(sdfDateTime.format(xgcal.toGregorianCalendar().getTime()));
+			tfd_UserLamu.setText(user);
 		} catch (DatatypeConfigurationException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {
@@ -341,30 +344,6 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 				setDescriptionMethod.invoke(newElement, getBundle().getString("lbl_DescriptionOf") + " " + newId);
 			}
 		}
-//		if (!(newElement instanceof ElementConditionType)) {
-//			Method setStateMethod = newElement.getClass().getDeclaredMethod("setState", new Class[] { String.class });
-//			setStateMethod.invoke(newElement, "active");
-//			updateLaMu(newElement, user);
-//			try {
-//				Method setStartDateMethod = newElement.getClass().getDeclaredMethod("setStartDate",
-//						new Class[] { XMLGregorianCalendar.class });
-//				Method setEndDateMethod = newElement.getClass().getDeclaredMethod("setEndDate",
-//						new Class[] { XMLGregorianCalendar.class });
-//				try {
-//					gcal.setTime(new Date());
-//					GregorianCalendar endDate = new GregorianCalendar();
-//					long yearInMillis = Math.round(1000 * 60 * 60 * 24 * 365.2425);
-//					endDate.setTimeInMillis(gcal.getTimeInMillis() + yearInMillis);
-//					XMLGregorianCalendar xEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(endDate);
-//					XMLGregorianCalendar xgcal = DatatypeFactory.newInstance().newXMLGregorianCalendar(gcal);
-//					setStartDateMethod.invoke(newElement, xgcal);
-//					setEndDateMethod.invoke(newElement, xEndDate);
-//				} catch (DatatypeConfigurationException e) {
-//					e.printStackTrace();
-//				}
-//			} catch (NoSuchMethodException e) {
-//			}
-//		}
 		Editor14.getStore14().put(newId, newElement);
 		updateLaMu(newElement, InteractionFrameworkEditor.user);
 		return newId;

@@ -41,7 +41,7 @@ import nl.visi.schemas._20160331.ProjectTypeType;
 
 abstract class PanelControl16<E extends ElementType> extends Control16 {
 	enum Fields {
-		Id, Description, State, Language, Category, HelpInfo, Code;
+		Id, Description, State, DateLaMu, UserLaMu, Language, Category, HelpInfo, Code;
 	}
 
 	protected JPanel panel;
@@ -50,7 +50,8 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 	protected ElementsTableModel<E> elementsTableModel;
 	protected JTable tbl_Elements;
 	protected JButton btn_NewElement, btn_CopyElement, btn_DeleteElement;
-	protected JTextField tfd_Filter, tfd_Id, tfd_Description, tfd_State, tfd_Language, tfd_Category, tfd_HelpInfo, tfd_Code;
+	protected JTextField tfd_Filter, tfd_Id, tfd_Description, tfd_State, tfd_DateLamu, tfd_UserLamu, tfd_Language,
+			tfd_Category, tfd_HelpInfo, tfd_Code;
 	protected DateField startDateField, endDateField;
 	protected boolean inSelection = false;
 
@@ -293,6 +294,16 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 			setDateLaMu.invoke(element, xgcal);
 			Method setUserLaMu = element.getClass().getMethod("setUserLaMu", new Class[] { String.class });
 			setUserLaMu.invoke(element, user);
+//			int row = 0;
+//			for (ElementType elem : elementsTableModel.elements) {
+//				if (elem.getId().equals(element.getId())) {
+//					elementsTableModel.update(row);
+//					break;
+//				}
+//				row++;
+//			}
+			tfd_DateLamu.setText(sdfDateTime.format(xgcal.toGregorianCalendar().getTime()));
+			tfd_UserLamu.setText(user);
 		} catch (DatatypeConfigurationException e) {
 			e.printStackTrace();
 		} catch (SecurityException e) {

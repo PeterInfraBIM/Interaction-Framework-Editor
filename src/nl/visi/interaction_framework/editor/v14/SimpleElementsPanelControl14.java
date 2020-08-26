@@ -29,7 +29,8 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 	private JButton btn_NavigateUserDefinedType;
 
 	private enum SimpleElementsTableColumns {
-		Id, Description, InterfaceType, State, DateLamu, UserLamu;
+//		Id, Description, InterfaceType, State, DateLamu, UserLamu;
+		Id, Description;
 
 		@Override
 		public String toString() {
@@ -59,14 +60,14 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 				return simpleElement.getId();
 			case Description:
 				return simpleElement.getDescription();
-			case InterfaceType:
-				return simpleElement.getInterfaceType();
-			case State:
-				return simpleElement.getState();
-			case DateLamu:
-				return getDateTime(simpleElement.getDateLaMu());
-			case UserLamu:
-				return simpleElement.getUserLaMu();
+//			case InterfaceType:
+//				return simpleElement.getInterfaceType();
+//			case State:
+//				return simpleElement.getState();
+//			case DateLamu:
+//				return getDateTime(simpleElement.getDateLaMu());
+//			case UserLamu:
+//				return simpleElement.getUserLaMu();
 			default:
 				return null;
 			}
@@ -81,7 +82,7 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 		tbl_Elements.setFillsViewportHeight(true);
 		TableRowSorter<ElementsTableModel<SimpleElementTypeType>> tableRowSorter = new TableRowSorter<>(
 				elementsTableModel);
-		tableRowSorter.setComparator(SimpleElementsTableColumns.DateLamu.ordinal(), dateTimeComparator);
+//		tableRowSorter.setComparator(SimpleElementsTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -94,20 +95,21 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-				String filterString = tfd_Filter.getText().toUpperCase();
-				if (filterString.isEmpty()) {
-					fillTable(SimpleElementTypeType.class);
-				} else {
-					List<SimpleElementTypeType> elements = Editor14.getStore14()
-							.getElements(SimpleElementTypeType.class);
-					elementsTableModel.clear();
-					for (SimpleElementTypeType element : elements) {
-						if (element.getDescription().toUpperCase().contains(filterString)
-								|| element.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(element);
-						}
-					}
-				}
+//				String filterString = tfd_Filter.getText().toUpperCase();
+//				if (filterString.isEmpty()) {
+//					fillTable(SimpleElementTypeType.class);
+//				} else {
+//					List<SimpleElementTypeType> elements = Editor14.getStore14()
+//							.getElements(SimpleElementTypeType.class);
+//					elementsTableModel.clear();
+//					for (SimpleElementTypeType element : elements) {
+//						if (element.getDescription().toUpperCase().contains(filterString)
+//								|| element.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(element);
+//						}
+//					}
+//				}
+				fillTable();
 			}
 		});
 		tfd_InterfaceType.getDocument().addDocumentListener(new DocumentAdapter() {
@@ -196,7 +198,22 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 
 	@Override
 	public void fillTable() {
-		fillTable(SimpleElementTypeType.class);
+		String filterString = tfd_Filter.getText().toUpperCase();
+		if (filterString.isEmpty()) {
+			fillTable(SimpleElementTypeType.class);
+		} else {
+			List<SimpleElementTypeType> elements = Editor14.getStore14()
+					.getElements(SimpleElementTypeType.class);
+			elementsTableModel.clear();
+			for (SimpleElementTypeType element : elements) {
+				if (element.getDescription().toUpperCase().contains(filterString)
+						|| element.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(element);
+				}
+			}
+		}
+
+//		fillTable(SimpleElementTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -213,6 +230,8 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 		tfd_Description.setEnabled(rowSelected);
 		tfd_InterfaceType.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
+		tfd_DateLamu.setEnabled(rowSelected);
+		tfd_UserLamu.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
@@ -225,6 +244,10 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 			tfd_Description.setText(selectedElement.getDescription());
 			tfd_InterfaceType.setText(selectedElement.getInterfaceType());
 			tfd_State.setText(selectedElement.getState());
+			tfd_DateLamu.setText(selectedElement.getDateLaMu() != null
+					? sdfDateTime.format(selectedElement.getDateLaMu().toGregorianCalendar().getTime())
+					: "");
+			tfd_UserLamu.setText(selectedElement.getUserLaMu());
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
@@ -253,6 +276,8 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 			tfd_Description.setText("");
 			tfd_InterfaceType.setText("");
 			tfd_State.setText("");
+			tfd_DateLamu.setText("");
+			tfd_UserLamu.setText("");
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");

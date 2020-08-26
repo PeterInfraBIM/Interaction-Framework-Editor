@@ -59,7 +59,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	private JTextField tfd_MinOccurs, tfd_MaxOccurs;
 
 	private enum ComplexElementsTableColumns {
-		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
+//		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
+		Id, Description;
 
 		@Override
 		public String toString() {
@@ -89,16 +90,16 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				return complexElement.getId();
 			case Description:
 				return complexElement.getDescription();
-			case StartDate:
-				return getDate(complexElement.getStartDate());
-			case EndDate:
-				return getDate(complexElement.getEndDate());
-			case State:
-				return complexElement.getState();
-			case DateLamu:
-				return getDateTime(complexElement.getDateLaMu());
-			case UserLamu:
-				return complexElement.getUserLaMu();
+//			case StartDate:
+//				return getDate(complexElement.getStartDate());
+//			case EndDate:
+//				return getDate(complexElement.getEndDate());
+//			case State:
+//				return complexElement.getState();
+//			case DateLamu:
+//				return getDateTime(complexElement.getDateLaMu());
+//			case UserLamu:
+//				return complexElement.getUserLaMu();
 			default:
 				return null;
 			}
@@ -320,7 +321,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 
 	public ComplexElementsPanelControl16() throws Exception {
 		super(COMPLEX_ELEMENTS_PANEL);
-		
 
 		initComplexElementsTable();
 		initSubComplexElementsTable();
@@ -569,9 +569,9 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		tbl_Elements.setFillsViewportHeight(true);
 		TableRowSorter<ElementsTableModel<ComplexElementTypeType>> tableRowSorter = new TableRowSorter<>(
 				elementsTableModel);
-		tableRowSorter.setComparator(ComplexElementsTableColumns.StartDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(ComplexElementsTableColumns.EndDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(ComplexElementsTableColumns.DateLamu.ordinal(), dateTimeComparator);
+//		tableRowSorter.setComparator(ComplexElementsTableColumns.StartDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(ComplexElementsTableColumns.EndDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(ComplexElementsTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -581,32 +581,48 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				updateSelectionArea(e);
 			}
 		});
-		
+
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-				String filterString = tfd_Filter.getText().toUpperCase();
-				if (filterString.isEmpty()) {
-					fillTable(ComplexElementTypeType.class);
-				} else {
-					List<ComplexElementTypeType> elements = Editor16.getStore16()
-							.getElements(ComplexElementTypeType.class);
-					elementsTableModel.clear();
-					for (ComplexElementTypeType element : elements) {
-						if (element.getDescription().toUpperCase().contains(filterString)
-								|| element.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(element);
-						}
-					}
-				}
+//				String filterString = tfd_Filter.getText().toUpperCase();
+//				if (filterString.isEmpty()) {
+//					fillTable(ComplexElementTypeType.class);
+//				} else {
+//					List<ComplexElementTypeType> elements = Editor16.getStore16()
+//							.getElements(ComplexElementTypeType.class);
+//					elementsTableModel.clear();
+//					for (ComplexElementTypeType element : elements) {
+//						if (element.getDescription().toUpperCase().contains(filterString)
+//								|| element.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(element);
+//						}
+//					}
+//				}
+				fillTable();
 			}
 		});
-		
+
 	}
 
 	@Override
 	public void fillTable() {
-		fillTable(ComplexElementTypeType.class);
+		String filterString = tfd_Filter.getText().toUpperCase();
+		if (filterString.isEmpty()) {
+			fillTable(ComplexElementTypeType.class);
+		} else {
+			List<ComplexElementTypeType> elements = Editor16.getStore16()
+					.getElements(ComplexElementTypeType.class);
+			elementsTableModel.clear();
+			for (ComplexElementTypeType element : elements) {
+				if (element.getDescription().toUpperCase().contains(filterString)
+						|| element.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(element);
+				}
+			}
+		}
+
+//		fillTable(ComplexElementTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -624,6 +640,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		startDateField.setEnabled(rowSelected);
 		endDateField.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
+		tfd_DateLamu.setEnabled(rowSelected);
+		tfd_UserLamu.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
@@ -648,6 +666,10 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				endDateField.setDate(selectedElement.getEndDate().toGregorianCalendar().getTime());
 			}
 			tfd_State.setText(selectedElement.getState());
+			tfd_DateLamu.setText(selectedElement.getDateLaMu() != null
+					? sdfDateTime.format(selectedElement.getDateLaMu().toGregorianCalendar().getTime())
+					: "");
+			tfd_UserLamu.setText(selectedElement.getUserLaMu());
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
@@ -699,6 +721,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			startDateField.setDate(null);
 			endDateField.setDate(null);
 			tfd_State.setText("");
+			tfd_DateLamu.setText("");
+			tfd_UserLamu.setText("");
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");

@@ -58,7 +58,8 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	}
 
 	private enum MiscellaneousTableColumns {
-		Id, ElementType, Description, StartDate, EndDate, State, DateLamu, UserLamu;
+//		Id, ElementType, Description, StartDate, EndDate, State, DateLamu, UserLamu;
+		Id, ElementType, Description;
 
 		@Override
 		public String toString() {
@@ -104,76 +105,76 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				if (element instanceof TransactionPhaseTypeType)
 					return ((TransactionPhaseTypeType) element).getDescription();
 				return null;
-			case StartDate:
-				if (element instanceof ProjectTypeType)
-					return getDate(((ProjectTypeType) element).getStartDate());
-				if (element instanceof PersonTypeType)
-					return getDate(((PersonTypeType) element).getStartDate());
-				if (element instanceof OrganisationTypeType)
-					return getDate(((OrganisationTypeType) element).getStartDate());
-				if (element instanceof GroupTypeType)
-					return getDate(((GroupTypeType) element).getStartDate());
-				if (element instanceof AppendixTypeType)
-					return getDate(((AppendixTypeType) element).getStartDate());
-				if (element instanceof TransactionPhaseTypeType)
-					return getDate(((TransactionPhaseTypeType) element).getStartDate());
-				return null;
-			case EndDate:
-				if (element instanceof ProjectTypeType)
-					return getDate(((ProjectTypeType) element).getEndDate());
-				if (element instanceof PersonTypeType)
-					return getDate(((PersonTypeType) element).getEndDate());
-				if (element instanceof OrganisationTypeType)
-					return getDate(((OrganisationTypeType) element).getEndDate());
-				if (element instanceof GroupTypeType)
-					return getDate(((GroupTypeType) element).getEndDate());
-				if (element instanceof AppendixTypeType)
-					return getDate(((AppendixTypeType) element).getEndDate());
-				if (element instanceof TransactionPhaseTypeType)
-					return getDate(((TransactionPhaseTypeType) element).getEndDate());
-				return null;
-			case State:
-				if (element instanceof ProjectTypeType)
-					return ((ProjectTypeType) element).getState();
-				if (element instanceof PersonTypeType)
-					return ((PersonTypeType) element).getState();
-				if (element instanceof OrganisationTypeType)
-					return ((OrganisationTypeType) element).getState();
-				if (element instanceof GroupTypeType)
-					return ((GroupTypeType) element).getState();
-				if (element instanceof AppendixTypeType)
-					return ((AppendixTypeType) element).getState();
-				if (element instanceof TransactionPhaseTypeType)
-					return ((TransactionPhaseTypeType) element).getState();
-				return null;
-			case DateLamu:
-				if (element instanceof ProjectTypeType)
-					return getDateTime(((ProjectTypeType) element).getDateLaMu());
-				if (element instanceof PersonTypeType)
-					return getDateTime(((PersonTypeType) element).getDateLaMu());
-				if (element instanceof OrganisationTypeType)
-					return getDateTime(((OrganisationTypeType) element).getDateLaMu());
-				if (element instanceof GroupTypeType)
-					return getDateTime(((GroupTypeType) element).getDateLaMu());
-				if (element instanceof AppendixTypeType)
-					return getDateTime(((AppendixTypeType) element).getDateLaMu());
-				if (element instanceof TransactionPhaseTypeType)
-					return getDateTime(((TransactionPhaseTypeType) element).getDateLaMu());
-				return null;
-			case UserLamu:
-				if (element instanceof ProjectTypeType)
-					return ((ProjectTypeType) element).getUserLaMu();
-				if (element instanceof PersonTypeType)
-					return ((PersonTypeType) element).getUserLaMu();
-				if (element instanceof OrganisationTypeType)
-					return ((OrganisationTypeType) element).getUserLaMu();
-				if (element instanceof GroupTypeType)
-					return ((GroupTypeType) element).getUserLaMu();
-				if (element instanceof AppendixTypeType)
-					return ((AppendixTypeType) element).getUserLaMu();
-				if (element instanceof TransactionPhaseTypeType)
-					return ((TransactionPhaseTypeType) element).getUserLaMu();
-				return null;
+//			case StartDate:
+//				if (element instanceof ProjectTypeType)
+//					return getDate(((ProjectTypeType) element).getStartDate());
+//				if (element instanceof PersonTypeType)
+//					return getDate(((PersonTypeType) element).getStartDate());
+//				if (element instanceof OrganisationTypeType)
+//					return getDate(((OrganisationTypeType) element).getStartDate());
+//				if (element instanceof GroupTypeType)
+//					return getDate(((GroupTypeType) element).getStartDate());
+//				if (element instanceof AppendixTypeType)
+//					return getDate(((AppendixTypeType) element).getStartDate());
+//				if (element instanceof TransactionPhaseTypeType)
+//					return getDate(((TransactionPhaseTypeType) element).getStartDate());
+//				return null;
+//			case EndDate:
+//				if (element instanceof ProjectTypeType)
+//					return getDate(((ProjectTypeType) element).getEndDate());
+//				if (element instanceof PersonTypeType)
+//					return getDate(((PersonTypeType) element).getEndDate());
+//				if (element instanceof OrganisationTypeType)
+//					return getDate(((OrganisationTypeType) element).getEndDate());
+//				if (element instanceof GroupTypeType)
+//					return getDate(((GroupTypeType) element).getEndDate());
+//				if (element instanceof AppendixTypeType)
+//					return getDate(((AppendixTypeType) element).getEndDate());
+//				if (element instanceof TransactionPhaseTypeType)
+//					return getDate(((TransactionPhaseTypeType) element).getEndDate());
+//				return null;
+//			case State:
+//				if (element instanceof ProjectTypeType)
+//					return ((ProjectTypeType) element).getState();
+//				if (element instanceof PersonTypeType)
+//					return ((PersonTypeType) element).getState();
+//				if (element instanceof OrganisationTypeType)
+//					return ((OrganisationTypeType) element).getState();
+//				if (element instanceof GroupTypeType)
+//					return ((GroupTypeType) element).getState();
+//				if (element instanceof AppendixTypeType)
+//					return ((AppendixTypeType) element).getState();
+//				if (element instanceof TransactionPhaseTypeType)
+//					return ((TransactionPhaseTypeType) element).getState();
+//				return null;
+//			case DateLamu:
+//				if (element instanceof ProjectTypeType)
+//					return getDateTime(((ProjectTypeType) element).getDateLaMu());
+//				if (element instanceof PersonTypeType)
+//					return getDateTime(((PersonTypeType) element).getDateLaMu());
+//				if (element instanceof OrganisationTypeType)
+//					return getDateTime(((OrganisationTypeType) element).getDateLaMu());
+//				if (element instanceof GroupTypeType)
+//					return getDateTime(((GroupTypeType) element).getDateLaMu());
+//				if (element instanceof AppendixTypeType)
+//					return getDateTime(((AppendixTypeType) element).getDateLaMu());
+//				if (element instanceof TransactionPhaseTypeType)
+//					return getDateTime(((TransactionPhaseTypeType) element).getDateLaMu());
+//				return null;
+//			case UserLamu:
+//				if (element instanceof ProjectTypeType)
+//					return ((ProjectTypeType) element).getUserLaMu();
+//				if (element instanceof PersonTypeType)
+//					return ((PersonTypeType) element).getUserLaMu();
+//				if (element instanceof OrganisationTypeType)
+//					return ((OrganisationTypeType) element).getUserLaMu();
+//				if (element instanceof GroupTypeType)
+//					return ((GroupTypeType) element).getUserLaMu();
+//				if (element instanceof AppendixTypeType)
+//					return ((AppendixTypeType) element).getUserLaMu();
+//				if (element instanceof TransactionPhaseTypeType)
+//					return ((TransactionPhaseTypeType) element).getUserLaMu();
+//				return null;
 			default:
 				return null;
 			}
@@ -356,9 +357,9 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		tbl_Elements.setModel(elementsTableModel);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<ElementType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
-		tableRowSorter.setComparator(MiscellaneousTableColumns.StartDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(MiscellaneousTableColumns.EndDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(MiscellaneousTableColumns.DateLamu.ordinal(), dateTimeComparator);
+//		tableRowSorter.setComparator(MiscellaneousTableColumns.StartDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(MiscellaneousTableColumns.EndDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(MiscellaneousTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -369,61 +370,63 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				updateSelectionArea(e);
 			}
 		});
-		
+
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-				String filterString = tfd_Filter.getText().toUpperCase();
-				if (filterString.isEmpty()) {
-					fillTable();
-				} else {
-					Store16 store = Editor16.getStore16();
+//				String filterString = tfd_Filter.getText().toUpperCase();
+//				if (filterString.isEmpty()) {
+//					fillTable();
+//				} else {
+//					Store16 store = Editor16.getStore16();
+//
+//					elementsTableModel.clear();
+//					List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
+//					for (ProjectTypeType project : projects) {
+//						if (project.getDescription().toUpperCase().contains(filterString)
+//								|| project.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(project);
+//						}
+//					}
+//					List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
+//					for (PersonTypeType person : persons) {
+//						if (person.getDescription().toUpperCase().contains(filterString)
+//								|| person.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(person);
+//						}
+//					}
+//					List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
+//					for (OrganisationTypeType organisation : organisations) {
+//						if (organisation.getDescription().toUpperCase().contains(filterString)
+//								|| organisation.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(organisation);
+//						}
+//					}
+//					List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
+//					for (GroupTypeType group : groups) {
+//						if (group.getDescription().toUpperCase().contains(filterString)
+//								|| group.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(group);
+//						}
+//					}
+//					List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
+//					for (AppendixTypeType appendix : appendices) {
+//						if (appendix.getDescription().toUpperCase().contains(filterString)
+//								|| appendix.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(appendix);
+//						}
+//					}
+//					List<TransactionPhaseTypeType> transactionPhases = store
+//							.getElements(TransactionPhaseTypeType.class);
+//					for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
+//						if (transactionPhase.getDescription().toUpperCase().contains(filterString)
+//								|| transactionPhase.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(transactionPhase);
+//						}
+//					}
+//				}
 
-					elementsTableModel.clear();
-					List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
-					for (ProjectTypeType project : projects) {
-						if (project.getDescription().toUpperCase().contains(filterString)
-								|| project.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(project);
-						}
-					}
-					List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
-					for (PersonTypeType person : persons) {
-						if (person.getDescription().toUpperCase().contains(filterString)
-								|| person.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(person);
-						}
-					}
-					List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
-					for (OrganisationTypeType organisation : organisations) {
-						if (organisation.getDescription().toUpperCase().contains(filterString)
-								|| organisation.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(organisation);
-						}
-					}
-					List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
-					for (GroupTypeType group : groups) {
-						if (group.getDescription().toUpperCase().contains(filterString)
-								|| group.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(group);
-						}
-					}
-					List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
-					for (AppendixTypeType appendix : appendices) {
-						if (appendix.getDescription().toUpperCase().contains(filterString)
-								|| appendix.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(appendix);
-						}
-					}
-					List<TransactionPhaseTypeType> transactionPhases = store
-							.getElements(TransactionPhaseTypeType.class);
-					for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
-						if (transactionPhase.getDescription().toUpperCase().contains(filterString)
-								|| transactionPhase.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(transactionPhase);
-						}
-					}
-				}
+				fillTable();
 			}
 
 		});
@@ -432,32 +435,109 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 
 	@Override
 	public void fillTable() {
-		Store16 store = Editor16.getStore16();
+//		Store16 store = Editor16.getStore16();
+//
+//		elementsTableModel.clear();
+//		List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
+//		for (ProjectTypeType project : projects) {
+//			elementsTableModel.add(project);
+//		}
+//		List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
+//		for (PersonTypeType person : persons) {
+//			elementsTableModel.add(person);
+//		}
+//		List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
+//		for (OrganisationTypeType organisation : organisations) {
+//			elementsTableModel.add(organisation);
+//		}
+//		List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
+//		for (GroupTypeType group : groups) {
+//			elementsTableModel.add(group);
+//		}
+//		List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
+//		for (AppendixTypeType appendix : appendices) {
+//			elementsTableModel.add(appendix);
+//		}
+//		List<TransactionPhaseTypeType> transactionPhases = store.getElements(TransactionPhaseTypeType.class);
+//		for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
+//			elementsTableModel.add(transactionPhase);
+//		}
 
-		elementsTableModel.clear();
-		List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
-		for (ProjectTypeType project : projects) {
-			elementsTableModel.add(project);
-		}
-		List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
-		for (PersonTypeType person : persons) {
-			elementsTableModel.add(person);
-		}
-		List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
-		for (OrganisationTypeType organisation : organisations) {
-			elementsTableModel.add(organisation);
-		}
-		List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
-		for (GroupTypeType group : groups) {
-			elementsTableModel.add(group);
-		}
-		List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
-		for (AppendixTypeType appendix : appendices) {
-			elementsTableModel.add(appendix);
-		}
-		List<TransactionPhaseTypeType> transactionPhases = store.getElements(TransactionPhaseTypeType.class);
-		for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
-			elementsTableModel.add(transactionPhase);
+		String filterString = tfd_Filter.getText().toUpperCase();
+		if (filterString.isEmpty()) {
+			Store16 store = Editor16.getStore16();
+
+			elementsTableModel.clear();
+			List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
+			for (ProjectTypeType project : projects) {
+				elementsTableModel.add(project);
+			}
+			List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
+			for (PersonTypeType person : persons) {
+				elementsTableModel.add(person);
+			}
+			List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
+			for (OrganisationTypeType organisation : organisations) {
+				elementsTableModel.add(organisation);
+			}
+			List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
+			for (GroupTypeType group : groups) {
+				elementsTableModel.add(group);
+			}
+			List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
+			for (AppendixTypeType appendix : appendices) {
+				elementsTableModel.add(appendix);
+			}
+			List<TransactionPhaseTypeType> transactionPhases = store.getElements(TransactionPhaseTypeType.class);
+			for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
+				elementsTableModel.add(transactionPhase);
+			}
+		} else {
+			Store16 store = Editor16.getStore16();
+
+			elementsTableModel.clear();
+			List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
+			for (ProjectTypeType project : projects) {
+				if (project.getDescription().toUpperCase().contains(filterString)
+						|| project.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(project);
+				}
+			}
+			List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
+			for (PersonTypeType person : persons) {
+				if (person.getDescription().toUpperCase().contains(filterString)
+						|| person.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(person);
+				}
+			}
+			List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
+			for (OrganisationTypeType organisation : organisations) {
+				if (organisation.getDescription().toUpperCase().contains(filterString)
+						|| organisation.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(organisation);
+				}
+			}
+			List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
+			for (GroupTypeType group : groups) {
+				if (group.getDescription().toUpperCase().contains(filterString)
+						|| group.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(group);
+				}
+			}
+			List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
+			for (AppendixTypeType appendix : appendices) {
+				if (appendix.getDescription().toUpperCase().contains(filterString)
+						|| appendix.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(appendix);
+				}
+			}
+			List<TransactionPhaseTypeType> transactionPhases = store.getElements(TransactionPhaseTypeType.class);
+			for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
+				if (transactionPhase.getDescription().toUpperCase().contains(filterString)
+						|| transactionPhase.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(transactionPhase);
+				}
+			}
 		}
 	}
 
@@ -685,6 +765,8 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		startDateField.setEnabled(rowSelected);
 		endDateField.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
+		tfd_DateLamu.setEnabled(rowSelected);
+		tfd_UserLamu.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
@@ -718,6 +800,10 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				XMLGregorianCalendar endDate = projectType.getEndDate();
 				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(projectType.getState());
+				tfd_DateLamu.setText(projectType.getDateLaMu() != null
+						? sdfDateTime.format(projectType.getDateLaMu().toGregorianCalendar().getTime())
+						: "");
+				tfd_UserLamu.setText(projectType.getUserLaMu());
 				tfd_Language.setText(projectType.getLanguage());
 				tfd_Category.setText(projectType.getCategory());
 				tfd_HelpInfo.setText(projectType.getHelpInfo());
@@ -735,6 +821,10 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				XMLGregorianCalendar endDate = personType.getEndDate();
 				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(personType.getState());
+				tfd_DateLamu.setText(personType.getDateLaMu() != null
+						? sdfDateTime.format(personType.getDateLaMu().toGregorianCalendar().getTime())
+						: "");
+				tfd_UserLamu.setText(personType.getUserLaMu());
 				tfd_Language.setText(personType.getLanguage());
 				tfd_Category.setText(personType.getCategory());
 				tfd_HelpInfo.setText(personType.getHelpInfo());
@@ -751,6 +841,10 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				XMLGregorianCalendar endDate = organisationType.getEndDate();
 				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(organisationType.getState());
+				tfd_DateLamu.setText(organisationType.getDateLaMu() != null
+						? sdfDateTime.format(organisationType.getDateLaMu().toGregorianCalendar().getTime())
+						: "");
+				tfd_UserLamu.setText(organisationType.getUserLaMu());
 				tfd_Language.setText(organisationType.getLanguage());
 				tfd_Category.setText(organisationType.getCategory());
 				tfd_HelpInfo.setText(organisationType.getHelpInfo());
@@ -766,6 +860,12 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				XMLGregorianCalendar endDate = ((GroupTypeType) selectedElement).getEndDate();
 				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(((GroupTypeType) selectedElement).getState());
+				tfd_DateLamu
+						.setText(((GroupTypeType) selectedElement).getDateLaMu() != null
+								? sdfDateTime.format(
+										((GroupTypeType) selectedElement).getDateLaMu().toGregorianCalendar().getTime())
+								: "");
+				tfd_UserLamu.setText(((GroupTypeType) selectedElement).getUserLaMu());
 				tfd_Language.setText(((GroupTypeType) selectedElement).getLanguage());
 				tfd_Category.setText(((GroupTypeType) selectedElement).getCategory());
 				tfd_HelpInfo.setText(((GroupTypeType) selectedElement).getHelpInfo());
@@ -777,6 +877,10 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				XMLGregorianCalendar endDate = appendixType.getEndDate();
 				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(appendixType.getState());
+				tfd_DateLamu.setText(appendixType.getDateLaMu() != null
+						? sdfDateTime.format(appendixType.getDateLaMu().toGregorianCalendar().getTime())
+						: "");
+				tfd_UserLamu.setText(appendixType.getUserLaMu());
 				tfd_Language.setText(appendixType.getLanguage());
 				tfd_Category.setText(appendixType.getCategory());
 				tfd_HelpInfo.setText(appendixType.getHelpInfo());
@@ -793,6 +897,10 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				XMLGregorianCalendar endDate = transactionPhaseType.getEndDate();
 				endDateField.setDate(endDate != null ? endDate.toGregorianCalendar().getTime() : null);
 				tfd_State.setText(transactionPhaseType.getState());
+				tfd_DateLamu.setText(transactionPhaseType.getDateLaMu() != null
+						? sdfDateTime.format(transactionPhaseType.getDateLaMu().toGregorianCalendar().getTime())
+						: "");
+				tfd_UserLamu.setText(transactionPhaseType.getUserLaMu());
 				tfd_Language.setText(transactionPhaseType.getLanguage());
 				tfd_Category.setText(transactionPhaseType.getCategory());
 				tfd_HelpInfo.setText(transactionPhaseType.getHelpInfo());
@@ -824,6 +932,8 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			startDateField.setDate(null);
 			endDateField.setDate(null);
 			tfd_State.setText("");
+			tfd_DateLamu.setText("");
+			tfd_UserLamu.setText("");
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");

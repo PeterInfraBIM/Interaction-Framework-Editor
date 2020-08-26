@@ -84,7 +84,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
 	private JPopupMenu popupMenu;
-	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel, elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel,
+			elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
@@ -1080,7 +1081,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	}
 
 	private enum TransactionsTableColumns {
-		Id, Description, Main, Initiator, Executor, StartDate, EndDate, State, DateLamu, UserLamu;
+//		Id, Description, Main, Initiator, Executor, StartDate, EndDate, State, DateLamu, UserLamu;
+		Id, Description, Main, Initiator, Executor;
 
 		@Override
 		public String toString() {
@@ -1117,16 +1119,16 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			case Executor:
 				RoleTypeType executor = getExecutor(transaction);
 				return executor != null ? executor.getDescription() : null;
-			case StartDate:
-				return getDate(transaction.getStartDate());
-			case EndDate:
-				return getDate(transaction.getEndDate());
-			case State:
-				return transaction.getState();
-			case DateLamu:
-				return getDateTime(transaction.getDateLaMu());
-			case UserLamu:
-				return transaction.getUserLaMu();
+//			case StartDate:
+//				return getDate(transaction.getStartDate());
+//			case EndDate:
+//				return getDate(transaction.getEndDate());
+//			case State:
+//				return transaction.getState();
+//			case DateLamu:
+//				return getDateTime(transaction.getDateLaMu());
+//			case UserLamu:
+//				return transaction.getUserLaMu();
 			default:
 				return null;
 			}
@@ -1782,9 +1784,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		tbl_Elements.setFillsViewportHeight(true);
 		TableRowSorter<ElementsTableModel<TransactionTypeType>> tableRowSorter = new TableRowSorter<>(
 				elementsTableModel);
-		tableRowSorter.setComparator(TransactionsTableColumns.StartDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(TransactionsTableColumns.EndDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(TransactionsTableColumns.DateLamu.ordinal(), dateTimeComparator);
+//		tableRowSorter.setComparator(TransactionsTableColumns.StartDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(TransactionsTableColumns.EndDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(TransactionsTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		TransactionsTableRenderer renderer = new TransactionsTableRenderer();
 		for (int index = 0; index < tbl_Elements.getColumnCount(); index++) {
@@ -1800,23 +1802,24 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				updateSelectionArea(e);
 			}
 		});
-		
+
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-				String filterString = tfd_Filter.getText().toUpperCase();
-				if (filterString.isEmpty()) {
-					fillTable(TransactionTypeType.class);
-				} else {
-					List<TransactionTypeType> elements = Editor14.getStore14().getElements(TransactionTypeType.class);
-					elementsTableModel.clear();
-					for (TransactionTypeType element : elements) {
-						if (element.getDescription().toUpperCase().contains(filterString)
-								|| element.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(element);
-						}
-					}
-				}
+//				String filterString = tfd_Filter.getText().toUpperCase();
+//				if (filterString.isEmpty()) {
+//					fillTable(TransactionTypeType.class);
+//				} else {
+//					List<TransactionTypeType> elements = Editor14.getStore14().getElements(TransactionTypeType.class);
+//					elementsTableModel.clear();
+//					for (TransactionTypeType element : elements) {
+//						if (element.getDescription().toUpperCase().contains(filterString)
+//								|| element.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(element);
+//						}
+//					}
+//				}
+				fillTable();
 			}
 		});
 	}
@@ -1867,7 +1870,20 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 	@Override
 	public void fillTable() {
-		fillTable(TransactionTypeType.class);
+		String filterString = tfd_Filter.getText().toUpperCase();
+		if (filterString.isEmpty()) {
+			fillTable(TransactionTypeType.class);
+		} else {
+			List<TransactionTypeType> elements = Editor14.getStore14().getElements(TransactionTypeType.class);
+			elementsTableModel.clear();
+			for (TransactionTypeType element : elements) {
+				if (element.getDescription().toUpperCase().contains(filterString)
+						|| element.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(element);
+				}
+			}
+		}
+		// fillTable(TransactionTypeType.class);
 		drawingPlane.currentTransaction = null;
 	}
 
@@ -1886,6 +1902,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		startDateField.setEnabled(rowSelected);
 		endDateField.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
+		tfd_DateLamu.setEnabled(rowSelected);
+		tfd_UserLamu.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
@@ -1916,6 +1934,10 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				endDateField.setDate(endDate.toGregorianCalendar().getTime());
 			}
 			tfd_State.setText(selectedElement.getState());
+			tfd_DateLamu.setText(selectedElement.getDateLaMu() != null
+					? sdfDateTime.format(selectedElement.getDateLaMu().toGregorianCalendar().getTime())
+					: "");
+			tfd_UserLamu.setText(selectedElement.getUserLaMu());
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
@@ -1981,7 +2003,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 
 			fillSubtransactionsTable();
-			
+
 			// canvas14Plane.selectedTransaction = selectedElement;
 		} else {
 			selectedElement = null;
@@ -1990,6 +2012,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			startDateField.setDate(null);
 			endDateField.setDate(null);
 			tfd_State.setText("");
+			tfd_DateLamu.setText("");
+			tfd_UserLamu.setText("");
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
@@ -2309,7 +2333,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
 
 		fillMessageTable();
-		
+
 		return mitt;
 	}
 

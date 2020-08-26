@@ -2,6 +2,10 @@ package nl.visi.interaction_framework.editor.v14;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -14,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -97,6 +103,36 @@ public class MainPanelControl14 extends Control14 {
 					miscellaneousPC.fillTable();
 					break;
 				}
+			}
+		});
+
+		tabs.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					tabs.setEnabledAt(tabs.getSelectedIndex(), false);
+					((JComponent) tabs.getSelectedComponent()).removeAll();
+					tabs.getSelectedComponent().repaint();
+					JFrame frame = new JFrame();
+					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					tearOff(frame, Tabs.values()[tabs.getSelectedIndex()]);
+					frame.pack();
+					frame.setVisible(true);
+				}
+			}
+
+			private void tearOff(JFrame frame, final Tabs tab) {
+				frame.setTitle(getBundle().getString("lbl_" + tab.name()));
+				frame.add(tab.getPanelControl().getPanel());
+				frame.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent e) {
+						super.windowClosing(e);
+						JComponent tabComponent = (JComponent) tabs.getComponentAt(tab.ordinal());
+						tabComponent.add(tab.getPanelControl().getPanel());
+						tabs.setEnabledAt(tab.ordinal(), true);
+					}
+				});
 			}
 		});
 	}

@@ -1045,7 +1045,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	}
 
 	private enum TransactionsTableColumns {
-		Id, Description, Main, Initiator, Executor, StartDate, EndDate, State, DateLamu, UserLamu;
+//		Id, Description, Main, Initiator, Executor, StartDate, EndDate, State, DateLamu, UserLamu;
+		Id, Description, Main, Initiator, Executor;
 
 		@Override
 		public String toString() {
@@ -1082,16 +1083,16 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			case Executor:
 				RoleTypeType executor = getExecutor(transaction);
 				return executor != null ? executor.getDescription() : null;
-			case StartDate:
-				return getDate(transaction.getStartDate());
-			case EndDate:
-				return getDate(transaction.getEndDate());
-			case State:
-				return transaction.getState();
-			case DateLamu:
-				return getDateTime(transaction.getDateLaMu());
-			case UserLamu:
-				return transaction.getUserLaMu();
+//			case StartDate:
+//				return getDate(transaction.getStartDate());
+//			case EndDate:
+//				return getDate(transaction.getEndDate());
+//			case State:
+//				return transaction.getState();
+//			case DateLamu:
+//				return getDateTime(transaction.getDateLaMu());
+//			case UserLamu:
+//				return transaction.getUserLaMu();
 			default:
 				return null;
 			}
@@ -1746,9 +1747,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tbl_Elements.setFillsViewportHeight(true);
 		TableRowSorter<ElementsTableModel<TransactionTypeType>> tableRowSorter = new TableRowSorter<>(
 				elementsTableModel);
-		tableRowSorter.setComparator(TransactionsTableColumns.StartDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(TransactionsTableColumns.EndDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(TransactionsTableColumns.DateLamu.ordinal(), dateTimeComparator);
+//		tableRowSorter.setComparator(TransactionsTableColumns.StartDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(TransactionsTableColumns.EndDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(TransactionsTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		TransactionsTableRenderer renderer = new TransactionsTableRenderer();
 		for (int index = 0; index < tbl_Elements.getColumnCount(); index++) {
@@ -1768,19 +1769,20 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-				String filterString = tfd_Filter.getText().toUpperCase();
-				if (filterString.isEmpty()) {
-					fillTable(TransactionTypeType.class);
-				} else {
-					List<TransactionTypeType> elements = Editor16.getStore16().getElements(TransactionTypeType.class);
-					elementsTableModel.clear();
-					for (TransactionTypeType element : elements) {
-						if (element.getDescription().toUpperCase().contains(filterString)
-								|| element.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(element);
-						}
-					}
-				}
+//				String filterString = tfd_Filter.getText().toUpperCase();
+//				if (filterString.isEmpty()) {
+//					fillTable(TransactionTypeType.class);
+//				} else {
+//					List<TransactionTypeType> elements = Editor16.getStore16().getElements(TransactionTypeType.class);
+//					elementsTableModel.clear();
+//					for (TransactionTypeType element : elements) {
+//						if (element.getDescription().toUpperCase().contains(filterString)
+//								|| element.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(element);
+//						}
+//					}
+//				}
+				fillTable();
 			}
 		});
 	}
@@ -1850,6 +1852,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		startDateField.setEnabled(rowSelected);
 		endDateField.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
+		tfd_DateLamu.setEnabled(rowSelected);
+		tfd_UserLamu.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
@@ -1880,6 +1884,10 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				endDateField.setDate(endDate.toGregorianCalendar().getTime());
 			}
 			tfd_State.setText(selectedElement.getState());
+			tfd_DateLamu.setText(selectedElement.getDateLaMu() != null
+					? sdfDateTime.format(selectedElement.getDateLaMu().toGregorianCalendar().getTime())
+					: "");
+			tfd_UserLamu.setText(selectedElement.getUserLaMu());
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
@@ -1952,6 +1960,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			startDateField.setDate(null);
 			endDateField.setDate(null);
 			tfd_State.setText("");
+			tfd_DateLamu.setText("");
+			tfd_UserLamu.setText("");
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");

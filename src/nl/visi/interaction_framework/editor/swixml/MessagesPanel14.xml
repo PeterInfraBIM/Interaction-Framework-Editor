@@ -9,50 +9,52 @@
 	<splitpane constraints="BorderLayout.CENTER"
 		ContinuousLayout="true" DividerLocation="220"
 		OneTouchExpandable="true" Orientation="JSplitPane.VERTICAL_SPLIT">
-		<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
-			<scrollpane>
-				<gridbagconstraints
-					Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Weightx="1.0"
-					Weighty="1.0" />
-				<table id="tbl_Elements"
-					SelectionMode="ListSelectionModel.SINGLE_SELECTION" />
-			</scrollpane>
-			<panel Layout="GridBagLayout">
-				<gridbagconstraints
-					Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1"
-					Weightx="1.0" />
-				<button id="btn_NewElement" Action="newElement"
-					Text="lbl_NewMessage">
-					<gridbagconstraints
-						Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
-						Insets="2,2,2,2" />
-				</button>
-				<button id="btn_CopyElement" Action="copyElement"
-					Enabled="false" Text="lbl_CopyMessage">
-					<gridbagconstraints
-						Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
-						Insets="2,2,2,2" />
-				</button>
-				<button id="btn_DeleteElement" Action="deleteElement"
-					Enabled="false" Text="lbl_Remove">
-					<gridbagconstraints
-						Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
-						Insets="2,0,2,2" />
-				</button>
-				<label Text="lbl_Filter">
-					<gridbagconstraints
-						Anchor="GridBagConstraints.WEST" Gridx="3" Gridy="0"
-						Insets="2,0,2,2" />
-				</label>
-				<textfield id="tfd_Filter" enabled="true" Columns="16">
-					<gridbagconstraints
-						Anchor="GridBagConstraints.WEST" Gridx="4" Gridy="0"
-						Insets="2,0,2,2" Weightx="1.0" />
-				</textfield>
-			</panel>
-		</panel>
-		<splitpane ContinuousLayout="true" DividerLocation="280"
+		<splitpane constraints="BorderLayout.CENTER"
+			ContinuousLayout="true" DividerLocation="0.5"
 			OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT">
+			<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+				<scrollpane>
+					<gridbagconstraints
+						Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Weightx="1.0"
+						Weighty="1.0" />
+					<table id="tbl_Elements"
+						SelectionMode="ListSelectionModel.SINGLE_SELECTION" />
+				</scrollpane>
+				<panel Layout="GridBagLayout">
+					<gridbagconstraints
+						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1"
+						Weightx="1.0" />
+					<button id="btn_NewElement" Action="newElement"
+						Text="lbl_NewMessage">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+							Insets="2,2,2,2" />
+					</button>
+					<button id="btn_CopyElement" Action="copyElement"
+						Enabled="false" Text="lbl_CopyMessage">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
+							Insets="2,2,2,2" />
+					</button>
+					<button id="btn_DeleteElement" Action="deleteElement"
+						Enabled="false" Text="lbl_Remove">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
+							Insets="2,0,2,2" />
+					</button>
+					<label Text="lbl_Filter">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="3" Gridy="0"
+							Insets="2,0,2,2" />
+					</label>
+					<textfield id="tfd_Filter" enabled="true" Columns="16">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="4" Gridy="0"
+							Insets="2,0,2,2" Weightx="1.0" />
+					</textfield>
+				</panel>
+			</panel>
 			<scrollpane Border="TitledBorder(lbl_Attributes)">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<label Text="lbl_Id">
@@ -71,7 +73,8 @@
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
 							Insets="2,2,2,2" />
 					</label>
-					<textfield id="tfd_Description" enabled="false" Columns="8">
+					<textfield id="tfd_Description" enabled="false"
+						Columns="8">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
@@ -110,69 +113,97 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="4"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
-					<label Text="lbl_Language">
+					<label Text="lbl_DateLamu">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="5"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_DateLamu" enabled="false"
+						editable="false" Columns="8">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="5"
+							Insets="2,2,2,2" Weightx="0.0" />
+					</textfield>
+					<label Text="lbl_UserLamu">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="6"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_UserLamu" enabled="false"
+						editable="false" Columns="8">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="6"
+							Insets="2,2,2,2" Weightx="0.0" />
+					</textfield>
+					<label Text="lbl_Language">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="7"
 							Insets="2,2,2,2" />
 					</label>
 					<textfield id="tfd_Language" enabled="false" Columns="8">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
-							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="5"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="7"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
 					<label Text="lbl_Category">
 						<gridbagconstraints
-							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="6"
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="8"
 							Insets="2,2,2,2" />
 					</label>
 					<textfield id="tfd_Category" enabled="false" Columns="8">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
-							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="6"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="8"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
 					<label Text="lbl_HelpInfo">
 						<gridbagconstraints
-							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="7"
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="9"
 							Insets="2,2,2,2" />
 					</label>
 					<textfield id="tfd_HelpInfo" enabled="false" Columns="8">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
-							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="7"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="9"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
 					<label Text="lbl_Code">
 						<gridbagconstraints
-							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="8"
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="10"
 							Insets="2,2,2,2" />
 					</label>
 					<textfield id="tfd_Code" enabled="false" Columns="8">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
-							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="8"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="10"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
 					<label Text="lbl_AppendixMandatory">
 						<gridbagconstraints
-							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="9"
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="11"
 							Insets="2,2,2,2" />
 					</label>
 					<checkbox id="chb_AppendixMandatory"
 						Action="setAppendixMandatory" enabled="false">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
-							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="9"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="11"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</checkbox>
 					<panel>
 						<gridbagconstraints
-							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="10" GridWidth="2"
+							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="12" GridWidth="2"
 							Weighty="1.0" />
 					</panel>
 				</panel>
 			</scrollpane>
+		</splitpane>
+		<splitpane ContinuousLayout="true" DividerLocation="280"
+			OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT">
+
 			<scrollpane Border="TitledBorder(lbl_Relations)">
 				<tabbedpane id="relationsTabs"
 					Border="EmptyBorder(4,4,4,4)"

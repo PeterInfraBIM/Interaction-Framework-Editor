@@ -557,7 +557,8 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 	}
 
 	private enum RoleTableColumns {
-		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
+//		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
+		Id, Description;
 
 		@Override
 		public String toString() {
@@ -587,16 +588,16 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 				return role.getId();
 			case Description:
 				return role.getDescription();
-			case StartDate:
-				return getDate(role.getStartDate());
-			case EndDate:
-				return getDate(role.getEndDate());
-			case State:
-				return role.getState();
-			case DateLamu:
-				return getDateTime(role.getDateLaMu());
-			case UserLamu:
-				return role.getUserLaMu();
+//			case StartDate:
+//				return getDate(role.getStartDate());
+//			case EndDate:
+//				return getDate(role.getEndDate());
+//			case State:
+//				return role.getState();
+//			case DateLamu:
+//				return getDateTime(role.getDateLaMu());
+//			case UserLamu:
+//				return role.getUserLaMu();
 			default:
 				return null;
 			}
@@ -963,9 +964,9 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 		tbl_Elements.setModel(elementsTableModel);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<RoleTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
-		tableRowSorter.setComparator(RoleTableColumns.StartDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(RoleTableColumns.EndDate.ordinal(), dateComparator);
-		tableRowSorter.setComparator(RoleTableColumns.DateLamu.ordinal(), dateTimeComparator);
+//		tableRowSorter.setComparator(RoleTableColumns.StartDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(RoleTableColumns.EndDate.ordinal(), dateComparator);
+//		tableRowSorter.setComparator(RoleTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -976,29 +977,44 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 				updateSelectionArea(e);
 			}
 		});
-		
+
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-				String filterString = tfd_Filter.getText().toUpperCase();
-				if (filterString.isEmpty()) {
-					fillTable(RoleTypeType.class);
-				} else {
-					List<RoleTypeType> elements = Editor14.getStore14().getElements(RoleTypeType.class);
-					elementsTableModel.clear();
-					for (RoleTypeType element : elements) {
-						if (element.getDescription().toUpperCase().contains(filterString)
-								|| element.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(element);
-						}
-					}
-				}
+//				String filterString = tfd_Filter.getText().toUpperCase();
+//				if (filterString.isEmpty()) {
+//					fillTable(RoleTypeType.class);
+//				} else {
+//					List<RoleTypeType> elements = Editor14.getStore14().getElements(RoleTypeType.class);
+//					elementsTableModel.clear();
+//					for (RoleTypeType element : elements) {
+//						if (element.getDescription().toUpperCase().contains(filterString)
+//								|| element.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(element);
+//						}
+//					}
+//				}
+				fillTable();
 			}
 		});
 	}
 
 	public void fillTable() {
-		fillTable(RoleTypeType.class);
+		String filterString = tfd_Filter.getText().toUpperCase();
+		if (filterString.isEmpty()) {
+			fillTable(RoleTypeType.class);
+		} else {
+			List<RoleTypeType> elements = Editor14.getStore14().getElements(RoleTypeType.class);
+			elementsTableModel.clear();
+			for (RoleTypeType element : elements) {
+				if (element.getDescription().toUpperCase().contains(filterString)
+						|| element.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(element);
+				}
+			}
+		}
+
+//		fillTable(RoleTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -1017,6 +1033,8 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 		startDateField.setEnabled(rowSelected);
 		endDateField.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
+		tfd_DateLamu.setEnabled(rowSelected);
+		tfd_UserLamu.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_Category.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
@@ -1042,6 +1060,10 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 				endDateField.setDate(selectedElement.getEndDate().toGregorianCalendar().getTime());
 			}
 			tfd_State.setText(selectedElement.getState());
+			tfd_DateLamu.setText(selectedElement.getDateLaMu() != null
+					? sdfDateTime.format(selectedElement.getDateLaMu().toGregorianCalendar().getTime())
+					: "");
+			tfd_UserLamu.setText(selectedElement.getUserLaMu());
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_Category.setText(selectedElement.getCategory());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
@@ -1073,6 +1095,8 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 			startDateField.setDate(null);
 			endDateField.setDate(null);
 			tfd_State.setText("");
+			tfd_DateLamu.setText("");
+			tfd_UserLamu.setText("");
 			tfd_Language.setText("");
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");

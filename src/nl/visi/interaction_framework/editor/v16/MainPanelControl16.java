@@ -2,6 +2,10 @@ package nl.visi.interaction_framework.editor.v16;
 
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.print.PageFormat;
 import java.awt.print.Printable;
 import java.awt.print.PrinterException;
@@ -14,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -99,6 +105,37 @@ public class MainPanelControl16 extends Control16 {
 				}
 			}
 		});
+
+		tabs.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					tabs.setEnabledAt(tabs.getSelectedIndex(), false);
+					((JComponent) tabs.getSelectedComponent()).removeAll();
+					tabs.getSelectedComponent().repaint();
+					JFrame frame = new JFrame();
+					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					tearOff(frame, Tabs.values()[tabs.getSelectedIndex()]);
+					frame.pack();
+					frame.setVisible(true);
+				}
+			}
+
+			private void tearOff(JFrame frame, final Tabs tab) {
+				frame.setTitle(getBundle().getString("lbl_" + tab.name()));
+				frame.add(tab.getPanelControl().getPanel());
+				frame.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent e) {
+						super.windowClosing(e);
+						JComponent tabComponent = (JComponent) tabs.getComponentAt(tab.ordinal());
+						tabComponent.add(tab.getPanelControl().getPanel());
+						tabs.setEnabledAt(tab.ordinal(), true);
+					}
+				});
+			}
+
+		});
 	}
 
 	public JPanel getMainPanel() throws Exception {
@@ -147,7 +184,8 @@ public class MainPanelControl16 extends Control16 {
 	public void openFramework(File frameworkFile, DefaultHandler defaultHandler) {
 		try {
 //			InputSource schema = new InputSource(new FileInputStream("_3_16.xsd"));
-			InputSource schema = new InputSource(getClass().getClassLoader().getResourceAsStream("main/resource/20160331.xsd"));
+			InputSource schema = new InputSource(
+					getClass().getClassLoader().getResourceAsStream("main/resource/20160331.xsd"));
 			Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
 			Editor16.getLoader16().load(schema, frameworkFile);
 			Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
@@ -380,7 +418,8 @@ public class MainPanelControl16 extends Control16 {
 	public void xsdCheck(File frameworkFile, DefaultHandler defaultHandler)
 			throws ParserConfigurationException, SAXException, IOException {
 //		InputSource schema = new InputSource(new FileInputStream("_3_16.xsd"));
-		InputSource schema = new InputSource(getClass().getClassLoader().getResourceAsStream("main/resource/20160331.xsd"));
+		InputSource schema = new InputSource(
+				getClass().getClassLoader().getResourceAsStream("main/resource/20160331.xsd"));
 		Editor16.getLoader16().validate(schema, frameworkFile, defaultHandler);
 	}
 }

@@ -50,7 +50,8 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 	private JMenuItem alphaMenuItem, addMenuItem, removeMenuItem, pasteMenuItem, moveUpMenuItem, moveDownMenuItem;
 
 	private enum UserDefinedTypesTableColumns {
-		Id, Description, State, BaseType, DateLamu, UserLamu;
+//		Id, Description, State, BaseType, DateLamu, UserLamu;
+		Id, Description, BaseType;
 
 		@Override
 		public String toString() {
@@ -80,14 +81,14 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 				return userDefinedType.getId();
 			case Description:
 				return userDefinedType.getDescription();
-			case State:
-				return userDefinedType.getState();
+//			case State:
+//				return userDefinedType.getState();
 			case BaseType:
 				return userDefinedType.getBaseType();
-			case DateLamu:
-				return getDateTime(userDefinedType.getDateLaMu());
-			case UserLamu:
-				return userDefinedType.getUserLaMu();
+//			case DateLamu:
+//				return getDateTime(userDefinedType.getDateLaMu());
+//			case UserLamu:
+//				return userDefinedType.getUserLaMu();
 			default:
 				return null;
 			}
@@ -444,7 +445,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<UserDefinedTypeType>> tableRowSorter = new TableRowSorter<>(
 				elementsTableModel);
-		tableRowSorter.setComparator(UserDefinedTypesTableColumns.DateLamu.ordinal(), dateTimeComparator);
+//		tableRowSorter.setComparator(UserDefinedTypesTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -459,26 +460,41 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-				String filterString = tfd_Filter.getText().toUpperCase();
-				if (filterString.isEmpty()) {
-					fillTable(UserDefinedTypeType.class);
-				} else {
-					List<UserDefinedTypeType> elements = Editor16.getStore16().getElements(UserDefinedTypeType.class);
-					elementsTableModel.clear();
-					for (UserDefinedTypeType element : elements) {
-						if (element.getDescription().toUpperCase().contains(filterString)
-								|| element.getId().toUpperCase().contains(filterString)) {
-							elementsTableModel.add(element);
-						}
-					}
-				}
+//				String filterString = tfd_Filter.getText().toUpperCase();
+//				if (filterString.isEmpty()) {
+//					fillTable(UserDefinedTypeType.class);
+//				} else {
+//					List<UserDefinedTypeType> elements = Editor16.getStore16().getElements(UserDefinedTypeType.class);
+//					elementsTableModel.clear();
+//					for (UserDefinedTypeType element : elements) {
+//						if (element.getDescription().toUpperCase().contains(filterString)
+//								|| element.getId().toUpperCase().contains(filterString)) {
+//							elementsTableModel.add(element);
+//						}
+//					}
+//				}
+				fillTable();
 			}
 		});
 	}
 
 	@Override
 	public void fillTable() {
-		fillTable(UserDefinedTypeType.class);
+		String filterString = tfd_Filter.getText().toUpperCase();
+		if (filterString.isEmpty()) {
+			fillTable(UserDefinedTypeType.class);
+		} else {
+			List<UserDefinedTypeType> elements = Editor16.getStore16().getElements(UserDefinedTypeType.class);
+			elementsTableModel.clear();
+			for (UserDefinedTypeType element : elements) {
+				if (element.getDescription().toUpperCase().contains(filterString)
+						|| element.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(element);
+				}
+			}
+		}
+
+//		fillTable(UserDefinedTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -497,6 +513,8 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		tfd_Description.setEnabled(rowSelected);
 		cbx_BaseType.setEnabled(rowSelected);
 		tfd_State.setEnabled(rowSelected);
+		tfd_DateLamu.setEnabled(rowSelected);
+		tfd_UserLamu.setEnabled(rowSelected);
 		tfd_Language.setEnabled(rowSelected);
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_XsdRestriction.setEnabled(rowSelected);
@@ -510,6 +528,10 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			tfd_Description.setText(selectedElement.getDescription());
 			cbx_BaseType.setSelectedItem(selectedElement.getBaseType());
 			tfd_State.setText(selectedElement.getState());
+			tfd_DateLamu.setText(selectedElement.getDateLaMu() != null
+					? sdfDateTime.format(selectedElement.getDateLaMu().toGregorianCalendar().getTime())
+					: "");
+			tfd_UserLamu.setText(selectedElement.getUserLaMu());
 			tfd_Language.setText(selectedElement.getLanguage());
 			tfd_HelpInfo.setText(selectedElement.getHelpInfo());
 			tfd_XsdRestriction.setText(selectedElement.getXsdRestriction());
@@ -521,6 +543,8 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			tfd_Description.setText("");
 			cbx_BaseType.setSelectedItem(null);
 			tfd_State.setText("");
+			tfd_DateLamu.setText("");
+			tfd_UserLamu.setText("");
 			tfd_Language.setText("");
 			tfd_HelpInfo.setText("");
 			tfd_XsdRestriction.setText("");
