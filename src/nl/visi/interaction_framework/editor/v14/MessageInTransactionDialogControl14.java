@@ -171,7 +171,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	private DefaultMutableTreeNode root;
 	private JPopupMenu popupMenu;
 	private JRadioButtonMenuItem rbt_EmptyItem, rbt_FixedItem, rbt_FreeItem;
-	private JMenuItem mit_Remove;
+	private JMenuItem mit_Remove, mit_CollapseAll, mit_ExpandAll;
 	private DefaultMutableTreeNode selectedNode;
 	private ElementConditionTable elementConditionTable;
 	private MessageInTransactionTypeType currentMitt;
@@ -255,6 +255,8 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 					tree_Elements.setSelectionRow(row);
 					selectedNode = (DefaultMutableTreeNode) tree_Elements.getSelectionPath().getLastPathComponent();
 					Object userObject = selectedNode.getUserObject();
+					mit_CollapseAll.setEnabled(true);
+					mit_ExpandAll.setEnabled(true);
 					if (selectedNode.getUserObject() instanceof SimpleElementTreeNode) {
 						SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
 						String finalCondition = seNode.getFinalCondition();
@@ -405,6 +407,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			}
 		}
 		tree_Elements.expandPath(new TreePath(root));
+		expandAll();
 	}
 
 	void clearTree() {
@@ -483,7 +486,38 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			}
 		}
 	}
+	
+	public void collapseAll() {
+		TreeNode root = (TreeNode) tree_Elements.getModel().getRoot();
+		expandAll(tree_Elements, new TreePath(root), false);
+		tree_Elements.expandPath(new TreePath(root));
+	}
 
+	public void expandAll() {
+		TreeNode root = (TreeNode) tree_Elements.getModel().getRoot();
+		expandAll(tree_Elements, new TreePath(root), true);
+	}
+
+	private void expandAll(JTree tree, TreePath path, boolean expand) {
+		TreeNode node = (TreeNode) path.getLastPathComponent();
+
+		if (node.getChildCount() >= 0) {
+			Enumeration<? extends TreeNode> enumeration = node.children();
+			while (enumeration.hasMoreElements()) {
+				TreeNode n = (TreeNode) enumeration.nextElement();
+				TreePath p = path.pathByAddingChild(n);
+
+				expandAll(tree, p, expand);
+			}
+		}
+
+		if (expand) {
+			tree.expandPath(path);
+		} else {
+			tree.collapsePath(path);
+		}
+	}
+	
 	private boolean isStartMessage(MessageInTransactionTypeType mitt) {
 		TransactionTypeType transaction = getTransaction(mitt);
 		List<MessageInTransactionTypeType> previous = getPrevious(mitt);

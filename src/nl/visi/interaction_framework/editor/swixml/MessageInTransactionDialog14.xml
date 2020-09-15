@@ -23,6 +23,11 @@
 						<separator />
 						<menuitem id="mit_Remove" action="removeElementCondition"
 							text="lbl_Remove" />
+						<separator />
+						<menuitem id="mit_CollapseAll" action="collapseAll"
+							enabled="false" text="lbl_CollapseAll" />
+						<menuitem id="mit_ExpandAll" action="expandAll"
+							enabled="false" text="lbl_ExpandAll" />
 					</popupmenu>
 				</tree>
 			</scrollpane>

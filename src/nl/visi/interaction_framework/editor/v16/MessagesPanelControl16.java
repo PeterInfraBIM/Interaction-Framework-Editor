@@ -442,7 +442,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		complexElementsTableModel = new ComplexElementsTableModel();
 		complexElementsTableModel.setSorted(false);
 		tbl_ComplexElements.setModel(complexElementsTableModel);
-		tbl_ComplexElements.setAutoCreateRowSorter(true);
+//		tbl_ComplexElements.setAutoCreateRowSorter(true);
 		tbl_ComplexElements.setFillsViewportHeight(true);
 		tbl_ComplexElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_ComplexElements
@@ -475,7 +475,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		appendicesTableModel = new AppendicesTableModel();
 		appendicesTableModel.setSorted(false);
 		tbl_Appendices.setModel(appendicesTableModel);
-		tbl_Appendices.setAutoCreateRowSorter(true);
+//		tbl_Appendices.setAutoCreateRowSorter(true);
 		tbl_Appendices.setFillsViewportHeight(true);
 		tbl_Appendices.setDropMode(DropMode.INSERT_ROWS);
 		tbl_Appendices.setTransferHandler(getTransferHandler(tbl_Appendices, appendicesTableModel, true));

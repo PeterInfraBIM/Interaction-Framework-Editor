@@ -192,7 +192,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	private DefaultMutableTreeNode root;
 	private JPopupMenu popupMenu;
 	private JRadioButtonMenuItem rbt_EmptyItem, rbt_FixedItem, rbt_FreeItem;
-	private JMenuItem mit_Remove;
+	private JMenuItem mit_Remove, mit_CollapseAll, mit_ExpandAll;
 	private DefaultMutableTreeNode selectedNode;
 	private ElementConditionTable elementConditionTable;
 	private MessageInTransactionTypeType currentMitt;
@@ -208,7 +208,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 			return getBundle().getString("lbl_" + name());
 		}
 	}
-	
+
 	@SuppressWarnings("serial")
 	private class PrevNextTableModel extends AbstractTableModel {
 		public List<MessageInTransactionTypeType> elements = new ArrayList<>();
@@ -276,6 +276,8 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 					tree_Elements.setSelectionRow(row);
 					selectedNode = (DefaultMutableTreeNode) tree_Elements.getSelectionPath().getLastPathComponent();
 					Object userObject = selectedNode.getUserObject();
+					mit_CollapseAll.setEnabled(true);
+					mit_ExpandAll.setEnabled(true);
 					if (selectedNode.getUserObject() instanceof SimpleElementTreeNode) {
 						SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
 						String finalCondition = seNode.getFinalCondition();
@@ -346,7 +348,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 			}
 		});
 	}
-	
+
 	void initSequenceElements() {
 		prevTableModel = new PrevNextTableModel();
 		tbl_Prev.setModel(prevTableModel);
@@ -372,7 +374,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		chb_OpenSecondaryTransactionsAllowed.setSelected(
 				mitt.isOpenSecondaryTransactionsAllowed() != null ? mitt.isOpenSecondaryTransactionsAllowed() : false);
 	}
-	
+
 	private Map<String, DefaultMutableTreeNode> treeMap;
 
 	private DefaultMutableTreeNode getTreeMap(String key, Object value, DefaultMutableTreeNode parent) {
@@ -427,6 +429,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 			}
 		}
 		tree_Elements.expandPath(new TreePath(root));
+		expandAll();
 	}
 
 	void clearTree() {
@@ -510,6 +513,37 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 					treeModel.nodeChanged(children.nextElement());
 				}
 			}
+		}
+	}
+
+	public void collapseAll() {
+		TreeNode root = (TreeNode) tree_Elements.getModel().getRoot();
+		expandAll(tree_Elements, new TreePath(root), false);
+		tree_Elements.expandPath(new TreePath(root));
+	}
+
+	public void expandAll() {
+		TreeNode root = (TreeNode) tree_Elements.getModel().getRoot();
+		expandAll(tree_Elements, new TreePath(root), true);
+	}
+
+	private void expandAll(JTree tree, TreePath path, boolean expand) {
+		TreeNode node = (TreeNode) path.getLastPathComponent();
+
+		if (node.getChildCount() >= 0) {
+			Enumeration<? extends TreeNode> enumeration = node.children();
+			while (enumeration.hasMoreElements()) {
+				TreeNode n = (TreeNode) enumeration.nextElement();
+				TreePath p = path.pathByAddingChild(n);
+
+				expandAll(tree, p, expand);
+			}
+		}
+
+		if (expand) {
+			tree.expandPath(path);
+		} else {
+			tree.collapsePath(path);
 		}
 	}
 

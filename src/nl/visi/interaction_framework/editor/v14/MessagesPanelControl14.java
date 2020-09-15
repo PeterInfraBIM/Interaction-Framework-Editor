@@ -436,7 +436,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		complexElementsTableModel = new ComplexElementsTableModel();
 		complexElementsTableModel.setSorted(false);
 		tbl_ComplexElements.setModel(complexElementsTableModel);
-		tbl_ComplexElements.setAutoCreateRowSorter(true);
+//		tbl_ComplexElements.setAutoCreateRowSorter(true);
 		tbl_ComplexElements.setFillsViewportHeight(true);
 		tbl_ComplexElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_ComplexElements

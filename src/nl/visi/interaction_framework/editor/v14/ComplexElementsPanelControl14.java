@@ -345,7 +345,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		simpleElementsTableModel = new SimpleElementsTableModel();
 		simpleElementsTableModel.setSorted(false);
 		tbl_SimpleElements.setModel(simpleElementsTableModel);
-		tbl_SimpleElements.setAutoCreateRowSorter(true);
+//		tbl_SimpleElements.setAutoCreateRowSorter(true);
 		tbl_SimpleElements.setFillsViewportHeight(true);
 		tbl_SimpleElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_SimpleElements.setTransferHandler(getTransferHandler(tbl_SimpleElements, simpleElementsTableModel, false));
@@ -394,7 +394,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		subComplexElementsTableModel = new SubComplexElementsTableModel();
 		subComplexElementsTableModel.setSorted(false);
 		tbl_SubComplexElements.setModel(subComplexElementsTableModel);
-		tbl_SubComplexElements.setAutoCreateRowSorter(true);
+//		tbl_SubComplexElements.setAutoCreateRowSorter(true);
 		tbl_SubComplexElements.setFillsViewportHeight(true);
 		tbl_SubComplexElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_SubComplexElements
