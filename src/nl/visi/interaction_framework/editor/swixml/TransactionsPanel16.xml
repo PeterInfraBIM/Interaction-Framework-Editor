@@ -215,7 +215,7 @@
 			Layout="BorderLayout">
 			<tabbedpane id="transactionTabs"
 				Border="EmptyBorder(4,4,4,4)"
-				Titles="lbl_Roles,lbl_Messages,lbl_Subtransactions,lbl_SequenceDiagram,lbl_SequenceDiagram">
+				Titles="lbl_Roles,lbl_Messages,lbl_Subtransactions,lbl_StaticSequenceDiagram,lbl_DynamicSequenceDiagram">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<label Text="lbl_Initiator">
 						<gridbagconstraints

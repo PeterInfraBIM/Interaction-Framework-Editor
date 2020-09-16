@@ -30,6 +30,8 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -57,6 +59,8 @@ import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
+import nl.visi.interaction_framework.editor.v14.Editor14;
+import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20160331.GroupTypeType;
@@ -84,7 +88,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
 	private JPopupMenu popupMenu;
-	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel, elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel,
+			elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;
@@ -1609,16 +1614,98 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		return messagesTableModel;
 	}
 
+	private enum TransactionTabs {
+		Roles, Messages, Subtransactions, StaticSequenceDiagram, DynamicSequenceDiagram;
+
+		JFrame tearOffFrame;
+
+		JFrame getTearOffFrame() {
+			if (tearOffFrame == null) {
+				tearOffFrame = new JFrame(getBundle().getString("lbl_" + name()));
+			}
+			return tearOffFrame;
+		}
+
+	}
+
 	public TransactionsPanelControl16() throws Exception {
 		super(TRANSACTIONS_PANEL);
 
 		transactionTabs.addChangeListener(new ChangeListener() {
-
 			@Override
 			public void stateChanged(ChangeEvent e) {
-				if (transactionTabs.getSelectedComponent().equals(canvasPanel)) {
+				switch (TransactionTabs.values()[transactionTabs.getSelectedIndex()]) {
+				case DynamicSequenceDiagram:
+					break;
+				case Messages:
+					break;
+				case Roles:
+					break;
+				case StaticSequenceDiagram:
 					drawingPlane.setCurrentTransaction(null);
+					break;
+				case Subtransactions:
+					break;
+				default:
+					break;
 				}
+//				if (transactionTabs.getSelectedComponent().equals(canvasPanel)) {
+//					drawingPlane.setCurrentTransaction(null);
+//				}
+			}
+		});
+		transactionTabs.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (transactionTabs.getSelectedIndex() == TransactionTabs.StaticSequenceDiagram.ordinal()
+						|| transactionTabs.getSelectedIndex() == TransactionTabs.DynamicSequenceDiagram.ordinal()) {
+					if (e.getClickCount() == 2) {
+						System.out.println(TransactionTabs.values()[transactionTabs.getSelectedIndex()].name());
+						transactionTabs.setEnabledAt(transactionTabs.getSelectedIndex(), false);
+						((JComponent) transactionTabs.getSelectedComponent()).removeAll();
+						transactionTabs.getSelectedComponent().repaint();
+						JFrame frame = TransactionTabs.values()[transactionTabs.getSelectedIndex()].getTearOffFrame();
+						frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+						tearOff(frame, TransactionTabs.values()[transactionTabs.getSelectedIndex()]);
+						frame.pack();
+						frame.setVisible(true);
+					}
+				}
+			}
+
+			private void tearOff(JFrame frame, final TransactionTabs tab) {
+				frame.setTitle(getBundle().getString("lbl_" + tab.name()));
+				switch (tab) {
+				case DynamicSequenceDiagram:
+					frame.add(scrollPane2, BorderLayout.CENTER);
+					break;
+				case StaticSequenceDiagram:
+					frame.add(scrollPane, BorderLayout.CENTER);
+					break;
+				default:
+					break;
+				}
+//				frame.add(tab.getPanelControl().getPanel());
+				frame.addWindowListener(new WindowAdapter() {
+					@Override
+					public void windowClosing(WindowEvent e) {
+						super.windowClosing(e);
+						JComponent tabComponent = (JComponent) transactionTabs.getComponentAt(tab.ordinal());
+						switch (tab) {
+						case DynamicSequenceDiagram:
+							tabComponent.add(scrollPane2, BorderLayout.CENTER);
+							break;
+						case StaticSequenceDiagram:
+							tabComponent.add(scrollPane, BorderLayout.CENTER);
+							break;
+						default:
+							break;
+						}
+//						tabComponent.add(tab.getPanelControl().getPanel());
+						transactionTabs.setEnabledAt(tab.ordinal(), true);
+						tab.tearOffFrame = null;
+					}
+				});
 			}
 		});
 
@@ -1769,19 +1856,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(TransactionTypeType.class);
-//				} else {
-//					List<TransactionTypeType> elements = Editor16.getStore16().getElements(TransactionTypeType.class);
-//					elementsTableModel.clear();
-//					for (TransactionTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -1833,7 +1907,19 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 	@Override
 	public void fillTable() {
-		fillTable(TransactionTypeType.class);
+		String filterString = tfd_Filter.getText().toUpperCase();
+		if (filterString.isEmpty()) {
+			fillTable(TransactionTypeType.class);
+		} else {
+			List<TransactionTypeType> elements = Editor16.getStore16().getElements(TransactionTypeType.class);
+			elementsTableModel.clear();
+			for (TransactionTypeType element : elements) {
+				if (element.getDescription().toUpperCase().contains(filterString)
+						|| element.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(element);
+				}
+			}
+		}
 		drawingPlane.currentTransaction = null;
 	}
 

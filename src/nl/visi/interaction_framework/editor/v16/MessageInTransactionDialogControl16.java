@@ -1,6 +1,7 @@
 package nl.visi.interaction_framework.editor.v16;
 
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -11,11 +12,13 @@ import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
@@ -35,7 +38,7 @@ import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
 
 public class MessageInTransactionDialogControl16 extends Control16 {
-	private static final String MESSAGE_IN_TRANSACTION_DIALOG = "nl/visi/interaction_framework/editor/swixml/MessageInTransactionDialog14.xml";
+	private static final String MESSAGE_IN_TRANSACTION_DIALOG = "nl/visi/interaction_framework/editor/swixml/MessageInTransactionPanel14.xml";
 
 	class SimpleElementTreeNode {
 		private final MessageInTransactionTypeType mitt;
@@ -247,7 +250,12 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 
 	public MessageInTransactionDialogControl16(TransactionsPanelControl16 transactionsPanelControl) throws Exception {
 		super();
-		dialog = (JDialog) render(MESSAGE_IN_TRANSACTION_DIALOG);
+		JFrame owner = (JFrame) SwingUtilities.windowForComponent(transactionsPanelControl.getPanel());
+		dialog = new JDialog(owner);
+		JTabbedPane tabbedPane = (JTabbedPane) render(MESSAGE_IN_TRANSACTION_DIALOG);
+		dialog.getContentPane().add(tabbedPane);
+		dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		dialog.setSize(480, 480);
 		this.elementConditionTable = transactionsPanelControl.elementConditionTable;
 		initTreeElements();
 	}

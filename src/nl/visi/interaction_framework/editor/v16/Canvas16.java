@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -165,7 +166,7 @@ public class Canvas16 extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-						if (messageInTransactionDialogControl16 == null) {
+//						if (messageInTransactionDialogControl16 == null) {
 							messageInTransactionDialogControl16 = new MessageInTransactionDialogControl16(
 									transactionPanel);
 							messageInTransactionDialogControl16.getDialog().setModal(false);
@@ -175,7 +176,7 @@ public class Canvas16 extends JPanel {
 									super.windowClosed(e);
 								}
 							});
-						}
+//						}
 						TransactionTypeType transaction = Control16.getTransaction(Message.this.mitt);
 						MessageTypeType message = Control16.getMessage(Message.this.mitt);
 						messageInTransactionDialogControl16.getDialog().setTitle(transaction.getDescription() + " : "
