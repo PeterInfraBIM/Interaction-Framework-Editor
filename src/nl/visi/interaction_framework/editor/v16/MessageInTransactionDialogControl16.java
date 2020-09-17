@@ -252,6 +252,17 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		super();
 		JFrame owner = (JFrame) SwingUtilities.windowForComponent(transactionsPanelControl.getPanel());
 		dialog = new JDialog(owner);
+		initialize(transactionsPanelControl);
+	}
+
+	public MessageInTransactionDialogControl16(TransactionsPanelControl16 transactionsPanelControl, Window owner)
+			throws Exception {
+		super();
+		dialog = new JDialog(owner);
+		initialize(transactionsPanelControl);
+	}
+
+	private void initialize(TransactionsPanelControl16 transactionsPanelControl) throws Exception {
 		JTabbedPane tabbedPane = (JTabbedPane) render(MESSAGE_IN_TRANSACTION_DIALOG);
 		dialog.getContentPane().add(tabbedPane);
 		dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

@@ -166,9 +166,10 @@ public class Canvas16 extends JPanel {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
-//						if (messageInTransactionDialogControl16 == null) {
+						if (messageInTransactionDialogControl16 == null) {
+							Window window = SwingUtilities.windowForComponent(Canvas16.this);
 							messageInTransactionDialogControl16 = new MessageInTransactionDialogControl16(
-									transactionPanel);
+									transactionPanel, window);
 							messageInTransactionDialogControl16.getDialog().setModal(false);
 							messageInTransactionDialogControl16.getDialog().addWindowListener(new WindowAdapter() {
 								@Override
@@ -176,7 +177,7 @@ public class Canvas16 extends JPanel {
 									super.windowClosed(e);
 								}
 							});
-//						}
+						}
 						TransactionTypeType transaction = Control16.getTransaction(Message.this.mitt);
 						MessageTypeType message = Control16.getMessage(Message.this.mitt);
 						messageInTransactionDialogControl16.getDialog().setTitle(transaction.getDescription() + " : "

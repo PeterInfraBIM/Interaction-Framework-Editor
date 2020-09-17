@@ -11,6 +11,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Stroke;
+import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -2390,7 +2391,11 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		MessageInTransactionTypeType mitt = activeItem.getMitt();
 		try {
 			if (messageInTransactionDialogControl16 == null) {
-				messageInTransactionDialogControl16 = new MessageInTransactionDialogControl16(this);
+				Window window = SwingUtilities.windowForComponent(scrollPane);
+				if (TransactionTabs.StaticSequenceDiagram.tearOffFrame != null) {
+					window = TransactionTabs.StaticSequenceDiagram.tearOffFrame;
+				}
+				messageInTransactionDialogControl16 = new MessageInTransactionDialogControl16(this, window);
 				messageInTransactionDialogControl16.getDialog().setModal(false);
 				messageInTransactionDialogControl16.getDialog().addWindowListener(new WindowAdapter() {
 
