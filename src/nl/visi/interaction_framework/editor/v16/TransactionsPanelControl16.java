@@ -10,8 +10,11 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.Window;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -60,8 +63,6 @@ import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
-import nl.visi.interaction_framework.editor.v14.Editor14;
-import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20160331.GroupTypeType;
@@ -331,9 +332,17 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 									activeItem.activeLabel.setForeground(Color.black);
 								}
 								activeItem = MessageItem.this;
-								popupMenu.show(e.getComponent(), e.getX(), e.getY());
+								// popupMenu.show(e.getComponent(), e.getX(), e.getY());
 							} else {
-								InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
+								if (e.getClickCount() == 2) {
+									InteractionFrameworkEditor.navigate(getMessage(MessageItem.this.mitt));
+								} else {
+									if (activeItem != null) {
+										activeItem.activeLabel.setForeground(Color.black);
+									}
+									activeItem = MessageItem.this;
+									editMitt();
+								}
 							}
 						}
 					});
@@ -1728,6 +1737,15 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		canvas16Plane = new Canvas16(this);
 		scrollPane2 = new JScrollPane(canvas16Plane, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane2.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				super.componentResized(e);
+				Rectangle visibleRect = scrollPane2.getVisibleRect();
+				canvas16Plane.setSize(new Dimension(visibleRect.width - 20, visibleRect.height - 20));
+				canvas16Plane.setDimensions();
+			}
+		});
 		canvas2Panel.add(scrollPane2, BorderLayout.CENTER);
 	}
 
@@ -2390,10 +2408,16 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	public void editMitt() {
 		MessageInTransactionTypeType mitt = activeItem.getMitt();
 		try {
-			if (messageInTransactionDialogControl16 == null) {
-				Window window = SwingUtilities.windowForComponent(scrollPane);
+			Window window = SwingUtilities.windowForComponent(scrollPane);
+			if (messageInTransactionDialogControl16 == null
+					|| (TransactionTabs.StaticSequenceDiagram.tearOffFrame != null
+							&& messageInTransactionDialogControl16.getDialog()
+									.getOwner() != TransactionTabs.StaticSequenceDiagram.tearOffFrame)) {
 				if (TransactionTabs.StaticSequenceDiagram.tearOffFrame != null) {
 					window = TransactionTabs.StaticSequenceDiagram.tearOffFrame;
+				}
+				if (messageInTransactionDialogControl16 != null) {
+					messageInTransactionDialogControl16.getDialog().dispose();
 				}
 				messageInTransactionDialogControl16 = new MessageInTransactionDialogControl16(this, window);
 				messageInTransactionDialogControl16.getDialog().setModal(false);
@@ -2407,11 +2431,50 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					}
 
 				});
+				messageInTransactionDialogControl16.addPropertyChangeListener(new PropertyChangeListener() {
+					@Override
+					public void propertyChange(PropertyChangeEvent evt) {
+						switch (evt.getPropertyName()) {
+						case "Previous removed":
+							MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							System.out.println("Previous removed: " + removedPrev.getId());
+							drawingPlane.setCurrentTransaction(null);
+							drawingPlane.repaint();
+							break;
+						case "Next removed":
+							MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							System.out.println("Next removed: " + removedNext.getId());
+							drawingPlane.setCurrentTransaction(null);
+							drawingPlane.repaint();
+							break;
+						case "Previous added":
+							MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							System.out.println("Previous added: " + addedPrev.getId());
+							drawingPlane.setCurrentTransaction(null);
+							drawingPlane.repaint();
+							break;
+						case "Next added":
+							MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							System.out.println("Next added: " + addedNext.getId());
+							drawingPlane.setCurrentTransaction(null);
+							drawingPlane.repaint();
+							break;
+						}
+
+					}
+				});
 			}
 			messageInTransactionDialogControl16.fillTree(mitt);
+			messageInTransactionDialogControl16.initSequenceElements();
+			messageInTransactionDialogControl16.fillSequenceElements(mitt);
+			MessageTypeType message = Control16.getMessage(mitt);
+			messageInTransactionDialogControl16.getDialog().setTitle(
+					selectedElement.getDescription() + " : " + message.getDescription() + " [" + mitt.getId() + "]");
 			activeItem.activeLabel.setForeground(Color.blue);
 			messageInTransactionDialogControl16.getDialog().setVisible(true);
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			e.printStackTrace();
 		}
 	}

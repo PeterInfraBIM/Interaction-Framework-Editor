@@ -4,17 +4,21 @@ import java.awt.Component;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
@@ -23,6 +27,8 @@ import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -30,6 +36,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import nl.visi.interaction_framework.editor.SelectBox;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
@@ -188,6 +195,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 
 	}
 
+	private JFrame owner;
 	private JDialog dialog;
 	private JPanel elementsTreePanel;
 	private JTree tree_Elements;
@@ -201,6 +209,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	private MessageInTransactionTypeType currentMitt;
 	private JTable tbl_Prev, tbl_Next;
 	private PrevNextTableModel prevTableModel, nextTableModel;
+	private JButton btn_RemovePrevious, btn_RemoveNext;
 	private JCheckBox chb_FirstMessage, chb_Direction, chb_OpenSecondaryTransactionsAllowed;
 
 	private enum PrevNextTableColumns {
@@ -250,7 +259,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 
 	public MessageInTransactionDialogControl16(TransactionsPanelControl16 transactionsPanelControl) throws Exception {
 		super();
-		JFrame owner = (JFrame) SwingUtilities.windowForComponent(transactionsPanelControl.getPanel());
+		owner = (JFrame) SwingUtilities.windowForComponent(transactionsPanelControl.getPanel());
 		dialog = new JDialog(owner);
 		initialize(transactionsPanelControl);
 	}
@@ -372,9 +381,25 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		prevTableModel = new PrevNextTableModel();
 		tbl_Prev.setModel(prevTableModel);
 		tbl_Prev.setFillsViewportHeight(true);
+		tbl_Prev.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+				btn_RemovePrevious.setEnabled(tbl_Prev.getSelectedRow() >= 0);
+			}
+		});
 		nextTableModel = new PrevNextTableModel();
 		tbl_Next.setModel(nextTableModel);
 		tbl_Next.setFillsViewportHeight(true);
+		tbl_Next.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+				btn_RemoveNext.setEnabled(tbl_Next.getSelectedRow() >= 0);
+			}
+		});
 	}
 
 	void fillSequenceElements(MessageInTransactionTypeType mitt) {
@@ -609,4 +634,93 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		}
 		return true;
 	}
+
+	public void addPrevious() {
+		System.out.println("addPrevious");
+		List<String> items = new ArrayList<>();
+		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+				.getElements(MessageInTransactionTypeType.class);
+		for (MessageInTransactionTypeType mitt : allMitts) {
+			MessageTypeType message = getMessage(mitt);
+			items.add(message.getDescription() + " [" + mitt.getId() + "]");
+		}
+		SelectBox selectBox = new SelectBox(owner, getBundle().getString("lbl_Add"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				MessageInTransactionTypeType prevMitt = Editor16.getStore16()
+						.getElement(MessageInTransactionTypeType.class, mittId);
+				Control16.addPrevious(currentMitt, prevMitt);
+				int selectedRow = prevTableModel.getRowCount();
+				prevTableModel.elements.add(prevMitt);
+				prevTableModel.fireTableRowsInserted(selectedRow, selectedRow);
+				propertyChangeSupport.firePropertyChange("Previous added", currentMitt, prevMitt);
+			}
+		});
+	}
+
+	public void addNext() {
+		System.out.println("addNext");
+		List<String> items = new ArrayList<>();
+		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+				.getElements(MessageInTransactionTypeType.class);
+		for (MessageInTransactionTypeType mitt : allMitts) {
+			MessageTypeType message = getMessage(mitt);
+			items.add(message.getDescription() + " [" + mitt.getId() + "]");
+		}
+		SelectBox selectBox = new SelectBox(owner, getBundle().getString("lbl_Add"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				MessageInTransactionTypeType nextMitt = Editor16.getStore16()
+						.getElement(MessageInTransactionTypeType.class, mittId);
+				Control16.addPrevious(nextMitt, currentMitt);
+				int selectedRow = nextTableModel.getRowCount();
+				nextTableModel.elements.add(nextMitt);
+				nextTableModel.fireTableRowsInserted(selectedRow, selectedRow);
+				propertyChangeSupport.firePropertyChange("Previous added", nextMitt, currentMitt);
+			}
+		});
+	}
+
+	public void removePrevious() {
+		int selectedRow = tbl_Prev.getSelectedRow();
+		MessageInTransactionTypeType prevMitt = prevTableModel.elements.get(selectedRow);
+		int confirm = JOptionPane.showConfirmDialog(getDialog(),
+				getBundle().getString("lbl_Remove") + " " + prevMitt.getId(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (confirm == JOptionPane.OK_OPTION) {
+			System.out.println("Remove Previous action: " + prevMitt.getId());
+			removePrevious(currentMitt, prevMitt);
+			prevTableModel.elements.remove(selectedRow);
+			prevTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
+			propertyChangeSupport.firePropertyChange("Previous removed", currentMitt, prevMitt);
+		}
+	}
+
+	public void removeNext() {
+		int selectedRow = tbl_Next.getSelectedRow();
+		MessageInTransactionTypeType nextMitt = nextTableModel.elements.get(selectedRow);
+		int confirm = JOptionPane.showConfirmDialog(getDialog(),
+				getBundle().getString("lbl_Remove") + " " + nextMitt.getId(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (confirm == JOptionPane.OK_OPTION) {
+			System.out.println("Remove Next action: " + nextMitt.getId());
+			removePrevious(nextMitt, currentMitt);
+			nextTableModel.elements.remove(selectedRow);
+			nextTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
+			propertyChangeSupport.firePropertyChange("Next removed", nextMitt, currentMitt);
+		}
+	}
+
 }

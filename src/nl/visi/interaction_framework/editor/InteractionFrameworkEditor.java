@@ -89,7 +89,7 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	static void renderSplashFrame(Graphics2D g) {
-		final String version = "Release candidate: 2.07 - release date: 2020-09-15";
+		final String version = "Release candidate: 2.08 - release date: 2020-09-18";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();
@@ -139,15 +139,25 @@ public class InteractionFrameworkEditor extends Control {
 						if (selectedOption == JOptionPane.YES_OPTION) {
 							System.out.println("YES");
 							saveFramework();
-							frame.dispose();
+							// frame.dispose();
+							closeAllWindows();
 						} else if (selectedOption == JOptionPane.NO_OPTION) {
 							System.out.println("NO");
-							frame.dispose();
+							// frame.dispose();
+							closeAllWindows();
 						} else if (selectedOption == JOptionPane.CANCEL_OPTION) {
 							System.out.println("CANCEL");
 						}
 					} else {
 						frame.dispose();
+					}
+				}
+
+				private void closeAllWindows() {
+					java.awt.Window win[] = java.awt.Window.getWindows();
+					for (int i = 0; i < win.length; i++) {
+						win[i].dispose();
+						win[i] = null;
 					}
 				}
 			});
@@ -363,11 +373,11 @@ public class InteractionFrameworkEditor extends Control {
 			frameworkFile = null;
 			version = "1.6";
 			tfd_Version.setText(version);
-			
+
 			mainPanelControl16 = new MainPanelControl16();
-			
+
 			saveFramework();
-			
+
 			mainPanel.removeAll();
 			mainPanel.add(mainPanelControl16.getMainPanel());
 			mainPanel.revalidate();

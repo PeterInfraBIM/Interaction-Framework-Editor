@@ -41,6 +41,10 @@
 				<scrollpane>
 					<table id="tbl_Prev" />
 				</scrollpane>
+				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
+					<button id="btn_AddPrevious" action="addPrevious" text="lbl_Add" enabled="true" />
+					<button id="btn_RemovePrevious" action="removePrevious" text="lbl_Remove" enabled="false" />
+				</panel>
 			</panel>
 			<panel layout="BorderLayout"
 				border="TitledBorder(lbl_NextMessages)">
@@ -50,6 +54,10 @@
 				<scrollpane>
 					<table id="tbl_Next" />
 				</scrollpane>
+				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
+					<button id="btn_AddNext" action="addNext" text="lbl_Add" enabled="true" />
+					<button id="btn_RemoveNext" action="removeNext" text="lbl_Remove" enabled="false" />
+				</panel>
 			</panel>
 		</panel>
 		<panel id="checkboxPanel" layout="GridBagLayout">
