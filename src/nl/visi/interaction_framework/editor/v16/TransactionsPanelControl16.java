@@ -90,8 +90,17 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
 	private JPopupMenu popupMenu;
-	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel,
-			elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel;
+
+	private JPanel canvasPanel;
+
+	private JPanel canvas2Panel;
+
+	private JPanel sequencePanel;
+
+	private JPanel elementConditionPanel;
+
+	private JPanel elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	private JTable tbl_Messages, tbl_Subtransactions;
 	private JTextField tfd_Result;

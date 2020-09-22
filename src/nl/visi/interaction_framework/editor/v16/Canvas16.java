@@ -26,6 +26,7 @@ import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -717,7 +718,7 @@ public class Canvas16 extends JPanel {
 				items.add(message.getDescription() + " [" + message.getId() + "]");
 			}
 			transactionPanel.getPanel().getParent();
-			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+			SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(Canvas16.this)),
 					bundle.getString("lbl_AddNewResponse"), items);
 			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 				@Override
@@ -734,6 +735,8 @@ public class Canvas16 extends JPanel {
 					Message message = new Message(newMitt);
 					message.state = MessageState.Next;
 					selectedNext.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
 				}
 			});
 		}
@@ -746,14 +749,15 @@ public class Canvas16 extends JPanel {
 			for (final MessageInTransactionTypeType existingMitt : mitts) {
 				if (Control16.getTransaction(existingMitt).getId().equals(selectedTransaction.getId())) {
 					if (existingMitt.isInitiatorToExecutor() != Message.this.mitt.isInitiatorToExecutor()) {
-						if (!nextMitts.contains(existingMitt)) {
+						if (nextMitts == null || !nextMitts.contains(existingMitt)) {
 							MessageTypeType message = Control16.getMessage(existingMitt);
 							items.add(message.getDescription() + " [" + existingMitt.getId() + "]");
 						}
 					}
 				}
 			}
-			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+
+			SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(Canvas16.this)),
 					bundle.getString("lbl_AddExistingResponse"), items);
 			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 				@Override
@@ -769,6 +773,8 @@ public class Canvas16 extends JPanel {
 					Message message = new Message(existingMitt);
 					message.state = MessageState.Next;
 					selectedNext.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
 				}
 			});
 		}
@@ -785,7 +791,8 @@ public class Canvas16 extends JPanel {
 				if (!transaction.getId().equals(selectedTransaction.getId())) {
 					for (MessageInTransactionTypeType externalMitt : mitts) {
 						if (Control16.getTransaction(externalMitt).getId().equals(transaction.getId())) {
-							if (!role.getId().equals(Control16.getInitiator(externalMitt).getId())) {
+//							if (!role.getId().equals(Control16.getInitiator(externalMitt).getId())) {
+							if (role.getId().equals(Control16.getInitiator(externalMitt).getId())) {
 								List<MessageInTransactionTypeType> previousList = Control16.getPrevious(externalMitt);
 								if (previousList == null) {
 									messages.add(externalMitt);
@@ -812,7 +819,7 @@ public class Canvas16 extends JPanel {
 				items.add(transaction.getDescription() + ":" + message.getDescription() + " [" + externalMitt.getId()
 						+ "]");
 			}
-			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+			SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(Canvas16.this)),
 					bundle.getString("lbl_AddExternalRequest"), items);
 			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 				@Override
@@ -828,6 +835,8 @@ public class Canvas16 extends JPanel {
 					Message message = new Message(existingMitt);
 					message.state = MessageState.Next;
 					selectedRequest.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
 				}
 			});
 		}
@@ -882,7 +891,7 @@ public class Canvas16 extends JPanel {
 				items.add(transaction.getDescription() + ":" + message.getDescription() + " [" + externalMitt.getId()
 						+ "]");
 			}
-			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+			SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(Canvas16.this)),
 					bundle.getString("lbl_AddExternalResponse"), items);
 			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 				@Override
@@ -898,6 +907,8 @@ public class Canvas16 extends JPanel {
 					Message message = new Message(externalMitt);
 					message.setState(MessageState.Previous);
 					selectedResponse.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
 				}
 			});
 		}
@@ -949,7 +960,7 @@ public class Canvas16 extends JPanel {
 			items.add(message.getDescription() + " [" + message.getId() + "]");
 		}
 		transactionPanel.getPanel().getParent();
-		SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(Canvas16.this)),
 				bundle.getString("lbl_AddStartMessage"), items);
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
@@ -965,6 +976,8 @@ public class Canvas16 extends JPanel {
 				Message message = new Message(mitt);
 				message.state = MessageState.Next;
 				selectedNext.add(message);
+				transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+				transactionPanel.getDrawingPlane().repaint();
 			}
 		});
 	}
