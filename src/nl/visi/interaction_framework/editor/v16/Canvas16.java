@@ -254,6 +254,8 @@ public class Canvas16 extends JPanel {
 										}
 										break;
 									}
+									transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+									transactionPanel.getDrawingPlane().repaint();
 								}
 							});
 						}
@@ -304,6 +306,15 @@ public class Canvas16 extends JPanel {
 						}
 					});
 			popupMenu.add(addExternalResponse);
+			popupMenu.add(new JSeparator());
+			final JMenuItem removeMenuItem = new JMenuItem(new AbstractAction(bundle.getString("lbl_Remove")) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					removeSelectedMessage();
+				}
+			});
+			removeMenuItem.setEnabled(false);
+			popupMenu.add(removeMenuItem);
 			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
 					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			activeLabel.setBackground(LIGHT_YELLOW_4);
@@ -317,6 +328,7 @@ public class Canvas16 extends JPanel {
 						addExternalRequest.setEnabled(menuEnabled);
 						addExternalResponse.setEnabled(menuEnabled);
 						mittEdit.setEnabled(state.equals(MessageState.Selected));
+						removeMenuItem.setEnabled(state.equals(MessageState.Selected));
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					} else {
 						Message.this.setState(MessageState.Selected);
@@ -346,6 +358,20 @@ public class Canvas16 extends JPanel {
 			});
 
 			Canvas16.this.add(activeLabel);
+		}
+
+		private void removeSelectedMessage() {
+			List<MessageInTransactionTypeType> elements = transactionPanel.getMessagesTableModel().elements;
+			int index = elements.indexOf(selectedMessage.mitt);
+			transactionPanel.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
+			transactionPanel.removeMessage();
+			transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+			transactionPanel.getDrawingPlane().repaint();
+			if (messageInTransactionDialogControl16 != null) {
+				messageInTransactionDialogControl16.getDialog().dispose();
+			}
+			Canvas16.this.remove(selectedMessage.activeLabel);
+			selectedMessage = null;
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -737,6 +763,10 @@ public class Canvas16 extends JPanel {
 					selectedNext.add(message);
 					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
 					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl16 != null) {
+						messageInTransactionDialogControl16.initSequenceElements();
+						messageInTransactionDialogControl16.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}
@@ -775,6 +805,10 @@ public class Canvas16 extends JPanel {
 					selectedNext.add(message);
 					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
 					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl16 != null) {
+						messageInTransactionDialogControl16.initSequenceElements();
+						messageInTransactionDialogControl16.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}
@@ -837,6 +871,10 @@ public class Canvas16 extends JPanel {
 					selectedRequest.add(message);
 					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
 					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl16 != null) {
+						messageInTransactionDialogControl16.initSequenceElements();
+						messageInTransactionDialogControl16.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}
@@ -909,6 +947,10 @@ public class Canvas16 extends JPanel {
 					selectedResponse.add(message);
 					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
 					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl16 != null) {
+						messageInTransactionDialogControl16.initSequenceElements();
+						messageInTransactionDialogControl16.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}

@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -340,6 +341,12 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		SimpleElementTypeType simpleElementType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + simpleElementType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		List<ComplexElementTypeType> elements = store.getElements(ComplexElementTypeType.class);
 		for (ComplexElementTypeType ceType : elements) {
 			ComplexElementTypeType.SimpleElements simpleElements = ceType.getSimpleElements();

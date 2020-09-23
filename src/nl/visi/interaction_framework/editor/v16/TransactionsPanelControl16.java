@@ -36,8 +36,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
@@ -89,7 +89,6 @@ import nl.visi.schemas._20160331.TransactionTypeTypeRef;
 public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPopupMenu popupMenu;
 	private JPanel startDatePanel, endDatePanel;
 
 	private JPanel canvasPanel;
@@ -102,7 +101,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 	private JPanel elementsTreePanel;
 	private JTabbedPane transactionTabs;
-	private JTable tbl_Messages, tbl_Subtransactions;
+	JTable tbl_Messages;
+
+	private JTable tbl_Subtransactions;
 	private JTextField tfd_Result;
 	private JComboBox<String> cbx_Initiator, cbx_Executor;
 
@@ -2263,6 +2264,12 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		TransactionTypeType transactionType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + transactionType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		List<MessageInTransactionTypeType> toBeDeleted = new ArrayList<MessageInTransactionTypeType>();
 		List<MessageInTransactionTypeType> mitts = store.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType mitt : mitts) {
@@ -2504,11 +2511,16 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 
 		int row = tbl_Messages.getSelectedRow();
 		MessageInTransactionTypeType mitt = messagesTableModel.get(row);
-		updateAllMittsWithThisMittAsPrevious(mitt);
-		store.remove(mitt);
-		fillMessageTable();
-		updateLaMu(selectedElement, user);
-		elementsTableModel.update(selectedRow);
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + mitt.getId(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.OK_OPTION) {
+			updateAllMittsWithThisMittAsPrevious(mitt);
+			store.remove(mitt);
+			fillMessageTable();
+			updateLaMu(selectedElement, user);
+			elementsTableModel.update(selectedRow);
+		}
 	}
 
 	private void updateAllMittsWithThisMittAsPrevious(MessageInTransactionTypeType selectedMitt) {

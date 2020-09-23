@@ -20,6 +20,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -370,6 +371,13 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		if (endIndex == -1)
 			return null;
 		String removedItem = document.getText(beginIndex, endIndex + 3 - beginIndex);
+		
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + removedItem,
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return null;
+
 		document.remove(beginIndex, endIndex + 3 - beginIndex);
 		tfd_XsdRestriction.setDocument(document);
 		return removedItem;
@@ -611,6 +619,12 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		UserDefinedTypeType userDefinedType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + userDefinedType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		List<SimpleElementTypeType> elements = store.getElements(SimpleElementTypeType.class);
 		for (SimpleElementTypeType element : elements) {
 			UserDefinedType dataType = element.getUserDefinedType();

@@ -529,7 +529,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				if (selectedRow >= 0) {
 					List<ComplexElementTypeType> complexElements = getComplexElements(selectedElement);
 					ComplexElementTypeType ce = subComplexElementsTableModel.elements.get(selectedRow);
-					btn_RemoveSimpleElement.setEnabled(complexElements != null && complexElements.contains(ce));
+					btn_RemoveComplexElement.setEnabled(complexElements != null && complexElements.contains(ce));
 					Object conditionValue = tbl_SubComplexElements.getValueAt(selectedRow,
 							SubComplexElementsTableColumns.Condition.ordinal());
 					cbx_ComplexElementConditions.setSelectedItem(conditionValue == "" ? null : conditionValue);
@@ -787,6 +787,12 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + complexElementType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		try {
 			Class<?>[] classesWithComplexElements = { ComplexElementTypeType.class, ProjectTypeType.class,
 					PersonTypeType.class, OrganisationTypeType.class, AppendixTypeType.class, MessageTypeType.class };
@@ -878,6 +884,12 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	public void removeComplexElement() {
 		int selectedSubComplexElementsRow = tbl_SubComplexElements.getSelectedRow();
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + subComplexElementsTableModel.elements.get(selectedSubComplexElementsRow).getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		ComplexElementTypeType complexElement = subComplexElementsTableModel.remove(selectedSubComplexElementsRow);
 		ComplexElements complexElements = selectedElement.getComplexElements();
 		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
@@ -927,6 +939,12 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 
 	public void removeSimpleElement() {
 		int selectedSimpleElementsRow = tbl_SimpleElements.getSelectedRow();
+
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + simpleElementsTableModel.elements.get(selectedSimpleElementsRow).getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
 
 		SimpleElementTypeType simpleElement = simpleElementsTableModel.remove(selectedSimpleElementsRow);
 		SimpleElements simpleElements = selectedElement.getSimpleElements();

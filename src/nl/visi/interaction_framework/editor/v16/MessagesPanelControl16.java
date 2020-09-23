@@ -9,6 +9,7 @@ import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
@@ -701,6 +702,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		MessageTypeType messageType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + messageType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		List<MessageInTransactionTypeType> elements = store.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType element : elements) {
 			Message message = element.getMessage();
@@ -769,6 +776,13 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		int selectedRow = tbl_ComplexElements.getSelectedRow();
 
 		ComplexElementTypeType complexElement = complexElementsTableModel.remove(selectedRow);
+		
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + complexElement.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
 		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 		for (Object object : list) {
@@ -813,6 +827,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	public void removeAppendix() {
 		int selectedRow = tbl_Appendices.getSelectedRow();
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + appendicesTableModel.elements.get(selectedRow).getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		AppendixTypeType appendices = appendicesTableModel.remove(selectedRow);
 		AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
 		List<Object> list = appendixTypes.getAppendixTypeOrAppendixTypeRef();

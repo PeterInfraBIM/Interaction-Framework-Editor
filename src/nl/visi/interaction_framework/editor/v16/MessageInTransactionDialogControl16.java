@@ -688,7 +688,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 				int selectedRow = nextTableModel.getRowCount();
 				nextTableModel.elements.add(nextMitt);
 				nextTableModel.fireTableRowsInserted(selectedRow, selectedRow);
-				propertyChangeSupport.firePropertyChange("Previous added", nextMitt, currentMitt);
+				propertyChangeSupport.firePropertyChange("Next added", nextMitt, currentMitt);
 			}
 		});
 	}

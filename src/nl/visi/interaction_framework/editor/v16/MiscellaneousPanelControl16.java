@@ -9,6 +9,7 @@ import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -695,6 +696,13 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		int selectedMiscellaneousRow = tbl_Elements.getSelectedRow();
 		selectedMiscellaneousRow = tbl_Elements.getRowSorter().convertRowIndexToModel(selectedMiscellaneousRow);
 		ElementType elementType = elementsTableModel.get(selectedMiscellaneousRow);
+
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + elementType.getId(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		String className = elementType.getClass().getSimpleName();
 		MiscellaneousTypes type = MiscellaneousTypes.valueOf(className.substring(0, className.length() - 4));
 		List<Object> mittElements = null;
@@ -1000,6 +1008,14 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 
 	public void removeComplexElement() {
 		int selectedRow = tbl_ComplexElements.getSelectedRow();
+
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": "
+						+ complexElementsTableModel.elements.get(selectedRow).getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		List<Object> list = null;
 		ComplexElementTypeType complexElement = complexElementsTableModel.remove(selectedRow);
 		if (selectedElement instanceof AppendixTypeType) {

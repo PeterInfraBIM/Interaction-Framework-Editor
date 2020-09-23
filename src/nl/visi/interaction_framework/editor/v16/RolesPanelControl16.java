@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -1200,6 +1201,12 @@ public class RolesPanelControl16 extends PanelControl16<RoleTypeType> {
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		RoleTypeType roleType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + roleType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		List<TransactionTypeType> elements = store.getElements(TransactionTypeType.class);
 		for (TransactionTypeType element : elements) {
 			RoleTypeType initiator = getInitiator(element);
