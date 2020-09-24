@@ -313,7 +313,29 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				this.font = new Font("Dialog", Font.PLAIN, 11);
 				if (!printMode) {
 					activeLabel = new RotatingButton(name);
-					activeLabel.setToolTipText(mitt.getId());
+					String toolTip = mitt.getId();
+					List<MessageInTransactionTypeType> befores = Control16.getSendBefores(mitt);
+					if (befores != null) {
+						toolTip += " send before: ";
+						for (int i = 0; i < befores.size(); i++) {
+							toolTip += befores.get(i).getId();
+							if (i < befores.size() - 1) {
+								toolTip += ", ";
+							}
+						}
+					}
+					List<MessageInTransactionTypeType> afters = Control16.getSendAfters(mitt);
+					if (afters != null) {
+						toolTip += " send after: ";
+						for (int i = 0; i < afters.size(); i++) {
+							toolTip += afters.get(i).getId() + " ";
+							if (i < afters.size() - 1) {
+								toolTip += ", ";
+							}
+						}
+					}
+
+					activeLabel.setToolTipText(toolTip);
 					activeLabel.setContentAreaFilled(false);
 					activeLabel.setBackground(Color.white);
 					activeLabel.setBorderPainted(false);
@@ -2506,7 +2528,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		elementsTableModel.update(selectedRow);
 	}
 
-	public void removeMessage() {
+	public boolean removeMessage() {
 		Store16 store = Editor16.getStore16();
 
 		int row = tbl_Messages.getSelectedRow();
@@ -2520,7 +2542,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			fillMessageTable();
 			updateLaMu(selectedElement, user);
 			elementsTableModel.update(selectedRow);
+			return true;
 		}
+		return false;
 	}
 
 	private void updateAllMittsWithThisMittAsPrevious(MessageInTransactionTypeType selectedMitt) {

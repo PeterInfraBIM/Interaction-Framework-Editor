@@ -364,14 +364,32 @@ public class Canvas16 extends JPanel {
 			List<MessageInTransactionTypeType> elements = transactionPanel.getMessagesTableModel().elements;
 			int index = elements.indexOf(selectedMessage.mitt);
 			transactionPanel.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
-			transactionPanel.removeMessage();
-			transactionPanel.getDrawingPlane().setCurrentTransaction(null);
-			transactionPanel.getDrawingPlane().repaint();
-			if (messageInTransactionDialogControl16 != null) {
-				messageInTransactionDialogControl16.getDialog().dispose();
+			boolean removed = transactionPanel.removeMessage();
+			if (removed) {
+				transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+				transactionPanel.getDrawingPlane().repaint();
+				if (messageInTransactionDialogControl16 != null) {
+					messageInTransactionDialogControl16.getDialog().dispose();
+				}
+				Canvas16.this.remove(selectedMessage.activeLabel);
+				for (Message msg : selectedNext) {
+					Canvas16.this.remove(msg.activeLabel);
+				}
+				selectedNext.clear();
+				for (Message msg : selectedPrev) {
+					Canvas16.this.remove(msg.activeLabel);
+				}
+				selectedPrev.clear();
+				for (Message msg : selectedRequest) {
+					Canvas16.this.remove(msg.activeLabel);
+				}
+				selectedRequest.clear();
+				for (Message msg : selectedResponse) {
+					Canvas16.this.remove(msg.activeLabel);
+				}
+				selectedResponse.clear();
+				selectedMessage = null;
 			}
-			Canvas16.this.remove(selectedMessage.activeLabel);
-			selectedMessage = null;
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -384,6 +402,26 @@ public class Canvas16 extends JPanel {
 					label = Control16.getMessage(mitt).getDescription();
 				} else {
 					label = transaction.getDescription() + ":" + Control16.getMessage(mitt).getDescription();
+				}
+				List<MessageInTransactionTypeType> befores = Control16.getSendBefores(mitt);
+				if (befores != null) {
+					toolTip += " send before: ";
+					for (int i = 0; i < befores.size(); i++) {
+						toolTip += befores.get(i).getId();
+						if (i < befores.size() - 1) {
+							toolTip += ", ";
+						}
+					}
+				}
+				List<MessageInTransactionTypeType> afters = Control16.getSendAfters(mitt);
+				if (afters != null) {
+					toolTip += " send after: ";
+					for (int i = 0; i < afters.size(); i++) {
+						toolTip += afters.get(i).getId() + " ";
+						if (i < afters.size() - 1) {
+							toolTip += ", ";
+						}
+					}
 				}
 			}
 			activeLabel.setText(label);
@@ -954,6 +992,7 @@ public class Canvas16 extends JPanel {
 				}
 			});
 		}
+
 	}
 
 	public Canvas16(final TransactionsPanelControl16 transactionPanel) {
