@@ -4,11 +4,13 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Paint;
 import java.awt.Stroke;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -78,7 +80,7 @@ public class Canvas14 extends JPanel {
 		private Color color;
 		private RotatingButton activeLabel;
 
-		public Role(RoleTypeType role, int x, int y, Color color) {
+		public Role(final RoleTypeType role, int x, int y, Color color) {
 			this.role = role;
 			this.x = x;
 			this.y = y;
@@ -92,6 +94,7 @@ public class Canvas14 extends JPanel {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
+					InteractionFrameworkEditor.navigate(role);
 				}
 
 				@Override
@@ -114,6 +117,7 @@ public class Canvas14 extends JPanel {
 			String label = role != null ? role.getDescription() : "?";
 			activeLabel.setText(label);
 			activeLabel.setToolTipText(role != null ? role.getId() : "?");
+			g2.setFont(g2.getFont().deriveFont(Font.BOLD));
 			int stringWidth = g2.getFontMetrics().stringWidth(label);
 			if (printMode) {
 				Paint paint = g2.getPaint();
@@ -146,6 +150,7 @@ public class Canvas14 extends JPanel {
 		private int x;
 		private int y;
 		private JPopupMenu popupMenu;
+		private final JMenuItem mittEdit;
 
 		public Message(MessageInTransactionTypeType mitt) {
 			this(mitt, 0, 0);
@@ -161,18 +166,101 @@ public class Canvas14 extends JPanel {
 
 			setTitleAndToolTip(mitt);
 			popupMenu = new JPopupMenu();
-			final JMenuItem mittEdit = new JMenuItem(new AbstractAction(bundle.getString("lbl_Edit")) {
+			mittEdit = new JMenuItem(new AbstractAction(bundle.getString("lbl_Edit")) {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					try {
 						if (messageInTransactionDialogControl14 == null) {
+							Window window = SwingUtilities.windowForComponent(Canvas14.this);
 							messageInTransactionDialogControl14 = new MessageInTransactionDialogControl14(
-									transactionPanel);
+									transactionPanel, window);
 							messageInTransactionDialogControl14.getDialog().setModal(false);
 							messageInTransactionDialogControl14.getDialog().addWindowListener(new WindowAdapter() {
 								@Override
 								public void windowClosing(WindowEvent e) {
 									super.windowClosed(e);
+								}
+							});
+							messageInTransactionDialogControl14.addPropertyChangeListener(new PropertyChangeListener() {
+								@Override
+								public void propertyChange(PropertyChangeEvent evt) {
+									switch (evt.getPropertyName()) {
+									case "Previous removed":
+										MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType) evt
+												.getNewValue();
+										System.out.println("Previous removed: " + removedPrev.getId());
+										TransactionTypeType prTransaction = Control14.getTransaction(removedPrev);
+										List<Message> rpLstv = prTransaction.getId().equals(selectedTransaction.getId())
+												? selectedPrev
+												: selectedResponse;
+										int index = -1;
+										for (int i = 0; i < rpLstv.size(); i++) {
+											if (rpLstv.get(i).mitt.getId().equals(removedPrev.getId())) {
+												index = i;
+												break;
+											}
+										}
+										if (index != -1) {
+											Canvas14.this.remove(rpLstv.get(index).activeLabel);
+											rpLstv.remove(index);
+										}
+										break;
+									case "Next removed":
+										MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType) evt
+												.getOldValue();
+										System.out.println("Next removed: " + removedNext.getId());
+										TransactionTypeType nrTransaction = Control14.getTransaction(removedNext);
+										List<Message> nrLstv = nrTransaction.getId().equals(selectedTransaction.getId())
+												? selectedNext
+												: selectedRequest;
+										index = -1;
+										for (int i = 0; i < nrLstv.size(); i++) {
+											if (nrLstv.get(i).mitt.getId().equals(removedNext.getId())) {
+												index = i;
+												break;
+											}
+										}
+										if (index != -1) {
+											Canvas14.this.remove(nrLstv.get(index).activeLabel);
+											nrLstv.remove(index);
+										}
+										break;
+									case "Previous added":
+										MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType) evt
+												.getNewValue();
+										System.out.println("Previous added: " + addedPrev.getId());
+										TransactionTypeType paTransaction = Control14.getTransaction(addedPrev);
+										Message newMessage = new Message(addedPrev);
+										newMessage.state = MessageState.Previous;
+										if (paTransaction.getId().equals(selectedTransaction.getId())) {
+											selectedPrev.add(newMessage);
+										} else {
+											selectedRequest.add(newMessage);
+										}
+										break;
+									case "Next added":
+										MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType) evt
+												.getOldValue();
+										System.out.println("Next added: " + addedNext.getId());
+										TransactionTypeType naTransaction = Control14.getTransaction(addedNext);
+										Message naMessage = new Message(addedNext);
+										naMessage.state = MessageState.Next;
+										if (naTransaction.getId().equals(selectedTransaction.getId())) {
+											selectedNext.add(naMessage);
+										} else {
+											selectedRequest.add(naMessage);
+										}
+										break;
+									case "Direction changed":
+										MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt.getOldValue();
+										Boolean direction = (Boolean) evt.getNewValue();
+										System.out.println(
+												"Direction changed: " + currentMitt.getId() + "=" + direction.booleanValue());
+										currentMitt.setInitiatorToExecutor(direction);
+										break;
+									}
+									transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+									transactionPanel.getDrawingPlane().repaint();
 								}
 							});
 						}
@@ -189,6 +277,7 @@ public class Canvas14 extends JPanel {
 					}
 				}
 			});
+			mittEdit.setEnabled(false);
 			popupMenu.add(mittEdit);
 			popupMenu.add(new JSeparator());
 			final JMenuItem addNewResponse = new JMenuItem(new AbstractAction(bundle.getString("lbl_AddNewResponse")) {
@@ -222,6 +311,15 @@ public class Canvas14 extends JPanel {
 						}
 					});
 			popupMenu.add(addExternalResponse);
+			popupMenu.add(new JSeparator());
+			final JMenuItem removeMenuItem = new JMenuItem(new AbstractAction(bundle.getString("lbl_Remove")) {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					removeSelectedMessage();
+				}
+			});
+			removeMenuItem.setEnabled(false);
+			popupMenu.add(removeMenuItem);
 			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
 					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			activeLabel.setBackground(LIGHT_YELLOW_4);
@@ -234,9 +332,20 @@ public class Canvas14 extends JPanel {
 						addExistingResponse.setEnabled(menuEnabled);
 						addExternalRequest.setEnabled(menuEnabled);
 						addExternalResponse.setEnabled(menuEnabled);
+						mittEdit.setEnabled(state.equals(MessageState.Selected));
+						removeMenuItem.setEnabled(state.equals(MessageState.Selected));
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					} else {
 						Message.this.setState(MessageState.Selected);
+						if (messageInTransactionDialogControl14 != null) {
+							TransactionTypeType transaction = Control14.getTransaction(Message.this.mitt);
+							MessageTypeType message = Control14.getMessage(Message.this.mitt);
+							messageInTransactionDialogControl14.getDialog().setTitle(transaction.getDescription()
+									+ " : " + message.getDescription() + " [" + Message.this.mitt.getId() + "]");
+							messageInTransactionDialogControl14.fillTree(Message.this.mitt);
+							messageInTransactionDialogControl14.initSequenceElements();
+							messageInTransactionDialogControl14.fillSequenceElements(Message.this.mitt);
+						}
 					}
 				}
 
@@ -256,6 +365,38 @@ public class Canvas14 extends JPanel {
 			Canvas14.this.add(activeLabel);
 		}
 
+		private void removeSelectedMessage() {
+			List<MessageInTransactionTypeType> elements = transactionPanel.getMessagesTableModel().elements;
+			int index = elements.indexOf(selectedMessage.mitt);
+			transactionPanel.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
+			boolean removed = transactionPanel.removeMessage();
+			if (removed) {
+				transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+				transactionPanel.getDrawingPlane().repaint();
+				if (messageInTransactionDialogControl14 != null) {
+					messageInTransactionDialogControl14.getDialog().dispose();
+				}
+				Canvas14.this.remove(selectedMessage.activeLabel);
+				for (Message msg : selectedNext) {
+					Canvas14.this.remove(msg.activeLabel);
+				}
+				selectedNext.clear();
+				for (Message msg : selectedPrev) {
+					Canvas14.this.remove(msg.activeLabel);
+				}
+				selectedPrev.clear();
+				for (Message msg : selectedRequest) {
+					Canvas14.this.remove(msg.activeLabel);
+				}
+				selectedRequest.clear();
+				for (Message msg : selectedResponse) {
+					Canvas14.this.remove(msg.activeLabel);
+				}
+				selectedResponse.clear();
+				selectedMessage = null;
+			}
+		}
+
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
 			String label = "?";
 			String toolTip = "?";
@@ -266,6 +407,26 @@ public class Canvas14 extends JPanel {
 					label = Control14.getMessage(mitt).getDescription();
 				} else {
 					label = transaction.getDescription() + ":" + Control14.getMessage(mitt).getDescription();
+				}
+				List<MessageInTransactionTypeType> befores = Control14.getSendBefores(mitt);
+				if (befores != null) {
+					toolTip += " send before: ";
+					for (int i = 0; i < befores.size(); i++) {
+						toolTip += befores.get(i).getId();
+						if (i < befores.size() - 1) {
+							toolTip += ", ";
+						}
+					}
+				}
+				List<MessageInTransactionTypeType> afters = Control14.getSendAfters(mitt);
+				if (afters != null) {
+					toolTip += " send after: ";
+					for (int i = 0; i < afters.size(); i++) {
+						toolTip += afters.get(i).getId() + " ";
+						if (i < afters.size() - 1) {
+							toolTip += ", ";
+						}
+					}
 				}
 			}
 			activeLabel.setText(label);
@@ -643,6 +804,12 @@ public class Canvas14 extends JPanel {
 					Message message = new Message(newMitt);
 					message.state = MessageState.Next;
 					selectedNext.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl14 != null) {
+						messageInTransactionDialogControl14.initSequenceElements();
+						messageInTransactionDialogControl14.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}
@@ -678,6 +845,12 @@ public class Canvas14 extends JPanel {
 					Message message = new Message(existingMitt);
 					message.state = MessageState.Next;
 					selectedNext.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl14 != null) {
+						messageInTransactionDialogControl14.initSequenceElements();
+						messageInTransactionDialogControl14.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}
@@ -694,7 +867,8 @@ public class Canvas14 extends JPanel {
 				if (!transaction.getId().equals(selectedTransaction.getId())) {
 					for (MessageInTransactionTypeType externalMitt : mitts) {
 						if (Control14.getTransaction(externalMitt).getId().equals(transaction.getId())) {
-							if (!role.getId().equals(Control14.getInitiator(externalMitt).getId())) {
+//							if (!role.getId().equals(Control14.getInitiator(externalMitt).getId())) {
+							if (role.getId().equals(Control14.getInitiator(externalMitt).getId())) {
 								List<MessageInTransactionTypeType> previousList = Control14.getPrevious(externalMitt);
 								if (previousList == null) {
 									messages.add(externalMitt);
@@ -737,6 +911,12 @@ public class Canvas14 extends JPanel {
 					Message message = new Message(existingMitt);
 					message.state = MessageState.Next;
 					selectedRequest.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl14 != null) {
+						messageInTransactionDialogControl14.initSequenceElements();
+						messageInTransactionDialogControl14.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}
@@ -807,6 +987,12 @@ public class Canvas14 extends JPanel {
 					Message message = new Message(externalMitt);
 					message.setState(MessageState.Previous);
 					selectedResponse.add(message);
+					transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+					transactionPanel.getDrawingPlane().repaint();
+					if (messageInTransactionDialogControl14 != null) {
+						messageInTransactionDialogControl14.initSequenceElements();
+						messageInTransactionDialogControl14.fillSequenceElements(Message.this.mitt);
+					}
 				}
 			});
 		}
@@ -832,8 +1018,6 @@ public class Canvas14 extends JPanel {
 		final JMenu selectMenu = new JMenu(bundle.getString("lbl_SelectMessage"));
 		popupMenu.add(selectMenu);
 		popupMenu.add(new JSeparator());
-		final JMenu addStartMsg = new JMenu(bundle.getString("lbl_AddStartMessage"));
-		popupMenu.add(addStartMsg);
 		final JMenuItem addStartMessage = new JMenuItem(new AbstractAction(bundle.getString("lbl_AddStartMessage")) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -847,7 +1031,6 @@ public class Canvas14 extends JPanel {
 			public void mouseClicked(MouseEvent e) {
 				if (SwingUtilities.isRightMouseButton(e)) {
 					fillSelectMenu(selectMenu);
-					fillAddStartMessageMenu(addStartMsg);
 					popupMenu.show(e.getComponent(), e.getX(), e.getY());
 				}
 			}
@@ -877,6 +1060,8 @@ public class Canvas14 extends JPanel {
 				Message message = new Message(mitt);
 				message.state = MessageState.Next;
 				selectedNext.add(message);
+				transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+				transactionPanel.getDrawingPlane().repaint();
 			}
 		});
 	}
@@ -896,24 +1081,6 @@ public class Canvas14 extends JPanel {
 						});
 				selectMenu.add(msgItem);
 			}
-		}
-	}
-
-	private void fillAddStartMessageMenu(JMenu addStartMsg) {
-		addStartMsg.removeAll();
-		List<MessageTypeType> messages = Editor14.getStore14().getElements(MessageTypeType.class);
-		for (final MessageTypeType message : messages) {
-			addStartMsg.add(new JMenuItem(new AbstractAction(message.getDescription() + " [" + message.getId() + "]") {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					transactionPanel.cbx_Messages.setSelectedItem(message.getId());
-					MessageInTransactionTypeType mitt = transactionPanel.addMessage();
-					initNewDiagram();
-					Message message = new Message(mitt);
-					message.state = MessageState.Next;
-					selectedNext.add(message);
-				}
-			}));
 		}
 	}
 
@@ -1140,25 +1307,19 @@ public class Canvas14 extends JPanel {
 				} else {
 					switch (currMsg.getState()) {
 					case History:
-//						g2d.setColor(Color.RED);
 						drawConnectorBox(getStartX(currMsg), lastY, 1, BoxType.OPEN_TOP,
 								startMessage ? LIGHT_GREEN_1 : Color.WHITE);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.CLOSED : BoxType.OPEN_BOTTOM,
 								endMessage ? LIGHT_RED_1 : Color.WHITE);
-//						g2d.setColor(Color.BLACK);
 						break;
 					case Next:
-//						g2d.setColor(Color.CYAN);
 						drawConnectorBox(getStartX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM, Color.WHITE);
-//						g2d.setColor(Color.BLACK);
 						break;
 					case Previous:
-//						g2d.setColor(Color.PINK);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM, Color.WHITE);
-//						g2d.setColor(Color.BLACK);
 						break;
 					default:
 						break;
@@ -1171,7 +1332,6 @@ public class Canvas14 extends JPanel {
 	}
 
 	private int getEndX(Message currMsg) {
-//		return currMsg.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;
 		TransactionTypeType transaction = Control14.getTransaction(currMsg.mitt);
 		if (transaction.getId().equals(selectedTransaction.getId())) {
 			return currMsg.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;

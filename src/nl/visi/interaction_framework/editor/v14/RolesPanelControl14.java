@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -981,19 +982,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(RoleTypeType.class);
-//				} else {
-//					List<RoleTypeType> elements = Editor14.getStore14().getElements(RoleTypeType.class);
-//					elementsTableModel.clear();
-//					for (RoleTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -1013,8 +1001,6 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 				}
 			}
 		}
-
-//		fillTable(RoleTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -1200,6 +1186,12 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		RoleTypeType roleType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + roleType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		List<TransactionTypeType> elements = store.getElements(TransactionTypeType.class);
 		for (TransactionTypeType element : elements) {
 			RoleTypeType initiator = getInitiator(element);

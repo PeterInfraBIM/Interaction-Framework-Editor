@@ -32,6 +32,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import nl.visi.interaction_framework.editor.NewFrameworkDialogControl;
+import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.ProjectTypeType;
 
@@ -54,6 +55,8 @@ public class MainPanelControl14 extends Control14 {
 	public enum Tabs {
 		Roles, Transactions, Messages, ComplexElements, SimpleElements, UserDefinedTypes, Miscellaneous;
 
+		JFrame tearOffFrame;
+
 		PanelControl14<?> getPanelControl() {
 			switch (this) {
 			case ComplexElements:
@@ -72,6 +75,13 @@ public class MainPanelControl14 extends Control14 {
 				return miscellaneousPC;
 			}
 			return null;
+		}
+		
+		JFrame getTearOffFrame() {
+			if (tearOffFrame == null) {
+				tearOffFrame = new JFrame(getBundle().getString("lbl_" + name()));
+			}
+			return tearOffFrame;
 		}
 	}
 
@@ -113,7 +123,8 @@ public class MainPanelControl14 extends Control14 {
 					tabs.setEnabledAt(tabs.getSelectedIndex(), false);
 					((JComponent) tabs.getSelectedComponent()).removeAll();
 					tabs.getSelectedComponent().repaint();
-					JFrame frame = new JFrame();
+//					JFrame frame = new JFrame();
+					JFrame frame = Tabs.values()[tabs.getSelectedIndex()].getTearOffFrame();
 					frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 					tearOff(frame, Tabs.values()[tabs.getSelectedIndex()]);
 					frame.pack();
@@ -131,6 +142,7 @@ public class MainPanelControl14 extends Control14 {
 						JComponent tabComponent = (JComponent) tabs.getComponentAt(tab.ordinal());
 						tabComponent.add(tab.getPanelControl().getPanel());
 						tabs.setEnabledAt(tab.ordinal(), true);
+						tab.tearOffFrame = null;
 					}
 				});
 			}
@@ -173,12 +185,7 @@ public class MainPanelControl14 extends Control14 {
 		projectType.setNamespace(newFrameworkDialogControl.getNamespace());
 		try {
 			Editor14.getStore14().clear();
-//			frameworkFile = null;
-//			buildTabs();
 			return miscellaneousPC.newElement(projectType, "ProjectType_");
-//			Tabs.values()[tabs.getSelectedIndex()].getPanelControl().fillTable();
-//			tabs.repaint();
-//			MainFrameControl16.this.setMainframeText(projectType.getId());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -340,16 +347,22 @@ public class MainPanelControl14 extends Control14 {
 		switch (Store14.ElementTypeType.valueOf(element.getClass().getSimpleName())) {
 		case AppendixTypeType:
 			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case ComplexElementTypeType:
 			tabs.setSelectedIndex(Tabs.ComplexElements.ordinal());
+			if (Tabs.ComplexElements.tearOffFrame != null)
+				Tabs.ComplexElements.tearOffFrame.toFront();
 			panelControl = Tabs.ComplexElements.getPanelControl();
 			break;
 		case ElementConditionType:
 			break;
 		case GroupTypeType:
 			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case MessageInTransactionTypeConditionType:
@@ -358,38 +371,56 @@ public class MainPanelControl14 extends Control14 {
 			break;
 		case MessageTypeType:
 			tabs.setSelectedIndex(Tabs.Messages.ordinal());
+			if (Tabs.Messages.tearOffFrame != null)
+				Tabs.Messages.tearOffFrame.toFront();
 			panelControl = Tabs.Messages.getPanelControl();
 			break;
 		case OrganisationTypeType:
 			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case PersonTypeType:
 			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case ProjectTypeType:
 			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case RoleTypeType:
 			tabs.setSelectedIndex(Tabs.Roles.ordinal());
+			if (Tabs.Roles.tearOffFrame != null)
+				Tabs.Roles.tearOffFrame.toFront();
 			panelControl = Tabs.Roles.getPanelControl();
 			break;
 		case SimpleElementTypeType:
 			tabs.setSelectedIndex(Tabs.SimpleElements.ordinal());
+			if (Tabs.SimpleElements.tearOffFrame != null)
+				Tabs.SimpleElements.tearOffFrame.toFront();
 			panelControl = Tabs.SimpleElements.getPanelControl();
 			break;
 		case TransactionPhaseTypeType:
 			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case TransactionTypeType:
 			tabs.setSelectedIndex(Tabs.Transactions.ordinal());
+			if (Tabs.Transactions.tearOffFrame != null)
+				Tabs.Transactions.tearOffFrame.toFront();
 			panelControl = Tabs.Transactions.getPanelControl();
 			break;
 		case UserDefinedTypeType:
 			tabs.setSelectedIndex(Tabs.UserDefinedTypes.ordinal());
+			if (Tabs.UserDefinedTypes.tearOffFrame != null)
+				Tabs.UserDefinedTypes.tearOffFrame.toFront();
 			panelControl = Tabs.UserDefinedTypes.getPanelControl();
 			break;
 		default:
@@ -406,7 +437,9 @@ public class MainPanelControl14 extends Control14 {
 	public void navigateForward() {
 		int tabIndex = tabs.getSelectedIndex();
 		PanelControl14<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
-		backwardStack.push(panelControl.selectedElement);
+		if (panelControl.selectedElement != null) {
+			backwardStack.push(panelControl.selectedElement);
+		}
 		ElementType et = forwardStack.pop();
 		navExec(et);
 	}
@@ -414,7 +447,9 @@ public class MainPanelControl14 extends Control14 {
 	public void navigateBackward() {
 		int tabIndex = tabs.getSelectedIndex();
 		PanelControl14<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
-		forwardStack.push(panelControl.selectedElement);
+		if (panelControl.selectedElement != null) {
+			forwardStack.push(panelControl.selectedElement);
+		}
 		ElementType et = backwardStack.pop();
 		navExec(et);
 	}

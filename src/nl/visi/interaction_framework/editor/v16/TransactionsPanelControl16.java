@@ -89,17 +89,8 @@ import nl.visi.schemas._20160331.TransactionTypeTypeRef;
 public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel;
-
-	private JPanel canvasPanel;
-
-	private JPanel canvas2Panel;
-
-	private JPanel sequencePanel;
-
-	private JPanel elementConditionPanel;
-
-	private JPanel elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel,
+			elementsTreePanel;
 	private JTabbedPane transactionTabs;
 	JTable tbl_Messages;
 
@@ -2343,7 +2334,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		}
 		for (MessageInTransactionTypeType mitt : toBeDeleted) {
-			// store.remove(mitt.getId());
 			store.remove(mitt);
 		}
 
@@ -2497,6 +2487,14 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
+						case "Direction changed":
+							MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt.getOldValue();
+							Boolean direction = (Boolean) evt.getNewValue();
+							System.out.println(
+									"Direction changed: " + currentMitt.getId() + "=" + direction.booleanValue());
+							drawingPlane.setCurrentTransaction(null);
+							drawingPlane.repaint();
+							break;
 						}
 
 					}
@@ -2510,9 +2508,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					selectedElement.getDescription() + " : " + message.getDescription() + " [" + mitt.getId() + "]");
 			activeItem.activeLabel.setForeground(Color.blue);
 			messageInTransactionDialogControl16.getDialog().setVisible(true);
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}

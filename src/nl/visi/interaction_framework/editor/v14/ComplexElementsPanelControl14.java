@@ -14,6 +14,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
@@ -445,20 +446,6 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(ComplexElementTypeType.class);
-//				} else {
-//					List<ComplexElementTypeType> elements = Editor14.getStore14()
-//							.getElements(ComplexElementTypeType.class);
-//					elementsTableModel.clear();
-//					for (ComplexElementTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -471,8 +458,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		if (filterString.isEmpty()) {
 			fillTable(ComplexElementTypeType.class);
 		} else {
-			List<ComplexElementTypeType> elements = Editor14.getStore14()
-					.getElements(ComplexElementTypeType.class);
+			List<ComplexElementTypeType> elements = Editor14.getStore14().getElements(ComplexElementTypeType.class);
 			elementsTableModel.clear();
 			for (ComplexElementTypeType element : elements) {
 				if (element.getDescription().toUpperCase().contains(filterString)
@@ -481,8 +467,6 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 				}
 			}
 		}
-
-//		fillTable(ComplexElementTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -635,6 +619,12 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + complexElementType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		try {
 			Class<?>[] classesWithComplexElements = { ComplexElementTypeType.class, ProjectTypeType.class,
 					PersonTypeType.class, OrganisationTypeType.class, AppendixTypeType.class, MessageTypeType.class };
@@ -726,6 +716,13 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 	public void removeComplexElement() {
 		int selectedSubComplexElementsRow = tbl_SubComplexElements.getSelectedRow();
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": "
+						+ subComplexElementsTableModel.elements.get(selectedSubComplexElementsRow).getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		ComplexElementTypeType complexElement = subComplexElementsTableModel.remove(selectedSubComplexElementsRow);
 		ComplexElements complexElements = selectedElement.getComplexElements();
 		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
@@ -775,6 +772,12 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 
 	public void removeSimpleElement() {
 		int selectedSimpleElementsRow = tbl_SimpleElements.getSelectedRow();
+
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + simpleElementsTableModel.elements.get(selectedSimpleElementsRow).getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
 
 		SimpleElementTypeType simpleElement = simpleElementsTableModel.remove(selectedSimpleElementsRow);
 		SimpleElements simpleElements = selectedElement.getSimpleElements();

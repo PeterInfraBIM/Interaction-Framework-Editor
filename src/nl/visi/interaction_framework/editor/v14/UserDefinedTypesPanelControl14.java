@@ -20,6 +20,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
@@ -34,7 +35,6 @@ import javax.swing.text.Document;
 
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
-import nl.visi.schemas._20140331.TransactionTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
 
@@ -371,6 +371,13 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 		if (endIndex == -1)
 			return null;
 		String removedItem = document.getText(beginIndex, endIndex + 3 - beginIndex);
+
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + removedItem, getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return null;
+
 		document.remove(beginIndex, endIndex + 3 - beginIndex);
 		tfd_XsdRestriction.setDocument(document);
 		return removedItem;
@@ -386,7 +393,6 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 			document.insertString(beginIndex, insertItem, null);
 		}
 		return true;
-
 	}
 
 	private int findBeginIndexEnumerationElement(String text, int findIndex) throws BadLocationException {
@@ -462,19 +468,6 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(UserDefinedTypeType.class);
-//				} else {
-//					List<UserDefinedTypeType> elements = Editor14.getStore14().getElements(UserDefinedTypeType.class);
-//					elementsTableModel.clear();
-//					for (UserDefinedTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -495,8 +488,6 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 				}
 			}
 		}
-
-//		fillTable(UserDefinedTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -613,6 +604,12 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		UserDefinedTypeType userDefinedType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + userDefinedType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		List<SimpleElementTypeType> elements = store.getElements(SimpleElementTypeType.class);
 		for (SimpleElementTypeType element : elements) {
 			UserDefinedType dataType = element.getUserDefinedType();

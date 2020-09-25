@@ -468,19 +468,6 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(UserDefinedTypeType.class);
-//				} else {
-//					List<UserDefinedTypeType> elements = Editor16.getStore16().getElements(UserDefinedTypeType.class);
-//					elementsTableModel.clear();
-//					for (UserDefinedTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -501,8 +488,6 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 				}
 			}
 		}
-
-//		fillTable(UserDefinedTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {

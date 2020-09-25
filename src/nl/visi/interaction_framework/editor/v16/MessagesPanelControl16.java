@@ -518,7 +518,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				}
 			}
 		}
-//		fillTable(MessageTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {

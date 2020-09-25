@@ -992,7 +992,6 @@ public class Canvas16 extends JPanel {
 				}
 			});
 		}
-
 	}
 
 	public Canvas16(final TransactionsPanelControl16 transactionPanel) {
@@ -1304,25 +1303,19 @@ public class Canvas16 extends JPanel {
 				} else {
 					switch (currMsg.getState()) {
 					case History:
-//						g2d.setColor(Color.RED);
 						drawConnectorBox(getStartX(currMsg), lastY, 1, BoxType.OPEN_TOP,
 								startMessage ? LIGHT_GREEN_1 : Color.WHITE);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.CLOSED : BoxType.OPEN_BOTTOM,
 								endMessage ? LIGHT_RED_1 : Color.WHITE);
-//						g2d.setColor(Color.BLACK);
 						break;
 					case Next:
-//						g2d.setColor(Color.CYAN);
 						drawConnectorBox(getStartX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM, Color.WHITE);
-//						g2d.setColor(Color.BLACK);
 						break;
 					case Previous:
-//						g2d.setColor(Color.PINK);
 						drawConnectorBox(getEndX(currMsg), lastY, 1,
 								nextMsg == null ? BoxType.OPEN_TOP : BoxType.OPEN_TOP_BOTTOM, Color.WHITE);
-//						g2d.setColor(Color.BLACK);
 						break;
 					default:
 						break;
@@ -1335,7 +1328,6 @@ public class Canvas16 extends JPanel {
 	}
 
 	private int getEndX(Message currMsg) {
-//		return currMsg.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;
 		TransactionTypeType transaction = Control16.getTransaction(currMsg.mitt);
 		if (transaction.getId().equals(selectedTransaction.getId())) {
 			return currMsg.mitt.isInitiatorToExecutor() ? executorFlow : initiatorFlow;

@@ -375,95 +375,14 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable();
-//				} else {
-//					Store16 store = Editor16.getStore16();
-//
-//					elementsTableModel.clear();
-//					List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
-//					for (ProjectTypeType project : projects) {
-//						if (project.getDescription().toUpperCase().contains(filterString)
-//								|| project.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(project);
-//						}
-//					}
-//					List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
-//					for (PersonTypeType person : persons) {
-//						if (person.getDescription().toUpperCase().contains(filterString)
-//								|| person.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(person);
-//						}
-//					}
-//					List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
-//					for (OrganisationTypeType organisation : organisations) {
-//						if (organisation.getDescription().toUpperCase().contains(filterString)
-//								|| organisation.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(organisation);
-//						}
-//					}
-//					List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
-//					for (GroupTypeType group : groups) {
-//						if (group.getDescription().toUpperCase().contains(filterString)
-//								|| group.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(group);
-//						}
-//					}
-//					List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
-//					for (AppendixTypeType appendix : appendices) {
-//						if (appendix.getDescription().toUpperCase().contains(filterString)
-//								|| appendix.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(appendix);
-//						}
-//					}
-//					List<TransactionPhaseTypeType> transactionPhases = store
-//							.getElements(TransactionPhaseTypeType.class);
-//					for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
-//						if (transactionPhase.getDescription().toUpperCase().contains(filterString)
-//								|| transactionPhase.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(transactionPhase);
-//						}
-//					}
-//				}
-
 				fillTable();
 			}
-
 		});
 
 	}
 
 	@Override
 	public void fillTable() {
-//		Store16 store = Editor16.getStore16();
-//
-//		elementsTableModel.clear();
-//		List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
-//		for (ProjectTypeType project : projects) {
-//			elementsTableModel.add(project);
-//		}
-//		List<PersonTypeType> persons = store.getElements(PersonTypeType.class);
-//		for (PersonTypeType person : persons) {
-//			elementsTableModel.add(person);
-//		}
-//		List<OrganisationTypeType> organisations = store.getElements(OrganisationTypeType.class);
-//		for (OrganisationTypeType organisation : organisations) {
-//			elementsTableModel.add(organisation);
-//		}
-//		List<GroupTypeType> groups = store.getElements(GroupTypeType.class);
-//		for (GroupTypeType group : groups) {
-//			elementsTableModel.add(group);
-//		}
-//		List<AppendixTypeType> appendices = store.getElements(AppendixTypeType.class);
-//		for (AppendixTypeType appendix : appendices) {
-//			elementsTableModel.add(appendix);
-//		}
-//		List<TransactionPhaseTypeType> transactionPhases = store.getElements(TransactionPhaseTypeType.class);
-//		for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
-//			elementsTableModel.add(transactionPhase);
-//		}
-
 		String filterString = tfd_Filter.getText().toUpperCase();
 		if (filterString.isEmpty()) {
 			Store16 store = Editor16.getStore16();

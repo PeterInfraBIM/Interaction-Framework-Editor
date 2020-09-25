@@ -218,8 +218,6 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				}
 			}
 		}
-
-//		fillTable(SimpleElementTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -365,27 +363,6 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		Editor16.getStore16().remove(simpleElementType.getId());
 		elementsTableModel.remove(row);
 	}
-
-//	public void setUserDefinedType() {
-//		String idref = (String) cbx_UserDefinedType.getSelectedItem();
-//		if (idref != null) {
-//			UserDefinedTypeType definedType = Editor16.getStore16().getElement(UserDefinedTypeType.class, idref);
-//			SimpleElementTypeType.UserDefinedType value = objectFactory.createSimpleElementTypeTypeUserDefinedType();
-//			UserDefinedTypeTypeRef userDefinedTypeTypeRef = objectFactory.createUserDefinedTypeTypeRef();
-//			userDefinedTypeTypeRef.setIdref(definedType);
-//			value.setUserDefinedTypeRef(userDefinedTypeTypeRef);
-//			selectedElement.setUserDefinedType(value);
-//			updateLaMu(selectedElement, user);
-//			elementsTableModel.update(selectedRow);
-//		} else {
-//			if (selectedElement != null) {
-//				UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
-//				if (userDefinedType != null) {
-//					selectedElement.setUserDefinedType(null);
-//				}
-//			}
-//		}
-//	}
 
 	public void navigateUserDefinedType() {
 		String idref = (String) cbx_UserDefinedType.getSelectedItem();

@@ -8,6 +8,7 @@ import java.util.List;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
@@ -257,57 +258,12 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		return transactionsTableModel;
 	}
 
-//	private enum AppendicesTableColumns {
-//		Id, Description, Navigate;
-//
-//		@Override
-//		public String toString() {
-//			return getBundle().getString("lbl_" + name());
-//		}
-//
-//	}
-//
-//	@SuppressWarnings("serial")
-//	public class AppendicesTableModel extends ElementsTableModel<AppendixTypeType> {
-//
-//		@Override
-//		public int getColumnCount() {
-//			return AppendicesTableColumns.values().length;
-//		}
-//
-//		@Override
-//		public String getColumnName(int columnIndex) {
-//			return AppendicesTableColumns.values()[columnIndex].toString();
-//		}
-//
-//		@Override
-//		public Object getValueAt(int rowIndex, int columnIndex) {
-//			AppendixTypeType appendixElement = get(rowIndex);
-//			switch (AppendicesTableColumns.values()[columnIndex]) {
-//			case Id:
-//				return appendixElement.getId();
-//			case Description:
-//				return appendixElement.getDescription();
-//			default:
-//				break;
-//			}
-//			return null;
-//		}
-//
-//		@Override
-//		public boolean isCellEditable(int rowIndex, int columnIndex) {
-//			return columnIndex == AppendicesTableColumns.Navigate.ordinal();
-//		}
-//
-//	}
-
 	public MessagesPanelControl14() throws Exception {
 		super(MESSAGES_PANEL);
 
 		initMessagesTable();
 		initComplexElementsTable();
 		initTransactionsTable();
-//		initAppendicesTable();
 		initStartDateField();
 		initEndDateField();
 	}
@@ -464,38 +420,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		});
 	}
 
-//	@SuppressWarnings("serial")
-//	private void initAppendicesTable() {
-//		appendicesTableModel = new AppendicesTableModel();
-//		appendicesTableModel.setSorted(false);
-//		tbl_Appendices.setModel(appendicesTableModel);
-//		tbl_Appendices.setAutoCreateRowSorter(true);
-//		tbl_Appendices.setFillsViewportHeight(true);
-//		tbl_Appendices.setDropMode(DropMode.INSERT_ROWS);
-//		tbl_Appendices.setTransferHandler(getTransferHandler(tbl_Appendices, appendicesTableModel, true));
-//		tbl_Appendices.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				int selectedRow = tbl_Appendices.getSelectedRow();
-//				btn_RemoveAppendix.setEnabled(selectedRow >= 0);
-//			}
-//		});
-//		TableColumn navigateColumn = tbl_Appendices.getColumnModel()
-//				.getColumn(AppendicesTableColumns.Navigate.ordinal());
-//		navigateColumn.setMaxWidth(50);
-//		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
-//		navigateColumn.setCellEditor(new NavigatorEditor() {
-//			@Override
-//			protected void navigate() {
-//				int row = tbl_Appendices.getSelectedRow();
-//				AppendixTypeType appendixTypeType = appendicesTableModel.get(row);
-//				if (appendixTypeType != null) {
-//					Editor14.getMainFrameControl().navigate(appendixTypeType);
-//				}
-//			}
-//		});
-//	}
-
 	@Override
 	public void fillTable() {
 		String filterString = tfd_Filter.getText().toUpperCase();
@@ -511,7 +435,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 				}
 			}
 		}
-//		fillTable(MessageTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -581,27 +504,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 				cbx_ComplexElements.addItem(element.getId());
 			}
 
-//			appendicesTableModel.clear();
-//			AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
-//			if (appendixTypes != null) {
-//				List<Object> appendixList = appendixTypes.getAppendixTypeOrAppendixTypeRef();
-//				for (Object object : appendixList) {
-//					AppendixTypeType element = null;
-//					if (object instanceof AppendixTypeTypeRef) {
-//						element = (AppendixTypeType) ((AppendixTypeTypeRef) object).getIdref();
-//					} else {
-//						element = (AppendixTypeType) object;
-//					}
-//					appendicesTableModel.add(element);
-//				}
-//			}
-//			cbx_Appendices.removeAllItems();
-//			cbx_Appendices.addItem(null);
-//			List<AppendixTypeType> apElements = Editor14.getStore14().getElements(AppendixTypeType.class);
-//			for (AppendixTypeType element : apElements) {
-//				cbx_Appendices.addItem(element.getId());
-//			}
-
 			transactionsTableModel.clear();
 			List<MessageInTransactionTypeType> mittList = Editor14.getStore14()
 					.getElements(MessageInTransactionTypeType.class);
@@ -632,7 +534,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 			tfd_Category.setText("");
 			tfd_HelpInfo.setText("");
 			tfd_Code.setText("");
-//			chb_AppendixMandatory.setSelected(false);
 			transactionsTableModel.clear();
 			complexElementsTableModel.clear();
 		}
@@ -688,6 +589,12 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		MessageTypeType messageType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + messageType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		List<MessageInTransactionTypeType> elements = store.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType element : elements) {
 			Message message = element.getMessage();
@@ -725,15 +632,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		btn_AddComplexElement.setEnabled(selectedIndex > 0);
 	}
 
-//	public void selectAppendix() {
-//		int selectedIndex = cbx_Appendices.getSelectedIndex();
-//		btn_AddAppendix.setEnabled(selectedIndex > 0);
-//	}
-
-//	public void setAppendixMandatory() {
-//		selectedElement.setAppendixMandatory(chb_AppendixMandatory.isSelected());
-//	}
-
 	public void addComplexElement() {
 		String ceId = (String) cbx_ComplexElements.getSelectedItem();
 		ComplexElementTypeType element = Editor14.getStore14().getElement(ComplexElementTypeType.class, ceId);
@@ -756,6 +654,13 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		int selectedRow = tbl_ComplexElements.getSelectedRow();
 
 		ComplexElementTypeType complexElement = complexElementsTableModel.remove(selectedRow);
+
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + complexElement.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+		
 		MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
 		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 		for (Object object : list) {
@@ -778,49 +683,4 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 	}
-
-//	public void addAppendix() {
-//		String appId = (String) cbx_Appendices.getSelectedItem();
-//		AppendixTypeType element = Editor14.getStore14().getElement(AppendixTypeType.class, appId);
-//		AppendixTypeTypeRef ref = objectFactory.createAppendixTypeTypeRef();
-//		ref.setIdref(element);
-//		AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
-//		if (appendixTypes == null) {
-//			appendixTypes = objectFactory.createMessageTypeTypeAppendixTypes();
-//			selectedElement.setAppendixTypes(appendixTypes);
-//		}
-//		List<Object> list = appendixTypes.getAppendixTypeOrAppendixTypeRef();
-//		list.add(ref);
-//		appendicesTableModel.add(element);
-//		updateLaMu(selectedElement, user);
-//		elementsTableModel.update(selectedRow);
-//		cbx_Appendices.setSelectedItem(null);
-//	}
-
-//	public void removeAppendix() {
-//		int selectedRow = tbl_Appendices.getSelectedRow();
-//
-//		AppendixTypeType appendices = appendicesTableModel.remove(selectedRow);
-//		AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
-//		List<Object> list = appendixTypes.getAppendixTypeOrAppendixTypeRef();
-//		for (Object object : list) {
-//			AppendixTypeType element = null;
-//			if (object instanceof AppendixTypeTypeRef) {
-//				element = (AppendixTypeType) ((AppendixTypeTypeRef) object).getIdref();
-//			} else if (object instanceof AppendixTypeType) {
-//				element = (AppendixTypeType) object;
-//			}
-//			if (element != null) {
-//				if (appendices.equals(element)) {
-//					list.remove(object);
-//					break;
-//				}
-//			}
-//		}
-//		if (list.isEmpty()) {
-//			selectedElement.setAppendixTypes(null);
-//		}
-//		updateLaMu(selectedElement, user);
-//		elementsTableModel.update(selectedRow);
-//	}
 }

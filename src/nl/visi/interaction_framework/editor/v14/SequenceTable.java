@@ -5,6 +5,7 @@ import java.beans.PropertyChangeListener;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
@@ -302,6 +303,13 @@ public class SequenceTable extends Control14 {
 				: -1;
 		if (selectedRow > -1) {
 			SequenceRule conditionRule = sequenceTableModel.get(selectedRow);
+			
+			int response = JOptionPane.showConfirmDialog(getPanel(),
+					getBundle().getString("lbl_Remove") + ": " + conditionRule.getMitt().getId(),
+					getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (response == JOptionPane.CANCEL_OPTION)
+				return;
+			
 			switch (conditionRule.getType()) {
 			case Next:
 				removePrevious(conditionRule.getMitt(), parent);

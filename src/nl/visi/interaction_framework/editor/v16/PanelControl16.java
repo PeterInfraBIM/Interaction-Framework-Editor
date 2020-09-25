@@ -294,14 +294,6 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 			setDateLaMu.invoke(element, xgcal);
 			Method setUserLaMu = element.getClass().getMethod("setUserLaMu", new Class[] { String.class });
 			setUserLaMu.invoke(element, user);
-//			int row = 0;
-//			for (ElementType elem : elementsTableModel.elements) {
-//				if (elem.getId().equals(element.getId())) {
-//					elementsTableModel.update(row);
-//					break;
-//				}
-//				row++;
-//			}
 			tfd_DateLamu.setText(sdfDateTime.format(xgcal.toGregorianCalendar().getTime()));
 			tfd_UserLamu.setText(user);
 		} catch (DatatypeConfigurationException e) {

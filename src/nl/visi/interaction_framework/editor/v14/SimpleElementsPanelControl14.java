@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -23,6 +24,8 @@ import nl.visi.schemas._20140331.UserDefinedTypeTypeRef;
 
 public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTypeType> {
 	private static final String SIMPLE_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/SimpleElementsPanel.xml";
+
+	protected static final Class<Object> UserDefinedTypeType = null;
 
 	private JTextField tfd_Filter, tfd_InterfaceType, tfd_ValueList;
 	private JComboBox<String> cbx_GlobalElementCondition, cbx_UserDefinedType;
@@ -112,6 +115,7 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 				fillTable();
 			}
 		});
+		
 		tfd_InterfaceType.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
@@ -212,8 +216,6 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 				}
 			}
 		}
-
-//		fillTable(SimpleElementTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {
@@ -336,6 +338,12 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
 		SimpleElementTypeType simpleElementType = elementsTableModel.get(row);
 
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + simpleElementType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		List<ComplexElementTypeType> elements = store.getElements(ComplexElementTypeType.class);
 		for (ComplexElementTypeType ceType : elements) {
 			ComplexElementTypeType.SimpleElements simpleElements = ceType.getSimpleElements();
@@ -354,27 +362,6 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 		Editor14.getStore14().remove(simpleElementType.getId());
 		elementsTableModel.remove(row);
 	}
-
-//	public void setUserDefinedType() {
-//		String idref = (String) cbx_UserDefinedType.getSelectedItem();
-//		if (idref != null) {
-//			UserDefinedTypeType definedType = Editor14.getStore14().getElement(UserDefinedTypeType.class, idref);
-//			SimpleElementTypeType.UserDefinedType value = objectFactory.createSimpleElementTypeTypeUserDefinedType();
-//			UserDefinedTypeTypeRef userDefinedTypeTypeRef = objectFactory.createUserDefinedTypeTypeRef();
-//			userDefinedTypeTypeRef.setIdref(definedType);
-//			value.setUserDefinedTypeRef(userDefinedTypeTypeRef);
-//			selectedElement.setUserDefinedType(value);
-//			updateLaMu(selectedElement, user);
-//			elementsTableModel.update(selectedRow);
-//		} else {
-//			if (selectedElement != null) {
-//				UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
-//				if (userDefinedType != null) {
-//					selectedElement.setUserDefinedType(null);
-//				}
-//			}
-//		}
-//	}
 
 	public void navigateUserDefinedType() {
 		String idref = (String) cbx_UserDefinedType.getSelectedItem();

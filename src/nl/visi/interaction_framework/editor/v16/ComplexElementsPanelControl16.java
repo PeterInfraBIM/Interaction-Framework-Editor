@@ -585,20 +585,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(ComplexElementTypeType.class);
-//				} else {
-//					List<ComplexElementTypeType> elements = Editor16.getStore16()
-//							.getElements(ComplexElementTypeType.class);
-//					elementsTableModel.clear();
-//					for (ComplexElementTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -621,8 +607,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				}
 			}
 		}
-
-//		fillTable(ComplexElementTypeType.class);
 	}
 
 	protected void updateSelectionArea(ListSelectionEvent e) {

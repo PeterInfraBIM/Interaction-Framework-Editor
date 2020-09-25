@@ -8,6 +8,7 @@ import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
@@ -367,6 +368,12 @@ public class ElementConditionTable extends Control14 {
 	public void removeElementCondition() {
 		int row = tbl_ElementConditions.getSelectedRow();
 		ElementConditionType elementConditionType = elementConditionsTableModel.get(row);
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + elementConditionType.getId(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.CANCEL_OPTION)
+			return;
+
 		Editor14.getStore14().remove(elementConditionType.getId());
 		elementConditionsTableModel.remove(row);
 	}

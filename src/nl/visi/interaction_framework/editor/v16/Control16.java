@@ -20,12 +20,14 @@ import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20160331.ElementConditionType.SimpleElement;
 import nl.visi.schemas._20160331.ElementType;
+import nl.visi.schemas._20160331.GroupTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendAfter;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionType.SendBefore;
 import nl.visi.schemas._20160331.MessageInTransactionTypeConditionTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Conditions;
+import nl.visi.schemas._20160331.MessageInTransactionTypeType.Group;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Previous;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
@@ -1021,6 +1023,20 @@ public abstract class Control16 extends Control {
 						}
 					}
 				}
+			}
+		}
+		return null;
+	}
+	
+	protected static GroupTypeType getGroup(MessageInTransactionTypeType mitt) {
+		if (mitt != null) {
+			Group group = mitt.getGroup();
+			if (group != null) {
+				GroupTypeType groupType = group.getGroupType();
+				if (groupType == null) {
+					groupType = (GroupTypeType) group.getGroupTypeRef().getIdref();
+				}
+				return groupType;
 			}
 		}
 		return null;

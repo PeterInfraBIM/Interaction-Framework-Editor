@@ -723,4 +723,10 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		}
 	}
 
+	public void changeDirection() {
+		System.out.println("Change direction action: " + currentMitt.getId() + "=" + chb_Direction.isSelected());
+		currentMitt.setInitiatorToExecutor(chb_Direction.isSelected());
+		propertyChangeSupport.firePropertyChange("Direction changed", currentMitt, chb_Direction.isSelected());
+	}
+
 }

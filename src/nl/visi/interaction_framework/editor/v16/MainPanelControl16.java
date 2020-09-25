@@ -145,7 +145,6 @@ public class MainPanelControl16 extends Control16 {
 					}
 				});
 			}
-
 		});
 	}
 
