@@ -2,8 +2,6 @@ package nl.visi.interaction_framework.editor.v14;
 
 import java.awt.Component;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
@@ -39,9 +37,7 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import nl.visi.interaction_framework.editor.SelectBox;
-import nl.visi.interaction_framework.editor.v16.Control16;
 import nl.visi.interaction_framework.editor.v16.Editor16;
-import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
@@ -191,9 +187,9 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	private DefaultMutableTreeNode selectedNode;
 	private ElementConditionTable elementConditionTable;
 	private MessageInTransactionTypeType currentMitt;
-	private JTable tbl_Prev, tbl_Next;
-	private PrevNextTableModel prevTableModel, nextTableModel;
-	private JButton btn_RemovePrevious, btn_RemoveNext;
+	private JTable tbl_Prev, tbl_Next, tbl_SendBefore, tbl_SendAfter;
+	private PrevNextTableModel prevTableModel, nextTableModel, sendBeforeTableModel, sendAfterTableModel;
+	private JButton btn_RemovePrevious, btn_RemoveNext, btn_RemoveSendBefore, btn_RemoveSendAfter;
 	private JCheckBox chb_FirstMessage, chb_Direction, chb_OpenSecondaryTransactionsAllowed;
 
 	private enum PrevNextTableColumns {
@@ -384,6 +380,28 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				btn_RemoveNext.setEnabled(tbl_Next.getSelectedRow() >= 0);
 			}
 		});
+		sendBeforeTableModel = new PrevNextTableModel();
+		tbl_SendBefore.setModel(sendBeforeTableModel);
+		tbl_SendBefore.setFillsViewportHeight(true);
+		tbl_SendBefore.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+				btn_RemoveSendBefore.setEnabled(tbl_SendBefore.getSelectedRow() >= 0);
+			}
+		});
+		sendAfterTableModel = new PrevNextTableModel();
+		tbl_SendAfter.setModel(sendAfterTableModel);
+		tbl_SendAfter.setFillsViewportHeight(true);
+		tbl_SendAfter.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (e.getValueIsAdjusting())
+					return;
+				btn_RemoveSendAfter.setEnabled(tbl_SendAfter.getSelectedRow() >= 0);
+			}
+		});
 	}
 
 	void fillSequenceElements(MessageInTransactionTypeType mitt) {
@@ -396,6 +414,16 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		if (nextList != null) {
 			nextTableModel.elements.addAll(nextList);
 			nextTableModel.fireTableDataChanged();
+		}
+		List<MessageInTransactionTypeType> sendBeforeList = getSendBefores(mitt);
+		if (sendBeforeList != null) {
+			sendBeforeTableModel.elements.addAll(sendBeforeList);
+			sendBeforeTableModel.fireTableDataChanged();
+		}
+		List<MessageInTransactionTypeType> sendAfterList = getSendAfters(mitt);
+		if (sendAfterList != null) {
+			sendAfterTableModel.elements.addAll(sendAfterList);
+			sendAfterTableModel.fireTableDataChanged();
 		}
 		chb_FirstMessage.setSelected(mitt.isFirstMessage() != null ? mitt.isFirstMessage() : false);
 		chb_Direction.setSelected(mitt.isInitiatorToExecutor() != null ? mitt.isInitiatorToExecutor() : false);
@@ -668,6 +696,63 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			}
 		});
 	}
+	
+	public void addSendBefore() {
+		System.out.println("addSendBefore");
+		List<String> items = new ArrayList<>();
+		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+				.getElements(MessageInTransactionTypeType.class);
+		for (MessageInTransactionTypeType mitt : allMitts) {
+			MessageTypeType message = getMessage(mitt);
+			items.add(message.getDescription() + " [" + mitt.getId() + "]");
+		}
+		SelectBox selectBox = new SelectBox(owner, getBundle().getString("lbl_Add"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				MessageInTransactionTypeType sendBeforeMitt = Editor16.getStore16()
+						.getElement(MessageInTransactionTypeType.class, mittId);
+				Control14.addSendBefore(currentMitt, sendBeforeMitt);
+				int selectedRow = sendBeforeTableModel.getRowCount();
+				sendBeforeTableModel.elements.add(sendBeforeMitt);
+				sendBeforeTableModel.fireTableRowsInserted(selectedRow, selectedRow);
+			}
+		});
+	}
+
+	public void addSendAfter() {
+		System.out.println("addSendAfter");
+		List<String> items = new ArrayList<>();
+		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+				.getElements(MessageInTransactionTypeType.class);
+		for (MessageInTransactionTypeType mitt : allMitts) {
+			MessageTypeType message = getMessage(mitt);
+			items.add(message.getDescription() + " [" + mitt.getId() + "]");
+		}
+		SelectBox selectBox = new SelectBox(owner, getBundle().getString("lbl_Add"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				MessageInTransactionTypeType sendAfterMitt = Editor16.getStore16()
+						.getElement(MessageInTransactionTypeType.class, mittId);
+				Control14.addSendAfter(currentMitt, sendAfterMitt);
+				int selectedRow = sendAfterTableModel.getRowCount();
+				sendAfterTableModel.elements.add(sendAfterMitt);
+				sendAfterTableModel.fireTableRowsInserted(selectedRow, selectedRow);
+			}
+		});
+	}
+
 
 	public void removePrevious() {
 		int selectedRow = tbl_Prev.getSelectedRow();
@@ -696,6 +781,34 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			nextTableModel.elements.remove(selectedRow);
 			nextTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
 			propertyChangeSupport.firePropertyChange("Next removed", nextMitt, currentMitt);
+		}
+	}
+
+	public void removeSendBefore() {
+		int selectedRow = tbl_SendBefore.getSelectedRow();
+		MessageInTransactionTypeType sendBeforeMitt = sendBeforeTableModel.elements.get(selectedRow);
+		int confirm = JOptionPane.showConfirmDialog(getDialog(),
+				getBundle().getString("lbl_Remove") + " " + sendBeforeMitt.getId(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (confirm == JOptionPane.OK_OPTION) {
+			System.out.println("Remove SendBefore action: " + sendBeforeMitt.getId());
+			removeSendBefore(currentMitt, sendBeforeMitt);
+			sendBeforeTableModel.elements.remove(selectedRow);
+			sendBeforeTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
+		}
+	}
+
+	public void removeSendAfter() {
+		int selectedRow = tbl_SendAfter.getSelectedRow();
+		MessageInTransactionTypeType sendAfterMitt = sendAfterTableModel.elements.get(selectedRow);
+		int confirm = JOptionPane.showConfirmDialog(getDialog(),
+				getBundle().getString("lbl_Remove") + " " + sendAfterMitt.getId(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (confirm == JOptionPane.OK_OPTION) {
+			System.out.println("Remove SendAfter action: " + sendAfterMitt.getId());
+			removeSendAfter(currentMitt, sendAfterMitt);
+			sendAfterTableModel.elements.remove(selectedRow);
+			sendAfterTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
 		}
 	}
 

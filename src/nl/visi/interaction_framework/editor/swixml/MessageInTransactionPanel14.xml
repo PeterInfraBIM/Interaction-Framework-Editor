@@ -30,43 +30,9 @@
 	</panel>
 	<panel id="sequencePanel" layout="GridBagLayout"
 		border="EmptyBorder(8,8,8,8)">
-		<panel id="prevNextPanel" layout="GridBagLayout">
-			<gridbagconstraints Fill="GridBagConstraints.BOTH"
-				Gridx="0" Gridy="0" Weightx="1.0" Weighty="1.0" />
-			<panel layout="BorderLayout"
-				border="TitledBorder(lbl_PreviousMessages)">
-				<gridbagconstraints
-					Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Insets="2,2,2,2"
-					Weightx="1.0" Weighty="1.0" />
-				<scrollpane>
-					<table id="tbl_Prev" />
-				</scrollpane>
-				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
-					<button id="btn_AddPrevious" action="addPrevious"
-						text="lbl_Add" enabled="true" />
-					<button id="btn_RemovePrevious" action="removePrevious"
-						text="lbl_Remove" enabled="false" />
-				</panel>
-			</panel>
-			<panel layout="BorderLayout"
-				border="TitledBorder(lbl_NextMessages)">
-				<gridbagconstraints
-					Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="1" Insets="2,2,2,2"
-					Weightx="1.0" Weighty="1.0" />
-				<scrollpane>
-					<table id="tbl_Next" />
-				</scrollpane>
-				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
-					<button id="btn_AddNext" action="addNext" text="lbl_Add"
-						enabled="true" />
-					<button id="btn_RemoveNext" action="removeNext"
-						text="lbl_Remove" enabled="false" />
-				</panel>
-			</panel>
-		</panel>
 		<panel id="checkboxPanel" layout="GridBagLayout">
 			<gridbagconstraints Fill="GridBagConstraints.BOTH"
-				Gridx="0" Gridy="1" Weightx="1.0" />
+				Gridx="0" Gridy="0" Weightx="1.0" />
 			<checkbox id="chb_FirstMessage" text="lbl_FirstMessage">
 				<gridbagconstraints
 					Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
@@ -90,5 +56,54 @@
 					Weighty="1.0" />
 			</panel>
 		</panel>
+		<tabbedpane id="prevNextPanel"
+			Titles="lbl_PreviousMessages,lbl_NextMessages,lbl_SendBefore,lbl_SendAfter">
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="1" Weightx="1.0" Weighty="1.0" />
+			<panel layout="BorderLayout">
+				<scrollpane>
+					<table id="tbl_Prev" />
+				</scrollpane>
+				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
+					<button id="btn_AddPrevious" action="addPrevious"
+						text="lbl_Add" enabled="true" />
+					<button id="btn_RemovePrevious" action="removePrevious"
+						text="lbl_Remove" enabled="false" />
+				</panel>
+			</panel>
+			<panel layout="BorderLayout">
+				<scrollpane>
+					<table id="tbl_Next" />
+				</scrollpane>
+				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
+					<button id="btn_AddNext" action="addNext" text="lbl_Add"
+						enabled="true" />
+					<button id="btn_RemoveNext" action="removeNext"
+						text="lbl_Remove" enabled="false" />
+				</panel>
+			</panel>
+			<panel layout="BorderLayout">
+				<scrollpane>
+					<table id="tbl_SendBefore" />
+				</scrollpane>
+				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
+					<button id="btn_AddSendBefore" action="addSendBefore"
+						text="lbl_Add" enabled="true" />
+					<button id="btn_RemoveSendBefore" action="removeSendBefore"
+						text="lbl_Remove" enabled="false" />
+				</panel>
+			</panel>
+			<panel layout="BorderLayout">
+				<scrollpane>
+					<table id="tbl_SendAfter" />
+				</scrollpane>
+				<panel constraints="Borderlayout.SOUTH" layout="FlowLayout">
+					<button id="btn_AddSendAfter" action="addSendAfter"
+						text="lbl_Add" enabled="true" />
+					<button id="btn_RemoveSendAfter" action="removeSendAfter"
+						text="lbl_Remove" enabled="false" />
+				</panel>
+			</panel>
+		</tabbedpane>
 	</panel>
 </tabbedpane>
