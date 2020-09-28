@@ -472,6 +472,7 @@ public class Canvas16 extends JPanel {
 							historyAfter.clear();
 						} else {
 							int index = transactionPanel.elementsTableModel.elements.indexOf(transaction);
+							index = transactionPanel.tbl_Elements.getRowSorter().convertRowIndexToView(index);
 							transactionPanel.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
 							selectedTransaction = transaction;
 							initNewDiagram();
