@@ -63,8 +63,6 @@ import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
-import nl.visi.interaction_framework.editor.v16.Control16;
-import nl.visi.interaction_framework.editor.v16.MessageInTransactionDialogControl16;
 import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20140331.GroupTypeType;
@@ -105,7 +103,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private JComboBox<String> cbx_TransactionPhases;
 
 	private JComboBox<String> cbx_Groups;
-	private MessagesTableModel messagesTableModel;
+	MessagesTableModel messagesTableModel;
 	private SequenceTable sequenceTable;
 	ElementConditionTable elementConditionTable;
 	private MessageInTransactionDialogControl14 messageInTransactionDialogControl;

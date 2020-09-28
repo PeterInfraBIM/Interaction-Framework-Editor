@@ -20,12 +20,14 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -52,6 +54,8 @@ public class Canvas14 extends JPanel {
 	private static final Color LIGHT_YELLOW_4 = new Color(255, 255, 215);
 	private static final Color LIGHT_GOLD_4 = new Color(255, 233, 148);
 	private static final int MESSAGE_LINE_HEIGHT = 24;
+	private final ImageIcon greenCircleIcon, redCircleIcon;
+
 	final private ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
 	private final TransactionsPanelControl14 transactionPanel;
 	TransactionTypeType selectedTransaction;
@@ -252,10 +256,11 @@ public class Canvas14 extends JPanel {
 										}
 										break;
 									case "Direction changed":
-										MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt.getOldValue();
+										MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt
+												.getOldValue();
 										Boolean direction = (Boolean) evt.getNewValue();
-										System.out.println(
-												"Direction changed: " + currentMitt.getId() + "=" + direction.booleanValue());
+										System.out.println("Direction changed: " + currentMitt.getId() + "="
+												+ direction.booleanValue());
 										currentMitt.setInitiatorToExecutor(direction);
 										break;
 									}
@@ -621,48 +626,16 @@ public class Canvas14 extends JPanel {
 			}
 		}
 
-		private boolean isStartMessage() {
-			if (!Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
-				return false;
-			}
-			List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(mitt);
-			if (prevMitts == null) {
-				return true;
-			}
-			for (MessageInTransactionTypeType prev : prevMitts) {
-				if (Control14.getTransaction(prev).getId().equals(selectedTransaction.getId())) {
-					return false;
-				}
-			}
-			return true;
-		}
-
-		private boolean isEndMessage() {
-			if (!Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
-				return false;
-			}
-			List<MessageInTransactionTypeType> nextMitts = Control14.getNext(mitt);
-			if (nextMitts == null) {
-				return true;
-			}
-			for (MessageInTransactionTypeType next : nextMitts) {
-				if (Control14.getTransaction(next).getId().equals(selectedTransaction.getId())) {
-					return false;
-				}
-			}
-			return true;
-		}
-
 		void paint(int y) {
 			setTitleAndToolTip(mitt);
 
-			if (isStartMessage()) {
-				activeLabel.setBorder(BorderFactory.createCompoundBorder(
-						BorderFactory.createLineBorder(LIGHT_GREEN_1, 2), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
-			}
-			if (isEndMessage()) {
+			if (isEndMessage(mitt)) {
 				activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_RED_1, 2),
 						BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+			}
+			if (isStartMessage(mitt)) {
+				activeLabel.setBorder(BorderFactory.createCompoundBorder(
+						BorderFactory.createLineBorder(LIGHT_GREEN_1, 2), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 			}
 			TransactionTypeType transaction = Control14.getTransaction(mitt);
 			int stringWidth = g2d.getFontMetrics().stringWidth(this.activeLabel.getText());
@@ -999,6 +972,12 @@ public class Canvas14 extends JPanel {
 	}
 
 	public Canvas14(final TransactionsPanelControl14 transactionPanel) {
+		URL greenCircleURL = this.getClass()
+				.getResource("/nl/visi/interaction_framework/editor/icons/circle-green-16.png");
+		greenCircleIcon = new ImageIcon(greenCircleURL);
+		URL redCircleURL = this.getClass().getResource("/nl/visi/interaction_framework/editor/icons/circle-red-16.png");
+		redCircleIcon = new ImageIcon(redCircleURL);
+
 		addComponentListener(new ResizeListener());
 		this.transactionPanel = transactionPanel;
 		this.printMode = false;
@@ -1080,6 +1059,11 @@ public class Canvas14 extends JPanel {
 							}
 						});
 				selectMenu.add(msgItem);
+
+				if (isEndMessage(mitt))
+					msgItem.setIcon(redCircleIcon);
+				if (isStartMessage(mitt))
+					msgItem.setIcon(greenCircleIcon);
 			}
 		}
 	}
@@ -1258,8 +1242,8 @@ public class Canvas14 extends JPanel {
 	private int drawConnectorBoxes(List<Message> messageList, Message lastMsg, int lastY) {
 		if (messageList == null) {
 //			g2d.setColor(Color.GREEN);
-			boolean startMessage = selectedMessage.isStartMessage();
-			boolean endMessage = selectedMessage.isEndMessage();
+			boolean startMessage = isStartMessage(selectedMessage.mitt);
+			boolean endMessage = isEndMessage(selectedMessage.mitt);
 			drawConnectorBox(getStartX(selectedMessage), lastY, 1, lastMsg == null ? BoxType.CLOSED : BoxType.OPEN_TOP,
 					startMessage ? LIGHT_GREEN_1 : Color.WHITE);
 			drawConnectorBox(getEndX(selectedMessage), lastY, 1,
@@ -1272,8 +1256,8 @@ public class Canvas14 extends JPanel {
 				Message prevMsg = index > 0 ? messageList.get(index - 1) : lastMsg;
 				Message currMsg = messageList.get(index);
 				Message nextMsg = index < messageList.size() - 1 ? messageList.get(index + 1) : null;
-				boolean startMessage = currMsg.isStartMessage();
-				boolean endMessage = currMsg.isEndMessage();
+				boolean startMessage = isStartMessage(currMsg.mitt);
+				boolean endMessage = isEndMessage(currMsg.mitt);
 
 				if (prevMsg == null) {
 					switch (currMsg.getState()) {
@@ -1487,6 +1471,38 @@ public class Canvas14 extends JPanel {
 		if (executor != null) {
 			executor.x = executorFlow - 50;
 		}
+	}
+
+	private boolean isStartMessage(MessageInTransactionTypeType mitt) {
+		if (!Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
+			return false;
+		}
+		List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(mitt);
+		if (prevMitts == null) {
+			return true;
+		}
+		for (MessageInTransactionTypeType prev : prevMitts) {
+			if (Control14.getTransaction(prev).getId().equals(selectedTransaction.getId())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isEndMessage(MessageInTransactionTypeType mitt) {
+		if (!Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
+			return false;
+		}
+		List<MessageInTransactionTypeType> nextMitts = Control14.getNext(mitt);
+		if (nextMitts == null) {
+			return true;
+		}
+		for (MessageInTransactionTypeType next : nextMitts) {
+			if (Control14.getTransaction(next).getId().equals(selectedTransaction.getId())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }
