@@ -323,7 +323,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 
 	public void itemDown() throws BadLocationException {
 		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
-		String removedItem = removeEnumerationElement(selectedRow);
+		String removedItem = removeEnumerationElement(selectedRow, false);
 		if (removedItem != null) {
 			boolean success = insertEnumerationElement(selectedRow + 1, removedItem);
 			if (success) {
@@ -338,7 +338,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 
 	public void itemUp() throws BadLocationException {
 		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
-		String removedItem = removeEnumerationElement(selectedRow);
+		String removedItem = removeEnumerationElement(selectedRow, false);
 		if (removedItem != null) {
 			boolean success = insertEnumerationElement(selectedRow - 1, removedItem);
 			if (success) {
@@ -353,7 +353,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 
 	public void itemRemove() throws BadLocationException {
 		int selectedRow = tbl_XsdEnumerations.getSelectedRow();
-		String removedItem = removeEnumerationElement(selectedRow);
+		String removedItem = removeEnumerationElement(selectedRow, true);
 		if (removedItem != null) {
 			initXsdRestriction();
 			xsdEnumerationsTableModel.removeItem(selectedRow);
@@ -361,7 +361,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		}
 	}
 
-	private String removeEnumerationElement(int removeIndex) throws BadLocationException {
+	private String removeEnumerationElement(int removeIndex, boolean warning) throws BadLocationException {
 		Document document = tfd_XsdRestriction.getDocument();
 		String text = document.getText(0, document.getLength());
 		int beginIndex = findBeginIndexEnumerationElement(text, removeIndex);
@@ -371,13 +371,14 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		if (endIndex == -1)
 			return null;
 		String removedItem = document.getText(beginIndex, endIndex + 3 - beginIndex);
-		
-		int response = JOptionPane.showConfirmDialog(getPanel(),
-				getBundle().getString("lbl_Remove") + ": " + removedItem,
-				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-		if (response == JOptionPane.CANCEL_OPTION)
-			return null;
 
+		if (warning) {
+			int response = JOptionPane.showConfirmDialog(getPanel(),
+					getBundle().getString("lbl_Remove") + ": " + removedItem, getBundle().getString("lbl_Remove"),
+					JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (response == JOptionPane.CANCEL_OPTION)
+				return null;
+		}
 		document.remove(beginIndex, endIndex + 3 - beginIndex);
 		tfd_XsdRestriction.setDocument(document);
 		return removedItem;
@@ -609,7 +610,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
-		
+
 		List<SimpleElementTypeType> elements = store.getElements(SimpleElementTypeType.class);
 		for (SimpleElementTypeType element : elements) {
 			UserDefinedType dataType = element.getUserDefinedType();

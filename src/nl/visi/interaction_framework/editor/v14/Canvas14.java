@@ -482,6 +482,8 @@ public class Canvas14 extends JPanel {
 							transactionPanel.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
 							selectedTransaction = transaction;
 							initNewDiagram();
+							transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+							transactionPanel.getDrawingPlane().repaint();
 						}
 						break;
 					case Previous:
@@ -493,9 +495,12 @@ public class Canvas14 extends JPanel {
 							historyBefore.clear();
 						} else {
 							int index = transactionPanel.elementsTableModel.elements.indexOf(transaction);
+							index = transactionPanel.tbl_Elements.getRowSorter().convertRowIndexToView(index);
 							transactionPanel.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
 							selectedTransaction = transaction;
 							initNewDiagram();
+							transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+							transactionPanel.getDrawingPlane().repaint();
 						}
 						break;
 					case Selected:
@@ -1225,10 +1230,12 @@ public class Canvas14 extends JPanel {
 			lastY = drawConnectorBoxes(historyAfter, selectedMessage, lastY);
 
 		} else {
+			lastY = y;
 			for (Message message : selectedNext) {
 				message.paint(y);
+				y += MESSAGE_LINE_HEIGHT;
 			}
-			drawConnectorBox(initiatorFlow, y, selectedNext.size(), BoxType.CLOSED, Color.WHITE);
+			drawConnectorBox(initiatorFlow, lastY, selectedNext.size(), BoxType.CLOSED, Color.WHITE);
 		}
 
 		if (y > getHeight()) {
@@ -1475,6 +1482,8 @@ public class Canvas14 extends JPanel {
 	}
 
 	private boolean isStartMessage(MessageInTransactionTypeType mitt) {
+		if (mitt.isFirstMessage() != null && mitt.isFirstMessage())
+			return true;
 		if (!Control14.getTransaction(mitt).getId().equals(selectedTransaction.getId())) {
 			return false;
 		}

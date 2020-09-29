@@ -1409,11 +1409,14 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 			// Any candidates with zero previous mitt's ?
 			Iterator<MessageInTransactionTypeType> iterator = startCandidates.iterator();
+			List<MessageInTransactionTypeType> firstMessageMitts = new ArrayList<MessageInTransactionTypeType>();
 			List<MessageInTransactionTypeType> zeroPreviousMitts = new ArrayList<MessageInTransactionTypeType>();
 			List<MessageInTransactionTypeType> foreignPreviousMitts = new ArrayList<MessageInTransactionTypeType>();
 			while (iterator.hasNext()) {
 				MessageInTransactionTypeType mitt = iterator.next();
-				if (mitt.getPrevious() == null) {
+				if (mitt.isFirstMessage() != null && mitt.isFirstMessage()) {
+					firstMessageMitts.add(mitt);
+				} else if (mitt.getPrevious() == null) {
 					zeroPreviousMitts.add(mitt);
 				} else {
 					List<Object> previousList = mitt.getPrevious()
@@ -1440,6 +1443,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				}
 			}
 			startCandidates.clear();
+			startCandidates.addAll(firstMessageMitts);
 			startCandidates.addAll(zeroPreviousMitts);
 			startCandidates.addAll(foreignPreviousMitts);
 
