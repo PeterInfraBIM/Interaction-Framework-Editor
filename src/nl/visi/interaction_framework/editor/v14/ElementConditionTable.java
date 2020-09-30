@@ -336,8 +336,10 @@ public class ElementConditionTable extends Control14 {
 						Set<SimpleElementTypeType> seElementSet = new HashSet<SimpleElementTypeType>();
 						for (ComplexElementTypeType ce : msgComplexElements) {
 							List<SimpleElementTypeType> simpleElements = getSimpleElements(ce);
-							for (SimpleElementTypeType simpleElement : simpleElements) {
-								seElementSet.add(simpleElement);
+							if (simpleElements != null) {
+								for (SimpleElementTypeType simpleElement : simpleElements) {
+									seElementSet.add(simpleElement);
+								}
 							}
 						}
 						if (seElementSet.contains(ecSimpleElement)) {
