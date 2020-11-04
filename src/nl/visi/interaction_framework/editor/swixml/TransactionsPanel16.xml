@@ -19,8 +19,9 @@
 	<splitpane constraints="BorderLayout.CENTER"
 		ContinuousLayout="true" DividerLocation="220"
 		OneTouchExpandable="true" Orientation="JSplitPane.VERTICAL_SPLIT">
-		<splitpane ContinuousLayout="true" DividerLocation="0.5" OneTouchExpandable="true"
-			Orientation="JSplitPane.HORIZONTAL_SPLIT">
+		<splitpane ContinuousLayout="true" OneTouchExpandable="true"
+			Orientation="JSplitPane.HORIZONTAL_SPLIT" DividerLocation="600"
+			ResizeWeight="1.0">
 			<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 				<scrollpane>
 					<gridbagconstraints

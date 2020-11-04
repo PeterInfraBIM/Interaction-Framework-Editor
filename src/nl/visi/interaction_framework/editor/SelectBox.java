@@ -100,7 +100,10 @@ public class SelectBox extends JDialog {
 		itemList = new JList<>();
 		listModel = new DefaultListModel<>();
 		itemList.setModel(listModel);
-		listModel.addAll(items);
+//		listModel.addAll(items);
+		for (String item : items) {
+			listModel.addElement(item);
+		}
 		itemList.addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -121,7 +124,10 @@ public class SelectBox extends JDialog {
 		String filterTextUc = filterText.toUpperCase();
 		if (filterText.equals("")) {
 			listModel.clear();
-			listModel.addAll(SelectBox.this.items);
+//			listModel.addAll(SelectBox.this.items);
+			for (String item : SelectBox.this.items) {
+				listModel.addElement(item);
+			}
 		} else {
 			listModel.clear();
 			for (String item : SelectBox.this.items) {

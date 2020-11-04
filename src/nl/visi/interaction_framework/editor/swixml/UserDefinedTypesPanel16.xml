@@ -26,7 +26,7 @@
 		ContinuousLayout="true" DividerLocation="220"
 		OneTouchExpandable="true" Orientation="JSplitPane.VERTICAL_SPLIT">
 		<splitpane constraints="BorderLayout.CENTER"
-			ContinuousLayout="true" DividerLocation="0.5"
+			ContinuousLayout="true" DividerLocation="600" ResizeWeight="1.0"
 			OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT">
 			<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 				<scrollpane>
@@ -71,7 +71,7 @@
 					</textfield>
 				</panel>
 			</panel>
-						<scrollpane Border="TitledBorder(lbl_Attributes)">
+			<scrollpane Border="TitledBorder(lbl_Attributes)">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<label Text="lbl_Id">
 						<gridbagconstraints
@@ -247,11 +247,11 @@
 								Insets="2,2,2,2" />
 						</button>
 					</panel>
-<!-- 					<panel> -->
-<!-- 						<gridbagconstraints -->
-<!-- 							Fill="GridBagConstraints.BOTH" Gridwidth="2" Gridx="0" Gridy="3" -->
-<!-- 							Weightx="1.0" Weighty="1.0" /> -->
-<!-- 					</panel> -->
+					<!-- <panel> -->
+					<!-- <gridbagconstraints -->
+					<!-- Fill="GridBagConstraints.BOTH" Gridwidth="2" Gridx="0" Gridy="3" -->
+					<!-- Weightx="1.0" Weighty="1.0" /> -->
+					<!-- </panel> -->
 				</panel>
 			</scrollpane>
 		</splitpane>
