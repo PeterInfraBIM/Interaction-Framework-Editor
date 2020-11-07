@@ -20,7 +20,7 @@
 		ContinuousLayout="true" DividerLocation="220"
 		OneTouchExpandable="true" Orientation="JSplitPane.VERTICAL_SPLIT">
 		<splitpane ContinuousLayout="true" OneTouchExpandable="true"
-			Orientation="JSplitPane.HORIZONTAL_SPLIT" DividerLocation="600"
+			Orientation="JSplitPane.HORIZONTAL_SPLIT" DividerLocation="580"
 			ResizeWeight="1.0">
 			<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 				<scrollpane>

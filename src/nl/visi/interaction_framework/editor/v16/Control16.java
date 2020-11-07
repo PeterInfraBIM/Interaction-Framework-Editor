@@ -13,6 +13,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 import nl.visi.interaction_framework.editor.Control;
+import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
@@ -36,6 +37,9 @@ import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.MessageTypeType.ComplexElements;
 import nl.visi.schemas._20160331.ObjectFactory;
+import nl.visi.schemas._20160331.OrganisationTypeType;
+import nl.visi.schemas._20160331.PersonTypeType;
+import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
@@ -457,6 +461,94 @@ public abstract class Control16 extends Control {
 	protected static List<ComplexElementTypeType> getComplexElements(MessageTypeType messageType) {
 		if (messageType != null) {
 			ComplexElements complexElements = messageType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(AppendixTypeType appendixType) {
+		if (appendixType != null) {
+			AppendixTypeType.ComplexElements complexElements = appendixType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(OrganisationTypeType organisationType) {
+		if (organisationType != null) {
+			OrganisationTypeType.ComplexElements complexElements = organisationType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(PersonTypeType personType) {
+		if (personType != null) {
+			PersonTypeType.ComplexElements complexElements = personType.getComplexElements();
+			if (complexElements != null) {
+				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
+				ComplexElementTypeType complexElementType = null;
+				List<Object> complexElementObjects = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object complexElementObject : complexElementObjects) {
+					if (complexElementObject instanceof ComplexElementTypeType) {
+						complexElementType = (ComplexElementTypeType) complexElementObject;
+					} else {
+						complexElementType = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) complexElementObject)
+								.getIdref();
+					}
+					complexElementTypeList.add(complexElementType);
+				}
+				return complexElementTypeList;
+			}
+		}
+		return null;
+	}
+
+	protected static List<ComplexElementTypeType> getComplexElements(ProjectTypeType projectType) {
+		if (projectType != null) {
+			ProjectTypeType.ComplexElements complexElements = projectType.getComplexElements();
 			if (complexElements != null) {
 				List<ComplexElementTypeType> complexElementTypeList = new ArrayList<>();
 				ComplexElementTypeType complexElementType = null;
@@ -1010,8 +1102,7 @@ public abstract class Control16 extends Control {
 					}
 
 				} else {
-					if ((complexElements != null && complexElements.size() == 2
-							&& pce != null
+					if ((complexElements != null && complexElements.size() == 2 && pce != null
 							&& complexElements.get(0).getId().equals(pce.getId()) && cce != null
 							&& complexElements.get(1).getId().equals(cce.getId()))
 							|| (complexElements == null && pce == null && cce == null)) {
@@ -1027,7 +1118,7 @@ public abstract class Control16 extends Control {
 		}
 		return null;
 	}
-	
+
 	protected static GroupTypeType getGroup(MessageInTransactionTypeType mitt) {
 		if (mitt != null) {
 			Group group = mitt.getGroup();
@@ -1040,5 +1131,105 @@ public abstract class Control16 extends Control {
 			}
 		}
 		return null;
+	}
+
+	protected static List<ElementType> getUseElements(ComplexElementTypeType ce) {
+		List<ElementType> useElements = new ArrayList<>();
+		// Complex elements
+		List<ComplexElementTypeType> complexElementTypes = Editor16.getStore16()
+				.getElements(ComplexElementTypeType.class);
+		for (ComplexElementTypeType complexElementType : complexElementTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(complexElementType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(complexElementType);
+			}
+		}
+		// Messages
+		List<MessageTypeType> messageTypes = Editor16.getStore16().getElements(MessageTypeType.class);
+		for (MessageTypeType messageType : messageTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(messageType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(messageType);
+			}
+		}
+		// Appendices
+		List<AppendixTypeType> appendixTypes = Editor16.getStore16().getElements(AppendixTypeType.class);
+		for (AppendixTypeType appendixType : appendixTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(appendixType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(appendixType);
+			}
+		}
+		// Organisations
+		List<OrganisationTypeType> organisationTypes = Editor16.getStore16().getElements(OrganisationTypeType.class);
+		for (OrganisationTypeType organisationType : organisationTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(organisationType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(organisationType);
+			}
+		}
+		// Persons
+		List<PersonTypeType> personTypes = Editor16.getStore16().getElements(PersonTypeType.class);
+		for (PersonTypeType personType : personTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(personType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(personType);
+			}
+		}
+		// Projects
+		List<ProjectTypeType> projectTypes = Editor16.getStore16().getElements(ProjectTypeType.class);
+		for (ProjectTypeType projectType : projectTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(projectType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(projectType);
+			}
+		}
+		// Element conditions
+		List<ElementConditionType> elementConditions = Editor16.getStore16().getElements(ElementConditionType.class);
+		for (ElementConditionType elementCondition : elementConditions) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(elementCondition);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(elementCondition);
+			}
+		}
+
+		return useElements.isEmpty() ? null : useElements;
+	}
+
+	protected static List<ElementType> getUseElements(SimpleElementTypeType se) {
+		List<ElementType> useElements = new ArrayList<>();
+		// Complex elements
+		List<ComplexElementTypeType> complexElementTypes = Editor16.getStore16()
+				.getElements(ComplexElementTypeType.class);
+		for (ComplexElementTypeType complexElementType : complexElementTypes) {
+			List<SimpleElementTypeType> simpleElements = getSimpleElements(complexElementType);
+			if (simpleElements != null && simpleElements.contains(se)) {
+				useElements.add(complexElementType);
+			}
+		}
+		// Element conditions
+		List<ElementConditionType> elementConditions = Editor16.getStore16().getElements(ElementConditionType.class);
+		for (ElementConditionType elementCondition : elementConditions) {
+			SimpleElementTypeType simpleElement = getSimpleElement(elementCondition);
+			if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
+				useElements.add(elementCondition);
+			}
+		}
+
+		return useElements.isEmpty() ? null : useElements;
+	}
+	
+	protected static List<ElementType> getUseElements(UserDefinedTypeType udt) {
+		List<ElementType> useElements = new ArrayList<>();
+		// Simple elements
+		List<SimpleElementTypeType> simpleElementTypes = Editor16.getStore16()
+				.getElements(SimpleElementTypeType.class);
+		for (SimpleElementTypeType simpleElementType : simpleElementTypes) {
+			UserDefinedTypeType userDefinedType = getUserDefinedType(simpleElementType);
+			if (userDefinedType != null && userDefinedType.getId().equals(udt.getId())) {
+				useElements.add(simpleElementType);
+			}
+		}
+		return useElements.isEmpty() ? null : useElements;
 	}
 }

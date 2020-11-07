@@ -7,16 +7,24 @@ import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ElementConditionType;
+import nl.visi.schemas._20160331.ElementType;
+import nl.visi.schemas._20160331.MessageTypeType;
+import nl.visi.schemas._20160331.OrganisationTypeType;
+import nl.visi.schemas._20160331.PersonTypeType;
+import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20160331.UserDefinedTypeType;
@@ -30,7 +38,79 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 	private JTextField tfd_InterfaceType, tfd_ValueList;
 	private JComboBox<String> cbx_GlobalElementCondition, cbx_UserDefinedType;
 	private JButton btn_NavigateUserDefinedType;
+	private JTable tbl_UseElements;
+	private UseElementsTableModel useElementsTableModel;
 
+	private enum UseElementsTableColumns {
+		Id, Description, Type, Navigate;
+
+		@Override
+		public String toString() {
+			return getBundle().getString("lbl_" + name());
+		}
+	}
+
+	@SuppressWarnings("serial")
+	public class UseElementsTableModel extends ElementsTableModel<ElementType> {
+
+		@Override
+		public int getColumnCount() {
+			return UseElementsTableColumns.values().length;
+		}
+
+		@Override
+		public String getColumnName(int columnIndex) {
+			return UseElementsTableColumns.values()[columnIndex].toString();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			ElementType useElementType = get(rowIndex);
+
+			switch (UseElementsTableColumns.values()[columnIndex]) {
+			case Id:
+				return useElementType.getId();
+			case Description:
+				switch (useElementType.getClass().getSimpleName()) {
+				case "AppendixTypeType":
+					return ((AppendixTypeType) useElementType).getDescription();
+				case "ComplexElementTypeType":
+					return ((ComplexElementTypeType) useElementType).getDescription();
+				case "ElementConditionType":
+					return ((ElementConditionType) useElementType).getDescription();
+				case "MessageTypeType":
+					return ((MessageTypeType) useElementType).getDescription();
+				case "OrganisationTypeType":
+					return ((OrganisationTypeType) useElementType).getDescription();
+				case "PersonTypeType":
+					return ((PersonTypeType) useElementType).getDescription();
+				case "ProjectTypeType":
+					return ((ProjectTypeType) useElementType).getDescription();
+				}
+				return null;
+			case Type:
+				String simpleName = useElementType.getClass().getSimpleName();
+				int lastIndexOfType = simpleName.lastIndexOf("Type");
+				return simpleName.substring(0, lastIndexOfType);
+			default:
+				break;
+			}
+
+			return null;
+		}
+		
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			switch (UseElementsTableColumns.values()[columnIndex]) {
+			case Navigate:
+				return true;
+			default:
+				return false;
+			}
+		}
+	}
+
+	
 	private enum SimpleElementsTableColumns {
 //		Id, Description, InterfaceType, State, DateLamu, UserLamu;
 		Id, Description;
@@ -77,6 +157,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		}
 	}
 
+	@SuppressWarnings("serial")
 	public SimpleElementsPanelControl16() throws Exception {
 		super(SIMPLE_ELEMENTS_PANEL);
 		elementsTableModel = new SimpleElementsTableModel();
@@ -200,6 +281,27 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				}
 			}
 		});
+		
+		useElementsTableModel = new UseElementsTableModel();
+		tbl_UseElements.setModel(useElementsTableModel);
+		tbl_UseElements.setFillsViewportHeight(true);
+		tbl_UseElements.setAutoCreateRowSorter(true);
+		TableColumn navigateColumn = tbl_UseElements.getColumnModel()
+				.getColumn(UseElementsTableColumns.Navigate.ordinal());
+		navigateColumn.setMaxWidth(50);
+		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
+		navigateColumn.setCellEditor(new NavigatorEditor() {
+			@Override
+			protected void navigate() {
+				int row = tbl_UseElements.getSelectedRow();
+				row = tbl_UseElements.getRowSorter().convertRowIndexToModel(row);
+				ElementType useElementType = useElementsTableModel.get(row);
+				if (useElementType != null) {
+					InteractionFrameworkEditor.navigate(useElementType);
+				}
+			}
+		});
+
 	}
 
 	@Override
@@ -274,6 +376,13 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				}
 				cbx_UserDefinedType.setSelectedItem(userDefined.getId());
 			}
+			useElementsTableModel.clear();
+			List<ElementType> useElements = getUseElements(selectedElement);
+			if (useElements != null) {
+				for (ElementType elementType : useElements) {
+					useElementsTableModel.add(elementType);
+				}
+			}
 		} else {
 			selectedElement = null;
 			tfd_Id.setText("");
@@ -288,6 +397,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			tfd_ValueList.setText("");
 			cbx_UserDefinedType.removeAllItems();
 			btn_NavigateUserDefinedType.setEnabled(false);
+			useElementsTableModel.clear();
 		}
 		inSelection = false;
 	}

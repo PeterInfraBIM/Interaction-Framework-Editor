@@ -29,22 +29,26 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import nl.visi.interaction_framework.editor.DocumentAdapter;
+import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20140331.SimpleElementTypeType;
 import nl.visi.schemas._20140331.SimpleElementTypeType.UserDefinedType;
 import nl.visi.schemas._20140331.UserDefinedTypeType;
+import nl.visi.schemas._20140331.ElementType;
 
 public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTypeType> {
 	private static final String USER_DEFINED_TYPES_PANEL = "nl/visi/interaction_framework/editor/swixml/UserDefinedTypesPanel16.xml";
 
 	private JTextField tfd_XsdRestriction;
 	private JComboBox<String> cbx_BaseType;
-	private JTable tbl_XsdEnumerations;
+	private JTable tbl_XsdEnumerations, tbl_UseElements;
 	private XsdEnumerationsTableModel xsdEnumerationsTableModel;
+	private UseElementsTableModel useElementsTableModel;
 	private JTextField tfd_ItemText;
 	private JButton btn_ItemAdd, btn_ItemRemove, btn_Paste, btn_Alpha, btn_ItemUp, btn_ItemDown;
 	private JPopupMenu popupMenu;
@@ -172,12 +176,70 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 
 	}
 
+	private enum UseElementsTableColumns {
+		Id, Description, Type, Navigate;
+
+		@Override
+		public String toString() {
+			return getBundle().getString("lbl_" + name());
+		}
+	}
+	
+	@SuppressWarnings("serial")
+	public class UseElementsTableModel extends ElementsTableModel<ElementType> {
+
+		@Override
+		public int getColumnCount() {
+			return UseElementsTableColumns.values().length;
+		}
+
+		@Override
+		public String getColumnName(int columnIndex) {
+			return UseElementsTableColumns.values()[columnIndex].toString();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			ElementType useElementType = get(rowIndex);
+
+			switch (UseElementsTableColumns.values()[columnIndex]) {
+			case Id:
+				return useElementType.getId();
+			case Description:
+				switch (useElementType.getClass().getSimpleName()) {
+				case "SimpleElementTypeType":
+					return ((SimpleElementTypeType) useElementType).getDescription();
+				}
+				return null;
+			case Type:
+				String simpleName = useElementType.getClass().getSimpleName();
+				int lastIndexOfType = simpleName.lastIndexOf("Type");
+				return simpleName.substring(0, lastIndexOfType);
+			default:
+				break;
+			}
+
+			return null;
+		}
+		
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			switch (UseElementsTableColumns.values()[columnIndex]) {
+			case Navigate:
+				return true;
+			default:
+				return false;
+			}
+		}
+	}
+	
 	public UserDefinedTypesPanelControl14() throws Exception {
 		super(USER_DEFINED_TYPES_PANEL);
 		initElementsTable();
 		initBaseType();
 		initXsdRestriction();
 		initXsdEnumerationTable();
+		initUseElementsTable();
 	}
 
 	private void initXsdEnumerationTable() {
@@ -225,6 +287,29 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 		});
 	}
 
+	@SuppressWarnings("serial")
+	private void initUseElementsTable() {
+		useElementsTableModel = new UseElementsTableModel();
+		tbl_UseElements.setModel(useElementsTableModel);
+		tbl_UseElements.setFillsViewportHeight(true);
+		tbl_UseElements.setAutoCreateRowSorter(true);
+		TableColumn navigateColumn = tbl_UseElements.getColumnModel()
+				.getColumn(UseElementsTableColumns.Navigate.ordinal());
+		navigateColumn.setMaxWidth(50);
+		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
+		navigateColumn.setCellEditor(new NavigatorEditor() {
+			@Override
+			protected void navigate() {
+				int row = tbl_UseElements.getSelectedRow();
+				row = tbl_UseElements.getRowSorter().convertRowIndexToModel(row);
+				ElementType useElementType = useElementsTableModel.get(row);
+				if (useElementType != null) {
+					InteractionFrameworkEditor.navigate(useElementType);
+				}
+			}
+		});
+	}
+	
 	public void pasteAction() {
 		Clipboard c = Toolkit.getDefaultToolkit().getSystemClipboard();
 		Transferable t = c.getContents(this);
@@ -532,6 +617,12 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 			tfd_XsdRestriction.setText(selectedElement.getXsdRestriction());
 			xsdEnumerationsTableModel.clear();
 			fillEnumerationTable();
+			List<ElementType> useElements = getUseElements(selectedElement);
+			if (useElements != null) {
+				for (ElementType elementType : useElements) {
+					useElementsTableModel.add(elementType);
+				}
+			}
 		} else {
 			selectedElement = null;
 			tfd_Id.setText("");
@@ -544,6 +635,7 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 			tfd_HelpInfo.setText("");
 			tfd_XsdRestriction.setText("");
 			xsdEnumerationsTableModel.clear();
+			useElementsTableModel.clear();
 		}
 		inSelection = false;
 	}

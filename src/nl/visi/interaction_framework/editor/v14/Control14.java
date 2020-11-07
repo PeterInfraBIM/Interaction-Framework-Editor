@@ -1067,4 +1067,103 @@ public abstract class Control14 extends Control {
 		return null;
 	}
 
+	protected static List<ElementType> getUseElements(ComplexElementTypeType ce) {
+		List<ElementType> useElements = new ArrayList<>();
+		// Complex elements
+		List<ComplexElementTypeType> complexElementTypes = Editor14.getStore14()
+				.getElements(ComplexElementTypeType.class);
+		for (ComplexElementTypeType complexElementType : complexElementTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(complexElementType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(complexElementType);
+			}
+		}
+		// Messages
+		List<MessageTypeType> messageTypes = Editor14.getStore14().getElements(MessageTypeType.class);
+		for (MessageTypeType messageType : messageTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(messageType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(messageType);
+			}
+		}
+		// Appendices
+		List<AppendixTypeType> appendixTypes = Editor14.getStore14().getElements(AppendixTypeType.class);
+		for (AppendixTypeType appendixType : appendixTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(appendixType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(appendixType);
+			}
+		}
+		// Organisations
+		List<OrganisationTypeType> organisationTypes = Editor14.getStore14().getElements(OrganisationTypeType.class);
+		for (OrganisationTypeType organisationType : organisationTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(organisationType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(organisationType);
+			}
+		}
+		// Persons
+		List<PersonTypeType> personTypes = Editor14.getStore14().getElements(PersonTypeType.class);
+		for (PersonTypeType personType : personTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(personType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(personType);
+			}
+		}
+		// Projects
+		List<ProjectTypeType> projectTypes = Editor14.getStore14().getElements(ProjectTypeType.class);
+		for (ProjectTypeType projectType : projectTypes) {
+			List<ComplexElementTypeType> complexElements = getComplexElements(projectType);
+			if (complexElements != null && complexElements.contains(ce)) {
+				useElements.add(projectType);
+			}
+		}
+		// Element conditions
+		List<ElementConditionType> elementConditions = Editor14.getStore14().getElements(ElementConditionType.class);
+		for (ElementConditionType elementCondition : elementConditions) {
+			ComplexElementTypeType complexElement = getComplexElement(elementCondition);
+			if (complexElement != null && complexElement.getId().equals(ce.getId())) {
+				useElements.add(elementCondition);
+			}
+		}
+
+		return useElements.isEmpty() ? null : useElements;
+	}
+
+	protected static List<ElementType> getUseElements(SimpleElementTypeType se) {
+		List<ElementType> useElements = new ArrayList<>();
+		// Complex elements
+		List<ComplexElementTypeType> complexElementTypes = Editor14.getStore14()
+				.getElements(ComplexElementTypeType.class);
+		for (ComplexElementTypeType complexElementType : complexElementTypes) {
+			List<SimpleElementTypeType> simpleElements = getSimpleElements(complexElementType);
+			if (simpleElements != null && simpleElements.contains(se)) {
+				useElements.add(complexElementType);
+			}
+		}
+		// Element conditions
+		List<ElementConditionType> elementConditions = Editor14.getStore14().getElements(ElementConditionType.class);
+		for (ElementConditionType elementCondition : elementConditions) {
+			SimpleElementTypeType simpleElement = getSimpleElement(elementCondition);
+			if (simpleElement != null && simpleElement.getId().equals(se.getId())) {
+				useElements.add(elementCondition);
+			}
+		}
+
+		return useElements.isEmpty() ? null : useElements;
+	}
+	
+	protected static List<ElementType> getUseElements(UserDefinedTypeType udt) {
+		List<ElementType> useElements = new ArrayList<>();
+		// Simple elements
+		List<SimpleElementTypeType> simpleElementTypes = Editor14.getStore14()
+				.getElements(SimpleElementTypeType.class);
+		for (SimpleElementTypeType simpleElementType : simpleElementTypes) {
+			UserDefinedTypeType userDefinedType = getUserDefinedType(simpleElementType);
+			if (userDefinedType != null && userDefinedType.getId().equals(udt.getId())) {
+				useElements.add(simpleElementType);
+			}
+		}
+		return useElements.isEmpty() ? null : useElements;
+	}
 }

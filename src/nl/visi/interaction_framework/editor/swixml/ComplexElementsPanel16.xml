@@ -10,7 +10,7 @@
 		ContinuousLayout="true" DividerLocation="220"
 		OneTouchExpandable="true" Orientation="JSplitPane.VERTICAL_SPLIT">
 		<splitpane constraints="BorderLayout.CENTER"
-			ContinuousLayout="true" DividerLocation="600" ResizeWeight="1.0"
+			ContinuousLayout="true" DividerLocation="580" ResizeWeight="1.0"
 			OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT">
 			<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 				<scrollpane>
@@ -214,7 +214,7 @@
 		<scrollpane Border="TitledBorder(lbl_Relations)">
 			<tabbedpane id="relationsTabs"
 				Border="EmptyBorder(4,4,4,4)"
-				Titles="lbl_SimpleElements,lbl_ComplexElements">
+				Titles="lbl_SimpleElements,lbl_ComplexElements,lbl_UseElements">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<scrollpane>
 						<gridbagconstraints
@@ -280,6 +280,16 @@
 								Insets="0,2,2,2" />
 						</button>
 					</panel>
+				</panel>
+				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+					<scrollpane>
+						<gridbagconstraints
+							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
+						<table id="tbl_UseElements"
+							SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+							PreferredScrollableViewportSize="200,50" />
+					</scrollpane>
 				</panel>
 			</tabbedpane>
 		</scrollpane>

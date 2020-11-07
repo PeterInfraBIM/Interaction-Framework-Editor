@@ -20,6 +20,7 @@ import java.util.Stack;
 
 import javax.swing.JComponent;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
@@ -428,8 +429,11 @@ public class MainPanelControl16 extends Control16 {
 		if (panelControl != null) {
 			int index = panelControl.elementsTableModel.elements.indexOf(element);
 			if (index >= 0) {
+				index = panelControl.tbl_Elements.convertRowIndexToView(index);
 				panelControl.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
 			}
+		} else {
+			JOptionPane.showMessageDialog(mainPanel, "No tab available for this navigation link.", "No tab available", JOptionPane.WARNING_MESSAGE);
 		}
 	}
 

@@ -50,9 +50,10 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	private static final String COMPLEX_ELEMENTS_PANEL = "nl/visi/interaction_framework/editor/swixml/ComplexElementsPanel16.xml";
 
 	private JPanel startDatePanel, endDatePanel;
-	private JTable tbl_SubComplexElements, tbl_SimpleElements;
+	private JTable tbl_SubComplexElements, tbl_SimpleElements, tbl_UseElements;
 	private SubComplexElementsTableModel subComplexElementsTableModel;
 	private SimpleElementsTableModel simpleElementsTableModel;
+	private UseElementsTableModel useElementsTableModel;
 	private JComboBox<String> cbx_GlobalElementCondition, cbx_SimpleElementConditions, cbx_ComplexElementConditions,
 			cbx_ComplexElements, cbx_SimpleElements;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddSimpleElement, btn_RemoveSimpleElement;
@@ -319,12 +320,82 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		return simpleElementsTableModel;
 	}
 
+	private enum UseElementsTableColumns {
+		Id, Description, Type, Navigate;
+
+		@Override
+		public String toString() {
+			return getBundle().getString("lbl_" + name());
+		}
+	}
+
+	@SuppressWarnings("serial")
+	public class UseElementsTableModel extends ElementsTableModel<ElementType> {
+
+		@Override
+		public int getColumnCount() {
+			return UseElementsTableColumns.values().length;
+		}
+
+		@Override
+		public String getColumnName(int columnIndex) {
+			return UseElementsTableColumns.values()[columnIndex].toString();
+		}
+
+		@Override
+		public Object getValueAt(int rowIndex, int columnIndex) {
+			ElementType useElementType = get(rowIndex);
+
+			switch (UseElementsTableColumns.values()[columnIndex]) {
+			case Id:
+				return useElementType.getId();
+			case Description:
+				switch (useElementType.getClass().getSimpleName()) {
+				case "AppendixTypeType":
+					return ((AppendixTypeType) useElementType).getDescription();
+				case "ComplexElementTypeType":
+					return ((ComplexElementTypeType) useElementType).getDescription();
+				case "ElementConditionType":
+					return ((ElementConditionType) useElementType).getDescription();
+				case "MessageTypeType":
+					return ((MessageTypeType) useElementType).getDescription();
+				case "OrganisationTypeType":
+					return ((OrganisationTypeType) useElementType).getDescription();
+				case "PersonTypeType":
+					return ((PersonTypeType) useElementType).getDescription();
+				case "ProjectTypeType":
+					return ((ProjectTypeType) useElementType).getDescription();
+				}
+				return null;
+			case Type:
+				String simpleName = useElementType.getClass().getSimpleName();
+				int lastIndexOfType = simpleName.lastIndexOf("Type");
+				return simpleName.substring(0, lastIndexOfType);
+			default:
+				break;
+			}
+
+			return null;
+		}
+		
+		@Override
+		public boolean isCellEditable(int rowIndex, int columnIndex) {
+			switch (UseElementsTableColumns.values()[columnIndex]) {
+			case Navigate:
+				return true;
+			default:
+				return false;
+			}
+		}
+	}
+
 	public ComplexElementsPanelControl16() throws Exception {
 		super(COMPLEX_ELEMENTS_PANEL);
 
 		initComplexElementsTable();
 		initSubComplexElementsTable();
 		initSimpleElementsTable();
+		initUseElementsTable();
 		initStartDateField();
 		initEndDateField();
 		initMinOccurs();
@@ -562,6 +633,29 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		});
 	}
 
+	@SuppressWarnings("serial")
+	private void initUseElementsTable() {
+		useElementsTableModel = new UseElementsTableModel();
+		tbl_UseElements.setModel(useElementsTableModel);
+		tbl_UseElements.setFillsViewportHeight(true);
+		tbl_UseElements.setAutoCreateRowSorter(true);
+		TableColumn navigateColumn = tbl_UseElements.getColumnModel()
+				.getColumn(UseElementsTableColumns.Navigate.ordinal());
+		navigateColumn.setMaxWidth(50);
+		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
+		navigateColumn.setCellEditor(new NavigatorEditor() {
+			@Override
+			protected void navigate() {
+				int row = tbl_UseElements.getSelectedRow();
+				row = tbl_UseElements.getRowSorter().convertRowIndexToModel(row);
+				ElementType useElementType = useElementsTableModel.get(row);
+				if (useElementType != null) {
+					InteractionFrameworkEditor.navigate(useElementType);
+				}
+			}
+		});
+	}
+
 	private void initComplexElementsTable() {
 		elementsTableModel = new ComplexElementsTableModel();
 		tbl_Elements.setModel(elementsTableModel);
@@ -597,8 +691,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		if (filterString.isEmpty()) {
 			fillTable(ComplexElementTypeType.class);
 		} else {
-			List<ComplexElementTypeType> elements = Editor16.getStore16()
-					.getElements(ComplexElementTypeType.class);
+			List<ComplexElementTypeType> elements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
 			elementsTableModel.clear();
 			for (ComplexElementTypeType element : elements) {
 				if (element.getDescription().toUpperCase().contains(filterString)
@@ -691,6 +784,13 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 					}
 				}
 			}
+			useElementsTableModel.clear();
+			List<ElementType> useElements = getUseElements(selectedElement);
+			if (useElements != null) {
+				for (ElementType elementType : useElements) {
+					useElementsTableModel.add(elementType);
+				}
+			}
 			cbx_ComplexElements.removeAllItems();
 			cbx_ComplexElements.addItem(null);
 			List<ComplexElementTypeType> ceList = Editor16.getStore16().getElements(ComplexElementTypeType.class);
@@ -716,6 +816,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			cbx_ComplexElements.removeAllItems();
 			subComplexElementsTableModel.clear();
 			simpleElementsTableModel.clear();
+			useElementsTableModel.clear();
 			cbx_SimpleElements.removeAllItems();
 		}
 		inSelection = false;
@@ -776,7 +877,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
-		
+
 		try {
 			Class<?>[] classesWithComplexElements = { ComplexElementTypeType.class, ProjectTypeType.class,
 					PersonTypeType.class, OrganisationTypeType.class, AppendixTypeType.class, MessageTypeType.class };
@@ -869,7 +970,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		int selectedSubComplexElementsRow = tbl_SubComplexElements.getSelectedRow();
 
 		int response = JOptionPane.showConfirmDialog(getPanel(),
-				getBundle().getString("lbl_Remove") + ": " + subComplexElementsTableModel.elements.get(selectedSubComplexElementsRow).getId(),
+				getBundle().getString("lbl_Remove") + ": "
+						+ subComplexElementsTableModel.elements.get(selectedSubComplexElementsRow).getId(),
 				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
@@ -925,7 +1027,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		int selectedSimpleElementsRow = tbl_SimpleElements.getSelectedRow();
 
 		int response = JOptionPane.showConfirmDialog(getPanel(),
-				getBundle().getString("lbl_Remove") + ": " + simpleElementsTableModel.elements.get(selectedSimpleElementsRow).getId(),
+				getBundle().getString("lbl_Remove") + ": "
+						+ simpleElementsTableModel.elements.get(selectedSimpleElementsRow).getId(),
 				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
