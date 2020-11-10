@@ -358,6 +358,10 @@ public class MainPanelControl16 extends Control16 {
 			panelControl = Tabs.ComplexElements.getPanelControl();
 			break;
 		case ElementConditionType:
+			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
+			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case GroupTypeType:
 			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());

@@ -1,5 +1,6 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
@@ -25,31 +26,41 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
+import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.TransactionTabs;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
+import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.GroupTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Group;
+import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.OrganisationTypeType;
 import nl.visi.schemas._20160331.PersonTypeType;
 import nl.visi.schemas._20160331.ProjectTypeType;
+import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.TransactionPhaseTypeType;
+import nl.visi.schemas._20160331.TransactionTypeType;
 
 public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	private static final String MISCELLANEOUS_PANEL = "nl/visi/interaction_framework/editor/swixml/MiscellaneousPanel.xml";
 	private JTable tbl_ComplexElements;
-	private JPanel startDatePanel, endDatePanel, relationsPanel;
+	private JPanel startDatePanel, endDatePanel, cards, relationsPanel, elementConditionPanel, emptyPanel;
+	private CardLayout cl;
 	private JLabel lbl_Code, lbl_Namespace;
 	private JComboBox<MiscellaneousTypes> cbx_ElementType;
-	private JComboBox<String> cbx_ComplexElements;
+	private JComboBox<String> cbx_ComplexElements, cbx_Condition;
 	private ComplexElementsTableModel complexElementsTableModel;
-	private JButton btn_AddComplexElement, btn_RemoveComplexElement;
-	private JTextField tfd_Namespace;
+	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_NavigateComplexElementType1,
+			btn_NavigateComplexElementType2, btn_NavigateSimpleElementType, btn_NavigateMitt,
+			btn_NavigateTransactionType, btn_NavigateMessageType;
+	private JTextField tfd_Namespace, tfd_ComplexElement1, tfd_ComplexElement2, tfd_SimpleElement, tfd_MittId,
+			tfd_Transaction, tfd_Message;
 
 	private enum MiscellaneousTypes {
-		AppendixType, GroupType, OrganisationType, PersonType, ProjectType, TransactionPhaseType;
+		AppendixType, ElementCondition, GroupType, OrganisationType, PersonType, ProjectType, TransactionPhaseType;
 
 		@Override
 		public String toString() {
@@ -59,7 +70,6 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	}
 
 	private enum MiscellaneousTableColumns {
-//		Id, ElementType, Description, StartDate, EndDate, State, DateLamu, UserLamu;
 		Id, ElementType, Description;
 
 		@Override
@@ -105,77 +115,9 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 					return ((AppendixTypeType) element).getDescription();
 				if (element instanceof TransactionPhaseTypeType)
 					return ((TransactionPhaseTypeType) element).getDescription();
+				if (element instanceof ElementConditionType)
+					return ((ElementConditionType) element).getDescription();
 				return null;
-//			case StartDate:
-//				if (element instanceof ProjectTypeType)
-//					return getDate(((ProjectTypeType) element).getStartDate());
-//				if (element instanceof PersonTypeType)
-//					return getDate(((PersonTypeType) element).getStartDate());
-//				if (element instanceof OrganisationTypeType)
-//					return getDate(((OrganisationTypeType) element).getStartDate());
-//				if (element instanceof GroupTypeType)
-//					return getDate(((GroupTypeType) element).getStartDate());
-//				if (element instanceof AppendixTypeType)
-//					return getDate(((AppendixTypeType) element).getStartDate());
-//				if (element instanceof TransactionPhaseTypeType)
-//					return getDate(((TransactionPhaseTypeType) element).getStartDate());
-//				return null;
-//			case EndDate:
-//				if (element instanceof ProjectTypeType)
-//					return getDate(((ProjectTypeType) element).getEndDate());
-//				if (element instanceof PersonTypeType)
-//					return getDate(((PersonTypeType) element).getEndDate());
-//				if (element instanceof OrganisationTypeType)
-//					return getDate(((OrganisationTypeType) element).getEndDate());
-//				if (element instanceof GroupTypeType)
-//					return getDate(((GroupTypeType) element).getEndDate());
-//				if (element instanceof AppendixTypeType)
-//					return getDate(((AppendixTypeType) element).getEndDate());
-//				if (element instanceof TransactionPhaseTypeType)
-//					return getDate(((TransactionPhaseTypeType) element).getEndDate());
-//				return null;
-//			case State:
-//				if (element instanceof ProjectTypeType)
-//					return ((ProjectTypeType) element).getState();
-//				if (element instanceof PersonTypeType)
-//					return ((PersonTypeType) element).getState();
-//				if (element instanceof OrganisationTypeType)
-//					return ((OrganisationTypeType) element).getState();
-//				if (element instanceof GroupTypeType)
-//					return ((GroupTypeType) element).getState();
-//				if (element instanceof AppendixTypeType)
-//					return ((AppendixTypeType) element).getState();
-//				if (element instanceof TransactionPhaseTypeType)
-//					return ((TransactionPhaseTypeType) element).getState();
-//				return null;
-//			case DateLamu:
-//				if (element instanceof ProjectTypeType)
-//					return getDateTime(((ProjectTypeType) element).getDateLaMu());
-//				if (element instanceof PersonTypeType)
-//					return getDateTime(((PersonTypeType) element).getDateLaMu());
-//				if (element instanceof OrganisationTypeType)
-//					return getDateTime(((OrganisationTypeType) element).getDateLaMu());
-//				if (element instanceof GroupTypeType)
-//					return getDateTime(((GroupTypeType) element).getDateLaMu());
-//				if (element instanceof AppendixTypeType)
-//					return getDateTime(((AppendixTypeType) element).getDateLaMu());
-//				if (element instanceof TransactionPhaseTypeType)
-//					return getDateTime(((TransactionPhaseTypeType) element).getDateLaMu());
-//				return null;
-//			case UserLamu:
-//				if (element instanceof ProjectTypeType)
-//					return ((ProjectTypeType) element).getUserLaMu();
-//				if (element instanceof PersonTypeType)
-//					return ((PersonTypeType) element).getUserLaMu();
-//				if (element instanceof OrganisationTypeType)
-//					return ((OrganisationTypeType) element).getUserLaMu();
-//				if (element instanceof GroupTypeType)
-//					return ((GroupTypeType) element).getUserLaMu();
-//				if (element instanceof AppendixTypeType)
-//					return ((AppendixTypeType) element).getUserLaMu();
-//				if (element instanceof TransactionPhaseTypeType)
-//					return ((TransactionPhaseTypeType) element).getUserLaMu();
-//				return null;
 			default:
 				return null;
 			}
@@ -246,6 +188,17 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		}
 		initStartDateField();
 		initEndDateField();
+
+		cl = (CardLayout) (cards.getLayout());
+		cards.add(relationsPanel, "relationsPanel");
+		cards.add(elementConditionPanel, "elementConditionPanel");
+		cards.add(emptyPanel, "emptyPanel");
+		cl.show(cards, "emptyPanel");
+
+		cbx_Condition.addItem(null);
+		cbx_Condition.addItem("EMPTY");
+		cbx_Condition.addItem("FIXED");
+		cbx_Condition.addItem("FREE");
 	}
 
 	private void initEndDateField() {
@@ -358,9 +311,6 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		tbl_Elements.setModel(elementsTableModel);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<ElementType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
-//		tableRowSorter.setComparator(MiscellaneousTableColumns.StartDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MiscellaneousTableColumns.EndDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MiscellaneousTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -388,6 +338,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			Store16 store = Editor16.getStore16();
 
 			elementsTableModel.clear();
+
 			List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
 			for (ProjectTypeType project : projects) {
 				elementsTableModel.add(project);
@@ -411,6 +362,10 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			List<TransactionPhaseTypeType> transactionPhases = store.getElements(TransactionPhaseTypeType.class);
 			for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
 				elementsTableModel.add(transactionPhase);
+			}
+			List<ElementConditionType> elementConditions = store.getElements(ElementConditionType.class);
+			for (ElementConditionType elementCondition : elementConditions) {
+				elementsTableModel.add(elementCondition);
 			}
 		} else {
 			Store16 store = Editor16.getStore16();
@@ -458,6 +413,13 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 					elementsTableModel.add(transactionPhase);
 				}
 			}
+			List<ElementConditionType> elementConditions = store.getElements(ElementConditionType.class);
+			for (ElementConditionType elementCondition : elementConditions) {
+				if (elementCondition.getDescription().toUpperCase().contains(filterString)
+						|| elementCondition.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(elementCondition);
+				}
+			}
 		}
 	}
 
@@ -483,6 +445,9 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				break;
 			case TransactionPhaseType:
 				et = objectFactory.createTransactionPhaseTypeType();
+				break;
+			case ElementCondition:
+				et = objectFactory.createElementConditionType();
 				break;
 			}
 
@@ -520,6 +485,19 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				copyAppendixType.setStartDate(origAppendixType.getStartDate());
 				copyAppendixType.setState(origAppendixType.getState());
 				copyElementType = copyAppendixType;
+				break;
+			case ElementCondition:
+				ElementConditionType origElementConditionType = (ElementConditionType) origElementType;
+				ElementConditionType copyElementConditionType = objectFactory.createElementConditionType();
+				newElement(copyElementConditionType, "ElementConditionType_");
+				store.generateCopyId(copyElementConditionType, origElementConditionType);
+				copyElementConditionType.setCondition(origElementConditionType.getCondition());
+				copyElementConditionType.setMessageInTransaction(origElementConditionType.getMessageInTransaction());
+				copyElementConditionType.setComplexElements(origElementConditionType.getComplexElements());
+				copyElementConditionType.setSimpleElement(origElementConditionType.getSimpleElement());
+				copyElementConditionType.setDescription(origElementConditionType.getDescription());
+				copyElementConditionType.setHelpInfo(origElementConditionType.getHelpInfo());
+				copyElementType = copyElementConditionType;
 				break;
 			case GroupType:
 				GroupTypeType origGroupType = (GroupTypeType) origElementType;
@@ -628,6 +606,8 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		switch (type) {
 		case AppendixType:
 			break;
+		case ElementCondition:
+			break;
 		case GroupType:
 			mittElements = Editor16.getStore16().getElements(MessageInTransactionTypeType.class);
 			for (Object object : mittElements) {
@@ -685,41 +665,80 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		boolean isGroupType = selectedElement instanceof GroupTypeType;
 		boolean isProjectType = selectedElement instanceof ProjectTypeType;
 		boolean isTransactionPhaseType = selectedElement instanceof TransactionPhaseTypeType;
+		boolean isElementConditionType = selectedElement instanceof ElementConditionType;
 		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
-		startDateField.setEnabled(rowSelected);
-		endDateField.setEnabled(rowSelected);
-		tfd_State.setEnabled(rowSelected);
-		tfd_DateLamu.setEnabled(rowSelected);
-		tfd_UserLamu.setEnabled(rowSelected);
-		tfd_Language.setEnabled(rowSelected);
-		tfd_Category.setEnabled(rowSelected);
+		startDateField.setEnabled(rowSelected && !isElementConditionType);
+		endDateField.setEnabled(rowSelected && !isElementConditionType);
+		tfd_State.setEnabled(rowSelected && !isElementConditionType);
+		tfd_DateLamu.setEnabled(rowSelected && !isElementConditionType);
+		tfd_UserLamu.setEnabled(rowSelected && !isElementConditionType);
+		tfd_Language.setEnabled(rowSelected && !isElementConditionType);
+		tfd_Category.setEnabled(rowSelected && !isElementConditionType);
 		tfd_HelpInfo.setEnabled(rowSelected);
-		tfd_Code.setEnabled(rowSelected);
-		lbl_Code.setVisible(!isGroupType);
-		tfd_Code.setVisible(!isGroupType);
+		tfd_Code.setEnabled(rowSelected && !isElementConditionType);
+		lbl_Code.setVisible(!isGroupType && !isElementConditionType);
+		tfd_Code.setVisible(!isGroupType && !isElementConditionType);
 		tfd_Code.getParent().invalidate();
 		tfd_Namespace.setEnabled(rowSelected);
 		lbl_Namespace.setVisible(isProjectType);
 		tfd_Namespace.setVisible(isProjectType);
 		tfd_Namespace.getParent().invalidate();
-		if (rowSelected && !(isGroupType || isTransactionPhaseType)) {
-			tbl_ComplexElements.setEnabled(true);
-			cbx_ComplexElements.setEnabled(true);
-			relationsPanel.setVisible(true);
+		if (rowSelected && !(isGroupType || isTransactionPhaseType || isElementConditionType)) {
+			cl.show(cards, "relationsPanel");
+		} else if (rowSelected && isElementConditionType) {
+			cl.show(cards, "elementConditionPanel");
 		} else {
-			tbl_ComplexElements.setEnabled(false);
-			cbx_ComplexElements.setEnabled(false);
-			relationsPanel.setVisible(false);
+			cl.show(cards, "emptyPanel");
 		}
-		relationsPanel.invalidate();
 		if (rowSelected) {
 			complexElementsTableModel.clear();
 			tfd_Id.setText(selectedElement.getId());
 			List<Object> ceList = null;
-			if (selectedElement instanceof ProjectTypeType) {
+			if (selectedElement instanceof ElementConditionType) {
+				ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+				tfd_Description.setText(elementConditionType.getDescription());
+				tfd_HelpInfo.setText(elementConditionType.getHelpInfo());
+				cbx_Condition.setSelectedItem(elementConditionType.getCondition());
+				List<ComplexElementTypeType> complexElements2 = getComplexElements(elementConditionType);
+				tfd_ComplexElement1.setText(
+						complexElements2 != null ? ((ComplexElementTypeType) complexElements2.get(0)).getDescription()
+								: null);
+				tfd_ComplexElement1.setToolTipText(
+						complexElements2 != null ? ((ComplexElementTypeType) complexElements2.get(0)).getId() : null);
+				btn_NavigateComplexElementType1.setEnabled(complexElements2 != null);
+				tfd_ComplexElement2.setText(complexElements2 != null && complexElements2.size() > 1
+						? ((ComplexElementTypeType) complexElements2.get(1)).getDescription()
+						: null);
+				tfd_ComplexElement2.setToolTipText(complexElements2 != null && complexElements2.size() > 1
+						? ((ComplexElementTypeType) complexElements2.get(2)).getId()
+						: null);
+				btn_NavigateComplexElementType2.setEnabled(complexElements2 != null && complexElements2.size() > 1);
+				SimpleElementTypeType simpleElement = getSimpleElement(elementConditionType);
+				tfd_SimpleElement.setText(simpleElement != null ? simpleElement.getDescription() : null);
+				tfd_SimpleElement.setToolTipText(simpleElement != null ? simpleElement.getId() : null);
+				btn_NavigateSimpleElementType.setEnabled(simpleElement != null);
+				MessageInTransactionTypeType mitt = getMessageInTransaction(elementConditionType);
+				tfd_MittId.setText(mitt != null ? mitt.getId() : null);
+				btn_NavigateMitt.setEnabled(mitt != null);
+				btn_NavigateTransactionType.setEnabled(mitt != null);
+				btn_NavigateMessageType.setEnabled(mitt != null);
+				if (mitt != null) {
+					TransactionTypeType transaction = getTransaction(mitt);
+					tfd_Transaction.setText(transaction.getDescription());
+					tfd_Transaction.setToolTipText(transaction.getId());
+					MessageTypeType message = getMessage(mitt);
+					tfd_Message.setText(message.getDescription());
+					tfd_Message.setToolTipText(message.getId());
+				} else {
+					tfd_Transaction.setText(null);
+					tfd_Transaction.setToolTipText(null);
+					tfd_Message.setText(null);
+					tfd_Message.setToolTipText(null);
+				}
+			} else if (selectedElement instanceof ProjectTypeType) {
 				ProjectTypeType projectType = (ProjectTypeType) selectedElement;
 				tfd_Description.setText(projectType.getDescription());
 				XMLGregorianCalendar startDate = projectType.getStartDate();
@@ -873,9 +892,48 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		inSelection = false;
 	}
 
-	public void selectComplexElement() {
-		int selectedIndex = cbx_ComplexElements.getSelectedIndex();
-		btn_AddComplexElement.setEnabled(selectedIndex > 0);
+	public void navigateComplexElementType1() {
+		String idref = tfd_ComplexElement1.getToolTipText();
+		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void navigateComplexElementType2() {
+		String idref = tfd_ComplexElement2.getToolTipText();
+		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void navigateSimpleElementType() {
+		String idref = tfd_SimpleElement.getToolTipText();
+		SimpleElementTypeType element = Editor16.getStore16().getElement(SimpleElementTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void navigateTransactionType() {
+		String idref = tfd_Transaction.getToolTipText();
+		TransactionTypeType element = Editor16.getStore16().getElement(TransactionTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+		String mittId = tfd_MittId.getText();
+		MessageInTransactionTypeType mitt = Editor16.getStore16().getElement(MessageInTransactionTypeType.class,
+				mittId);
+		TransactionsPanelControl16 panelControl = (TransactionsPanelControl16) Tabs.Transactions.getPanelControl();
+		int index = panelControl.getMessagesTableModel().elements.indexOf(mitt);
+		panelControl.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
+		panelControl.transactionTabs.setSelectedIndex(TransactionTabs.Messages.ordinal());
+	}
+
+	public void navigateMessageType() {
+		String idref = tfd_Message.getToolTipText();
+		MessageTypeType element = Editor16.getStore16().getElement(MessageTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void selectCondition() {
+		ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		String selectedItem = (String) cbx_Condition.getSelectedItem();
+		if (selectedItem != null)
+			elementConditionType.setCondition(selectedItem);
 	}
 
 	public void addComplexElement() {

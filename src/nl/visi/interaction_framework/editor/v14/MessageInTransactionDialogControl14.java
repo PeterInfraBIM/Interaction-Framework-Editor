@@ -538,27 +538,32 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	public void removeElementCondition() {
 		Object userObject = selectedNode.getUserObject();
 		if (userObject != null) {
-			if (userObject instanceof SimpleElementTreeNode) {
-				SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
-				ElementConditionType ec = getElementConditionType(seNode.getMitt(), seNode.getCe(), seNode.getSe());
-				Editor14.getStore14().remove(ec.getId());
-				fillTree(seNode.getMitt());
-				elementConditionTable.fillElementConditionsTable(seNode.getMitt());
-				TreePath parentPath = new TreePath(selectedNode.getPath()).getParentPath();
-				tree_Elements.expandPath(parentPath);
-				treeModel.nodeChanged(selectedNode);
-			} else if (userObject instanceof ComplexElementTreeNode) {
-				ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
-				ElementConditionType ec = getElementConditionType(ceNode.getMitt(), ceNode.getCe(), null);
-				Editor14.getStore14().remove(ec.getId());
-				fillTree(ceNode.getMitt());
-				elementConditionTable.fillElementConditionsTable(ceNode.getMitt());
-				TreePath nodePath = new TreePath(selectedNode.getPath());
-				tree_Elements.expandPath(nodePath);
-				treeModel.nodeChanged(selectedNode);
-				Enumeration<TreeNode> children = selectedNode.children();
-				while (children.hasMoreElements()) {
-					treeModel.nodeChanged(children.nextElement());
+			int confirm = JOptionPane.showConfirmDialog(getDialog(),
+					getBundle().getString("lbl_Remove") + " " + getBundle().getString("lbl_ElementCondition"),
+					getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (confirm == JOptionPane.OK_OPTION) {
+				if (userObject instanceof SimpleElementTreeNode) {
+					SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
+					ElementConditionType ec = getElementConditionType(seNode.getMitt(), seNode.getCe(), seNode.getSe());
+					Editor14.getStore14().remove(ec.getId());
+					fillTree(seNode.getMitt());
+					elementConditionTable.fillElementConditionsTable(seNode.getMitt());
+					TreePath parentPath = new TreePath(selectedNode.getPath()).getParentPath();
+					tree_Elements.expandPath(parentPath);
+					treeModel.nodeChanged(selectedNode);
+				} else if (userObject instanceof ComplexElementTreeNode) {
+					ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
+					ElementConditionType ec = getElementConditionType(ceNode.getMitt(), ceNode.getCe(), null);
+					Editor14.getStore14().remove(ec.getId());
+					fillTree(ceNode.getMitt());
+					elementConditionTable.fillElementConditionsTable(ceNode.getMitt());
+					TreePath nodePath = new TreePath(selectedNode.getPath());
+					tree_Elements.expandPath(nodePath);
+					treeModel.nodeChanged(selectedNode);
+					Enumeration<TreeNode> children = selectedNode.children();
+					while (children.hasMoreElements()) {
+						treeModel.nodeChanged(children.nextElement());
+					}
 				}
 			}
 		}
@@ -696,7 +701,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			}
 		});
 	}
-	
+
 	public void addSendBefore() {
 		System.out.println("addSendBefore");
 		List<String> items = new ArrayList<>();
@@ -752,7 +757,6 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 			}
 		});
 	}
-
 
 	public void removePrevious() {
 		int selectedRow = tbl_Prev.getSelectedRow();

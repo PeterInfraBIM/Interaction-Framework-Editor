@@ -208,49 +208,194 @@
 		<!-- <splitpane ContinuousLayout="true" DividerLocation="280" -->
 		<!-- OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT"> -->
 		<scrollpane Border="TitledBorder(lbl_Relations)">
-			<panel id="relationsPanel" Border="EmptyBorder(4,4,4,4)"
-				Layout="GridBagLayout">
-				<label Text="lbl_ComplexElements">
-					<gridbagconstraints
-						Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
-						Insets="2,2,2,2" />
-				</label>
-				<scrollpane>
-					<gridbagconstraints
-						Fill="GridBagConstraints.BOTH" Gridx="1" Gridy="0"
-						Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
-					<table id="tbl_ComplexElements" DragEnabled="true"
-						SelectionMode="ListSelectionModel.SINGLE_SELECTION"
-						PreferredScrollableViewportSize="200,50" />
-				</scrollpane>
-				<panel Layout="GridBagLayout">
-					<gridbagconstraints
-						Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1" />
-					<combobox id="cbx_ComplexElements"
-						Action="selectComplexElement" Enabled="false">
+			<panel id="cards" Layout="CardLayout">
+				<panel id="relationsPanel" name="relationsPanel"
+					Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+					<label Text="lbl_ComplexElements">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+							Insets="2,2,2,2" />
+					</label>
+					<scrollpane>
+						<gridbagconstraints
+							Fill="GridBagConstraints.BOTH" Gridx="1" Gridy="0"
+							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
+						<table id="tbl_ComplexElements" DragEnabled="true"
+							SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+							PreferredScrollableViewportSize="200,50" />
+					</scrollpane>
+					<panel Layout="GridBagLayout">
+						<gridbagconstraints
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1" />
+						<combobox id="cbx_ComplexElements"
+							Action="selectComplexElement" Enabled="true">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
+								Insets="0,2,2,2" Weightx="1.0" />
+						</combobox>
+						<button id="btn_AddComplexElement"
+							Action="addComplexElement" Enabled="false" Text="lbl_Add">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
+								Insets="0,2,2,2" />
+						</button>
+						<button id="btn_RemoveComplexElement"
+							Action="removeComplexElement" Enabled="false" Text="lbl_Remove">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
+								Insets="0,2,2,2" />
+						</button>
+					</panel>
+					<!-- <panel> -->
+					<!-- <gridbagconstraints -->
+					<!-- Fill="GridBagConstraints.BOTH" Gridwidth="2" Gridx="0" Gridy="2" -->
+					<!-- Weightx="1.0" Weighty="1.0" /> -->
+					<!-- </panel> -->
+				</panel>
+				<panel id="elementConditionPanel" name="elementConditionPanel"
+					Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout" Visible="true">
+					<label Text="lbl_Condition">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+							Insets="2,2,2,2" />
+					</label>
+					<combobox id="cbx_Condition" Action="selectCondition"
+						enabled="true">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
-							Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
-							Insets="0,2,2,2" Weightx="1.0" />
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
+							Insets="2,2,2,2" Weightx="1.0" />
 					</combobox>
-					<button id="btn_AddComplexElement"
-						Action="addComplexElement" Enabled="false" Text="lbl_Add">
+					<label id="lbl_ComplexElement1" Text="lbl_ComplexElement1">
 						<gridbagconstraints
-							Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
-							Insets="0,2,2,2" />
-					</button>
-					<button id="btn_RemoveComplexElement"
-						Action="removeComplexElement" Enabled="false" Text="lbl_Remove">
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_ComplexElement1" Enabled="true"
+						Editable="false" Columns="8">
 						<gridbagconstraints
-							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
-							Insets="0,2,2,2" />
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<button id="btn_NavigateComplexElementType1"
+						Action="navigateComplexElementType1" Enabled="false"
+						Icon="img_ForwardNav">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="1"
+							Insets="2,2,2,2" />
 					</button>
+					<label id="lbl_ComplexElement2" Text="lbl_ComplexElement2">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="2"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_ComplexElement2" Enabled="true"
+						Editable="false" Columns="8">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<button id="btn_NavigateComplexElementType2"
+						Action="navigateComplexElementType2" Enabled="false"
+						Icon="img_ForwardNav">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="2"
+							Insets="2,2,2,2" />
+					</button>
+					<label id="lbl_SimpleElement" Text="lbl_SimpleElement">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="3"
+							Insets="2,2,2,2" />
+					</label>
+					<textfield id="tfd_SimpleElement" Enabled="true"
+						Editable="false" Columns="8">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="3"
+							Insets="2,2,2,2" Weightx="1.0" />
+					</textfield>
+					<button id="btn_NavigateSimpleElementType"
+						Action="navigateSimpleElementType" Enabled="false"
+						Icon="img_ForwardNav">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="3"
+							Insets="2,2,2,2" />
+					</button>
+					<panel Border="TitledBorder(lbl_Mitt)" layout="GridBagLayout">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST"
+							Fill="GridBagConstraints.HORIZONTAL" GridWidth="3" Gridx="0"
+							Gridy="4" Insets="2,2,2,2" />
+						<label id="lbl_Mitt" Text="ID">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+								Insets="2,2,2,2" />
+						</label>
+						<textfield id="tfd_MittId" Enabled="true"
+							Editable="false" Columns="8">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0"
+								Insets="2,2,2,2" Weightx="1.0" />
+						</textfield>
+						<button id="btn_NavigateMitt"
+							Action="navigateTransactionType" Enabled="false"
+							Icon="img_ForwardNav">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
+								Insets="2,2,2,2" />
+						</button>
+						<label id="lbl_Transaction" Text="lbl_Transaction">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1"
+								Insets="2,2,2,2" />
+						</label>
+						<textfield id="tfd_Transaction" Enabled="true"
+							Editable="false" Columns="8">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1"
+								Insets="2,2,2,2" Weightx="1.0" />
+						</textfield>
+						<button id="btn_NavigateTransactionType"
+							Action="navigateTransactionType" Enabled="false"
+							Icon="img_ForwardNav">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="1"
+								Insets="2,2,2,2" />
+						</button>
+						<label id="lbl_Message" Text="lbl_Message">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="2"
+								Insets="2,2,2,2" />
+						</label>
+						<textfield id="tfd_Message" Enabled="true"
+							Editable="false" Columns="8">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
+								Insets="2,2,2,2" Weightx="1.0" />
+						</textfield>
+						<button id="btn_NavigateMessageType"
+							Action="navigateMessageType" Enabled="false"
+							Icon="img_ForwardNav">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="2"
+								Insets="2,2,2,2" />
+						</button>
+					</panel>
 				</panel>
-				<!-- <panel> -->
-				<!-- <gridbagconstraints -->
-				<!-- Fill="GridBagConstraints.BOTH" Gridwidth="2" Gridx="0" Gridy="2" -->
-				<!-- Weightx="1.0" Weighty="1.0" /> -->
-				<!-- </panel> -->
+				<panel id="emptyPanel" name="emptyPanel"
+					Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout" Visible="true">
+					<label Text="Empty panel">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
+							Insets="2,2,2,2" />
+					</label>
+				</panel>
 			</panel>
 		</scrollpane>
 		<!-- </splitpane> -->

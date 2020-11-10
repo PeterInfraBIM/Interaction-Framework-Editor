@@ -560,33 +560,38 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	public void removeElementCondition() {
 		Object userObject = selectedNode.getUserObject();
 		if (userObject != null) {
-			if (userObject instanceof SimpleElementTreeNode) {
-				SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
-				ElementConditionType ec = getElementConditionType(seNode.getMitt(), seNode.getPce(), seNode.getCce(),
-						seNode.getSe());
-				Editor16.getStore16().remove(ec.getId());
-				fillTree(seNode.getMitt());
-				elementConditionTable.fillElementConditionsTable(seNode.getMitt());
-				TreePath parentPath = new TreePath(selectedNode.getPath()).getParentPath();
-				tree_Elements.expandPath(parentPath);
-				treeModel.nodeChanged(selectedNode);
-			} else if (userObject instanceof ComplexElementTreeNode) {
-				ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
-				ElementConditionType ec;
-				if (ceNode.getPce() == null) {
-					ec = getElementConditionType(ceNode.getMitt(), ceNode.getCe(), null, null);
-				} else {
-					ec = getElementConditionType(ceNode.getMitt(), ceNode.getPce(), ceNode.getCe(), null);
-				}
-				Editor16.getStore16().remove(ec.getId());
-				fillTree(ceNode.getMitt());
-				elementConditionTable.fillElementConditionsTable(ceNode.getMitt());
-				TreePath nodePath = new TreePath(selectedNode.getPath());
-				tree_Elements.expandPath(nodePath);
-				treeModel.nodeChanged(selectedNode);
-				Enumeration<TreeNode> children = selectedNode.children();
-				while (children.hasMoreElements()) {
-					treeModel.nodeChanged(children.nextElement());
+			int confirm = JOptionPane.showConfirmDialog(getDialog(),
+					getBundle().getString("lbl_Remove") + " " + getBundle().getString("lbl_ElementCondition"),
+					getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+			if (confirm == JOptionPane.OK_OPTION) {
+				if (userObject instanceof SimpleElementTreeNode) {
+					SimpleElementTreeNode seNode = (SimpleElementTreeNode) userObject;
+					ElementConditionType ec = getElementConditionType(seNode.getMitt(), seNode.getPce(),
+							seNode.getCce(), seNode.getSe());
+					Editor16.getStore16().remove(ec.getId());
+					fillTree(seNode.getMitt());
+					elementConditionTable.fillElementConditionsTable(seNode.getMitt());
+					TreePath parentPath = new TreePath(selectedNode.getPath()).getParentPath();
+					tree_Elements.expandPath(parentPath);
+					treeModel.nodeChanged(selectedNode);
+				} else if (userObject instanceof ComplexElementTreeNode) {
+					ComplexElementTreeNode ceNode = (ComplexElementTreeNode) userObject;
+					ElementConditionType ec;
+					if (ceNode.getPce() == null) {
+						ec = getElementConditionType(ceNode.getMitt(), ceNode.getCe(), null, null);
+					} else {
+						ec = getElementConditionType(ceNode.getMitt(), ceNode.getPce(), ceNode.getCe(), null);
+					}
+					Editor16.getStore16().remove(ec.getId());
+					fillTree(ceNode.getMitt());
+					elementConditionTable.fillElementConditionsTable(ceNode.getMitt());
+					TreePath nodePath = new TreePath(selectedNode.getPath());
+					tree_Elements.expandPath(nodePath);
+					treeModel.nodeChanged(selectedNode);
+					Enumeration<TreeNode> children = selectedNode.children();
+					while (children.hasMoreElements()) {
+						treeModel.nodeChanged(children.nextElement());
+					}
 				}
 			}
 		}
@@ -838,7 +843,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 			sendAfterTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
 		}
 	}
-	
+
 	public void changeDirection() {
 		System.out.println("Change direction action: " + currentMitt.getId() + "=" + chb_Direction.isSelected());
 		currentMitt.setInitiatorToExecutor(chb_Direction.isSelected());
