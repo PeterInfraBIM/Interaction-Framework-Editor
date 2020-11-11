@@ -286,6 +286,19 @@
 							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="1"
 							Insets="2,2,2,2" />
 					</button>
+					<button id="btn_SetComplexElementType1"
+						Action="setComplexElementType1" Enabled="true" Text="lbl_Set">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="3" Gridy="1"
+							Insets="2,2,2,2" />
+					</button>
+					<button id="btn_RemoveComplexElementType1"
+						Action="removeComplexElementType1" Enabled="true"
+						Text="lbl_Remove">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="4" Gridy="1"
+							Insets="2,2,2,2" />
+					</button>
 					<label id="lbl_ComplexElement2" Text="lbl_ComplexElement2">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="2"
@@ -303,6 +316,19 @@
 						Icon="img_ForwardNav">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="2"
+							Insets="2,2,2,2" />
+					</button>
+					<button id="btn_SetComplexElementType2"
+						Action="setComplexElementType2" Enabled="true" Text="lbl_Set">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="3" Gridy="2"
+							Insets="2,2,2,2" />
+					</button>
+					<button id="btn_RemoveComplexElementType2"
+						Action="removeComplexElementType2" Enabled="true"
+						Text="lbl_Remove">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="4" Gridy="2"
 							Insets="2,2,2,2" />
 					</button>
 					<label id="lbl_SimpleElement" Text="lbl_SimpleElement">
@@ -324,10 +350,22 @@
 							Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="3"
 							Insets="2,2,2,2" />
 					</button>
+					<button id="btn_SetSimpleElementType"
+						Action="setSimpleElementType" Enabled="true" Text="lbl_Set">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="3" Gridy="3"
+							Insets="2,2,2,2" />
+					</button>
+					<button id="btn_RemoveSimpleElementType"
+						Action="removeSimpleElementType" Enabled="true" Text="lbl_Remove">
+						<gridbagconstraints
+							Anchor="GridBagConstraints.WEST" Gridx="4" Gridy="3"
+							Insets="2,2,2,2" />
+					</button>
 					<panel Border="TitledBorder(lbl_Mitt)" layout="GridBagLayout">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST"
-							Fill="GridBagConstraints.HORIZONTAL" GridWidth="3" Gridx="0"
+							Fill="GridBagConstraints.HORIZONTAL" GridWidth="5" Gridx="0"
 							Gridy="4" Insets="2,2,2,2" />
 						<label id="lbl_Mitt" Text="ID">
 							<gridbagconstraints
@@ -386,6 +424,21 @@
 								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="2"
 								Insets="2,2,2,2" />
 						</button>
+						<button id="btn_SetMitt" Action="setMitt" Enabled="true"
+							Text="lbl_Set">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.VERTICAL" Gridheight="3" Gridx="3"
+								Gridy="0" Insets="2,2,2,2" />
+						</button>
+						<button id="btn_RemoveMitt" Action="removeMitt"
+							Enabled="true" Text="lbl_Remove">
+							<gridbagconstraints
+								Anchor="GridBagConstraints.WEST"
+								Fill="GridBagConstraints.VERTICAL" Gridheight="3" Gridx="4"
+								Gridy="0" Insets="2,2,2,2" />
+						</button>
+
 					</panel>
 				</panel>
 				<panel id="emptyPanel" name="emptyPanel"

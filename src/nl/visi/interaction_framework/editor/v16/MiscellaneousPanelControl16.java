@@ -3,17 +3,21 @@ package nl.visi.interaction_framework.editor.v16;
 import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -26,6 +30,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.interaction_framework.editor.SelectBox;
 import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.TransactionTabs;
 import nl.visi.schemas._20160331.AppendixTypeType;
@@ -54,8 +59,9 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	private JComboBox<String> cbx_ComplexElements, cbx_Condition;
 	private ComplexElementsTableModel complexElementsTableModel;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_NavigateComplexElementType1,
-			btn_NavigateComplexElementType2, btn_NavigateSimpleElementType, btn_NavigateMitt,
-			btn_NavigateTransactionType, btn_NavigateMessageType;
+			btn_RemoveComplexElementType1, btn_NavigateComplexElementType2, btn_RemoveComplexElementType2,
+			btn_NavigateSimpleElementType, btn_RemoveSimpleElementType, btn_NavigateMitt, btn_NavigateTransactionType,
+			btn_NavigateMessageType, btn_RemoveMitt;
 	private JTextField tfd_Namespace, tfd_ComplexElement1, tfd_ComplexElement2, tfd_SimpleElement, tfd_MittId,
 			tfd_Transaction, tfd_Message;
 
@@ -448,6 +454,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				break;
 			case ElementCondition:
 				et = objectFactory.createElementConditionType();
+				((ElementConditionType) et).setCondition("FIXED");
 				break;
 			}
 
@@ -708,23 +715,27 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 								: null);
 				tfd_ComplexElement1.setToolTipText(
 						complexElements2 != null ? ((ComplexElementTypeType) complexElements2.get(0)).getId() : null);
+				btn_RemoveComplexElementType1.setEnabled(complexElements2 != null);
 				btn_NavigateComplexElementType1.setEnabled(complexElements2 != null);
 				tfd_ComplexElement2.setText(complexElements2 != null && complexElements2.size() > 1
 						? ((ComplexElementTypeType) complexElements2.get(1)).getDescription()
 						: null);
 				tfd_ComplexElement2.setToolTipText(complexElements2 != null && complexElements2.size() > 1
-						? ((ComplexElementTypeType) complexElements2.get(2)).getId()
+						? ((ComplexElementTypeType) complexElements2.get(1)).getId()
 						: null);
 				btn_NavigateComplexElementType2.setEnabled(complexElements2 != null && complexElements2.size() > 1);
+				btn_RemoveComplexElementType2.setEnabled(complexElements2 != null && complexElements2.size() > 1);
 				SimpleElementTypeType simpleElement = getSimpleElement(elementConditionType);
 				tfd_SimpleElement.setText(simpleElement != null ? simpleElement.getDescription() : null);
 				tfd_SimpleElement.setToolTipText(simpleElement != null ? simpleElement.getId() : null);
 				btn_NavigateSimpleElementType.setEnabled(simpleElement != null);
+				btn_RemoveSimpleElementType.setEnabled(simpleElement != null);
 				MessageInTransactionTypeType mitt = getMessageInTransaction(elementConditionType);
 				tfd_MittId.setText(mitt != null ? mitt.getId() : null);
 				btn_NavigateMitt.setEnabled(mitt != null);
 				btn_NavigateTransactionType.setEnabled(mitt != null);
 				btn_NavigateMessageType.setEnabled(mitt != null);
+				btn_RemoveMitt.setEnabled(mitt != null);
 				if (mitt != null) {
 					TransactionTypeType transaction = getTransaction(mitt);
 					tfd_Transaction.setText(transaction.getDescription());
@@ -892,16 +903,159 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		inSelection = false;
 	}
 
+	public void setComplexElementType1() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<String> items = new ArrayList<>();
+		List<ComplexElementTypeType> elements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
+		for (ComplexElementTypeType element : elements) {
+			items.add(element.getDescription() + " [" + element.getId() + "]");
+		}
+		Collections.sort(items);
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
+				getBundle().getString("lbl_ComplexElement1"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String elementId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, elementId);
+				setElementConditionTypeComplexElement1(elementConditionType, ce);
+				updateSelectionArea(null);
+			}
+		});
+	}
+
+	public void removeComplexElementType1() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		ComplexElementTypeType complexElement1 = Control16.getElementConditionTypeComplexElement1(elementConditionType);
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + complexElement1.getDescription(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response != JOptionPane.CANCEL_OPTION) {
+			setElementConditionTypeComplexElement1(elementConditionType, null);
+			updateSelectionArea(null);
+		}
+	}
+
 	public void navigateComplexElementType1() {
 		String idref = tfd_ComplexElement1.getToolTipText();
 		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
 		InteractionFrameworkEditor.navigate(element);
 	}
 
+	public void setComplexElementType2() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<String> items = new ArrayList<>();
+		ComplexElementTypeType complexElement1 = getElementConditionTypeComplexElement1(elementConditionType);
+		List<ComplexElementTypeType> elements = getComplexElements(complexElement1);
+		if (elements != null) {
+			for (ComplexElementTypeType element : elements) {
+				items.add(element.getDescription() + " [" + element.getId() + "]");
+			}
+			Collections.sort(items);
+		}
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
+				getBundle().getString("lbl_ComplexElement2"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String elementId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				ComplexElementTypeType ce = Editor16.getStore16().getElement(ComplexElementTypeType.class, elementId);
+				setElementConditionTypeComplexElement2(elementConditionType, ce);
+				updateSelectionArea(null);
+			}
+		});
+	}
+
+	public void removeComplexElementType2() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		ComplexElementTypeType complexElement2 = Control16.getElementConditionTypeComplexElement2(elementConditionType);
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + complexElement2.getDescription(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response != JOptionPane.CANCEL_OPTION) {
+			Control16.setElementConditionTypeComplexElement2(elementConditionType, null);
+			updateSelectionArea(null);
+		}
+	}
+
 	public void navigateComplexElementType2() {
 		String idref = tfd_ComplexElement2.getToolTipText();
 		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, idref);
 		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void setSimpleElementType() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<String> items = new ArrayList<>();
+		List<SimpleElementTypeType> elements = new ArrayList<>();
+
+		ComplexElementTypeType complexElement1 = getElementConditionTypeComplexElement1(elementConditionType);
+		if (complexElement1 != null) {
+			elements = getSimpleElements(complexElement1);
+			ComplexElementTypeType complexElement2 = getElementConditionTypeComplexElement2(elementConditionType);
+			if (complexElement2 != null) {
+				List<SimpleElementTypeType> simpleElements2 = getSimpleElements(complexElement2);
+				if (simpleElements2 != null) {
+					for (SimpleElementTypeType simpleElement : simpleElements2) {
+						if (elements == null)
+							elements = new ArrayList<>();
+						elements.add(simpleElement);
+					}
+				}
+			} else {
+				List<ComplexElementTypeType> complexElements = getComplexElements(complexElement1);
+				if (complexElements != null) {
+					for (ComplexElementTypeType ce : complexElements) {
+						List<SimpleElementTypeType> simpleElements = getSimpleElements(ce);
+						for (SimpleElementTypeType simpleElement : simpleElements) {
+							if (elements == null)
+								elements = new ArrayList<>();
+							elements.add(simpleElement);
+						}
+					}
+				}
+			}
+		} else {
+			elements = Editor16.getStore16().getElements(SimpleElementTypeType.class);
+		}
+		if (elements != null) {
+			for (SimpleElementTypeType element : elements) {
+				items.add(element.getDescription() + " [" + element.getId() + "]");
+			}
+			Collections.sort(items);
+		}
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
+				getBundle().getString("lbl_SimpleElement"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String elementId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				SimpleElementTypeType se = Editor16.getStore16().getElement(SimpleElementTypeType.class, elementId);
+				Control16.setElementConditionTypeSimpleElement(elementConditionType, se);
+				updateSelectionArea(null);
+			}
+		});
+	}
+
+	public void removeSimpleElementType() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		SimpleElementTypeType simpleElement = Control16.getElementConditionTypeSimpleElement(elementConditionType);
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + simpleElement.getDescription(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response != JOptionPane.CANCEL_OPTION) {
+			Control16.setElementConditionTypeSimpleElement(elementConditionType, null);
+			updateSelectionArea(null);
+		}
 	}
 
 	public void navigateSimpleElementType() {
@@ -927,6 +1081,34 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		String idref = tfd_Message.getToolTipText();
 		MessageTypeType element = Editor16.getStore16().getElement(MessageTypeType.class, idref);
 		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void setMitt() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<String> items = new ArrayList<>();
+		List<MessageInTransactionTypeType> elements = Editor16.getStore16()
+				.getElements(MessageInTransactionTypeType.class);
+		for (MessageInTransactionTypeType element : elements) {
+			TransactionTypeType transaction = getTransaction(element);
+			MessageTypeType message = getMessage(element);
+			items.add(transaction.getDescription() + " : " + message.getDescription() + " [" + element.getId() + "]");
+		}
+		Collections.sort(items);
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
+				getBundle().getString("lbl_ComplexElement1"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String elementId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				MessageInTransactionTypeType mitt = Editor16.getStore16().getElement(MessageInTransactionTypeType.class,
+						elementId);
+				setElementConditionTypeMessageInTransaction(elementConditionType, mitt);
+				updateSelectionArea(null);
+			}
+		});
 	}
 
 	public void selectCondition() {
