@@ -37,6 +37,7 @@ import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType;
+import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.GroupTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
@@ -905,12 +906,39 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 
 	public void setComplexElementType1() {
 		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<ComplexElementTypeType> elements = null;
 		List<String> items = new ArrayList<>();
-		List<ComplexElementTypeType> elements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
-		for (ComplexElementTypeType element : elements) {
-			items.add(element.getDescription() + " [" + element.getId() + "]");
+		MessageInTransactionTypeType mitt = getMessageInTransaction(elementConditionType);
+		if (mitt != null) {
+			MessageTypeType message = getMessage(mitt);
+			List<ComplexElementTypeType> complexElements1 = getComplexElements(message);
+			if (complexElements1 != null) {
+				for (ComplexElementTypeType pce : complexElements1) {
+					if (elements == null) {
+						elements = new ArrayList<>();
+					}
+					if (!elements.contains(pce)) {
+						elements.add(pce);
+					}
+					List<ComplexElementTypeType> complexElements2 = getComplexElements(pce);
+					if (complexElements2 != null) {
+						for (ComplexElementTypeType cce : complexElements2) {
+							if (!elements.contains(cce)) {
+								elements.add(cce);
+							}
+						}
+					}
+				}
+			}
+		} else {
+			elements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
 		}
-		Collections.sort(items);
+		if (elements != null) {
+			for (ComplexElementTypeType element : elements) {
+				items.add(element.getDescription() + " [" + element.getId() + "]");
+			}
+			Collections.sort(items);
+		}
 		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
 				getBundle().getString("lbl_ComplexElement1"), items);
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
@@ -1086,16 +1114,40 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	public void setMitt() {
 		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
 		List<String> items = new ArrayList<>();
+		ComplexElementTypeType complexElement1 = getElementConditionTypeComplexElement1(elementConditionType);
+		SimpleElementTypeType simpleElement = getElementConditionTypeSimpleElement(elementConditionType);
 		List<MessageInTransactionTypeType> elements = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType element : elements) {
 			TransactionTypeType transaction = getTransaction(element);
 			MessageTypeType message = getMessage(element);
-			items.add(transaction.getDescription() + " : " + message.getDescription() + " [" + element.getId() + "]");
+			if (complexElement1 != null) {
+				List<ComplexElementTypeType> complexElements = getComplexElements(message);
+				if (complexElements != null && complexElements.contains(complexElement1)) {
+					items.add(transaction.getDescription() + " : " + message.getDescription() + " [" + element.getId()
+							+ "]");
+				}
+			} else if (simpleElement != null) {
+				List<ElementType> useElements = getUseElements(simpleElement);
+				if (useElements != null) {
+					for (ElementType useElement : useElements) {
+						if (useElement instanceof ComplexElementTypeType) {
+							List<ComplexElementTypeType> complexElements = getComplexElements(message);
+							if (complexElements != null && complexElements.contains(useElement)) {
+								items.add(transaction.getDescription() + " : " + message.getDescription() + " ["
+										+ element.getId() + "]");
+							}
+						}
+					}
+				}
+			} else {
+				items.add(
+						transaction.getDescription() + " : " + message.getDescription() + " [" + element.getId() + "]");
+			}
 		}
 		Collections.sort(items);
 		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
-				getBundle().getString("lbl_ComplexElement1"), items);
+				getBundle().getString("lbl_Mitt"), items);
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
@@ -1109,6 +1161,17 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				updateSelectionArea(null);
 			}
 		});
+	}
+
+	public void removeMitt() {
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + tfd_MittId.getText(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response != JOptionPane.CANCEL_OPTION) {
+			final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+			setElementConditionTypeMessageInTransaction(elementConditionType, null);
+			updateSelectionArea(null);
+		}
 	}
 
 	public void selectCondition() {
