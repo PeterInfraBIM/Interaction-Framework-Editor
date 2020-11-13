@@ -243,6 +243,12 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 				Method setState = selectedElement.getClass().getMethod("setState", new Class<?>[] { String.class });
 				setState.invoke(selectedElement, tfd_State.getText());
 				break;
+			case DateLaMu:
+				break;
+			case UserLaMu:
+				break;
+			default:
+				break;
 			}
 		} catch (Exception e) {
 		}

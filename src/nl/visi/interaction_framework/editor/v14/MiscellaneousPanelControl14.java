@@ -1,18 +1,23 @@
 package nl.visi.interaction_framework.editor.v14;
 
+import java.awt.CardLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -25,31 +30,44 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.interaction_framework.editor.SelectBox;
+import nl.visi.interaction_framework.editor.v14.MainPanelControl14.Tabs;
+import nl.visi.interaction_framework.editor.v14.TransactionsPanelControl14.TransactionTabs;
 import nl.visi.schemas._20140331.AppendixTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ComplexElementTypeTypeRef;
+import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.ElementType;
 import nl.visi.schemas._20140331.GroupTypeType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType.Group;
+import nl.visi.schemas._20140331.MessageTypeType;
 import nl.visi.schemas._20140331.OrganisationTypeType;
 import nl.visi.schemas._20140331.PersonTypeType;
 import nl.visi.schemas._20140331.ProjectTypeType;
+import nl.visi.schemas._20140331.SimpleElementTypeType;
 import nl.visi.schemas._20140331.TransactionPhaseTypeType;
+import nl.visi.schemas._20140331.TransactionTypeType;
 
 public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 	private static final String MISCELLANEOUS_PANEL = "nl/visi/interaction_framework/editor/swixml/MiscellaneousPanel.xml";
 	private JTable tbl_ComplexElements;
-	private JPanel startDatePanel, endDatePanel, relationsPanel;
-	private JLabel lbl_Code, lbl_Namespace;
+	private JPanel startDatePanel, endDatePanel, cards, relationsPanel, elementConditionPanel, emptyPanel;
+	private CardLayout cl;
+	private JLabel lbl_StartDate, lbl_EndDate, lbl_State, lbl_DateLamu, lbl_UserLamu, lbl_Language, lbl_Category,
+			lbl_Code, lbl_Namespace, lbl_ComplexElement2;
 	private JComboBox<MiscellaneousTypes> cbx_ElementType;
-	private JComboBox<String> cbx_ComplexElements;
+	private JComboBox<String> cbx_ComplexElements, cbx_Condition;
 	private ComplexElementsTableModel complexElementsTableModel;
-	private JButton btn_AddComplexElement, btn_RemoveComplexElement;
-	private JTextField tfd_Namespace;
+	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_NavigateComplexElementType1,
+			btn_RemoveComplexElementType1, btn_SetComplexElementType2, btn_RemoveComplexElementType2,
+			btn_NavigateSimpleElementType, btn_RemoveSimpleElementType, btn_NavigateMitt, btn_NavigateTransactionType,
+			btn_NavigateMessageType, btn_RemoveMitt;
+	private JTextField tfd_Namespace, tfd_ComplexElement1, tfd_ComplexElement2, tfd_SimpleElement, tfd_MittId,
+			tfd_Transaction, tfd_Message;
 
 	private enum MiscellaneousTypes {
-		AppendixType, GroupType, OrganisationType, PersonType, ProjectType, TransactionPhaseType;
+		AppendixType, ElementCondition, GroupType, OrganisationType, PersonType, ProjectType, TransactionPhaseType;
 
 		@Override
 		public String toString() {
@@ -59,7 +77,6 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 	}
 
 	private enum MiscellaneousTableColumns {
-//		Id, ElementType, Description, StartDate, EndDate, State, DateLamu, UserLamu;
 		Id, ElementType, Description;
 
 		@Override
@@ -93,6 +110,8 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				String label = "lbl_" + className.substring(0, className.length() - 4);
 				return getBundle().getString(label);
 			case Description:
+				if (element instanceof ElementConditionType)
+					return ((ElementConditionType) element).getDescription();
 				if (element instanceof ProjectTypeType)
 					return ((ProjectTypeType) element).getDescription();
 				if (element instanceof PersonTypeType)
@@ -106,76 +125,6 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				if (element instanceof TransactionPhaseTypeType)
 					return ((TransactionPhaseTypeType) element).getDescription();
 				return null;
-//			case StartDate:
-//				if (element instanceof ProjectTypeType)
-//					return getDate(((ProjectTypeType) element).getStartDate());
-//				if (element instanceof PersonTypeType)
-//					return getDate(((PersonTypeType) element).getStartDate());
-//				if (element instanceof OrganisationTypeType)
-//					return getDate(((OrganisationTypeType) element).getStartDate());
-//				if (element instanceof GroupTypeType)
-//					return getDate(((GroupTypeType) element).getStartDate());
-//				if (element instanceof AppendixTypeType)
-//					return getDate(((AppendixTypeType) element).getStartDate());
-//				if (element instanceof TransactionPhaseTypeType)
-//					return getDate(((TransactionPhaseTypeType) element).getStartDate());
-//				return null;
-//			case EndDate:
-//				if (element instanceof ProjectTypeType)
-//					return getDate(((ProjectTypeType) element).getEndDate());
-//				if (element instanceof PersonTypeType)
-//					return getDate(((PersonTypeType) element).getEndDate());
-//				if (element instanceof OrganisationTypeType)
-//					return getDate(((OrganisationTypeType) element).getEndDate());
-//				if (element instanceof GroupTypeType)
-//					return getDate(((GroupTypeType) element).getEndDate());
-//				if (element instanceof AppendixTypeType)
-//					return getDate(((AppendixTypeType) element).getEndDate());
-//				if (element instanceof TransactionPhaseTypeType)
-//					return getDate(((TransactionPhaseTypeType) element).getEndDate());
-//				return null;
-//			case State:
-//				if (element instanceof ProjectTypeType)
-//					return ((ProjectTypeType) element).getState();
-//				if (element instanceof PersonTypeType)
-//					return ((PersonTypeType) element).getState();
-//				if (element instanceof OrganisationTypeType)
-//					return ((OrganisationTypeType) element).getState();
-//				if (element instanceof GroupTypeType)
-//					return ((GroupTypeType) element).getState();
-//				if (element instanceof AppendixTypeType)
-//					return ((AppendixTypeType) element).getState();
-//				if (element instanceof TransactionPhaseTypeType)
-//					return ((TransactionPhaseTypeType) element).getState();
-//				return null;
-//			case DateLamu:
-//				if (element instanceof ProjectTypeType)
-//					return getDateTime(((ProjectTypeType) element).getDateLaMu());
-//				if (element instanceof PersonTypeType)
-//					return getDateTime(((PersonTypeType) element).getDateLaMu());
-//				if (element instanceof OrganisationTypeType)
-//					return getDateTime(((OrganisationTypeType) element).getDateLaMu());
-//				if (element instanceof GroupTypeType)
-//					return getDateTime(((GroupTypeType) element).getDateLaMu());
-//				if (element instanceof AppendixTypeType)
-//					return getDateTime(((AppendixTypeType) element).getDateLaMu());
-//				if (element instanceof TransactionPhaseTypeType)
-//					return getDateTime(((TransactionPhaseTypeType) element).getDateLaMu());
-//				return null;
-//			case UserLamu:
-//				if (element instanceof ProjectTypeType)
-//					return ((ProjectTypeType) element).getUserLaMu();
-//				if (element instanceof PersonTypeType)
-//					return ((PersonTypeType) element).getUserLaMu();
-//				if (element instanceof OrganisationTypeType)
-//					return ((OrganisationTypeType) element).getUserLaMu();
-//				if (element instanceof GroupTypeType)
-//					return ((GroupTypeType) element).getUserLaMu();
-//				if (element instanceof AppendixTypeType)
-//					return ((AppendixTypeType) element).getUserLaMu();
-//				if (element instanceof TransactionPhaseTypeType)
-//					return ((TransactionPhaseTypeType) element).getUserLaMu();
-//				return null;
 			default:
 				return null;
 			}
@@ -246,6 +195,22 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		}
 		initStartDateField();
 		initEndDateField();
+
+		cl = (CardLayout) (cards.getLayout());
+		cards.add(relationsPanel, "relationsPanel");
+		cards.add(elementConditionPanel, "elementConditionPanel");
+		cards.add(emptyPanel, "emptyPanel");
+		cl.show(cards, "emptyPanel");
+
+		cbx_Condition.addItem(null);
+		cbx_Condition.addItem("EMPTY");
+		cbx_Condition.addItem("FIXED");
+		cbx_Condition.addItem("FREE");
+
+		lbl_ComplexElement2.setEnabled(false);
+		tfd_ComplexElement2.setEnabled(false);
+		btn_SetComplexElementType2.setEnabled(false);
+		btn_RemoveComplexElementType2.setEnabled(false);
 	}
 
 	private void initEndDateField() {
@@ -358,9 +323,6 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		tbl_Elements.setModel(elementsTableModel);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<ElementType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
-//		tableRowSorter.setComparator(MiscellaneousTableColumns.StartDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MiscellaneousTableColumns.EndDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MiscellaneousTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -388,6 +350,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 			Store14 store = Editor14.getStore14();
 
 			elementsTableModel.clear();
+
 			List<ProjectTypeType> projects = store.getElements(ProjectTypeType.class);
 			for (ProjectTypeType project : projects) {
 				elementsTableModel.add(project);
@@ -411,6 +374,10 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 			List<TransactionPhaseTypeType> transactionPhases = store.getElements(TransactionPhaseTypeType.class);
 			for (TransactionPhaseTypeType transactionPhase : transactionPhases) {
 				elementsTableModel.add(transactionPhase);
+			}
+			List<ElementConditionType> elementConditions = store.getElements(ElementConditionType.class);
+			for (ElementConditionType elementCondition : elementConditions) {
+				elementsTableModel.add(elementCondition);
 			}
 		} else {
 			Store14 store = Editor14.getStore14();
@@ -458,6 +425,13 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 					elementsTableModel.add(transactionPhase);
 				}
 			}
+			List<ElementConditionType> elementConditions = store.getElements(ElementConditionType.class);
+			for (ElementConditionType elementCondition : elementConditions) {
+				if (elementCondition.getDescription().toUpperCase().contains(filterString)
+						|| elementCondition.getId().toUpperCase().contains(filterString)) {
+					elementsTableModel.add(elementCondition);
+				}
+			}
 		}
 
 	}
@@ -484,6 +458,10 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				break;
 			case TransactionPhaseType:
 				et = objectFactory.createTransactionPhaseTypeType();
+				break;
+			case ElementCondition:
+				et = objectFactory.createElementConditionType();
+				((ElementConditionType) et).setCondition("FIXED");
 				break;
 			}
 
@@ -521,6 +499,19 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				copyAppendixType.setStartDate(origAppendixType.getStartDate());
 				copyAppendixType.setState(origAppendixType.getState());
 				copyElementType = copyAppendixType;
+				break;
+			case ElementCondition:
+				ElementConditionType origElementConditionType = (ElementConditionType) origElementType;
+				ElementConditionType copyElementConditionType = objectFactory.createElementConditionType();
+				newElement(copyElementConditionType, "ElementConditionType_");
+				store.generateCopyId(copyElementConditionType, origElementConditionType);
+				copyElementConditionType.setCondition(origElementConditionType.getCondition());
+				copyElementConditionType.setMessageInTransaction(origElementConditionType.getMessageInTransaction());
+				copyElementConditionType.setComplexElement(origElementConditionType.getComplexElement());
+				copyElementConditionType.setSimpleElement(origElementConditionType.getSimpleElement());
+				copyElementConditionType.setDescription(origElementConditionType.getDescription());
+				copyElementConditionType.setHelpInfo(origElementConditionType.getHelpInfo());
+				copyElementType = copyElementConditionType;
 				break;
 			case GroupType:
 				GroupTypeType origGroupType = (GroupTypeType) origElementType;
@@ -629,6 +620,8 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		switch (type) {
 		case AppendixType:
 			break;
+		case ElementCondition:
+			break;
 		case GroupType:
 			mittElements = Editor14.getStore14().getElements(MessageInTransactionTypeType.class);
 			for (Object object : mittElements) {
@@ -686,41 +679,91 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		boolean isGroupType = selectedElement instanceof GroupTypeType;
 		boolean isProjectType = selectedElement instanceof ProjectTypeType;
 		boolean isTransactionPhaseType = selectedElement instanceof TransactionPhaseTypeType;
+		boolean isElementConditionType = selectedElement instanceof ElementConditionType;
 		btn_CopyElement.setEnabled(rowSelected);
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
-		startDateField.setEnabled(rowSelected);
-		endDateField.setEnabled(rowSelected);
-		tfd_State.setEnabled(rowSelected);
-		tfd_DateLamu.setEnabled(rowSelected);
-		tfd_UserLamu.setEnabled(rowSelected);
-		tfd_Language.setEnabled(rowSelected);
-		tfd_Category.setEnabled(rowSelected);
+		if (rowSelected && isElementConditionType) {
+			startDateField.setDate(null);
+			endDateField.setDate(null);
+			tfd_State.setText(null);
+			tfd_DateLamu.setText(null);
+			tfd_UserLamu.setText(null);
+			tfd_Language.setText(null);
+			tfd_Category.setText(null);
+		}
+		lbl_StartDate.setEnabled(rowSelected && !isElementConditionType);
+		startDateField.setEnabled(rowSelected && !isElementConditionType);
+		lbl_EndDate.setEnabled(rowSelected && !isElementConditionType);
+		endDateField.setEnabled(rowSelected && !isElementConditionType);
+		lbl_State.setEnabled(rowSelected && !isElementConditionType);
+		tfd_State.setEnabled(rowSelected && !isElementConditionType);
+		lbl_DateLamu.setEnabled(rowSelected && !isElementConditionType);
+		tfd_DateLamu.setEnabled(rowSelected && !isElementConditionType);
+		lbl_UserLamu.setEnabled(rowSelected && !isElementConditionType);
+		tfd_UserLamu.setEnabled(rowSelected && !isElementConditionType);
+		lbl_Language.setEnabled(rowSelected && !isElementConditionType);
+		tfd_Language.setEnabled(rowSelected && !isElementConditionType);
+		lbl_Category.setEnabled(rowSelected && !isElementConditionType);
+		tfd_Category.setEnabled(rowSelected && !isElementConditionType);
 		tfd_HelpInfo.setEnabled(rowSelected);
-		tfd_Code.setEnabled(rowSelected);
-		lbl_Code.setVisible(!isGroupType);
-		tfd_Code.setVisible(!isGroupType);
+		tfd_Code.setEnabled(rowSelected && !isElementConditionType);
+		lbl_Code.setVisible(!isGroupType && !isElementConditionType);
+		tfd_Code.setVisible(!isGroupType && !isElementConditionType);
 		tfd_Code.getParent().invalidate();
 		tfd_Namespace.setEnabled(rowSelected);
 		lbl_Namespace.setVisible(isProjectType);
 		tfd_Namespace.setVisible(isProjectType);
 		tfd_Namespace.getParent().invalidate();
-		if (rowSelected && !(isGroupType || isTransactionPhaseType)) {
-			tbl_ComplexElements.setEnabled(true);
-			cbx_ComplexElements.setEnabled(true);
-			relationsPanel.setVisible(true);
+		if (rowSelected && !(isGroupType || isTransactionPhaseType || isElementConditionType)) {
+			cl.show(cards, "relationsPanel");
+		} else if (rowSelected && isElementConditionType) {
+			cl.show(cards, "elementConditionPanel");
 		} else {
-			tbl_ComplexElements.setEnabled(false);
-			cbx_ComplexElements.setEnabled(false);
-			relationsPanel.setVisible(false);
+			cl.show(cards, "emptyPanel");
 		}
-		relationsPanel.invalidate();
 		if (rowSelected) {
 			complexElementsTableModel.clear();
 			tfd_Id.setText(selectedElement.getId());
 			List<Object> ceList = null;
-			if (selectedElement instanceof ProjectTypeType) {
+			if (selectedElement instanceof ElementConditionType) {
+				ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+				tfd_Description.setText(elementConditionType.getDescription());
+				tfd_HelpInfo.setText(elementConditionType.getHelpInfo());
+				cbx_Condition.setSelectedItem(elementConditionType.getCondition());
+				ComplexElementTypeType complexElements2 = getComplexElement(elementConditionType);
+				tfd_ComplexElement1.setText(
+						complexElements2 != null ? ((ComplexElementTypeType) complexElements2).getDescription() : null);
+				tfd_ComplexElement1.setToolTipText(
+						complexElements2 != null ? ((ComplexElementTypeType) complexElements2).getId() : null);
+				btn_RemoveComplexElementType1.setEnabled(complexElements2 != null);
+				btn_NavigateComplexElementType1.setEnabled(complexElements2 != null);
+				SimpleElementTypeType simpleElement = getSimpleElement(elementConditionType);
+				tfd_SimpleElement.setText(simpleElement != null ? simpleElement.getDescription() : null);
+				tfd_SimpleElement.setToolTipText(simpleElement != null ? simpleElement.getId() : null);
+				btn_NavigateSimpleElementType.setEnabled(simpleElement != null);
+				btn_RemoveSimpleElementType.setEnabled(simpleElement != null);
+				MessageInTransactionTypeType mitt = getMessageInTransaction(elementConditionType);
+				tfd_MittId.setText(mitt != null ? mitt.getId() : null);
+				btn_NavigateMitt.setEnabled(mitt != null);
+				btn_NavigateTransactionType.setEnabled(mitt != null);
+				btn_NavigateMessageType.setEnabled(mitt != null);
+				btn_RemoveMitt.setEnabled(mitt != null);
+				if (mitt != null) {
+					TransactionTypeType transaction = getTransaction(mitt);
+					tfd_Transaction.setText(transaction.getDescription());
+					tfd_Transaction.setToolTipText(transaction.getId());
+					MessageTypeType message = getMessage(mitt);
+					tfd_Message.setText(message.getDescription());
+					tfd_Message.setToolTipText(message.getId());
+				} else {
+					tfd_Transaction.setText(null);
+					tfd_Transaction.setToolTipText(null);
+					tfd_Message.setText(null);
+					tfd_Message.setToolTipText(null);
+				}
+			} else if (selectedElement instanceof ProjectTypeType) {
 				ProjectTypeType projectType = (ProjectTypeType) selectedElement;
 				tfd_Description.setText(projectType.getDescription());
 				XMLGregorianCalendar startDate = projectType.getStartDate();
@@ -872,6 +915,239 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		}
 
 		inSelection = false;
+	}
+
+	public void setComplexElementType1() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<ComplexElementTypeType> elements = null;
+		List<String> items = new ArrayList<>();
+		MessageInTransactionTypeType mitt = getMessageInTransaction(elementConditionType);
+		if (mitt != null) {
+			MessageTypeType message = getMessage(mitt);
+			List<ComplexElementTypeType> complexElements1 = getComplexElements(message);
+			if (complexElements1 != null) {
+				for (ComplexElementTypeType pce : complexElements1) {
+					if (elements == null) {
+						elements = new ArrayList<>();
+					}
+					if (!elements.contains(pce)) {
+						elements.add(pce);
+					}
+					List<ComplexElementTypeType> complexElements2 = getComplexElements(pce);
+					if (complexElements2 != null) {
+						for (ComplexElementTypeType cce : complexElements2) {
+							if (!elements.contains(cce)) {
+								elements.add(cce);
+							}
+						}
+					}
+				}
+			}
+		} else {
+			elements = Editor14.getStore14().getElements(ComplexElementTypeType.class);
+		}
+		if (elements != null) {
+			for (ComplexElementTypeType element : elements) {
+				items.add(element.getDescription() + " [" + element.getId() + "]");
+			}
+			Collections.sort(items);
+		}
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
+				getBundle().getString("lbl_ComplexElement1"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String elementId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				ComplexElementTypeType ce = Editor14.getStore14().getElement(ComplexElementTypeType.class, elementId);
+				setElementConditionTypeComplexElement(elementConditionType, ce);
+				updateSelectionArea(null);
+			}
+		});
+	}
+
+	public void removeComplexElementType1() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		ComplexElementTypeType complexElement1 = Control14.getComplexElement(elementConditionType);
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + complexElement1.getDescription(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response != JOptionPane.CANCEL_OPTION) {
+			setElementConditionTypeComplexElement(elementConditionType, null);
+			updateSelectionArea(null);
+		}
+	}
+
+	public void navigateComplexElementType1() {
+		String idref = tfd_ComplexElement1.getToolTipText();
+		ComplexElementTypeType element = Editor14.getStore14().getElement(ComplexElementTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void setSimpleElementType() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<String> items = new ArrayList<>();
+		List<SimpleElementTypeType> elements = new ArrayList<>();
+
+		ComplexElementTypeType complexElement1 = getComplexElement(elementConditionType);
+		if (complexElement1 != null) {
+			elements = getSimpleElements(complexElement1);
+//			ComplexElementTypeType complexElement2 = getElementConditionTypeComplexElement2(elementConditionType);
+//			if (complexElement2 != null) {
+//				List<SimpleElementTypeType> simpleElements2 = getSimpleElements(complexElement2);
+//				if (simpleElements2 != null) {
+//					for (SimpleElementTypeType simpleElement : simpleElements2) {
+//						if (elements == null)
+//							elements = new ArrayList<>();
+//						elements.add(simpleElement);
+//					}
+//				}
+//			} else {
+//				List<ComplexElementTypeType> complexElements = getComplexElements(complexElement1);
+//				if (complexElements != null) {
+//					for (ComplexElementTypeType ce : complexElements) {
+//						List<SimpleElementTypeType> simpleElements = getSimpleElements(ce);
+//						for (SimpleElementTypeType simpleElement : simpleElements) {
+//							if (elements == null)
+//								elements = new ArrayList<>();
+//							elements.add(simpleElement);
+//						}
+//					}
+//				}
+//			}
+		} else {
+			elements = Editor14.getStore14().getElements(SimpleElementTypeType.class);
+		}
+		if (elements != null) {
+			for (SimpleElementTypeType element : elements) {
+				items.add(element.getDescription() + " [" + element.getId() + "]");
+			}
+			Collections.sort(items);
+		}
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
+				getBundle().getString("lbl_SimpleElement"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String elementId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				SimpleElementTypeType se = Editor14.getStore14().getElement(SimpleElementTypeType.class, elementId);
+				setElementConditionTypeSimpleElement(elementConditionType, se);
+				updateSelectionArea(null);
+			}
+		});
+	}
+
+	public void removeSimpleElementType() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		SimpleElementTypeType simpleElement = Control14.getSimpleElement(elementConditionType);
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + simpleElement.getDescription(),
+				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response != JOptionPane.CANCEL_OPTION) {
+			setElementConditionTypeSimpleElement(elementConditionType, null);
+			updateSelectionArea(null);
+		}
+	}
+
+	public void navigateSimpleElementType() {
+		String idref = tfd_SimpleElement.getToolTipText();
+		SimpleElementTypeType element = Editor14.getStore14().getElement(SimpleElementTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void navigateTransactionType() {
+		String idref = tfd_Transaction.getToolTipText();
+		TransactionTypeType element = Editor14.getStore14().getElement(TransactionTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+		String mittId = tfd_MittId.getText();
+		MessageInTransactionTypeType mitt = Editor14.getStore14().getElement(MessageInTransactionTypeType.class,
+				mittId);
+		TransactionsPanelControl14 panelControl = (TransactionsPanelControl14) Tabs.Transactions.getPanelControl();
+		int index = panelControl.getMessagesTableModel().elements.indexOf(mitt);
+		panelControl.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
+		panelControl.tbl_Messages.scrollRectToVisible(panelControl.tbl_Messages.getCellRect(selectedRow, 0, true));
+		panelControl.transactionTabs.setSelectedIndex(TransactionTabs.Messages.ordinal());
+	}
+
+	public void navigateMessageType() {
+		String idref = tfd_Message.getToolTipText();
+		MessageTypeType element = Editor14.getStore14().getElement(MessageTypeType.class, idref);
+		InteractionFrameworkEditor.navigate(element);
+	}
+
+	public void setMitt() {
+		final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		List<String> items = new ArrayList<>();
+		ComplexElementTypeType complexElement1 = getComplexElement(elementConditionType);
+		SimpleElementTypeType simpleElement = getSimpleElement(elementConditionType);
+		List<MessageInTransactionTypeType> elements = Editor14.getStore14()
+				.getElements(MessageInTransactionTypeType.class);
+		for (MessageInTransactionTypeType element : elements) {
+			TransactionTypeType transaction = getTransaction(element);
+			MessageTypeType message = getMessage(element);
+			if (complexElement1 != null) {
+				List<ComplexElementTypeType> complexElements = getComplexElements(message);
+				if (complexElements != null && complexElements.contains(complexElement1)) {
+					items.add(transaction.getDescription() + " : " + message.getDescription() + " [" + element.getId()
+							+ "]");
+				}
+			} else if (simpleElement != null) {
+				List<ElementType> useElements = getUseElements(simpleElement);
+				if (useElements != null) {
+					for (ElementType useElement : useElements) {
+						if (useElement instanceof ComplexElementTypeType) {
+							List<ComplexElementTypeType> complexElements = getComplexElements(message);
+							if (complexElements != null && complexElements.contains(useElement)) {
+								items.add(transaction.getDescription() + " : " + message.getDescription() + " ["
+										+ element.getId() + "]");
+							}
+						}
+					}
+				}
+			} else {
+				items.add(
+						transaction.getDescription() + " : " + message.getDescription() + " [" + element.getId() + "]");
+			}
+		}
+		Collections.sort(items);
+		SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(getPanel())),
+				getBundle().getString("lbl_Mitt"), items);
+		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
+			public void propertyChange(PropertyChangeEvent evt) {
+				String result = (String) evt.getNewValue();
+				int lastOpenBracket = result.lastIndexOf('[');
+				int lastCloseBracket = result.lastIndexOf(']');
+				String elementId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				MessageInTransactionTypeType mitt = Editor14.getStore14().getElement(MessageInTransactionTypeType.class,
+						elementId);
+				setElementConditionTypeMessageInTransaction(elementConditionType, mitt);
+				updateSelectionArea(null);
+			}
+		});
+	}
+
+	public void removeMitt() {
+		int response = JOptionPane.showConfirmDialog(getPanel(),
+				getBundle().getString("lbl_Remove") + ": " + tfd_MittId.getText(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+		if (response != JOptionPane.CANCEL_OPTION) {
+			final ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+			setElementConditionTypeMessageInTransaction(elementConditionType, null);
+			updateSelectionArea(null);
+		}
+	}
+
+	public void selectCondition() {
+		ElementConditionType elementConditionType = (ElementConditionType) selectedElement;
+		String selectedItem = (String) cbx_Condition.getSelectedItem();
+		if (selectedItem != null)
+			elementConditionType.setCondition(selectedItem);
 	}
 
 	public void selectComplexElement() {

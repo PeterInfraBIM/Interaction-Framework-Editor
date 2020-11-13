@@ -37,7 +37,6 @@ import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.ElementConditionType;
-import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.GroupTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
@@ -55,7 +54,8 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	private JTable tbl_ComplexElements;
 	private JPanel startDatePanel, endDatePanel, cards, relationsPanel, elementConditionPanel, emptyPanel;
 	private CardLayout cl;
-	private JLabel lbl_Code, lbl_Namespace;
+	private JLabel lbl_StartDate, lbl_EndDate, lbl_State, lbl_DateLamu, lbl_UserLamu, lbl_Language, lbl_Category,
+			lbl_Code, lbl_Namespace, lbl_ComplexElement2;
 	private JComboBox<MiscellaneousTypes> cbx_ElementType;
 	private JComboBox<String> cbx_ComplexElements, cbx_Condition;
 	private ComplexElementsTableModel complexElementsTableModel;
@@ -678,12 +678,28 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		btn_DeleteElement.setEnabled(rowSelected);
 		tfd_Id.setEnabled(rowSelected);
 		tfd_Description.setEnabled(rowSelected);
+		if (rowSelected && isElementConditionType) {
+			startDateField.setDate(null);
+			endDateField.setDate(null);
+			tfd_State.setText(null);
+			tfd_DateLamu.setText(null);
+			tfd_UserLamu.setText(null);
+			tfd_Language.setText(null);
+			tfd_Category.setText(null);
+		}
+		lbl_StartDate.setEnabled(rowSelected && !isElementConditionType);
 		startDateField.setEnabled(rowSelected && !isElementConditionType);
+		lbl_EndDate.setEnabled(rowSelected && !isElementConditionType);
 		endDateField.setEnabled(rowSelected && !isElementConditionType);
+		lbl_State.setEnabled(rowSelected && !isElementConditionType);
 		tfd_State.setEnabled(rowSelected && !isElementConditionType);
+		lbl_DateLamu.setEnabled(rowSelected && !isElementConditionType);
 		tfd_DateLamu.setEnabled(rowSelected && !isElementConditionType);
+		lbl_UserLamu.setEnabled(rowSelected && !isElementConditionType);
 		tfd_UserLamu.setEnabled(rowSelected && !isElementConditionType);
+		lbl_Language.setEnabled(rowSelected && !isElementConditionType);
 		tfd_Language.setEnabled(rowSelected && !isElementConditionType);
+		lbl_Category.setEnabled(rowSelected && !isElementConditionType);
 		tfd_Category.setEnabled(rowSelected && !isElementConditionType);
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_Code.setEnabled(rowSelected && !isElementConditionType);
@@ -1102,6 +1118,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		TransactionsPanelControl16 panelControl = (TransactionsPanelControl16) Tabs.Transactions.getPanelControl();
 		int index = panelControl.getMessagesTableModel().elements.indexOf(mitt);
 		panelControl.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
+		panelControl.tbl_Messages.scrollRectToVisible(panelControl.tbl_Messages.getCellRect(selectedRow, 0, true));
 		panelControl.transactionTabs.setSelectedIndex(TransactionTabs.Messages.ordinal());
 	}
 

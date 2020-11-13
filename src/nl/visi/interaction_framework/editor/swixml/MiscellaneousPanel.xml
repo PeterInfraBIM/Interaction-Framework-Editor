@@ -96,7 +96,7 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="2"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
-					<label Text="lbl_StartDate">
+					<label id="lbl_StartDate" Text="lbl_StartDate">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="3"
 							Insets="2,2,2,2" />
@@ -107,7 +107,7 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="3"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</panel>
-					<label Text="lbl_EndDate">
+					<label id="lbl_EndDate" Text="lbl_EndDate">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="4"
 							Insets="2,2,2,2" />
@@ -118,7 +118,7 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="4"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</panel>
-					<label Text="lbl_State">
+					<label id="lbl_State" Text="lbl_State">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="5"
 							Insets="2,2,2,2" />
@@ -129,7 +129,7 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="5"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
-					<label Text="lbl_DateLamu">
+					<label id="lbl_DateLamu" Text="lbl_DateLamu">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="6"
 							Insets="2,2,2,2" />
@@ -141,7 +141,7 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="6"
 							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
-					<label Text="lbl_UserLamu">
+					<label id="lbl_UserLamu" Text="lbl_UserLamu">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="7"
 							Insets="2,2,2,2" />
@@ -153,7 +153,7 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="7"
 							Insets="2,2,2,2" Weightx="0.0" />
 					</textfield>
-					<label Text="lbl_Language">
+					<label id="lbl_Language" Text="lbl_Language">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="8"
 							Insets="2,2,2,2" />
@@ -164,7 +164,7 @@
 							Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="8"
 							Insets="2,2,2,2" Weightx="1.0" />
 					</textfield>
-					<label Text="lbl_Category">
+					<label id="lbl_Category" Text="lbl_Category">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="9"
 							Insets="2,2,2,2" />
@@ -205,8 +205,6 @@
 				</panel>
 			</scrollpane>
 		</splitpane>
-		<!-- <splitpane ContinuousLayout="true" DividerLocation="280" -->
-		<!-- OneTouchExpandable="true" Orientation="JSplitPane.HORIZONTAL_SPLIT"> -->
 		<scrollpane Border="TitledBorder(lbl_Relations)">
 			<panel id="cards" Layout="CardLayout">
 				<panel id="relationsPanel" name="relationsPanel"
@@ -247,11 +245,6 @@
 								Insets="0,2,2,2" />
 						</button>
 					</panel>
-					<!-- <panel> -->
-					<!-- <gridbagconstraints -->
-					<!-- Fill="GridBagConstraints.BOTH" Gridwidth="2" Gridx="0" Gridy="2" -->
-					<!-- Weightx="1.0" Weighty="1.0" /> -->
-					<!-- </panel> -->
 				</panel>
 				<panel id="elementConditionPanel" name="elementConditionPanel"
 					Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout" Visible="true">
@@ -443,7 +436,7 @@
 				</panel>
 				<panel id="emptyPanel" name="emptyPanel"
 					Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout" Visible="true">
-					<label Text="Empty panel">
+					<label Text="">
 						<gridbagconstraints
 							Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0"
 							Insets="2,2,2,2" />

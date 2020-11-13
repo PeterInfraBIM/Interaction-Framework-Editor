@@ -91,7 +91,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 
 	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel,
 			elementsTreePanel;
-	private JTabbedPane transactionTabs;
+	JTabbedPane transactionTabs;
 	JTable tbl_Messages;
 
 	private JTable tbl_Subtransactions;
@@ -1650,7 +1650,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		return messagesTableModel;
 	}
 
-	private enum TransactionTabs {
+	enum TransactionTabs {
 		Roles, Messages, Subtransactions, StaticSequenceDiagram, DynamicSequenceDiagram;
 
 		JFrame tearOffFrame;
