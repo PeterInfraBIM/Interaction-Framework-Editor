@@ -329,8 +329,9 @@ public class MainPanelControl14 extends Control14 {
 	}
 
 	public void navigate(ElementType element) {
-		int tabIndex = tabs.getSelectedIndex();
-		PanelControl14<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+//		int tabIndex = tabs.getSelectedIndex();
+//		PanelControl14<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+		PanelControl14<?> panelControl = Tabs.values()[tabsIndex].getPanelControl();
 		backwardStack.push(panelControl.selectedElement);
 		forwardStack.clear();
 		navExec(element);
