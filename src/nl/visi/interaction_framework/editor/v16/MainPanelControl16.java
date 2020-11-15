@@ -41,6 +41,7 @@ public class MainPanelControl16 extends Control16 {
 	private JPanel mainPanel, rolesPanel, transactionsPanel, messagesPanel, complexElementsPanel, simpleElementsPanel,
 			userDefinedTypesPanel, miscellaneousPanel;
 	JTabbedPane tabs;
+	int tabsIndex = 0;
 	private static ComplexElementsPanelControl16 complexElementsPC;
 	private static MessagesPanelControl16 messagesPC;
 	private static MiscellaneousPanelControl16 miscellaneousPC;
@@ -90,6 +91,7 @@ public class MainPanelControl16 extends Control16 {
 		tabs.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
+				tabsIndex = tabs.getSelectedIndex();
 				switch (Tabs.values()[tabs.getSelectedIndex()]) {
 				case Roles:
 					rolesPC.fillTable();
@@ -327,8 +329,9 @@ public class MainPanelControl16 extends Control16 {
 	}
 
 	public void navigate(ElementType element) {
-		int tabIndex = tabs.getSelectedIndex();
-		PanelControl16<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+//		int tabIndex = tabs.getSelectedIndex();
+//		PanelControl16<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+		PanelControl16<?> panelControl = Tabs.values()[tabsIndex].getPanelControl();
 		backwardStack.push(panelControl.selectedElement);
 		forwardStack.clear();
 		navExec(element);
@@ -346,32 +349,35 @@ public class MainPanelControl16 extends Control16 {
 		PanelControl16<?> panelControl = null;
 		switch (Store16.ElementTypeType.valueOf(element.getClass().getSimpleName())) {
 		case AppendixTypeType:
+			tabsIndex = Tabs.Miscellaneous.ordinal();
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case ComplexElementTypeType:
-			tabs.setSelectedIndex(Tabs.ComplexElements.ordinal());
+			tabsIndex = Tabs.ComplexElements.ordinal();
 			if (Tabs.ComplexElements.tearOffFrame != null)
 				Tabs.ComplexElements.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.ComplexElements.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.ComplexElements.getPanelControl();
 			break;
 		case ElementConditionType:
+			tabsIndex = Tabs.Miscellaneous.ordinal();
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case GroupTypeType:
+			tabsIndex = Tabs.Miscellaneous.ordinal();
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case MessageInTransactionTypeConditionType:
@@ -379,67 +385,76 @@ public class MainPanelControl16 extends Control16 {
 		case MessageInTransactionTypeType:
 			break;
 		case MessageTypeType:
+			tabsIndex = Tabs.Messages.ordinal();
 			if (Tabs.Messages.tearOffFrame != null)
 				Tabs.Messages.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Messages.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Messages.getPanelControl();
 			break;
 		case OrganisationTypeType:
+			tabsIndex = Tabs.Miscellaneous.ordinal();
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case PersonTypeType:
+			tabsIndex = Tabs.Miscellaneous.ordinal();
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case ProjectTypeType:
+			tabsIndex = Tabs.Miscellaneous.ordinal();
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case RoleTypeType:
+			tabsIndex = Tabs.Roles.ordinal();
 			if (Tabs.Roles.tearOffFrame != null)
 				Tabs.Roles.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Roles.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Roles.getPanelControl();
 			break;
 		case SimpleElementTypeType:
+			tabsIndex = Tabs.SimpleElements.ordinal();
 			if (Tabs.SimpleElements.tearOffFrame != null)
 				Tabs.SimpleElements.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.SimpleElements.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.SimpleElements.getPanelControl();
 			break;
 		case TransactionPhaseTypeType:
+			tabsIndex = Tabs.Miscellaneous.ordinal();
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case TransactionTypeType:
+			tabsIndex = Tabs.Transactions.ordinal();
 			if (Tabs.Transactions.tearOffFrame != null) {
 				Tabs.Transactions.tearOffFrame.toFront();
 			} else {
-				tabs.setSelectedIndex(Tabs.Transactions.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			}
 			panelControl = Tabs.Transactions.getPanelControl();
 			break;
 		case UserDefinedTypeType:
+			tabsIndex = Tabs.UserDefinedTypes.ordinal();
 			if (Tabs.UserDefinedTypes.tearOffFrame != null)
 				Tabs.UserDefinedTypes.tearOffFrame.toFront();
 			else
-				tabs.setSelectedIndex(Tabs.UserDefinedTypes.ordinal());
+				tabs.setSelectedIndex(tabsIndex);
 			panelControl = Tabs.UserDefinedTypes.getPanelControl();
 			break;
 		default:
@@ -458,8 +473,9 @@ public class MainPanelControl16 extends Control16 {
 	}
 
 	public void navigateForward() {
-		int tabIndex = tabs.getSelectedIndex();
-		PanelControl16<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+//		int tabIndex = tabs.getSelectedIndex();
+//		PanelControl16<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+		PanelControl16<?> panelControl = Tabs.values()[tabsIndex].getPanelControl();
 		if (panelControl.selectedElement != null) {
 			backwardStack.push(panelControl.selectedElement);
 		}
@@ -468,8 +484,9 @@ public class MainPanelControl16 extends Control16 {
 	}
 
 	public void navigateBackward() {
-		int tabIndex = tabs.getSelectedIndex();
-		PanelControl16<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+//		int tabIndex = tabs.getSelectedIndex();
+//		PanelControl16<?> panelControl = Tabs.values()[tabIndex].getPanelControl();
+		PanelControl16<?> panelControl = Tabs.values()[tabsIndex].getPanelControl();
 		if (panelControl.selectedElement != null) {
 			forwardStack.push(panelControl.selectedElement);
 		}
