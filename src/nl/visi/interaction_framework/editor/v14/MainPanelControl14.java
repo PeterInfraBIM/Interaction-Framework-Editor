@@ -76,7 +76,7 @@ public class MainPanelControl14 extends Control14 {
 			}
 			return null;
 		}
-		
+
 		JFrame getTearOffFrame() {
 			if (tearOffFrame == null) {
 				tearOffFrame = new JFrame(getBundle().getString("lbl_" + name()));
@@ -346,23 +346,31 @@ public class MainPanelControl14 extends Control14 {
 		PanelControl14<?> panelControl = null;
 		switch (Store14.ElementTypeType.valueOf(element.getClass().getSimpleName())) {
 		case AppendixTypeType:
-			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case ComplexElementTypeType:
-			tabs.setSelectedIndex(Tabs.ComplexElements.ordinal());
 			if (Tabs.ComplexElements.tearOffFrame != null)
 				Tabs.ComplexElements.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.ComplexElements.ordinal());
 			panelControl = Tabs.ComplexElements.getPanelControl();
 			break;
 		case ElementConditionType:
-			break;
-		case GroupTypeType:
-			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
+			panelControl = Tabs.Miscellaneous.getPanelControl();
+			break;
+		case GroupTypeType:
+			if (Tabs.Miscellaneous.tearOffFrame != null)
+				Tabs.Miscellaneous.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case MessageInTransactionTypeConditionType:
@@ -370,57 +378,67 @@ public class MainPanelControl14 extends Control14 {
 		case MessageInTransactionTypeType:
 			break;
 		case MessageTypeType:
-			tabs.setSelectedIndex(Tabs.Messages.ordinal());
 			if (Tabs.Messages.tearOffFrame != null)
 				Tabs.Messages.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Messages.ordinal());
 			panelControl = Tabs.Messages.getPanelControl();
 			break;
 		case OrganisationTypeType:
-			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case PersonTypeType:
-			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case ProjectTypeType:
-			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case RoleTypeType:
-			tabs.setSelectedIndex(Tabs.Roles.ordinal());
 			if (Tabs.Roles.tearOffFrame != null)
 				Tabs.Roles.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Roles.ordinal());
 			panelControl = Tabs.Roles.getPanelControl();
 			break;
 		case SimpleElementTypeType:
-			tabs.setSelectedIndex(Tabs.SimpleElements.ordinal());
 			if (Tabs.SimpleElements.tearOffFrame != null)
 				Tabs.SimpleElements.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.SimpleElements.ordinal());
 			panelControl = Tabs.SimpleElements.getPanelControl();
 			break;
 		case TransactionPhaseTypeType:
-			tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			if (Tabs.Miscellaneous.tearOffFrame != null)
 				Tabs.Miscellaneous.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.Miscellaneous.ordinal());
 			panelControl = Tabs.Miscellaneous.getPanelControl();
 			break;
 		case TransactionTypeType:
-			tabs.setSelectedIndex(Tabs.Transactions.ordinal());
-			if (Tabs.Transactions.tearOffFrame != null)
+			if (Tabs.Transactions.tearOffFrame != null) {
 				Tabs.Transactions.tearOffFrame.toFront();
+			} else {
+				tabs.setSelectedIndex(Tabs.Transactions.ordinal());
+			}
 			panelControl = Tabs.Transactions.getPanelControl();
 			break;
 		case UserDefinedTypeType:
-			tabs.setSelectedIndex(Tabs.UserDefinedTypes.ordinal());
 			if (Tabs.UserDefinedTypes.tearOffFrame != null)
 				Tabs.UserDefinedTypes.tearOffFrame.toFront();
+			else
+				tabs.setSelectedIndex(Tabs.UserDefinedTypes.ordinal());
 			panelControl = Tabs.UserDefinedTypes.getPanelControl();
 			break;
 		default:
@@ -433,7 +451,8 @@ public class MainPanelControl14 extends Control14 {
 				panelControl.tbl_Elements.getSelectionModel().setSelectionInterval(index, index);
 			}
 		} else {
-			JOptionPane.showMessageDialog(mainPanel, "No tab available for this navigation link.", "No tab available", JOptionPane.WARNING_MESSAGE);
+			JOptionPane.showMessageDialog(mainPanel, "No tab available for this navigation link.", "No tab available",
+					JOptionPane.WARNING_MESSAGE);
 		}
 	}
 
