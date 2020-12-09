@@ -2252,19 +2252,23 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			TransactionTypeType copyTransactionType = objectFactory.createTransactionTypeType();
 			newElement(copyTransactionType, "Transaction_");
 			store.generateCopyId(copyTransactionType, origTransactionType);
-			copyTransactionType.setAppendixTypes(origTransactionType.getAppendixTypes());
+			copyAppendices(origTransactionType, copyTransactionType);
+//			copyTransactionType.setAppendixTypes(origTransactionType.getAppendixTypes());
 			copyTransactionType.setCategory(origTransactionType.getCategory());
 			copyTransactionType.setCode(origTransactionType.getCode());
 			copyTransactionType.setDescription(origTransactionType.getDescription());
 			copyTransactionType.setEndDate(origTransactionType.getEndDate());
-			copyTransactionType.setExecutor(origTransactionType.getExecutor());
+			copyExecutor(origTransactionType, copyTransactionType);
+//			copyTransactionType.setExecutor(origTransactionType.getExecutor());
 			copyTransactionType.setHelpInfo(origTransactionType.getHelpInfo());
-			copyTransactionType.setInitiator(origTransactionType.getInitiator());
+			copyInitiator(origTransactionType, copyTransactionType);
+//			copyTransactionType.setInitiator(origTransactionType.getInitiator());
 			copyTransactionType.setLanguage(origTransactionType.getLanguage());
 			copyTransactionType.setResult(origTransactionType.getResult());
 			copyTransactionType.setStartDate(origTransactionType.getStartDate());
 			copyTransactionType.setState(origTransactionType.getState());
-			copyTransactionType.setSubTransactions(origTransactionType.getSubTransactions());
+			copySubtransactions(origTransactionType, copyTransactionType);
+//			copyTransactionType.setSubTransactions(origTransactionType.getSubTransactions());
 			store.put(copyTransactionType.getId(), copyTransactionType);
 			int copyrow = elementsTableModel.add(copyTransactionType);
 			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
@@ -2273,6 +2277,68 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			e.printStackTrace();
 		}
 
+	}
+
+	private void copyAppendices(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
+		TransactionTypeType.AppendixTypes appendixTypes = transactionType.getAppendixTypes();
+		if (appendixTypes != null) {
+			List<Object> refs = appendixTypes.getAppendixTypeOrAppendixTypeRef();
+			if (refs != null) {
+				TransactionTypeType.AppendixTypes copyAppendixTypes = objectFactory
+						.createTransactionTypeTypeAppendixTypes();
+				List<Object> copyRefs = copyAppendixTypes.getAppendixTypeOrAppendixTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyTransactionType.setAppendixTypes(copyAppendixTypes);
+			}
+		}
+	}
+	
+	private void copySubtransactions(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
+		TransactionTypeType.SubTransactions subtransactions = transactionType.getSubTransactions();
+		if (subtransactions != null) {
+			List<Object> refs = subtransactions.getTransactionTypeOrTransactionTypeRef();
+			if (refs != null) {
+				TransactionTypeType.SubTransactions copySubtransactions = objectFactory
+						.createTransactionTypeTypeSubTransactions();
+				List<Object> copyRefs = copySubtransactions.getTransactionTypeOrTransactionTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyTransactionType.setSubTransactions(copySubtransactions);
+			}
+		}
+	}
+
+	private void copyExecutor(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
+		TransactionTypeType.Executor executor = transactionType.getExecutor();
+		if (executor != null) {
+			RoleTypeType roleType = executor.getRoleType();
+			if (roleType == null) {
+				roleType = (RoleTypeType) executor.getRoleTypeRef().getIdref();
+			}
+			if (roleType != null) {
+				TransactionTypeType.Executor copyExecutor = objectFactory.createTransactionTypeTypeExecutor();
+				copyExecutor.setRoleType(roleType);
+				copyTransactionType.setExecutor(copyExecutor);
+			}
+		}
+	}
+
+	private void copyInitiator(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
+		TransactionTypeType.Initiator initiator = transactionType.getInitiator();
+		if (initiator != null) {
+			RoleTypeType roleType = initiator.getRoleType();
+			if (roleType == null) {
+				roleType = (RoleTypeType) initiator.getRoleTypeRef().getIdref();
+			}
+			if (roleType != null) {
+				TransactionTypeType.Initiator copyInitiator = objectFactory.createTransactionTypeTypeInitiator();
+				copyInitiator.setRoleType(roleType);
+				copyTransactionType.setInitiator(copyInitiator);
+			}
+		}
 	}
 
 	public void deleteElement() {

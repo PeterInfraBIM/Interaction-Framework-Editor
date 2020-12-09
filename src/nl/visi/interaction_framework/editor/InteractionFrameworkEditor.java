@@ -89,7 +89,7 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	static void renderSplashFrame(Graphics2D g) {
-		final String version = "Release candidate: 2.14 - release date: 2020-11-15";
+		final String version = "Release candidate: 2.15 - release date: 2020-12-09";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();

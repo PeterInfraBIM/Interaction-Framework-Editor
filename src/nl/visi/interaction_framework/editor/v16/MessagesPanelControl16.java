@@ -310,7 +310,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	public MessagesPanelControl16() throws Exception {
 		super(MESSAGES_PANEL);
-		
+
 		initMessagesTable();
 		initComplexElementsTable();
 		initTransactionsTable();
@@ -387,7 +387,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				updateSelectionArea(e);
 			}
 		});
-		
+
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
@@ -668,23 +668,25 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
-		MessageTypeType messageType = elementsTableModel.get(row);
+		MessageTypeType origMessageType = elementsTableModel.get(row);
 
 		try {
 			MessageTypeType copyMessageType = objectFactory.createMessageTypeType();
 			newElement(copyMessageType, "Message_");
-			store.generateCopyId(copyMessageType, messageType);
-			copyMessageType.setAppendixMandatory(messageType.isAppendixMandatory());
-			copyMessageType.setAppendixTypes(messageType.getAppendixTypes());
-			copyMessageType.setCategory(messageType.getCategory());
-			copyMessageType.setCode(messageType.getCode());
-			copyMessageType.setComplexElements(messageType.getComplexElements());
-			copyMessageType.setDescription(messageType.getDescription());
-			copyMessageType.setEndDate(messageType.getEndDate());
-			copyMessageType.setHelpInfo(messageType.getHelpInfo());
-			copyMessageType.setLanguage(messageType.getLanguage());
-			copyMessageType.setStartDate(messageType.getStartDate());
-			copyMessageType.setState(messageType.getState());
+			store.generateCopyId(copyMessageType, origMessageType);
+			copyMessageType.setAppendixMandatory(origMessageType.isAppendixMandatory());
+			copyAppendices(origMessageType, copyMessageType);
+//			copyMessageType.setAppendixTypes(origMessageType.getAppendixTypes());
+			copyMessageType.setCategory(origMessageType.getCategory());
+			copyMessageType.setCode(origMessageType.getCode());
+			copyComplexElements(origMessageType, copyMessageType);
+//			copyMessageType.setComplexElements(origMessageType.getComplexElements());
+			copyMessageType.setDescription(origMessageType.getDescription());
+			copyMessageType.setEndDate(origMessageType.getEndDate());
+			copyMessageType.setHelpInfo(origMessageType.getHelpInfo());
+			copyMessageType.setLanguage(origMessageType.getLanguage());
+			copyMessageType.setStartDate(origMessageType.getStartDate());
+			copyMessageType.setState(origMessageType.getState());
 			store.put(copyMessageType.getId(), copyMessageType);
 			int copyrow = elementsTableModel.add(copyMessageType);
 			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
@@ -695,6 +697,36 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	}
 
+	private void copyAppendices(MessageTypeType messageType, MessageTypeType copyMessageType) {
+		MessageTypeType.AppendixTypes appendixTypes = messageType.getAppendixTypes();
+		if (appendixTypes != null) {
+			List<Object> refs = appendixTypes.getAppendixTypeOrAppendixTypeRef();
+			if (refs != null) {
+				MessageTypeType.AppendixTypes copyAppendixTypes = objectFactory.createMessageTypeTypeAppendixTypes();
+				List<Object> copyRefs = copyAppendixTypes.getAppendixTypeOrAppendixTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyMessageType.setAppendixTypes(copyAppendixTypes);
+			}
+		}
+	}
+
+	private void copyComplexElements(MessageTypeType messageType, MessageTypeType copyMessageType) {
+		MessageTypeType.ComplexElements complexElements = messageType.getComplexElements();
+		if (complexElements != null) {
+			List<Object> refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			if (refs != null) {
+				MessageTypeType.ComplexElements copyComplexElements = objectFactory.createMessageTypeTypeComplexElements();
+				List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyMessageType.setComplexElements(copyComplexElements);
+			}
+		}
+	}
+
 	public void deleteElement() {
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
@@ -702,11 +734,11 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		MessageTypeType messageType = elementsTableModel.get(row);
 
 		int response = JOptionPane.showConfirmDialog(getPanel(),
-				getBundle().getString("lbl_Remove") + ": " + messageType.getId(),
-				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
+				getBundle().getString("lbl_Remove") + ": " + messageType.getId(), getBundle().getString("lbl_Remove"),
+				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
-		
+
 		List<MessageInTransactionTypeType> elements = store.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType element : elements) {
 			Message message = element.getMessage();
@@ -775,13 +807,13 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		int selectedRow = tbl_ComplexElements.getSelectedRow();
 
 		ComplexElementTypeType complexElement = complexElementsTableModel.remove(selectedRow);
-		
+
 		int response = JOptionPane.showConfirmDialog(getPanel(),
 				getBundle().getString("lbl_Remove") + ": " + complexElement.getId(),
 				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
-		
+
 		MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
 		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 		for (Object object : list) {
@@ -831,7 +863,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
-		
+
 		AppendixTypeType appendices = appendicesTableModel.remove(selectedRow);
 		AppendixTypes appendixTypes = selectedElement.getAppendixTypes();
 		List<Object> list = appendixTypes.getAppendixTypeOrAppendixTypeRef();

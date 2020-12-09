@@ -377,7 +377,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 
 			return null;
 		}
-		
+
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			switch (UseElementsTableColumns.values()[columnIndex]) {
@@ -839,29 +839,63 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
-		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
+		ComplexElementTypeType origComplexElementType = elementsTableModel.get(row);
 
 		try {
 			ComplexElementTypeType copyComplexElementType = objectFactory.createComplexElementTypeType();
 			newElement(copyComplexElementType, "ComplexElement_");
-			store.generateCopyId(copyComplexElementType, complexElementType);
-			copyComplexElementType.setCategory(complexElementType.getCategory());
-			copyComplexElementType.setComplexElements(complexElementType.getComplexElements());
-			copyComplexElementType.setDescription(complexElementType.getDescription());
-			copyComplexElementType.setEndDate(complexElementType.getEndDate());
-			copyComplexElementType.setHelpInfo(complexElementType.getHelpInfo());
-			copyComplexElementType.setLanguage(complexElementType.getLanguage());
-			copyComplexElementType.setMaxOccurs(complexElementType.getMaxOccurs());
-			copyComplexElementType.setMinOccurs(complexElementType.getMinOccurs());
-			copyComplexElementType.setSimpleElements(complexElementType.getSimpleElements());
-			copyComplexElementType.setStartDate(complexElementType.getStartDate());
-			copyComplexElementType.setState(complexElementType.getState());
+			store.generateCopyId(copyComplexElementType, origComplexElementType);
+			copyComplexElementType.setCategory(origComplexElementType.getCategory());
+			copyComplexElements(origComplexElementType, copyComplexElementType);
+//			copyComplexElementType.setComplexElements(complexElementType.getComplexElements());
+			copyComplexElementType.setDescription(origComplexElementType.getDescription());
+			copyComplexElementType.setEndDate(origComplexElementType.getEndDate());
+			copyComplexElementType.setHelpInfo(origComplexElementType.getHelpInfo());
+			copyComplexElementType.setLanguage(origComplexElementType.getLanguage());
+			copyComplexElementType.setMaxOccurs(origComplexElementType.getMaxOccurs());
+			copyComplexElementType.setMinOccurs(origComplexElementType.getMinOccurs());
+			copySimpleElements(origComplexElementType, copyComplexElementType);
+//			copyComplexElementType.setSimpleElements(origComplexElementType.getSimpleElements());
+			copyComplexElementType.setStartDate(origComplexElementType.getStartDate());
+			copyComplexElementType.setState(origComplexElementType.getState());
 			store.put(copyComplexElementType.getId(), copyComplexElementType);
 			int copyrow = elementsTableModel.add(copyComplexElementType);
 			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
 			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void copyComplexElements(ComplexElementTypeType origComplexType, ComplexElementTypeType copyComplexType) {
+		ComplexElementTypeType.ComplexElements complexElements = origComplexType.getComplexElements();
+		if (complexElements != null) {
+			List<Object> refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			if (refs != null) {
+				ComplexElementTypeType.ComplexElements copyComplexElements = objectFactory
+						.createComplexElementTypeTypeComplexElements();
+				List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyComplexType.setComplexElements(copyComplexElements);
+			}
+		}
+	}
+	
+	private void copySimpleElements(ComplexElementTypeType origComplexType, ComplexElementTypeType copyComplexType) {
+		ComplexElementTypeType.SimpleElements simpleElements = origComplexType.getSimpleElements();
+		if (simpleElements != null) {
+			List<Object> refs = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+			if (refs != null) {
+				ComplexElementTypeType.SimpleElements copySimpleElements = objectFactory
+						.createComplexElementTypeTypeSimpleElements();
+				List<Object> copyRefs = copySimpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyComplexType.setSimpleElements(copySimpleElements);
+			}
 		}
 	}
 
