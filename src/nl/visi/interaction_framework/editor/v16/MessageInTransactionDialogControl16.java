@@ -673,7 +673,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	}
 
 	public void addPrevious() {
-		System.out.println("addPrevious");
+		// System.out.println("addPrevious");
 		List<String> items = new ArrayList<>();
 		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
@@ -685,7 +685,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
@@ -702,7 +702,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	}
 
 	public void addNext() {
-		System.out.println("addNext");
+		// System.out.println("addNext");
 		List<String> items = new ArrayList<>();
 		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
@@ -714,7 +714,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
@@ -731,7 +731,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	}
 
 	public void addSendBefore() {
-		System.out.println("addSendBefore");
+		// System.out.println("addSendBefore");
 		List<String> items = new ArrayList<>();
 		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
@@ -743,7 +743,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
@@ -759,7 +759,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	}
 
 	public void addSendAfter() {
-		System.out.println("addSendAfter");
+		// System.out.println("addSendAfter");
 		List<String> items = new ArrayList<>();
 		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
@@ -771,7 +771,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
@@ -793,7 +793,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 				getBundle().getString("lbl_Remove") + " " + prevMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove Previous action: " + prevMitt.getId());
+			// System.out.println("Remove Previous action: " + prevMitt.getId());
 			removePrevious(currentMitt, prevMitt);
 			prevTableModel.elements.remove(selectedRow);
 			prevTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -808,7 +808,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 				getBundle().getString("lbl_Remove") + " " + nextMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove Next action: " + nextMitt.getId());
+			// System.out.println("Remove Next action: " + nextMitt.getId());
 			removePrevious(nextMitt, currentMitt);
 			nextTableModel.elements.remove(selectedRow);
 			nextTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -823,7 +823,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 				getBundle().getString("lbl_Remove") + " " + sendBeforeMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove SendBefore action: " + sendBeforeMitt.getId());
+			// System.out.println("Remove SendBefore action: " + sendBeforeMitt.getId());
 			removeSendBefore(currentMitt, sendBeforeMitt);
 			sendBeforeTableModel.elements.remove(selectedRow);
 			sendBeforeTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -837,7 +837,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 				getBundle().getString("lbl_Remove") + " " + sendAfterMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove SendAfter action: " + sendAfterMitt.getId());
+			// System.out.println("Remove SendAfter action: " + sendAfterMitt.getId());
 			removeSendAfter(currentMitt, sendAfterMitt);
 			sendAfterTableModel.elements.remove(selectedRow);
 			sendAfterTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -845,7 +845,7 @@ public class MessageInTransactionDialogControl16 extends Control16 {
 	}
 
 	public void changeDirection() {
-		System.out.println("Change direction action: " + currentMitt.getId() + "=" + chb_Direction.isSelected());
+		// System.out.println("Change direction action: " + currentMitt.getId() + "=" + chb_Direction.isSelected());
 		currentMitt.setInitiatorToExecutor(chb_Direction.isSelected());
 		propertyChangeSupport.firePropertyChange("Direction changed", currentMitt, chb_Direction.isSelected());
 	}

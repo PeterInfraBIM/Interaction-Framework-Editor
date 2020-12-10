@@ -690,21 +690,21 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
-		ComplexElementTypeType complexElementType = elementsTableModel.get(row);
+		ComplexElementTypeType origComplexElementType = elementsTableModel.get(row);
 
 		try {
 			ComplexElementTypeType copyComplexElementType = objectFactory.createComplexElementTypeType();
 			newElement(copyComplexElementType, "ComplexElement_");
-			store.generateCopyId(copyComplexElementType, complexElementType);
-			copyComplexElementType.setCategory(complexElementType.getCategory());
-			copyComplexElementType.setComplexElements(complexElementType.getComplexElements());
-			copyComplexElementType.setDescription(complexElementType.getDescription());
-			copyComplexElementType.setEndDate(complexElementType.getEndDate());
-			copyComplexElementType.setHelpInfo(complexElementType.getHelpInfo());
-			copyComplexElementType.setLanguage(complexElementType.getLanguage());
-			copyComplexElementType.setSimpleElements(complexElementType.getSimpleElements());
-			copyComplexElementType.setStartDate(complexElementType.getStartDate());
-			copyComplexElementType.setState(complexElementType.getState());
+			store.generateCopyId(copyComplexElementType, origComplexElementType);
+			copyComplexElementType.setCategory(origComplexElementType.getCategory());
+			copyComplexElements(origComplexElementType, copyComplexElementType);
+			copyComplexElementType.setDescription(origComplexElementType.getDescription());
+			copyComplexElementType.setEndDate(origComplexElementType.getEndDate());
+			copyComplexElementType.setHelpInfo(origComplexElementType.getHelpInfo());
+			copyComplexElementType.setLanguage(origComplexElementType.getLanguage());
+			copySimpleElements(origComplexElementType, copyComplexElementType);
+			copyComplexElementType.setStartDate(origComplexElementType.getStartDate());
+			copyComplexElementType.setState(origComplexElementType.getState());
 			store.put(copyComplexElementType.getId(), copyComplexElementType);
 			int copyrow = elementsTableModel.add(copyComplexElementType);
 			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
@@ -714,6 +714,38 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		}
 	}
 
+	private void copyComplexElements(ComplexElementTypeType origComplexType, ComplexElementTypeType copyComplexType) {
+		ComplexElementTypeType.ComplexElements complexElements = origComplexType.getComplexElements();
+		if (complexElements != null) {
+			List<Object> refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			if (refs != null) {
+				ComplexElementTypeType.ComplexElements copyComplexElements = objectFactory
+						.createComplexElementTypeTypeComplexElements();
+				List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyComplexType.setComplexElements(copyComplexElements);
+			}
+		}
+	}
+	
+	private void copySimpleElements(ComplexElementTypeType origComplexType, ComplexElementTypeType copyComplexType) {
+		ComplexElementTypeType.SimpleElements simpleElements = origComplexType.getSimpleElements();
+		if (simpleElements != null) {
+			List<Object> refs = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+			if (refs != null) {
+				ComplexElementTypeType.SimpleElements copySimpleElements = objectFactory
+						.createComplexElementTypeTypeSimpleElements();
+				List<Object> copyRefs = copySimpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyComplexType.setSimpleElements(copySimpleElements);
+			}
+		}
+	}
+	
 	@SuppressWarnings("unchecked")
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();

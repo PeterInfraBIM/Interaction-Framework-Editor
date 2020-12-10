@@ -37,7 +37,6 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
 import nl.visi.interaction_framework.editor.SelectBox;
-import nl.visi.interaction_framework.editor.v16.Editor16;
 import nl.visi.schemas._20140331.ComplexElementTypeType;
 import nl.visi.schemas._20140331.ElementConditionType;
 import nl.visi.schemas._20140331.MessageInTransactionTypeType;
@@ -645,9 +644,9 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	}
 
 	public void addPrevious() {
-		System.out.println("addPrevious");
+		// System.out.println("addPrevious");
 		List<String> items = new ArrayList<>();
-		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+		List<MessageInTransactionTypeType> allMitts = Editor14.getStore14()
 				.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType mitt : allMitts) {
 			MessageTypeType message = getMessage(mitt);
@@ -657,12 +656,12 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
 				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
-				MessageInTransactionTypeType prevMitt = Editor16.getStore16()
+				MessageInTransactionTypeType prevMitt = Editor14.getStore14()
 						.getElement(MessageInTransactionTypeType.class, mittId);
 				Control14.addPrevious(currentMitt, prevMitt);
 				int selectedRow = prevTableModel.getRowCount();
@@ -674,9 +673,9 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	}
 
 	public void addNext() {
-		System.out.println("addNext");
+		// System.out.println("addNext");
 		List<String> items = new ArrayList<>();
-		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+		List<MessageInTransactionTypeType> allMitts = Editor14.getStore14()
 				.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType mitt : allMitts) {
 			MessageTypeType message = getMessage(mitt);
@@ -686,12 +685,12 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
 				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
-				MessageInTransactionTypeType nextMitt = Editor16.getStore16()
+				MessageInTransactionTypeType nextMitt = Editor14.getStore14()
 						.getElement(MessageInTransactionTypeType.class, mittId);
 				Control14.addPrevious(nextMitt, currentMitt);
 				int selectedRow = nextTableModel.getRowCount();
@@ -703,9 +702,9 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	}
 
 	public void addSendBefore() {
-		System.out.println("addSendBefore");
+		// System.out.println("addSendBefore");
 		List<String> items = new ArrayList<>();
-		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+		List<MessageInTransactionTypeType> allMitts = Editor14.getStore14()
 				.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType mitt : allMitts) {
 			MessageTypeType message = getMessage(mitt);
@@ -715,12 +714,12 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
 				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
-				MessageInTransactionTypeType sendBeforeMitt = Editor16.getStore16()
+				MessageInTransactionTypeType sendBeforeMitt = Editor14.getStore14()
 						.getElement(MessageInTransactionTypeType.class, mittId);
 				Control14.addSendBefore(currentMitt, sendBeforeMitt);
 				int selectedRow = sendBeforeTableModel.getRowCount();
@@ -731,9 +730,9 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	}
 
 	public void addSendAfter() {
-		System.out.println("addSendAfter");
+		// System.out.println("addSendAfter");
 		List<String> items = new ArrayList<>();
-		List<MessageInTransactionTypeType> allMitts = Editor16.getStore16()
+		List<MessageInTransactionTypeType> allMitts = Editor14.getStore14()
 				.getElements(MessageInTransactionTypeType.class);
 		for (MessageInTransactionTypeType mitt : allMitts) {
 			MessageTypeType message = getMessage(mitt);
@@ -743,12 +742,12 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 		selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 			@Override
 			public void propertyChange(PropertyChangeEvent evt) {
-				System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
+				// System.out.println(evt.getPropertyName() + " is " + evt.getNewValue());
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
 				String mittId = result.substring(lastOpenBracket + 1, lastCloseBracket);
-				MessageInTransactionTypeType sendAfterMitt = Editor16.getStore16()
+				MessageInTransactionTypeType sendAfterMitt = Editor14.getStore14()
 						.getElement(MessageInTransactionTypeType.class, mittId);
 				Control14.addSendAfter(currentMitt, sendAfterMitt);
 				int selectedRow = sendAfterTableModel.getRowCount();
@@ -765,7 +764,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				getBundle().getString("lbl_Remove") + " " + prevMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove Previous action: " + prevMitt.getId());
+			// System.out.println("Remove Previous action: " + prevMitt.getId());
 			removePrevious(currentMitt, prevMitt);
 			prevTableModel.elements.remove(selectedRow);
 			prevTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -780,7 +779,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				getBundle().getString("lbl_Remove") + " " + nextMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove Next action: " + nextMitt.getId());
+			// System.out.println("Remove Next action: " + nextMitt.getId());
 			removePrevious(nextMitt, currentMitt);
 			nextTableModel.elements.remove(selectedRow);
 			nextTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -795,7 +794,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				getBundle().getString("lbl_Remove") + " " + sendBeforeMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove SendBefore action: " + sendBeforeMitt.getId());
+			// System.out.println("Remove SendBefore action: " + sendBeforeMitt.getId());
 			removeSendBefore(currentMitt, sendBeforeMitt);
 			sendBeforeTableModel.elements.remove(selectedRow);
 			sendBeforeTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -809,7 +808,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 				getBundle().getString("lbl_Remove") + " " + sendAfterMitt.getId(), getBundle().getString("lbl_Remove"),
 				JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (confirm == JOptionPane.OK_OPTION) {
-			System.out.println("Remove SendAfter action: " + sendAfterMitt.getId());
+			// System.out.println("Remove SendAfter action: " + sendAfterMitt.getId());
 			removeSendAfter(currentMitt, sendAfterMitt);
 			sendAfterTableModel.elements.remove(selectedRow);
 			sendAfterTableModel.fireTableRowsDeleted(selectedRow, selectedRow);
@@ -817,7 +816,7 @@ public class MessageInTransactionDialogControl14 extends Control14 {
 	}
 
 	public void changeDirection() {
-		System.out.println("Change direction action: " + currentMitt.getId() + "=" + chb_Direction.isSelected());
+		// System.out.println("Change direction action: " + currentMitt.getId() + "=" + chb_Direction.isSelected());
 		currentMitt.setInitiatorToExecutor(chb_Direction.isSelected());
 		propertyChangeSupport.firePropertyChange("Direction changed", currentMitt, chb_Direction.isSelected());
 	}

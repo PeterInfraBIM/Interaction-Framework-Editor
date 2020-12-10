@@ -938,7 +938,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			if (height != preferredSize.height || width != preferredSize.width
 					|| previousMiddleMargin != middleMargin) {
 				previousMiddleMargin = middleMargin;
-				System.out.println("width=" + width + " preferredSize.width=" + preferredSize.width);
+				// System.out.println("width=" + width + " preferredSize.width=" + preferredSize.width);
 				removeAll();
 				tcMap.clear();
 				setSize(getPreferredSize());
@@ -1083,7 +1083,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	}
 
 	private enum TransactionsTableColumns {
-//		Id, Description, Main, Initiator, Executor, StartDate, EndDate, State, DateLamu, UserLamu;
 		Id, Description, Main, Initiator, Executor;
 
 		@Override
@@ -1121,16 +1120,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			case Executor:
 				RoleTypeType executor = getExecutor(transaction);
 				return executor != null ? executor.getDescription() : null;
-//			case StartDate:
-//				return getDate(transaction.getStartDate());
-//			case EndDate:
-//				return getDate(transaction.getEndDate());
-//			case State:
-//				return transaction.getState();
-//			case DateLamu:
-//				return getDateTime(transaction.getDateLaMu());
-//			case UserLamu:
-//				return transaction.getUserLaMu();
 			default:
 				return null;
 			}
@@ -1697,7 +1686,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				if (transactionTabs.getSelectedIndex() == TransactionTabs.StaticSequenceDiagram.ordinal()
 						|| transactionTabs.getSelectedIndex() == TransactionTabs.DynamicSequenceDiagram.ordinal()) {
 					if (e.getClickCount() == 2) {
-						System.out.println(TransactionTabs.values()[transactionTabs.getSelectedIndex()].name());
+						// System.out.println(TransactionTabs.values()[transactionTabs.getSelectedIndex()].name());
 						transactionTabs.setEnabledAt(transactionTabs.getSelectedIndex(), false);
 						((JComponent) transactionTabs.getSelectedComponent()).removeAll();
 						transactionTabs.getSelectedComponent().repaint();
@@ -1880,9 +1869,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		tbl_Elements.setFillsViewportHeight(true);
 		TableRowSorter<ElementsTableModel<TransactionTypeType>> tableRowSorter = new TableRowSorter<>(
 				elementsTableModel);
-//		tableRowSorter.setComparator(TransactionsTableColumns.StartDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(TransactionsTableColumns.EndDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(TransactionsTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		TransactionsTableRenderer renderer = new TransactionsTableRenderer();
 		for (int index = 0; index < tbl_Elements.getColumnCount(); index++) {
@@ -2253,22 +2239,18 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			newElement(copyTransactionType, "Transaction_");
 			store.generateCopyId(copyTransactionType, origTransactionType);
 			copyAppendices(origTransactionType, copyTransactionType);
-//			copyTransactionType.setAppendixTypes(origTransactionType.getAppendixTypes());
 			copyTransactionType.setCategory(origTransactionType.getCategory());
 			copyTransactionType.setCode(origTransactionType.getCode());
 			copyTransactionType.setDescription(origTransactionType.getDescription());
 			copyTransactionType.setEndDate(origTransactionType.getEndDate());
 			copyExecutor(origTransactionType, copyTransactionType);
-//			copyTransactionType.setExecutor(origTransactionType.getExecutor());
 			copyTransactionType.setHelpInfo(origTransactionType.getHelpInfo());
 			copyInitiator(origTransactionType, copyTransactionType);
-//			copyTransactionType.setInitiator(origTransactionType.getInitiator());
 			copyTransactionType.setLanguage(origTransactionType.getLanguage());
 			copyTransactionType.setResult(origTransactionType.getResult());
 			copyTransactionType.setStartDate(origTransactionType.getStartDate());
 			copyTransactionType.setState(origTransactionType.getState());
 			copySubtransactions(origTransactionType, copyTransactionType);
-//			copyTransactionType.setSubTransactions(origTransactionType.getSubTransactions());
 			store.put(copyTransactionType.getId(), copyTransactionType);
 			int copyrow = elementsTableModel.add(copyTransactionType);
 			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
@@ -2534,34 +2516,34 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					public void propertyChange(PropertyChangeEvent evt) {
 						switch (evt.getPropertyName()) {
 						case "Previous removed":
-							MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType) evt.getNewValue();
-							System.out.println("Previous removed: " + removedPrev.getId());
+							// MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							// System.out.println("Previous removed: " + removedPrev.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Next removed":
-							MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType) evt.getOldValue();
-							System.out.println("Next removed: " + removedNext.getId());
+							// MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							// System.out.println("Next removed: " + removedNext.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Previous added":
-							MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType) evt.getNewValue();
-							System.out.println("Previous added: " + addedPrev.getId());
+							// MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							// System.out.println("Previous added: " + addedPrev.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Next added":
-							MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType) evt.getOldValue();
-							System.out.println("Next added: " + addedNext.getId());
+							// MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							// System.out.println("Next added: " + addedNext.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Direction changed":
-							MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt.getOldValue();
-							Boolean direction = (Boolean) evt.getNewValue();
-							System.out.println(
-									"Direction changed: " + currentMitt.getId() + "=" + direction.booleanValue());
+							// MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt.getOldValue();
+							// Boolean direction = (Boolean) evt.getNewValue();
+							// System.out.println(
+							//		"Direction changed: " + currentMitt.getId() + "=" + direction.booleanValue());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;

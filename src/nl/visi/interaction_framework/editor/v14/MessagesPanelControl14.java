@@ -46,7 +46,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement;
 
 	private enum MessagesTableColumns {
-//		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
 		Id, Description;
 
 		@Override
@@ -77,16 +76,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 				return message.getId();
 			case Description:
 				return message.getDescription();
-//			case StartDate:
-//				return getDate(message.getStartDate());
-//			case EndDate:
-//				return getDate(message.getEndDate());
-//			case State:
-//				return message.getState();
-//			case DateLamu:
-//				return getDateTime(message.getDateLaMu());
-//			case UserLamu:
-//				return message.getUserLaMu();
 			default:
 				return null;
 			}
@@ -324,9 +313,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<MessageTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
-//		tableRowSorter.setComparator(MessagesTableColumns.StartDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MessagesTableColumns.EndDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MessagesTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -340,19 +326,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(MessageTypeType.class);
-//				} else {
-//					List<MessageTypeType> elements = Editor14.getStore14().getElements(MessageTypeType.class);
-//					elementsTableModel.clear();
-//					for (MessageTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -392,7 +365,6 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		complexElementsTableModel = new ComplexElementsTableModel();
 		complexElementsTableModel.setSorted(false);
 		tbl_ComplexElements.setModel(complexElementsTableModel);
-//		tbl_ComplexElements.setAutoCreateRowSorter(true);
 		tbl_ComplexElements.setFillsViewportHeight(true);
 		tbl_ComplexElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_ComplexElements
@@ -557,22 +529,22 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
-		MessageTypeType messageType = elementsTableModel.get(row);
+		MessageTypeType origMessageType = elementsTableModel.get(row);
 
 		try {
 			MessageTypeType copyMessageType = objectFactory.createMessageTypeType();
 			newElement(copyMessageType, "Message_");
-			store.generateCopyId(copyMessageType, messageType);
-			copyMessageType.setAppendixTypes(messageType.getAppendixTypes());
-			copyMessageType.setCategory(messageType.getCategory());
-			copyMessageType.setCode(messageType.getCode());
-			copyMessageType.setComplexElements(messageType.getComplexElements());
-			copyMessageType.setDescription(messageType.getDescription());
-			copyMessageType.setEndDate(messageType.getEndDate());
-			copyMessageType.setHelpInfo(messageType.getHelpInfo());
-			copyMessageType.setLanguage(messageType.getLanguage());
-			copyMessageType.setStartDate(messageType.getStartDate());
-			copyMessageType.setState(messageType.getState());
+			store.generateCopyId(copyMessageType, origMessageType);
+			copyAppendices(origMessageType, copyMessageType);
+			copyMessageType.setCategory(origMessageType.getCategory());
+			copyMessageType.setCode(origMessageType.getCode());
+			copyComplexElements(origMessageType, copyMessageType);
+			copyMessageType.setDescription(origMessageType.getDescription());
+			copyMessageType.setEndDate(origMessageType.getEndDate());
+			copyMessageType.setHelpInfo(origMessageType.getHelpInfo());
+			copyMessageType.setLanguage(origMessageType.getLanguage());
+			copyMessageType.setStartDate(origMessageType.getStartDate());
+			copyMessageType.setState(origMessageType.getState());
 			store.put(copyMessageType.getId(), copyMessageType);
 			int copyrow = elementsTableModel.add(copyMessageType);
 			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
@@ -583,6 +555,36 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 
 	}
 
+	private void copyAppendices(MessageTypeType messageType, MessageTypeType copyMessageType) {
+		MessageTypeType.AppendixTypes appendixTypes = messageType.getAppendixTypes();
+		if (appendixTypes != null) {
+			List<Object> refs = appendixTypes.getAppendixTypeOrAppendixTypeRef();
+			if (refs != null) {
+				MessageTypeType.AppendixTypes copyAppendixTypes = objectFactory.createMessageTypeTypeAppendixTypes();
+				List<Object> copyRefs = copyAppendixTypes.getAppendixTypeOrAppendixTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyMessageType.setAppendixTypes(copyAppendixTypes);
+			}
+		}
+	}
+
+	private void copyComplexElements(MessageTypeType messageType, MessageTypeType copyMessageType) {
+		MessageTypeType.ComplexElements complexElements = messageType.getComplexElements();
+		if (complexElements != null) {
+			List<Object> refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			if (refs != null) {
+				MessageTypeType.ComplexElements copyComplexElements = objectFactory.createMessageTypeTypeComplexElements();
+				List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				for (Object item : refs) {
+					copyRefs.add(item);
+				}
+				copyMessageType.setComplexElements(copyComplexElements);
+			}
+		}
+	}
+	
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();

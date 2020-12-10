@@ -801,7 +801,7 @@ public class Canvas14 extends JPanel {
 			for (final MessageInTransactionTypeType existingMitt : mitts) {
 				if (Control14.getTransaction(existingMitt).getId().equals(selectedTransaction.getId())) {
 					if (existingMitt.isInitiatorToExecutor() != Message.this.mitt.isInitiatorToExecutor()) {
-						if (!nextMitts.contains(existingMitt)) {
+						if (nextMitts == null || !nextMitts.contains(existingMitt)) {
 							MessageTypeType message = Control14.getMessage(existingMitt);
 							items.add(message.getDescription() + " [" + existingMitt.getId() + "]");
 						}

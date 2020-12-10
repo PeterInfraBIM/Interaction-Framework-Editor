@@ -847,7 +847,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			store.generateCopyId(copyComplexElementType, origComplexElementType);
 			copyComplexElementType.setCategory(origComplexElementType.getCategory());
 			copyComplexElements(origComplexElementType, copyComplexElementType);
-//			copyComplexElementType.setComplexElements(complexElementType.getComplexElements());
 			copyComplexElementType.setDescription(origComplexElementType.getDescription());
 			copyComplexElementType.setEndDate(origComplexElementType.getEndDate());
 			copyComplexElementType.setHelpInfo(origComplexElementType.getHelpInfo());
@@ -855,7 +854,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			copyComplexElementType.setMaxOccurs(origComplexElementType.getMaxOccurs());
 			copyComplexElementType.setMinOccurs(origComplexElementType.getMinOccurs());
 			copySimpleElements(origComplexElementType, copyComplexElementType);
-//			copyComplexElementType.setSimpleElements(origComplexElementType.getSimpleElements());
 			copyComplexElementType.setStartDate(origComplexElementType.getStartDate());
 			copyComplexElementType.setState(origComplexElementType.getState());
 			store.put(copyComplexElementType.getId(), copyComplexElementType);

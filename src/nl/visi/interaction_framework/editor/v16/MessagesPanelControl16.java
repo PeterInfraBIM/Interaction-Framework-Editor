@@ -52,7 +52,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private JCheckBox chb_AppendixMandatory;
 
 	private enum MessagesTableColumns {
-//		Id, Description, StartDate, EndDate, State, DateLamu, UserLamu;
 		Id, Description;
 
 		@Override
@@ -83,16 +82,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				return message.getId();
 			case Description:
 				return message.getDescription();
-//			case StartDate:
-//				return getDate(message.getStartDate());
-//			case EndDate:
-//				return getDate(message.getEndDate());
-//			case State:
-//				return message.getState();
-//			case DateLamu:
-//				return getDateTime(message.getDateLaMu());
-//			case UserLamu:
-//				return message.getUserLaMu();
 			default:
 				return null;
 			}
@@ -375,9 +364,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<MessageTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
-//		tableRowSorter.setComparator(MessagesTableColumns.StartDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MessagesTableColumns.EndDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(MessagesTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -391,19 +377,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		tfd_Filter.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
-//				String filterString = tfd_Filter.getText().toUpperCase();
-//				if (filterString.isEmpty()) {
-//					fillTable(MessageTypeType.class);
-//				} else {
-//					List<MessageTypeType> elements = Editor16.getStore16().getElements(MessageTypeType.class);
-//					elementsTableModel.clear();
-//					for (MessageTypeType element : elements) {
-//						if (element.getDescription().toUpperCase().contains(filterString)
-//								|| element.getId().toUpperCase().contains(filterString)) {
-//							elementsTableModel.add(element);
-//						}
-//					}
-//				}
 				fillTable();
 			}
 		});
@@ -443,7 +416,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		complexElementsTableModel = new ComplexElementsTableModel();
 		complexElementsTableModel.setSorted(false);
 		tbl_ComplexElements.setModel(complexElementsTableModel);
-//		tbl_ComplexElements.setAutoCreateRowSorter(true);
 		tbl_ComplexElements.setFillsViewportHeight(true);
 		tbl_ComplexElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_ComplexElements
@@ -476,7 +448,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		appendicesTableModel = new AppendicesTableModel();
 		appendicesTableModel.setSorted(false);
 		tbl_Appendices.setModel(appendicesTableModel);
-//		tbl_Appendices.setAutoCreateRowSorter(true);
 		tbl_Appendices.setFillsViewportHeight(true);
 		tbl_Appendices.setDropMode(DropMode.INSERT_ROWS);
 		tbl_Appendices.setTransferHandler(getTransferHandler(tbl_Appendices, appendicesTableModel, true));
@@ -676,11 +647,9 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			store.generateCopyId(copyMessageType, origMessageType);
 			copyMessageType.setAppendixMandatory(origMessageType.isAppendixMandatory());
 			copyAppendices(origMessageType, copyMessageType);
-//			copyMessageType.setAppendixTypes(origMessageType.getAppendixTypes());
 			copyMessageType.setCategory(origMessageType.getCategory());
 			copyMessageType.setCode(origMessageType.getCode());
 			copyComplexElements(origMessageType, copyMessageType);
-//			copyMessageType.setComplexElements(origMessageType.getComplexElements());
 			copyMessageType.setDescription(origMessageType.getDescription());
 			copyMessageType.setEndDate(origMessageType.getEndDate());
 			copyMessageType.setHelpInfo(origMessageType.getHelpInfo());
