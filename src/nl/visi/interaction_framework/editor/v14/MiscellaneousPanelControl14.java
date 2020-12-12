@@ -491,7 +491,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				store.generateCopyId(copyAppendixType, origAppendixType);
 				copyAppendixType.setCategory(origAppendixType.getCategory());
 				copyAppendixType.setCode(origAppendixType.getCode());
-				copyAppendixType.setComplexElements(origAppendixType.getComplexElements());
+				copyComplexElements(origAppendixType, copyAppendixType, simpleClassName);
 				copyAppendixType.setDescription(origAppendixType.getDescription());
 				copyAppendixType.setEndDate(origAppendixType.getEndDate());
 				copyAppendixType.setHelpInfo(origAppendixType.getHelpInfo());
@@ -507,8 +507,8 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				store.generateCopyId(copyElementConditionType, origElementConditionType);
 				copyElementConditionType.setCondition(origElementConditionType.getCondition());
 				copyElementConditionType.setMessageInTransaction(origElementConditionType.getMessageInTransaction());
-				copyElementConditionType.setComplexElement(origElementConditionType.getComplexElement());
-				copyElementConditionType.setSimpleElement(origElementConditionType.getSimpleElement());
+				copyComplexElements(origElementConditionType, copyElementConditionType, simpleClassName);
+				copySimpleElement(origElementConditionType, copyElementConditionType);
 				copyElementConditionType.setDescription(origElementConditionType.getDescription());
 				copyElementConditionType.setHelpInfo(origElementConditionType.getHelpInfo());
 				copyElementType = copyElementConditionType;
@@ -534,7 +534,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				store.generateCopyId(copyOrganisationType, origOrganisationType);
 				copyOrganisationType.setCategory(origOrganisationType.getCategory());
 				copyOrganisationType.setCode(origOrganisationType.getCode());
-				copyOrganisationType.setComplexElements(origOrganisationType.getComplexElements());
+				copyComplexElements(origOrganisationType, copyOrganisationType, simpleClassName);
 				copyOrganisationType.setDescription(origOrganisationType.getDescription());
 				copyOrganisationType.setEndDate(origOrganisationType.getEndDate());
 				copyOrganisationType.setHelpInfo(origOrganisationType.getHelpInfo());
@@ -550,7 +550,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				store.generateCopyId(copyPersonType, origPersonType);
 				copyPersonType.setCategory(origPersonType.getCategory());
 				copyPersonType.setCode(origPersonType.getCode());
-				copyPersonType.setComplexElements(origPersonType.getComplexElements());
+				copyComplexElements(origPersonType, copyPersonType, simpleClassName);
 				copyPersonType.setDescription(origPersonType.getDescription());
 				copyPersonType.setEndDate(origPersonType.getEndDate());
 				copyPersonType.setHelpInfo(origPersonType.getHelpInfo());
@@ -566,7 +566,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				store.generateCopyId(copyProjectType, origProjectType);
 				copyProjectType.setCategory(origProjectType.getCategory());
 				copyProjectType.setCode(origProjectType.getCode());
-				copyProjectType.setComplexElements(origProjectType.getComplexElements());
+				copyComplexElements(origProjectType, copyProjectType, simpleClassName);
 				copyProjectType.setDescription(origProjectType.getDescription());
 				copyProjectType.setEndDate(origProjectType.getEndDate());
 				copyProjectType.setHelpInfo(origProjectType.getHelpInfo());
@@ -600,6 +600,112 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void copyComplexElements(ElementType origComplexType, ElementType copyComplexType, String simpleClassName) {
+		switch (MiscellaneousTypes.valueOf(simpleClassName.substring(0, simpleClassName.lastIndexOf("Type")))) {
+		case AppendixType:
+			AppendixTypeType.ComplexElements appendixComplexElements = ((AppendixTypeType) origComplexType)
+					.getComplexElements();
+			if (appendixComplexElements != null) {
+				List<Object> refs = appendixComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				if (refs != null) {
+					AppendixTypeType.ComplexElements copyComplexElements = objectFactory
+							.createAppendixTypeTypeComplexElements();
+					List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+					for (Object item : refs) {
+						copyRefs.add(item);
+					}
+					((AppendixTypeType) copyComplexType).setComplexElements(copyComplexElements);
+				}
+			}
+			break;
+		case ElementCondition:
+			ElementConditionType.ComplexElement complexElement = ((ElementConditionType)origComplexType).getComplexElement();
+			if (complexElement != null) {
+				ComplexElementTypeType complexElementType = complexElement.getComplexElementType();
+				if (complexElementType == null) {
+					complexElementType = (ComplexElementTypeType) complexElement.getComplexElementTypeRef().getIdref();
+				}
+				if (complexElementType != null) {
+					ElementConditionType.ComplexElement copyComplexElement = objectFactory
+							.createElementConditionTypeComplexElement();
+					copyComplexElement.setComplexElementType(complexElementType);
+					((ElementConditionType)copyComplexType).setComplexElement(copyComplexElement);
+				}
+			}
+			break;
+		case GroupType:
+			break;
+		case OrganisationType:
+			OrganisationTypeType.ComplexElements organisationComplexElements = ((OrganisationTypeType) origComplexType)
+					.getComplexElements();
+			if (organisationComplexElements != null) {
+				List<Object> refs = organisationComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				if (refs != null) {
+					OrganisationTypeType.ComplexElements copyComplexElements = objectFactory
+							.createOrganisationTypeTypeComplexElements();
+					List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+					for (Object item : refs) {
+						copyRefs.add(item);
+					}
+					((OrganisationTypeType) copyComplexType).setComplexElements(copyComplexElements);
+				}
+			}
+			break;
+		case PersonType:
+			PersonTypeType.ComplexElements personComplexElements = ((PersonTypeType) origComplexType)
+					.getComplexElements();
+			if (personComplexElements != null) {
+				List<Object> refs = personComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				if (refs != null) {
+					PersonTypeType.ComplexElements copyComplexElements = objectFactory
+							.createPersonTypeTypeComplexElements();
+					List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+					for (Object item : refs) {
+						copyRefs.add(item);
+					}
+					((PersonTypeType) copyComplexType).setComplexElements(copyComplexElements);
+				}
+			}
+			break;
+		case ProjectType:
+			ProjectTypeType.ComplexElements projectComplexElements = ((ProjectTypeType) origComplexType)
+					.getComplexElements();
+			if (projectComplexElements != null) {
+				List<Object> refs = projectComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+				if (refs != null) {
+					ProjectTypeType.ComplexElements copyComplexElements = objectFactory
+							.createProjectTypeTypeComplexElements();
+					List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
+					for (Object item : refs) {
+						copyRefs.add(item);
+					}
+					((ProjectTypeType) copyComplexType).setComplexElements(copyComplexElements);
+				}
+			}
+			break;
+		case TransactionPhaseType:
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void copySimpleElement(ElementConditionType origElementCondition,
+			ElementConditionType copyElementCondition) {
+		ElementConditionType.SimpleElement simpleElement = origElementCondition.getSimpleElement();
+		if (simpleElement != null) {
+			SimpleElementTypeType simpleElementType = simpleElement.getSimpleElementType();
+			if (simpleElementType == null) {
+				simpleElementType = (SimpleElementTypeType) simpleElement.getSimpleElementTypeRef().getIdref();
+			}
+			if (simpleElementType != null) {
+				ElementConditionType.SimpleElement copySimpleElement = objectFactory
+						.createElementConditionTypeSimpleElement();
+				copySimpleElement.setSimpleElementType(simpleElementType);
+			}
 		}
 	}
 

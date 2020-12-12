@@ -89,7 +89,7 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	static void renderSplashFrame(Graphics2D g) {
-		final String version = "Release candidate: 2.15 - release date: 2020-12-09";
+		final String version = "Release candidate: 2.16 - release date: 2020-12-12";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();
@@ -179,6 +179,18 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	public void newFramework() {
+		if (frameworkFile != null) {
+			int selectedOption = JOptionPane.showConfirmDialog(frame, getBundle().getString("lbl_SaveBeforeOpening"));
+			switch (selectedOption) {
+			case JOptionPane.YES_OPTION:
+				saveFramework();
+				break;
+			case JOptionPane.NO_OPTION:
+				break;
+			case JOptionPane.CANCEL_OPTION:
+				return;
+			}
+		}
 		btn_NewFramework.setEnabled(false);
 		try {
 			final NewFrameworkDialogControl newFrameworkDialogControl = new NewFrameworkDialogControl();
@@ -237,6 +249,18 @@ public class InteractionFrameworkEditor extends Control {
 	}
 
 	public void openFramework() throws Exception {
+		if (frameworkFile != null) {
+			int selectedOption = JOptionPane.showConfirmDialog(frame, getBundle().getString("lbl_SaveBeforeOpening"));
+			switch (selectedOption) {
+			case JOptionPane.YES_OPTION:
+				saveFramework();
+				break;
+			case JOptionPane.NO_OPTION:
+				break;
+			case JOptionPane.CANCEL_OPTION:
+				return;
+			}
+		}
 		JFileChooser fileChooser = new JFileChooser();
 		fileChooser.setDialogTitle(getBundle().getString("lbl_OpenFramework"));
 		fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);

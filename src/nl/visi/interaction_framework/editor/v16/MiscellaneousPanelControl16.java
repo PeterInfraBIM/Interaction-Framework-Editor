@@ -487,7 +487,6 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				copyAppendixType.setCategory(origAppendixType.getCategory());
 				copyAppendixType.setCode(origAppendixType.getCode());
 				copyComplexElements(origAppendixType, copyAppendixType, simpleClassName);
-//				copyAppendixType.setComplexElements(origAppendixType.getComplexElements());
 				copyAppendixType.setDescription(origAppendixType.getDescription());
 				copyAppendixType.setEndDate(origAppendixType.getEndDate());
 				copyAppendixType.setHelpInfo(origAppendixType.getHelpInfo());
@@ -504,7 +503,6 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				copyElementConditionType.setCondition(origElementConditionType.getCondition());
 				copyElementConditionType.setMessageInTransaction(origElementConditionType.getMessageInTransaction());
 				copyComplexElements(origElementConditionType, copyElementConditionType, simpleClassName);
-//				copyElementConditionType.setComplexElements(origElementConditionType.getComplexElements());
 				copySimpleElement(origElementConditionType, copyElementConditionType);
 				copyElementConditionType.setSimpleElement(origElementConditionType.getSimpleElement());
 				copyElementConditionType.setDescription(origElementConditionType.getDescription());
@@ -533,7 +531,6 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				copyOrganisationType.setCategory(origOrganisationType.getCategory());
 				copyOrganisationType.setCode(origOrganisationType.getCode());
 				copyComplexElements(origOrganisationType, copyOrganisationType, simpleClassName);
-//				copyOrganisationType.setComplexElements(origOrganisationType.getComplexElements());
 				copyOrganisationType.setDescription(origOrganisationType.getDescription());
 				copyOrganisationType.setEndDate(origOrganisationType.getEndDate());
 				copyOrganisationType.setHelpInfo(origOrganisationType.getHelpInfo());
@@ -550,7 +547,6 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				copyPersonType.setCategory(origPersonType.getCategory());
 				copyPersonType.setCode(origPersonType.getCode());
 				copyComplexElements(origPersonType, copyPersonType, simpleClassName);
-//				copyPersonType.setComplexElements(origPersonType.getComplexElements());
 				copyPersonType.setDescription(origPersonType.getDescription());
 				copyPersonType.setEndDate(origPersonType.getEndDate());
 				copyPersonType.setHelpInfo(origPersonType.getHelpInfo());
@@ -567,7 +563,6 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 				copyProjectType.setCategory(origProjectType.getCategory());
 				copyProjectType.setCode(origProjectType.getCode());
 				copyComplexElements(origProjectType, copyProjectType, simpleClassName);
-//				copyProjectType.setComplexElements(origProjectType.getComplexElements());
 				copyProjectType.setDescription(origProjectType.getDescription());
 				copyProjectType.setEndDate(origProjectType.getEndDate());
 				copyProjectType.setHelpInfo(origProjectType.getHelpInfo());
