@@ -561,7 +561,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			cbx_ComplexElements.addItem(null);
 			List<ComplexElementTypeType> ceElements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
 			for (ComplexElementTypeType element : ceElements) {
-				cbx_ComplexElements.addItem(element.getId());
+				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
 			appendicesTableModel.clear();
@@ -582,7 +582,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			cbx_Appendices.addItem(null);
 			List<AppendixTypeType> apElements = Editor16.getStore16().getElements(AppendixTypeType.class);
 			for (AppendixTypeType element : apElements) {
-				cbx_Appendices.addItem(element.getId());
+				cbx_Appendices.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
 			transactionsTableModel.clear();
@@ -755,7 +755,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	}
 
 	public void addComplexElement() {
-		String ceId = (String) cbx_ComplexElements.getSelectedItem();
+		String content = (String) cbx_ComplexElements.getSelectedItem();
+		String ceId = content.substring(1, content.indexOf("]"));
 		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, ceId);
 		ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
 		ref.setIdref(element);
@@ -807,7 +808,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	}
 
 	public void addAppendix() {
-		String appId = (String) cbx_Appendices.getSelectedItem();
+		String content = (String) cbx_Appendices.getSelectedItem();
+		String appId = content.substring(1, content.indexOf("]"));
 		AppendixTypeType element = Editor16.getStore16().getElement(AppendixTypeType.class, appId);
 		AppendixTypeTypeRef ref = objectFactory.createAppendixTypeTypeRef();
 		ref.setIdref(element);

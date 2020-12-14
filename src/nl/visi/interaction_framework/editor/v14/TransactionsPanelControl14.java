@@ -2078,7 +2078,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			cbx_Messages.addItem(null);
 			List<MessageTypeType> messages = Editor14.getStore14().getElements(MessageTypeType.class);
 			for (MessageTypeType message : messages) {
-				cbx_Messages.addItem(message.getId());
+				cbx_Messages.addItem("[" + message.getId() + "] " + message.getDescription());
 			}
 
 			fillSubtransactionsTable();
@@ -2433,7 +2433,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	public MessageInTransactionTypeType addMessage() {
 		Store14 store = Editor14.getStore14();
 
-		String msgId = (String) cbx_Messages.getSelectedItem();
+		String content = (String) cbx_Messages.getSelectedItem();
+		String msgId = content.substring(1, content.indexOf("]"));
 		MessageTypeType messageType = store.getElement(MessageTypeType.class, msgId);
 		MessageTypeTypeRef messageRef = objectFactory.createMessageTypeTypeRef();
 		messageRef.setIdref(messageType);

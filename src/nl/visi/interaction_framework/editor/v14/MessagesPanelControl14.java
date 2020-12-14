@@ -473,7 +473,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 			cbx_ComplexElements.addItem(null);
 			List<ComplexElementTypeType> ceElements = Editor14.getStore14().getElements(ComplexElementTypeType.class);
 			for (ComplexElementTypeType element : ceElements) {
-				cbx_ComplexElements.addItem(element.getId());
+				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
 			transactionsTableModel.clear();
@@ -635,7 +635,8 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 	}
 
 	public void addComplexElement() {
-		String ceId = (String) cbx_ComplexElements.getSelectedItem();
+		String content = (String) cbx_ComplexElements.getSelectedItem();
+		String ceId = content.substring(1, content.indexOf("]"));
 		ComplexElementTypeType element = Editor14.getStore14().getElement(ComplexElementTypeType.class, ceId);
 		ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
 		ref.setIdref(element);
