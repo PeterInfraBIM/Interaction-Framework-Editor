@@ -1188,7 +1188,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	}
 
 	private enum MessagesTableColumns {
-		Id, Message, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed, Start, Navigate;
+		Id_Mitt, Id_Message, Message, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed, Start, Navigate;
 
 		@Override
 		public String toString() {
@@ -1218,8 +1218,10 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				return null;
 
 			switch (MessagesTableColumns.values()[columnIndex]) {
-			case Id:
+			case Id_Mitt:
 				return mitt.getId();
+			case Id_Message:
+				return messageType.getId();
 			case Message:
 				return messageType.getDescription();
 			case TransactionPhase:
@@ -1268,7 +1270,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			switch (MessagesTableColumns.values()[columnIndex]) {
 //			case TransactionPhase:
 //				return String.class;
-			case Id:
+			case Id_Mitt:
+				return String.class;
+			case Id_Message:
 				return String.class;
 			case Message:
 				return String.class;
@@ -1289,7 +1293,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			switch (MessagesTableColumns.values()[columnIndex]) {
 			case Group:
 				return true;
-			case Id:
+			case Id_Message:
+				break;
+			case Id_Mitt:
 				break;
 			case InitiatorToExecutor:
 				return true;
@@ -1315,7 +1321,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			MessageInTransactionTypeType mitt = messagesTableModel.get(rowIndex);
 
 			switch (MessagesTableColumns.values()[columnIndex]) {
-			case Id:
+			case Id_Message:
+				break;
+			case Id_Mitt:
 				break;
 			case TransactionPhase:
 				setTransactionPhase(value, mitt);
