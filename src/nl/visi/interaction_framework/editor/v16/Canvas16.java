@@ -1033,7 +1033,9 @@ public class Canvas16 extends JPanel {
 				String result = (String) evt.getNewValue();
 				int lastOpenBracket = result.lastIndexOf('[');
 				int lastCloseBracket = result.lastIndexOf(']');
-				String messageId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				// String messageId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+				String messageId = result.substring(lastOpenBracket, lastCloseBracket + 1) + " "
+						+ result.substring(0, lastOpenBracket - 1);
 				transactionPanel.cbx_Messages.setSelectedItem(messageId);
 				MessageInTransactionTypeType mitt = transactionPanel.addMessage();
 				initNewDiagram();
@@ -1060,12 +1062,12 @@ public class Canvas16 extends JPanel {
 							}
 						});
 				selectMenu.add(msgItem);
-				
+
 				if (isEndMessage(mitt))
 					msgItem.setIcon(redCircleIcon);
 				if (isStartMessage(mitt))
 					msgItem.setIcon(greenCircleIcon);
-				
+
 			}
 		}
 	}
