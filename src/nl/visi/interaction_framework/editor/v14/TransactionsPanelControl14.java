@@ -1952,6 +1952,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				}
 			}
 		});
+		cbx_Messages.setTransferHandler(new Msg2MittTransferHandler());
 
 		tbl_Messages.getSelectionModel().addListSelectionListener(messageTableSelectionListener);
 	}

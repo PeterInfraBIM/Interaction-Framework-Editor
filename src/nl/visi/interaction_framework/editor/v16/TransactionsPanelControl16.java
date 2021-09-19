@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -113,7 +114,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private JTextArea tar_Initiator, tar_Executor;
 	private JScrollPane scrollPane, scrollPane2;
 	private Canvas drawingPlane;
-	private Canvas16 canvas16Plane;
+	Canvas16 canvas16Plane;
 	private Canvas.MessageItem activeItem;
 
 	private Map<MessageInTransactionTypeType, List<MessageInTransactionTypeType>> successorMap;
@@ -1771,6 +1772,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		});
 		canvas2Panel.add(scrollPane2, BorderLayout.CENTER);
+		canvas2Panel.setTransferHandler(new Msg2MittTransferHandler());
 	}
 
 	private void initResultField() {
@@ -1906,6 +1908,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		messagesTableModel = new MessagesTableModel();
 		tbl_Messages.setModel(messagesTableModel);
 		tbl_Messages.setFillsViewportHeight(true);
+		tbl_Messages.setDropMode(DropMode.INSERT_ROWS);
 		cbx_TransactionPhases = new JComboBox<>(new DefaultComboBoxModel<String>());
 		TableColumn transactionPhaseColumn = tbl_Messages.getColumnModel()
 				.getColumn(MessagesTableColumns.TransactionPhase.ordinal());
@@ -1941,6 +1944,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				}
 			}
 		});
+		cbx_Messages.setTransferHandler(new Msg2MittTransferHandler());
+		tbl_Messages.setTransferHandler(new Msg2MittTransferHandler());
 
 		tbl_Messages.getSelectionModel().addListSelectionListener(messageTableSelectionListener);
 	}
