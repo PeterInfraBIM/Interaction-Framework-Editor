@@ -321,12 +321,14 @@ public class Canvas16 extends JPanel {
 			popupMenu.add(removeMenuItem);
 			if (isEndMessage(mitt) || isStartMessage(mitt)) {
 				if (isEndMessage(mitt)) {
-				activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_RED_1, 2),
-						BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+					activeLabel.setBorder(
+							BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_RED_1, 2),
+									BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 				}
 				if (isStartMessage(mitt)) {
-				activeLabel.setBorder(BorderFactory.createCompoundBorder(
-						BorderFactory.createLineBorder(LIGHT_GREEN_1, 2), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+					activeLabel.setBorder(
+							BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_GREEN_1, 2),
+									BorderFactory.createEmptyBorder(2, 5, 2, 5)));
 				}
 			} else {
 				activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
@@ -1093,8 +1095,15 @@ public class Canvas16 extends JPanel {
 		super.paintComponent(g);
 		g2d = (Graphics2D) g;
 
-		boolean newDiagram = transactionPanel.selectedElement != null
-				&& !transactionPanel.selectedElement.equals(selectedTransaction);
+		if (transactionPanel.selectedElement == null) {
+			selectedTransaction = null;
+			Canvas16.this.removeAll();
+			g2d.setColor(Color.WHITE);
+			g2d.fillRect(0, 0, getWidth(), getHeight());
+			return;
+		}
+
+		boolean newDiagram = !transactionPanel.selectedElement.equals(selectedTransaction);
 		if (newDiagram) {
 			selectedTransaction = transactionPanel.selectedElement;
 			initNewDiagram();
