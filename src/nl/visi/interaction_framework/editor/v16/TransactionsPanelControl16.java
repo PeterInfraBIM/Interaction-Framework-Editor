@@ -939,7 +939,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			if (height != preferredSize.height || width != preferredSize.width
 					|| previousMiddleMargin != middleMargin) {
 				previousMiddleMargin = middleMargin;
-				// System.out.println("width=" + width + " preferredSize.width=" + preferredSize.width);
+				// System.out.println("width=" + width + " preferredSize.width=" +
+				// preferredSize.width);
 				removeAll();
 				tcMap.clear();
 				setSize(getPreferredSize());
@@ -1178,7 +1179,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	}
 
 	private enum MessagesTableColumns {
-		Id_Mitt, Id_Message, Message, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed, Start, Navigate;
+		Id_Mitt, Id_Message, Message, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed,
+		Start, Navigate;
 
 		@Override
 		public String toString() {
@@ -1908,7 +1910,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		messagesTableModel = new MessagesTableModel();
 		tbl_Messages.setModel(messagesTableModel);
 		tbl_Messages.setFillsViewportHeight(true);
-		tbl_Messages.setDropMode(DropMode.INSERT_ROWS);
+		tbl_Messages.setDropMode(DropMode.ON_OR_INSERT_ROWS);
 		cbx_TransactionPhases = new JComboBox<>(new DefaultComboBoxModel<String>());
 		TableColumn transactionPhaseColumn = tbl_Messages.getColumnModel()
 				.getColumn(MessagesTableColumns.TransactionPhase.ordinal());
@@ -2172,7 +2174,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		}
 	}
 
-	private void fillMessageTable() {
+	void fillMessageTable() {
 		messagesTableModel.clear();
 		List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
 				.getElements(MessageInTransactionTypeType.class);
@@ -2289,7 +2291,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		}
 	}
-	
+
 	private void copySubtransactions(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
 		TransactionTypeType.SubTransactions subtransactions = transactionType.getSubTransactions();
 		if (subtransactions != null) {
@@ -2483,6 +2485,11 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		return mitt;
 	}
 
+	public void reset() {
+		getDrawingPlane().setCurrentTransaction(null);
+		getDrawingPlane().repaint();
+	}
+
 	public void editMessage() {
 		int row = tbl_Messages.getSelectedRow();
 		MessageInTransactionTypeType mitt = messagesTableModel.get(row);
@@ -2530,34 +2537,40 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					public void propertyChange(PropertyChangeEvent evt) {
 						switch (evt.getPropertyName()) {
 						case "Previous removed":
-							// MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							// MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType)
+							// evt.getNewValue();
 							// System.out.println("Previous removed: " + removedPrev.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Next removed":
-							// MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							// MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType)
+							// evt.getOldValue();
 							// System.out.println("Next removed: " + removedNext.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Previous added":
-							// MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							// MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType)
+							// evt.getNewValue();
 							// System.out.println("Previous added: " + addedPrev.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Next added":
-							// MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							// MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType)
+							// evt.getOldValue();
 							// System.out.println("Next added: " + addedNext.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Direction changed":
-							// MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt.getOldValue();
+							// MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType)
+							// evt.getOldValue();
 							// Boolean direction = (Boolean) evt.getNewValue();
 							// System.out.println(
-							//		"Direction changed: " + currentMitt.getId() + "=" + direction.booleanValue());
+							// "Direction changed: " + currentMitt.getId() + "=" +
+							// direction.booleanValue());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;

@@ -60,6 +60,7 @@ public class Canvas16 extends JPanel {
 	final private ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
 	private final TransactionsPanelControl16 transactionPanel;
 	TransactionTypeType selectedTransaction;
+	TransactionTypeType currentTransaction;
 	private Role executor, initiator;
 	private List<Message> historyBefore, historyAfter, selectedNext, selectedPrev, selectedRequest, selectedResponse;
 	private Message selectedMessage;
@@ -1103,8 +1104,11 @@ public class Canvas16 extends JPanel {
 			return;
 		}
 
-		boolean newDiagram = !transactionPanel.selectedElement.equals(selectedTransaction);
+		boolean newDiagram = !transactionPanel.selectedElement.equals(selectedTransaction)
+				|| currentTransaction == null;
+		currentTransaction = transactionPanel.selectedElement;
 		if (newDiagram) {
+			System.out.println("newDiagram");
 			selectedTransaction = transactionPanel.selectedElement;
 			initNewDiagram();
 		}
@@ -1422,8 +1426,12 @@ public class Canvas16 extends JPanel {
 		}
 	}
 
-	private void initNewDiagram() {
-		Canvas16.this.removeAll();
+	void initNewDiagram() {
+		System.out.println("initNewDiagram");
+		if (Canvas16.this.getComponentCount() > 0) {
+			Canvas16.this.removeAll();
+			Canvas16.this.repaint();
+		}
 		initiator = new Role(Control16.getInitiator(selectedTransaction), leftMargin - 50, 25, LIGHT_RED_3);
 		executor = new Role(Control16.getExecutor(selectedTransaction), leftMargin + middleMargin, 25, LIGHT_GREEN_3);
 		historyAfter.clear();
@@ -1520,15 +1528,24 @@ public class Canvas16 extends JPanel {
 		return true;
 	}
 
-	void addMitt2Canvas(String messageId) {
+	MessageInTransactionTypeType addMitt2Canvas(String messageId) {
+		TransactionsPanelControl16 transactionsPC = MainPanelControl16.getTransactionsPC();
+		transactionsPC.canvas16Plane.selectedTransaction = transactionsPC.selectedElement;
 		transactionPanel.cbx_Messages.setSelectedItem(messageId);
 		MessageInTransactionTypeType mitt = transactionPanel.addMessage();
 		initNewDiagram();
 		Message message = new Message(mitt);
 		message.state = MessageState.Next;
 		selectedNext.add(message);
-		transactionPanel.getDrawingPlane().setCurrentTransaction(null);
-		transactionPanel.getDrawingPlane().repaint();
+		selectedTransaction = null;
+		reset();
+		transactionPanel.reset();
+		return mitt;
+	}
+
+	public void reset() {
+		currentTransaction = null;
+		repaint();
 	}
 
 }
