@@ -12,6 +12,7 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
+import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.interaction_framework.editor.v16.Control16.ElementsTableModel;
 import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.MessagesTableModel;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
@@ -81,6 +82,10 @@ public class Msg2MittTransferHandler extends TransferHandler {
 				return true;
 			} else if (info.getComponent() instanceof JComboBox) {
 				return true;
+			} else if (info.getComponent() instanceof JPanel) {
+				return true;
+			} else if (info.getComponent() instanceof RotatingButton) {
+				return true;
 			}
 		}
 		return false;
@@ -93,6 +98,17 @@ public class Msg2MittTransferHandler extends TransferHandler {
 		if (comp instanceof JComboBox<?>) {
 			JComboBox<?> msgComboBox = (JComboBox<?>) comp;
 			msgComboBox.setSelectedItem("[" + idDescr[0] + "] " + idDescr[1]);
+			return true;
+		} else if (comp instanceof RotatingButton) {
+			String mittId = ((RotatingButton) comp).getToolTipText();
+			MessageInTransactionTypeType selectedMitt = Editor16.getStore16()
+					.getElement(MessageInTransactionTypeType.class, mittId);
+			MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr);
+			newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
+			Control16.addPrevious(newMitt, selectedMitt);
+			transactionsPC.fillMessageTable();
+			transactionsPC.canvas16Plane.reset();
+			transactionsPC.reset();
 			return true;
 		} else if (comp instanceof JPanel) {
 			addMsg2Mitt(idDescr);

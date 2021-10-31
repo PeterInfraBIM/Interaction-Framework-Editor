@@ -169,6 +169,7 @@ public class Canvas16 extends JPanel {
 			this.x = x;
 			this.y = y;
 			activeLabel = new RotatingButton();
+			activeLabel.setTransferHandler(new Msg2MittTransferHandler());
 			resetActiveLabel();
 
 			setTitleAndToolTip(mitt);
@@ -776,7 +777,8 @@ public class Canvas16 extends JPanel {
 					String result = (String) evt.getNewValue();
 					int lastOpenBracket = result.lastIndexOf('[');
 					int lastCloseBracket = result.lastIndexOf(']');
-					String messageId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+					String messageId = result.substring(lastOpenBracket, lastCloseBracket + 1) + " "
+							+ result.substring(0, lastOpenBracket - 1);
 					transactionPanel.cbx_Messages.setSelectedItem(messageId);
 					MessageInTransactionTypeType newMitt = transactionPanel.addMessage();
 					Control16.addPrevious(newMitt, Message.this.mitt);
