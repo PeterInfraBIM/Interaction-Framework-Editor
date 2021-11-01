@@ -1715,6 +1715,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				switch (tab) {
 				case DynamicSequenceDiagram:
 					frame.add(scrollPane2, BorderLayout.CENTER);
+					frame.getRootPane().setTransferHandler(Msg2MittTransferHandler.getInstance());
 					break;
 				case StaticSequenceDiagram:
 					frame.add(scrollPane, BorderLayout.CENTER);
@@ -1774,7 +1775,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 		});
 		canvas2Panel.add(scrollPane2, BorderLayout.CENTER);
-		canvas2Panel.setTransferHandler(new Msg2MittTransferHandler());
+		canvas2Panel.setTransferHandler(Msg2MittTransferHandler.getInstance());
 	}
 
 	private void initResultField() {
@@ -1946,8 +1947,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 				}
 			}
 		});
-		cbx_Messages.setTransferHandler(new Msg2MittTransferHandler());
-		tbl_Messages.setTransferHandler(new Msg2MittTransferHandler());
+		cbx_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
+		tbl_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
 
 		tbl_Messages.getSelectionModel().addListSelectionListener(messageTableSelectionListener);
 	}

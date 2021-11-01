@@ -92,6 +92,7 @@ public class Canvas16 extends JPanel {
 			this.y = y;
 			this.color = color;
 			activeLabel = new RotatingButton();
+			activeLabel.setTransferHandler(Msg2MittTransferHandler.getInstance());
 			activeLabel.setContentAreaFilled(false);
 			activeLabel.setBackground(color);
 			activeLabel.setBorderPainted(false);
@@ -169,7 +170,7 @@ public class Canvas16 extends JPanel {
 			this.x = x;
 			this.y = y;
 			activeLabel = new RotatingButton();
-			activeLabel.setTransferHandler(new Msg2MittTransferHandler());
+			activeLabel.setTransferHandler(Msg2MittTransferHandler.getInstance());
 			resetActiveLabel();
 
 			setTitleAndToolTip(mitt);
