@@ -10,11 +10,9 @@ import java.io.IOException;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTable;
-import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
@@ -159,8 +157,10 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
 			Control16.addPrevious(newMitt, selectedMitt);
 			transactionsPC.fillMessageTable();
-			transactionsPC.canvas16Plane.reset();
-			transactionsPC.reset();
+			transactionsPC.canvas16Plane.selectMessage(newMitt);
+			transactionsPC.canvas16Plane.currentTransaction = transactionsPC.canvas16Plane.selectedTransaction;
+//			transactionsPC.canvas16Plane.reset();
+//			transactionsPC.reset();
 			return true;
 		} else if (comp instanceof JPanel || comp instanceof JRootPane) {
 			addMsg2Mitt(idDescr);
@@ -180,6 +180,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 				transactionsPC.fillMessageTable();
 				transactionsPC.canvas16Plane.reset();
 				transactionsPC.reset();
+				transactionsPC.canvas16Plane.selectMessage(newMitt);
 				return true;
 			}
 		}

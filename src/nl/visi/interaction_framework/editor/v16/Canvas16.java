@@ -1075,12 +1075,13 @@ public class Canvas16 extends JPanel {
 		}
 	}
 
-	private void selectMessage(MessageInTransactionTypeType mitt) {
+	void selectMessage(MessageInTransactionTypeType mitt) {
 		initNewDiagram();
 		Message message = new Message(mitt);
 		message.state = MessageState.Next;
 		selectedNext.add(message);
 		message.setState(MessageState.Selected);
+		System.out.println("exit selectMessage");
 	}
 
 	public Canvas16(TransactionsPanelControl16 transactionPanel, boolean printMode) {
@@ -1109,6 +1110,7 @@ public class Canvas16 extends JPanel {
 
 		boolean newDiagram = !transactionPanel.selectedElement.equals(selectedTransaction)
 				|| currentTransaction == null;
+		System.out.println("currentTransaction=" + currentTransaction);
 		currentTransaction = transactionPanel.selectedElement;
 		if (newDiagram) {
 			System.out.println("newDiagram");
@@ -1540,7 +1542,7 @@ public class Canvas16 extends JPanel {
 		Message message = new Message(mitt);
 		message.state = MessageState.Next;
 		selectedNext.add(message);
-		selectedTransaction = null;
+//		selectedTransaction = null;
 		reset();
 		transactionPanel.reset();
 		return mitt;
