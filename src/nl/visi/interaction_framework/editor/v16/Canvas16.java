@@ -63,7 +63,7 @@ public class Canvas16 extends JPanel {
 	TransactionTypeType currentTransaction;
 	private Role executor, initiator;
 	private List<Message> historyBefore, historyAfter, selectedNext, selectedPrev, selectedRequest, selectedResponse;
-	private Message selectedMessage;
+	Message selectedMessage;
 	private Dimension preferredSize;
 	private Graphics2D g2d;
 	private int leftMargin, rightMargin, middleMargin, topMargin, initiatorFlow, executorFlow;
@@ -151,7 +151,7 @@ public class Canvas16 extends JPanel {
 		History, Previous, Next, Selected;
 	}
 
-	private class Message {
+	class Message {
 		private MessageState state;
 		private final MessageInTransactionTypeType mitt;
 		private RotatingButton activeLabel;
@@ -385,32 +385,36 @@ public class Canvas16 extends JPanel {
 			int index = elements.indexOf(selectedMessage.mitt);
 			transactionPanel.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
 			boolean removed = transactionPanel.removeMessage();
-			if (removed) {
-				selectedTransaction = null;
-				transactionPanel.getDrawingPlane().setCurrentTransaction(null);
-				transactionPanel.getDrawingPlane().repaint();
-				if (messageInTransactionDialogControl16 != null) {
-					messageInTransactionDialogControl16.getDialog().dispose();
-				}
-				Canvas16.this.remove(selectedMessage.activeLabel);
-				for (Message msg : selectedNext) {
-					Canvas16.this.remove(msg.activeLabel);
-				}
-				selectedNext.clear();
-				for (Message msg : selectedPrev) {
-					Canvas16.this.remove(msg.activeLabel);
-				}
-				selectedPrev.clear();
-				for (Message msg : selectedRequest) {
-					Canvas16.this.remove(msg.activeLabel);
-				}
-				selectedRequest.clear();
-				for (Message msg : selectedResponse) {
-					Canvas16.this.remove(msg.activeLabel);
-				}
-				selectedResponse.clear();
-				selectedMessage = null;
+//			if (removed) {
+//				removeSelectedMessageFromDiagrams();
+//			}
+		}
+
+		void removeFromDiagrams() {
+			selectedTransaction = null;
+			transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+			transactionPanel.getDrawingPlane().repaint();
+			if (messageInTransactionDialogControl16 != null) {
+				messageInTransactionDialogControl16.getDialog().dispose();
 			}
+			Canvas16.this.remove(selectedMessage.activeLabel);
+			for (Message msg : selectedNext) {
+				Canvas16.this.remove(msg.activeLabel);
+			}
+			selectedNext.clear();
+			for (Message msg : selectedPrev) {
+				Canvas16.this.remove(msg.activeLabel);
+			}
+			selectedPrev.clear();
+			for (Message msg : selectedRequest) {
+				Canvas16.this.remove(msg.activeLabel);
+			}
+			selectedRequest.clear();
+			for (Message msg : selectedResponse) {
+				Canvas16.this.remove(msg.activeLabel);
+			}
+			selectedResponse.clear();
+			selectedMessage = null;
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -1046,7 +1050,7 @@ public class Canvas16 extends JPanel {
 				// String messageId = result.substring(lastOpenBracket + 1, lastCloseBracket);
 				String messageId = result.substring(lastOpenBracket, lastCloseBracket + 1) + " "
 						+ result.substring(0, lastOpenBracket - 1);
-				addMitt2Canvas(messageId);
+				addMitt2Canvas(messageId, true);
 			}
 		});
 	}
@@ -1110,7 +1114,6 @@ public class Canvas16 extends JPanel {
 
 		boolean newDiagram = !transactionPanel.selectedElement.equals(selectedTransaction)
 				|| currentTransaction == null;
-		System.out.println("currentTransaction=" + currentTransaction);
 		currentTransaction = transactionPanel.selectedElement;
 		if (newDiagram) {
 			System.out.println("newDiagram");
@@ -1533,7 +1536,7 @@ public class Canvas16 extends JPanel {
 		return true;
 	}
 
-	MessageInTransactionTypeType addMitt2Canvas(String messageId) {
+	MessageInTransactionTypeType addMitt2Canvas(String messageId, boolean resetDiagrams) {
 		TransactionsPanelControl16 transactionsPC = MainPanelControl16.getTransactionsPC();
 		transactionsPC.canvas16Plane.selectedTransaction = transactionsPC.selectedElement;
 		transactionPanel.cbx_Messages.setSelectedItem(messageId);
@@ -1542,9 +1545,10 @@ public class Canvas16 extends JPanel {
 		Message message = new Message(mitt);
 		message.state = MessageState.Next;
 		selectedNext.add(message);
-//		selectedTransaction = null;
-		reset();
-		transactionPanel.reset();
+		if (resetDiagrams) {
+			reset();
+			transactionPanel.reset();
+		}
 		return mitt;
 	}
 

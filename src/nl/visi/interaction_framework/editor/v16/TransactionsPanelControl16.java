@@ -2618,6 +2618,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			fillMessageTable();
 			updateLaMu(selectedElement, user);
 			elementsTableModel.update(selectedRow);
+			canvas16Plane.selectMessage(mitt);
+			canvas16Plane.selectedMessage.removeFromDiagrams();
 			return true;
 		}
 		return false;

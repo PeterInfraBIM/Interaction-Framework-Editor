@@ -153,33 +153,28 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			String mittId = ((RotatingButton) comp).getToolTipText();
 			MessageInTransactionTypeType selectedMitt = Editor16.getStore16()
 					.getElement(MessageInTransactionTypeType.class, mittId);
-			MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr);
+			MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
 			newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
 			Control16.addPrevious(newMitt, selectedMitt);
 			transactionsPC.fillMessageTable();
 			transactionsPC.canvas16Plane.selectMessage(newMitt);
-			transactionsPC.canvas16Plane.currentTransaction = transactionsPC.canvas16Plane.selectedTransaction;
-//			transactionsPC.canvas16Plane.reset();
-//			transactionsPC.reset();
 			return true;
 		} else if (comp instanceof JPanel || comp instanceof JRootPane) {
-			addMsg2Mitt(idDescr);
+			addMsg2Mitt(idDescr, true);
 			return true;
 		} else if (comp instanceof JTable) {
 			if (dropLocation.isInsertRow()) {
 				// between lines drop
-				addMsg2Mitt(idDescr);
+				addMsg2Mitt(idDescr, true);
 				return true;
 			} else {
 				// on line drop
 				int row = dropLocation.getRow();
 				MessageInTransactionTypeType selectedMitt = model.elements.get(row);
-				MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr);
+				MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
 				newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
 				Control16.addPrevious(newMitt, selectedMitt);
 				transactionsPC.fillMessageTable();
-				transactionsPC.canvas16Plane.reset();
-				transactionsPC.reset();
 				transactionsPC.canvas16Plane.selectMessage(newMitt);
 				return true;
 			}
@@ -187,8 +182,8 @@ public class Msg2MittTransferHandler extends TransferHandler {
 		return false;
 	}
 
-	private MessageInTransactionTypeType addMsg2Mitt(String[] idDescr) {
-		return transactionsPC.canvas16Plane.addMitt2Canvas("[" + idDescr[0] + "] " + idDescr[1]);
+	private MessageInTransactionTypeType addMsg2Mitt(String[] idDescr, boolean resetDiagrams) {
+		return transactionsPC.canvas16Plane.addMitt2Canvas("[" + idDescr[0] + "] " + idDescr[1], resetDiagrams);
 	}
 
 	private String[] getMessageIdPlusDescr(Transferable t) {
