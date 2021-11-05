@@ -34,6 +34,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 	private TransactionsPanelControl16 transactionsPC;
 	private JTable tbl_Messages, tbl_TransMessages;
 	private MessagesTableModel model;
+	private int dropAction;
 
 	public static Msg2MittTransferHandler getInstance() {
 		if (instance == null) {
@@ -80,8 +81,6 @@ public class Msg2MittTransferHandler extends TransferHandler {
 
 			init();
 
-			Component component = info.getComponent();
-
 			// Check if MessagesTable is the target
 			if (info.getComponent().equals(tbl_Messages)) {
 				return false;
@@ -93,6 +92,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			}
 
 			Transferable t = info.getTransferable();
+			dropAction = info.getDropAction();
 
 			// Check for existing message type
 			idDescr = getMessageIdPlusDescr(t);
@@ -173,9 +173,15 @@ public class Msg2MittTransferHandler extends TransferHandler {
 				MessageInTransactionTypeType selectedMitt = model.elements.get(row);
 				MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
 				newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
-				Control16.addPrevious(newMitt, selectedMitt);
-				transactionsPC.fillMessageTable();
-				transactionsPC.canvas16Plane.selectMessage(newMitt);
+				if (dropAction == MOVE) {
+					Control16.addPrevious(newMitt, selectedMitt);
+					transactionsPC.fillMessageTable();
+					transactionsPC.canvas16Plane.selectMessage(selectedMitt);
+				} else {
+					Control16.addPrevious(selectedMitt, newMitt);
+					transactionsPC.fillMessageTable();
+					transactionsPC.canvas16Plane.selectMessage(newMitt);
+				}
 				return true;
 			}
 		}

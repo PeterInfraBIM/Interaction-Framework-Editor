@@ -156,6 +156,7 @@ public class Canvas16 extends JPanel {
 		private final MessageInTransactionTypeType mitt;
 		private RotatingButton activeLabel;
 		private int x;
+		@SuppressWarnings("unused")
 		private int y;
 		private final JPopupMenu popupMenu;
 		private final JMenuItem mittEdit;
