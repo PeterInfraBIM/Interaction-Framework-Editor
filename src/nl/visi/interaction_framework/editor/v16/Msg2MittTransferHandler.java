@@ -1,7 +1,6 @@
 package nl.visi.interaction_framework.editor.v16;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
@@ -153,11 +152,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			String mittId = ((RotatingButton) comp).getToolTipText();
 			MessageInTransactionTypeType selectedMitt = Editor16.getStore16()
 					.getElement(MessageInTransactionTypeType.class, mittId);
-			MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
-			newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
-			Control16.addPrevious(newMitt, selectedMitt);
-			transactionsPC.fillMessageTable();
-			transactionsPC.canvas16Plane.selectMessage(newMitt);
+			dropBeforeOrAfter(selectedMitt);
 			return true;
 		} else if (comp instanceof JPanel || comp instanceof JRootPane) {
 			addMsg2Mitt(idDescr, true);
@@ -171,21 +166,25 @@ public class Msg2MittTransferHandler extends TransferHandler {
 				// on line drop
 				int row = dropLocation.getRow();
 				MessageInTransactionTypeType selectedMitt = model.elements.get(row);
-				MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
-				newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
-				if (dropAction == MOVE) {
-					Control16.addPrevious(newMitt, selectedMitt);
-					transactionsPC.fillMessageTable();
-					transactionsPC.canvas16Plane.selectMessage(selectedMitt);
-				} else {
-					Control16.addPrevious(selectedMitt, newMitt);
-					transactionsPC.fillMessageTable();
-					transactionsPC.canvas16Plane.selectMessage(newMitt);
-				}
+				dropBeforeOrAfter(selectedMitt);
 				return true;
 			}
 		}
 		return false;
+	}
+
+	void dropBeforeOrAfter(MessageInTransactionTypeType selectedMitt) {
+		MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
+		newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
+		if (dropAction == MOVE) {
+			Control16.addPrevious(newMitt, selectedMitt);
+			transactionsPC.fillMessageTable();
+			transactionsPC.canvas16Plane.selectMessage(selectedMitt);
+		} else {
+			Control16.addPrevious(selectedMitt, newMitt);
+			transactionsPC.fillMessageTable();
+			transactionsPC.canvas16Plane.selectMessage(newMitt);
+		}
 	}
 
 	private MessageInTransactionTypeType addMsg2Mitt(String[] idDescr, boolean resetDiagrams) {

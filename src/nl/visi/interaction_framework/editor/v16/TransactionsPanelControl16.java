@@ -2115,7 +2115,15 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		}
 
 		canvasPanel.repaint();
+		JFrame frame = TransactionTabs.StaticSequenceDiagram.getTearOffFrame();
+		if (frame != null) {
+			frame.getRootPane().repaint();
+		}
 		canvas2Panel.repaint();
+		JFrame frame2 = TransactionTabs.DynamicSequenceDiagram.getTearOffFrame();
+		if (frame2 != null) {
+			frame2.getRootPane().repaint();
+		}
 
 		inSelection = false;
 	}
