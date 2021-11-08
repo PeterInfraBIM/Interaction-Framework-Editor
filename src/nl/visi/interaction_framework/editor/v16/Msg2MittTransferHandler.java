@@ -185,6 +185,10 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			transactionsPC.fillMessageTable();
 			transactionsPC.canvas16Plane.selectMessage(newMitt);
 		}
+		// Next two statements prevent a reset of the dynamic sequence diagram 
+		// if this window wasn't shown earlier.
+		transactionsPC.canvas16Plane.selectedTransaction = transactionsPC.selectedElement;
+		transactionsPC.canvas16Plane.currentTransaction = transactionsPC.selectedElement;
 	}
 
 	private MessageInTransactionTypeType addMsg2Mitt(String[] idDescr, boolean resetDiagrams) {
