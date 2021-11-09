@@ -385,14 +385,12 @@ public class Canvas16 extends JPanel {
 			List<MessageInTransactionTypeType> elements = transactionPanel.getMessagesTableModel().elements;
 			int index = elements.indexOf(selectedMessage.mitt);
 			transactionPanel.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
-			boolean removed = transactionPanel.removeMessage();
-//			if (removed) {
-//				removeSelectedMessageFromDiagrams();
-//			}
+			transactionPanel.removeMessage();
 		}
 
 		void removeFromDiagrams() {
-			selectedTransaction = null;
+			MessageInTransactionTypeType saveFirstNext = selectedNext.size() > 0 ? selectedNext.get(0).mitt : null;
+//			selectedTransaction = null;
 			transactionPanel.getDrawingPlane().setCurrentTransaction(null);
 			transactionPanel.getDrawingPlane().repaint();
 			if (messageInTransactionDialogControl16 != null) {
@@ -415,7 +413,8 @@ public class Canvas16 extends JPanel {
 				Canvas16.this.remove(msg.activeLabel);
 			}
 			selectedResponse.clear();
-			selectedMessage = null;
+
+			selectMessage(saveFirstNext);
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -1082,10 +1081,12 @@ public class Canvas16 extends JPanel {
 
 	void selectMessage(MessageInTransactionTypeType mitt) {
 		initNewDiagram();
-		Message message = new Message(mitt);
-		message.state = MessageState.Next;
-		selectedNext.add(message);
-		message.setState(MessageState.Selected);
+		if (mitt != null) {
+			Message message = new Message(mitt);
+			message.state = MessageState.Next;
+			selectedNext.add(message);
+			message.setState(MessageState.Selected);
+		}
 		System.out.println("exit selectMessage");
 	}
 

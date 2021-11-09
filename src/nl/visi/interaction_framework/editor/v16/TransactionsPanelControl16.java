@@ -1504,10 +1504,19 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					}
 				}
 
+				List<MessageInTransactionTypeType> saveElements = new ArrayList<>();
+				for (MessageInTransactionTypeType saveMitt : elements) {
+					saveElements.add(saveMitt);
+				}
 				elements.clear();
 				MittNode currentNode = root;
 				level = 0;
 				traversMittTree(currentNode);
+				for (MessageInTransactionTypeType saveMitt : saveElements) {
+					if (!elements.contains(saveMitt)) {
+						elements.add(saveMitt);
+					}
+				}
 			}
 		}
 
@@ -2626,8 +2635,9 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			fillMessageTable();
 			updateLaMu(selectedElement, user);
 			elementsTableModel.update(selectedRow);
-			canvas16Plane.selectMessage(mitt);
-			canvas16Plane.selectedMessage.removeFromDiagrams();
+			if (canvas16Plane.selectedMessage != null) {
+				canvas16Plane.selectedMessage.removeFromDiagrams();
+			}
 			return true;
 		}
 		return false;
