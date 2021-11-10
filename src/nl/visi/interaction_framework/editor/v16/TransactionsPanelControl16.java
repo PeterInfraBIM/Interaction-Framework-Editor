@@ -1653,7 +1653,6 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			}
 			return startSubMitts;
 		}
-
 	}
 
 	public MessagesTableModel getMessagesTableModel() {
@@ -1700,6 +1699,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 //				}
 			}
 		});
+		
 		transactionTabs.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

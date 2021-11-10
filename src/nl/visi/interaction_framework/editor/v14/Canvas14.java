@@ -28,6 +28,7 @@ import java.util.ResourceBundle;
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
@@ -59,11 +60,13 @@ public class Canvas14 extends JPanel {
 	final private ResourceBundle bundle = ResourceBundle.getBundle(Control.RESOURCE_BUNDLE);
 	private final TransactionsPanelControl14 transactionPanel;
 	TransactionTypeType selectedTransaction;
+	TransactionTypeType currentTransaction;
 	private Role executor, initiator;
 	private List<Message> historyBefore, historyAfter, selectedNext, selectedPrev, selectedRequest, selectedResponse;
-	private Message selectedMessage;
+	Message selectedMessage;
 	private Dimension preferredSize;
 	private Graphics2D g2d;
+	@SuppressWarnings("unused")
 	private int leftMargin, rightMargin, middleMargin, topMargin, initiatorFlow, executorFlow;
 	private boolean printMode;
 	private JPopupMenu popupMenu;
@@ -90,6 +93,7 @@ public class Canvas14 extends JPanel {
 			this.y = y;
 			this.color = color;
 			activeLabel = new RotatingButton();
+			activeLabel.setTransferHandler(Msg2MittTransferHandler.getInstance());
 			activeLabel.setContentAreaFilled(false);
 			activeLabel.setBackground(color);
 			activeLabel.setBorderPainted(false);
@@ -132,8 +136,9 @@ public class Canvas14 extends JPanel {
 				g2.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
 				g2.drawString(label, x + 50 - (stringWidth / 2), y + 25);
 			} else {
-				activeLabel.setPreferredSize(new Dimension(150, 50));
-				activeLabel.setLocation(x + 25 - (stringWidth / 2) - 10, y + 25 - 10);
+				activeLabel.setMinimumSize(new Dimension(stringWidth + 30, 50));
+				activeLabel.setPreferredSize(new Dimension(stringWidth + 30, 50));
+				activeLabel.setLocation(x - (stringWidth / 4) + 15, y + 25 - 10);
 			}
 			Stroke saveStroke = g2.getStroke();
 			float dash[] = { 5.0f };
@@ -147,11 +152,12 @@ public class Canvas14 extends JPanel {
 		History, Previous, Next, Selected;
 	}
 
-	private class Message {
+	class Message {
 		private MessageState state;
 		private final MessageInTransactionTypeType mitt;
 		private RotatingButton activeLabel;
 		private int x;
+		@SuppressWarnings("unused")
 		private int y;
 		private JPopupMenu popupMenu;
 		private final JMenuItem mittEdit;
@@ -166,6 +172,7 @@ public class Canvas14 extends JPanel {
 			this.x = x;
 			this.y = y;
 			activeLabel = new RotatingButton();
+			activeLabel.setTransferHandler(Msg2MittTransferHandler.getInstance());
 			resetActiveLabel();
 
 			setTitleAndToolTip(mitt);
@@ -325,8 +332,21 @@ public class Canvas14 extends JPanel {
 			});
 			removeMenuItem.setEnabled(false);
 			popupMenu.add(removeMenuItem);
-			activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
-					BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+			if (isEndMessage(mitt) || isStartMessage(mitt)) {
+				if (isEndMessage(mitt)) {
+					activeLabel.setBorder(
+							BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_RED_1, 2),
+									BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+				}
+				if (isStartMessage(mitt)) {
+					activeLabel.setBorder(
+							BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_GREEN_1, 2),
+									BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+				}
+			} else {
+				activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(Color.BLACK, 1),
+						BorderFactory.createEmptyBorder(2, 5, 2, 5)));
+			}
 			activeLabel.setBackground(LIGHT_YELLOW_4);
 			activeLabel.addMouseListener(new MouseAdapter() {
 				@Override
@@ -374,32 +394,37 @@ public class Canvas14 extends JPanel {
 			List<MessageInTransactionTypeType> elements = transactionPanel.getMessagesTableModel().elements;
 			int index = elements.indexOf(selectedMessage.mitt);
 			transactionPanel.tbl_Messages.getSelectionModel().setSelectionInterval(index, index);
-			boolean removed = transactionPanel.removeMessage();
-			if (removed) {
-				transactionPanel.getDrawingPlane().setCurrentTransaction(null);
-				transactionPanel.getDrawingPlane().repaint();
-				if (messageInTransactionDialogControl14 != null) {
-					messageInTransactionDialogControl14.getDialog().dispose();
-				}
-				Canvas14.this.remove(selectedMessage.activeLabel);
-				for (Message msg : selectedNext) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedNext.clear();
-				for (Message msg : selectedPrev) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedPrev.clear();
-				for (Message msg : selectedRequest) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedRequest.clear();
-				for (Message msg : selectedResponse) {
-					Canvas14.this.remove(msg.activeLabel);
-				}
-				selectedResponse.clear();
-				selectedMessage = null;
+			transactionPanel.removeMessage();
+		}
+
+		void removeFromDiagrams() {
+			MessageInTransactionTypeType saveFirstNext = selectedNext.size() > 0 ? selectedNext.get(0).mitt : null;
+			MessageInTransactionTypeType saveFirstPrev = selectedPrev.size() > 0 ? selectedPrev.get(0).mitt : null;
+
+			transactionPanel.getDrawingPlane().setCurrentTransaction(null);
+			transactionPanel.getDrawingPlane().repaint();
+			if (messageInTransactionDialogControl14 != null) {
+				messageInTransactionDialogControl14.getDialog().dispose();
 			}
+			Canvas14.this.remove(selectedMessage.activeLabel);
+			for (Message msg : selectedNext) {
+				Canvas14.this.remove(msg.activeLabel);
+			}
+			selectedNext.clear();
+			for (Message msg : selectedPrev) {
+				Canvas14.this.remove(msg.activeLabel);
+			}
+			selectedPrev.clear();
+			for (Message msg : selectedRequest) {
+				Canvas14.this.remove(msg.activeLabel);
+			}
+			selectedRequest.clear();
+			for (Message msg : selectedResponse) {
+				Canvas14.this.remove(msg.activeLabel);
+			}
+			selectedResponse.clear();
+
+			selectMessage(saveFirstNext != null ? saveFirstNext : saveFirstPrev);
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -635,14 +660,6 @@ public class Canvas14 extends JPanel {
 		void paint(int y) {
 			setTitleAndToolTip(mitt);
 
-			if (isEndMessage(mitt)) {
-				activeLabel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(LIGHT_RED_1, 2),
-						BorderFactory.createEmptyBorder(2, 5, 2, 5)));
-			}
-			if (isStartMessage(mitt)) {
-				activeLabel.setBorder(BorderFactory.createCompoundBorder(
-						BorderFactory.createLineBorder(LIGHT_GREEN_1, 2), BorderFactory.createEmptyBorder(2, 5, 2, 5)));
-			}
 			TransactionTypeType transaction = Control14.getTransaction(mitt);
 			int stringWidth = g2d.getFontMetrics().stringWidth(this.activeLabel.getText());
 			if (printMode) {
@@ -775,7 +792,8 @@ public class Canvas14 extends JPanel {
 					String result = (String) evt.getNewValue();
 					int lastOpenBracket = result.lastIndexOf('[');
 					int lastCloseBracket = result.lastIndexOf(']');
-					String messageId = result.substring(lastOpenBracket + 1, lastCloseBracket);
+					String messageId = result.substring(lastOpenBracket, lastCloseBracket + 1) + " "
+							+ result.substring(0, lastOpenBracket - 1);
 					transactionPanel.cbx_Messages.setSelectedItem(messageId);
 					MessageInTransactionTypeType newMitt = transactionPanel.addMessage();
 					Control14.addPrevious(newMitt, Message.this.mitt);
@@ -808,6 +826,7 @@ public class Canvas14 extends JPanel {
 					}
 				}
 			}
+
 			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
 					bundle.getString("lbl_AddExistingResponse"), items);
 			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
@@ -902,7 +921,7 @@ public class Canvas14 extends JPanel {
 
 		private void addExternalResponse() {
 			List<String> items = new ArrayList<>();
-			List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(this.mitt);
+//			List<MessageInTransactionTypeType> prevMitts = Control14.getPrevious(this.mitt);
 			List<MessageInTransactionTypeType> messages = new ArrayList<>();
 			List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
 					.getElements(MessageInTransactionTypeType.class);
@@ -950,7 +969,7 @@ public class Canvas14 extends JPanel {
 				items.add(transaction.getDescription() + ":" + message.getDescription() + " [" + externalMitt.getId()
 						+ "]");
 			}
-			SelectBox selectBox = new SelectBox(InteractionFrameworkEditor.getApplicationFrame(),
+			SelectBox selectBox = new SelectBox(((JFrame) SwingUtilities.getRoot(Canvas14.this)),
 					bundle.getString("lbl_AddExternalResponse"), items);
 			selectBox.addPropertyChangeListener(new PropertyChangeListener() {
 				@Override
@@ -1041,14 +1060,7 @@ public class Canvas14 extends JPanel {
 				// String messageId = result.substring(lastOpenBracket + 1, lastCloseBracket);
 				String messageId = result.substring(lastOpenBracket, lastCloseBracket + 1) + " "
 						+ result.substring(0, lastOpenBracket - 1);
-				transactionPanel.cbx_Messages.setSelectedItem(messageId);
-				MessageInTransactionTypeType mitt = transactionPanel.addMessage();
-				initNewDiagram();
-				Message message = new Message(mitt);
-				message.state = MessageState.Next;
-				selectedNext.add(message);
-				transactionPanel.getDrawingPlane().setCurrentTransaction(null);
-				transactionPanel.getDrawingPlane().repaint();
+				addMitt2Canvas(messageId, true);
 			}
 		});
 	}
@@ -1076,12 +1088,14 @@ public class Canvas14 extends JPanel {
 		}
 	}
 
-	private void selectMessage(MessageInTransactionTypeType mitt) {
+	void selectMessage(MessageInTransactionTypeType mitt) {
 		initNewDiagram();
-		Message message = new Message(mitt);
-		message.state = MessageState.Next;
-		selectedNext.add(message);
-		message.setState(MessageState.Selected);
+		if (mitt != null) {
+			Message message = new Message(mitt);
+			message.state = MessageState.Next;
+			selectedNext.add(message);
+			message.setState(MessageState.Selected);
+		}
 	}
 
 	public Canvas14(TransactionsPanelControl14 transactionPanel, boolean printMode) {
@@ -1094,13 +1108,23 @@ public class Canvas14 extends JPanel {
 	public Dimension getPreferredSize() {
 		return preferredSize;
 	}
-
+	
+	@Override
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
 		g2d = (Graphics2D) g;
 
-		boolean newDiagram = transactionPanel.selectedElement != null
-				&& !transactionPanel.selectedElement.equals(selectedTransaction);
+		if (transactionPanel.selectedElement == null) {
+			selectedTransaction = null;
+			Canvas14.this.removeAll();
+			g2d.setColor(Color.WHITE);
+			g2d.fillRect(0, 0, getWidth(), getHeight());
+			return;
+		}
+
+		boolean newDiagram = !transactionPanel.selectedElement.equals(selectedTransaction)
+				|| currentTransaction == null;
+		currentTransaction = transactionPanel.selectedElement;
 		if (newDiagram) {
 			selectedTransaction = transactionPanel.selectedElement;
 			initNewDiagram();
@@ -1419,8 +1443,11 @@ public class Canvas14 extends JPanel {
 		}
 	}
 
-	private void initNewDiagram() {
-		Canvas14.this.removeAll();
+	void initNewDiagram() {
+		if (Canvas14.this.getComponentCount() > 0) {
+			Canvas14.this.removeAll();
+			Canvas14.this.repaint();
+		}
 		initiator = new Role(Control14.getInitiator(selectedTransaction), leftMargin - 50, 25, LIGHT_RED_3);
 		executor = new Role(Control14.getExecutor(selectedTransaction), leftMargin + middleMargin, 25, LIGHT_GREEN_3);
 		historyAfter.clear();
@@ -1515,6 +1542,27 @@ public class Canvas14 extends JPanel {
 			}
 		}
 		return true;
+	}
+
+	MessageInTransactionTypeType addMitt2Canvas(String messageId, boolean resetDiagrams) {
+		TransactionsPanelControl14 transactionsPC = MainPanelControl14.getTransactionsPC();
+		transactionsPC.canvas14Plane.selectedTransaction = transactionsPC.selectedElement;
+		transactionPanel.cbx_Messages.setSelectedItem(messageId);
+		MessageInTransactionTypeType mitt = transactionPanel.addMessage();
+		initNewDiagram();
+		Message message = new Message(mitt);
+		message.state = MessageState.Next;
+		selectedNext.add(message);
+		if (resetDiagrams) {
+			reset();
+			transactionPanel.reset();
+		}
+		return mitt;
+	}
+
+	public void reset() {
+		currentTransaction = null;
+		repaint();
 	}
 
 }

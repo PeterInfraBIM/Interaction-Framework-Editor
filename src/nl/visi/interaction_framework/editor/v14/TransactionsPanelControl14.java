@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -113,7 +114,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	private JTextArea tar_Initiator, tar_Executor;
 	private JScrollPane scrollPane, scrollPane2;
 	private Canvas drawingPlane;
-	private Canvas14 canvas14Plane;
+	Canvas14 canvas14Plane;
 	private Canvas.MessageItem activeItem;
 
 	private Map<MessageInTransactionTypeType, List<MessageInTransactionTypeType>> successorMap;
@@ -326,7 +327,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 						}
 					}
 
-					activeLabel.setToolTipText(mitt.getId());
+					activeLabel.setToolTipText(toolTip);
 					activeLabel.setContentAreaFilled(false);
 					activeLabel.setBackground(Color.white);
 					activeLabel.setBorderPainted(false);
@@ -938,7 +939,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			if (height != preferredSize.height || width != preferredSize.width
 					|| previousMiddleMargin != middleMargin) {
 				previousMiddleMargin = middleMargin;
-				// System.out.println("width=" + width + " preferredSize.width=" + preferredSize.width);
+				// System.out.println("width=" + width + " preferredSize.width=" + 
+				// preferredSize.width);
 				removeAll();
 				tcMap.clear();
 				setSize(getPreferredSize());
@@ -1083,7 +1085,6 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	}
 
 	private enum TransactionsTableColumns {
-//		Id, Description, Main, Initiator, Executor, StartDate, EndDate, State, DateLamu, UserLamu;
 		Id, Description, Main, Initiator, Executor;
 
 		@Override
@@ -1121,16 +1122,6 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			case Executor:
 				RoleTypeType executor = getExecutor(transaction);
 				return executor != null ? executor.getDescription() : null;
-//			case StartDate:
-//				return getDate(transaction.getStartDate());
-//			case EndDate:
-//				return getDate(transaction.getEndDate());
-//			case State:
-//				return transaction.getState();
-//			case DateLamu:
-//				return getDateTime(transaction.getDateLaMu());
-//			case UserLamu:
-//				return transaction.getUserLaMu();
 			default:
 				return null;
 			}
@@ -1512,10 +1503,19 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 					}
 				}
 
+				List<MessageInTransactionTypeType> saveElements = new ArrayList<>();
+				for (MessageInTransactionTypeType saveMitt : elements) {
+					saveElements.add(saveMitt);
+				}
 				elements.clear();
 				MittNode currentNode = root;
 				level = 0;
 				traversMittTree(currentNode);
+				for (MessageInTransactionTypeType saveMitt : saveElements) {
+					if (!elements.contains(saveMitt)) {
+						elements.add(saveMitt);
+					}
+				}
 			}
 		}
 
@@ -1723,6 +1723,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				switch (tab) {
 				case DynamicSequenceDiagram:
 					frame.add(scrollPane2, BorderLayout.CENTER);
+					frame.getRootPane().setTransferHandler(Msg2MittTransferHandler.getInstance());
 					break;
 				case StaticSequenceDiagram:
 					frame.add(scrollPane, BorderLayout.CENTER);
@@ -1782,6 +1783,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 		});
 		canvas2Panel.add(scrollPane2, BorderLayout.CENTER);
+		canvas2Panel.setTransferHandler(Msg2MittTransferHandler.getInstance());
 	}
 
 	private void initResultField() {
@@ -1917,6 +1919,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		messagesTableModel = new MessagesTableModel();
 		tbl_Messages.setModel(messagesTableModel);
 		tbl_Messages.setFillsViewportHeight(true);
+		tbl_Messages.setDropMode(DropMode.ON_OR_INSERT_ROWS);
 		cbx_TransactionPhases = new JComboBox<>(new DefaultComboBoxModel<String>());
 		TableColumn transactionPhaseColumn = tbl_Messages.getColumnModel()
 				.getColumn(MessagesTableColumns.TransactionPhase.ordinal());
@@ -1952,7 +1955,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				}
 			}
 		});
-		cbx_Messages.setTransferHandler(new Msg2MittTransferHandler());
+		cbx_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
+		tbl_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
 
 		tbl_Messages.getSelectionModel().addListSelectionListener(messageTableSelectionListener);
 	}
@@ -2064,6 +2068,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 				tar_Executor.setText(roleType.getDescription());
 			}
 
+			fillMessageTable();
+
 			DefaultComboBoxModel<String> transactionPhasesModel = (DefaultComboBoxModel<String>) cbx_TransactionPhases
 					.getModel();
 			transactionPhasesModel.removeAllElements();
@@ -2080,8 +2086,6 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			for (GroupTypeType group : groupsList) {
 				groupsModel.addElement(group.getId());
 			}
-
-			fillMessageTable();
 
 			cbx_Messages.removeAllItems();
 			cbx_Messages.addItem(null);
@@ -2119,7 +2123,15 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		}
 
 		canvasPanel.repaint();
+		JFrame frame = TransactionTabs.StaticSequenceDiagram.getTearOffFrame();
+		if (frame != null) {
+			frame.getRootPane().repaint();
+		}
 		canvas2Panel.repaint();
+		JFrame frame2 = TransactionTabs.DynamicSequenceDiagram.getTearOffFrame();
+		if (frame2 != null) {
+			frame2.getRootPane().repaint();
+		}
 
 		inSelection = false;
 	}
@@ -2179,7 +2191,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		}
 	}
 
-	private void fillMessageTable() {
+	void fillMessageTable() {
 		messagesTableModel.clear();
 		List<MessageInTransactionTypeType> mitts = Editor14.getStore14()
 				.getElements(MessageInTransactionTypeType.class);
@@ -2490,6 +2502,11 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		return mitt;
 	}
 
+	public void reset() {
+		getDrawingPlane().setCurrentTransaction(null);
+		getDrawingPlane().repaint();
+	}
+
 	public void editMessage() {
 		int row = tbl_Messages.getSelectedRow();
 		MessageInTransactionTypeType mitt = messagesTableModel.get(row);
@@ -2611,6 +2628,9 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			fillMessageTable();
 			updateLaMu(selectedElement, user);
 			elementsTableModel.update(selectedRow);
+			if (canvas14Plane.selectedMessage != null) {
+				canvas14Plane.selectedMessage.removeFromDiagrams();
+			}
 			return true;
 		}
 		return false;

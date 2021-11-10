@@ -66,6 +66,7 @@ public class Canvas16 extends JPanel {
 	Message selectedMessage;
 	private Dimension preferredSize;
 	private Graphics2D g2d;
+	@SuppressWarnings("unused")
 	private int leftMargin, rightMargin, middleMargin, topMargin, initiatorFlow, executorFlow;
 	private boolean printMode;
 	private JPopupMenu popupMenu;
@@ -390,7 +391,8 @@ public class Canvas16 extends JPanel {
 
 		void removeFromDiagrams() {
 			MessageInTransactionTypeType saveFirstNext = selectedNext.size() > 0 ? selectedNext.get(0).mitt : null;
-//			selectedTransaction = null;
+			MessageInTransactionTypeType saveFirstPrev = selectedPrev.size() > 0 ? selectedPrev.get(0).mitt : null;
+
 			transactionPanel.getDrawingPlane().setCurrentTransaction(null);
 			transactionPanel.getDrawingPlane().repaint();
 			if (messageInTransactionDialogControl16 != null) {
@@ -414,7 +416,7 @@ public class Canvas16 extends JPanel {
 			}
 			selectedResponse.clear();
 
-			selectMessage(saveFirstNext);
+			selectMessage(saveFirstNext != null ? saveFirstNext : saveFirstPrev);
 		}
 
 		private void setTitleAndToolTip(MessageInTransactionTypeType mitt) {
@@ -911,7 +913,7 @@ public class Canvas16 extends JPanel {
 
 		private void addExternalResponse() {
 			List<String> items = new ArrayList<>();
-			List<MessageInTransactionTypeType> prevMitts = Control16.getPrevious(this.mitt);
+//			List<MessageInTransactionTypeType> prevMitts = Control16.getPrevious(this.mitt);
 			List<MessageInTransactionTypeType> messages = new ArrayList<>();
 			List<MessageInTransactionTypeType> mitts = Editor16.getStore16()
 					.getElements(MessageInTransactionTypeType.class);
@@ -1087,7 +1089,6 @@ public class Canvas16 extends JPanel {
 			selectedNext.add(message);
 			message.setState(MessageState.Selected);
 		}
-		System.out.println("exit selectMessage");
 	}
 
 	public Canvas16(TransactionsPanelControl16 transactionPanel, boolean printMode) {
@@ -1118,7 +1119,6 @@ public class Canvas16 extends JPanel {
 				|| currentTransaction == null;
 		currentTransaction = transactionPanel.selectedElement;
 		if (newDiagram) {
-			System.out.println("newDiagram");
 			selectedTransaction = transactionPanel.selectedElement;
 			initNewDiagram();
 		}
@@ -1437,7 +1437,6 @@ public class Canvas16 extends JPanel {
 	}
 
 	void initNewDiagram() {
-		System.out.println("initNewDiagram");
 		if (Canvas16.this.getComponentCount() > 0) {
 			Canvas16.this.removeAll();
 			Canvas16.this.repaint();
