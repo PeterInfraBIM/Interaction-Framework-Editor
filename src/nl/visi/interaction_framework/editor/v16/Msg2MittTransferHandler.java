@@ -66,12 +66,19 @@ public class Msg2MittTransferHandler extends TransferHandler {
 	protected Transferable createTransferable(JComponent c) {
 		init();
 
-		JTable table = (JTable) c;
-		@SuppressWarnings("unchecked")
-		ElementsTableModel<MessageTypeType> model = (ElementsTableModel<MessageTypeType>) table.getModel();
-		int selectedRow = table.getRowSorter().convertRowIndexToModel(table.getSelectedRow());
-		MessageTypeType selectedElement = (MessageTypeType) model.get(selectedRow);
-		return new StringSelection(selectedElement.getId() + '\t' + selectedElement.getDescription());
+		if (c instanceof JTable) {
+			JTable table = (JTable) c;
+			@SuppressWarnings("unchecked")
+			ElementsTableModel<MessageTypeType> model = (ElementsTableModel<MessageTypeType>) table.getModel();
+			int selectedRow = table.getRowSorter().convertRowIndexToModel(table.getSelectedRow());
+			MessageTypeType selectedElement = (MessageTypeType) model.get(selectedRow);
+			return new StringSelection(selectedElement.getId() + '\t' + selectedElement.getDescription());
+		} else {
+			RotatingButton btn = (RotatingButton) c;
+			String[] words = btn.getToolTipText().split(" ");
+			System.out.println("create transferable for MITT: " + words[0]);
+			return new StringSelection(words[0]);
+		}
 	}
 
 	@Override
@@ -185,7 +192,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			transactionsPC.fillMessageTable();
 			transactionsPC.canvas16Plane.selectMessage(newMitt);
 		}
-		// Next two statements prevent a reset of the dynamic sequence diagram 
+		// Next two statements prevent a reset of the dynamic sequence diagram
 		// if this window wasn't shown earlier.
 		transactionsPC.canvas16Plane.selectedTransaction = transactionsPC.selectedElement;
 		transactionsPC.canvas16Plane.currentTransaction = transactionsPC.selectedElement;

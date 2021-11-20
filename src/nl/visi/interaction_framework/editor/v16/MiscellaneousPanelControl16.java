@@ -45,7 +45,6 @@ import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.OrganisationTypeType;
 import nl.visi.schemas._20160331.PersonTypeType;
 import nl.visi.schemas._20160331.ProjectTypeType;
-import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.TransactionPhaseTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;

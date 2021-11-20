@@ -1,7 +1,6 @@
 package nl.visi.interaction_framework.editor;
 
 import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.lang.reflect.Method;
 import java.util.List;
 

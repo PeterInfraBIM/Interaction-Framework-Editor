@@ -94,7 +94,7 @@ public class InteractionFrameworkEditor extends Control {
 //		final String version = "Release: 2.0.1 - release date: 2021-01-31";
 //		final String version = "Release: 2.0.2 - release date: 2021-08-17";
 //		final String version = "Release: 2.0.3 - release date: 2021-08-24";
-		final String version = "Release: 2.0.4 - release date: 2021-09-27";
+		final String version = "Release: 2.1.0 - release date: 2021-11-20";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();

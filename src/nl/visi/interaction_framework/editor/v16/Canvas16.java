@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
+import javax.swing.TransferHandler;
 
 import nl.visi.interaction_framework.editor.Control;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
@@ -173,6 +174,15 @@ public class Canvas16 extends JPanel {
 			this.y = y;
 			activeLabel = new RotatingButton();
 			activeLabel.setTransferHandler(Msg2MittTransferHandler.getInstance());
+			activeLabel.addMouseMotionListener(new MouseAdapter() {
+                @Override
+                public void mouseDragged(MouseEvent e) {
+                	// Enable drag 'n drop functionality to this button
+                	RotatingButton button = (RotatingButton) e.getSource();
+                    TransferHandler handle = button.getTransferHandler();
+                    handle.exportAsDrag(button, e, TransferHandler.COPY);
+                }
+            });
 			resetActiveLabel();
 
 			setTitleAndToolTip(mitt);
