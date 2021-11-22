@@ -141,6 +141,37 @@ public class Msg2MittTransferHandler extends TransferHandler {
 					}
 					return true;
 				}
+			} else {
+				if (info.getComponent().equals(transactionsPC.canvas2Panel)) {
+					// No background drop
+					return false;
+				}
+				if (info.getComponent().equals(transactionsPC.canvas16Plane.initiator.getActiveLabel())) {
+					// No initiator drop
+					return false;
+				}
+				if (info.getComponent().equals(transactionsPC.canvas16Plane.executor.getActiveLabel())) {
+					// No executor drop
+					return false;
+				}
+				if (info.getComponent() instanceof RotatingButton) {
+					RotatingButton target = (RotatingButton) info.getComponent();
+					String targetId = target.getToolTipText().split(" ")[0];
+					if (idDescr[0].equals(targetId)) {
+						// No drop on the same MITT
+						return false;
+					}
+					MessageInTransactionTypeType targetMitt = Editor16.getStore16()
+							.getElement(MessageInTransactionTypeType.class, targetId);
+					MessageInTransactionTypeType transferMitt = Editor16.getStore16()
+							.getElement(MessageInTransactionTypeType.class, idDescr[0]);
+					if (transferMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
+						// Not the same direction
+						return false;
+					}
+					System.out.println("incoming mitt: " + transferMitt.getId());
+					return true;
+				}
 			}
 			return false;
 		}

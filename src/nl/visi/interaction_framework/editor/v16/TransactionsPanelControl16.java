@@ -90,8 +90,9 @@ import nl.visi.schemas._20160331.TransactionTypeTypeRef;
 public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel,
+	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel,
 			elementsTreePanel;
+	JPanel canvas2Panel;
 	JTabbedPane transactionTabs;
 	JTable tbl_Messages;
 

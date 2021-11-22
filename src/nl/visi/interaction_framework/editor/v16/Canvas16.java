@@ -62,7 +62,8 @@ public class Canvas16 extends JPanel {
 	private final TransactionsPanelControl16 transactionPanel;
 	TransactionTypeType selectedTransaction;
 	TransactionTypeType currentTransaction;
-	private Role executor, initiator;
+	Role executor;
+	Role initiator;
 	private List<Message> historyBefore, historyAfter, selectedNext, selectedPrev, selectedRequest, selectedResponse;
 	Message selectedMessage;
 	private Dimension preferredSize;
@@ -80,7 +81,7 @@ public class Canvas16 extends JPanel {
 		}
 	}
 
-	private class Role {
+	class Role {
 
 		private RoleTypeType role;
 		private int x;
@@ -94,12 +95,12 @@ public class Canvas16 extends JPanel {
 			this.y = y;
 			this.color = color;
 			activeLabel = new RotatingButton();
-			activeLabel.setTransferHandler(Msg2MittTransferHandler.getInstance());
-			activeLabel.setContentAreaFilled(false);
-			activeLabel.setBackground(color);
-			activeLabel.setBorderPainted(false);
-			activeLabel.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
-			activeLabel.addMouseListener(new MouseAdapter() {
+			getActiveLabel().setTransferHandler(Msg2MittTransferHandler.getInstance());
+			getActiveLabel().setContentAreaFilled(false);
+			getActiveLabel().setBackground(color);
+			getActiveLabel().setBorderPainted(false);
+			getActiveLabel().setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
+			getActiveLabel().addMouseListener(new MouseAdapter() {
 
 				@Override
 				public void mouseClicked(MouseEvent e) {
@@ -118,14 +119,14 @@ public class Canvas16 extends JPanel {
 					Canvas16.this.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
 				}
 			});
-			Canvas16.this.add(activeLabel);
+			Canvas16.this.add(getActiveLabel());
 		}
 
 		void paint(Graphics g) {
 			Graphics2D g2 = (Graphics2D) g;
 			String label = role != null ? role.getDescription() : "?";
-			activeLabel.setText(label);
-			activeLabel.setToolTipText(role != null ? role.getId() : "?");
+			getActiveLabel().setText(label);
+			getActiveLabel().setToolTipText(role != null ? role.getId() : "?");
 			g2.setFont(g2.getFont().deriveFont(Font.BOLD));
 			int stringWidth = g2.getFontMetrics().stringWidth(label);
 			if (printMode) {
@@ -137,15 +138,19 @@ public class Canvas16 extends JPanel {
 				g2.setFont(getFont().deriveFont(getFont().getSize() - 2.0f));
 				g2.drawString(label, x + 50 - (stringWidth / 2), y + 25);
 			} else {
-				activeLabel.setMinimumSize(new Dimension(stringWidth + 30, 50));
-				activeLabel.setPreferredSize(new Dimension(stringWidth + 30, 50));
-				activeLabel.setLocation(x - (stringWidth / 4) + 15, y + 25 - 10);
+				getActiveLabel().setMinimumSize(new Dimension(stringWidth + 30, 50));
+				getActiveLabel().setPreferredSize(new Dimension(stringWidth + 30, 50));
+				getActiveLabel().setLocation(x - (stringWidth / 4) + 15, y + 25 - 10);
 			}
 			Stroke saveStroke = g2.getStroke();
 			float dash[] = { 5.0f };
 			g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
 			g2.drawLine(x + 50, y + 50, x + 50, getHeight() - 10);
 			g2.setStroke(saveStroke);
+		}
+
+		public RotatingButton getActiveLabel() {
+			return activeLabel;
 		}
 	}
 
@@ -175,14 +180,14 @@ public class Canvas16 extends JPanel {
 			activeLabel = new RotatingButton();
 			activeLabel.setTransferHandler(Msg2MittTransferHandler.getInstance());
 			activeLabel.addMouseMotionListener(new MouseAdapter() {
-                @Override
-                public void mouseDragged(MouseEvent e) {
-                	// Enable drag 'n drop functionality to this button
-                	RotatingButton button = (RotatingButton) e.getSource();
-                    TransferHandler handle = button.getTransferHandler();
-                    handle.exportAsDrag(button, e, TransferHandler.COPY);
-                }
-            });
+				@Override
+				public void mouseDragged(MouseEvent e) {
+					// Enable drag 'n drop functionality to this button
+					RotatingButton button = (RotatingButton) e.getSource();
+					TransferHandler handle = button.getTransferHandler();
+					handle.exportAsDrag(button, e, TransferHandler.COPY);
+				}
+			});
 			resetActiveLabel();
 
 			setTitleAndToolTip(mitt);
