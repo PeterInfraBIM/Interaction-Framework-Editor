@@ -6,6 +6,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -28,6 +29,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 	private static JTable.DropLocation dropLocation;
 	private static String[] idDescr;
 	private static RotatingButton selectedMessage;
+	private static MessageInTransactionTypeType transMitt;
 	private static Color saveSelectedBackground;
 	private boolean initialized = false;
 	private TransactionsPanelControl16 transactionsPC;
@@ -142,35 +144,41 @@ public class Msg2MittTransferHandler extends TransferHandler {
 					return true;
 				}
 			} else {
-				if (info.getComponent().equals(transactionsPC.canvas2Panel)) {
-					// No background drop
-					return false;
-				}
-				if (info.getComponent().equals(transactionsPC.canvas16Plane.initiator.getActiveLabel())) {
-					// No initiator drop
-					return false;
-				}
-				if (info.getComponent().equals(transactionsPC.canvas16Plane.executor.getActiveLabel())) {
-					// No executor drop
-					return false;
-				}
-				if (info.getComponent() instanceof RotatingButton) {
-					RotatingButton target = (RotatingButton) info.getComponent();
-					String targetId = target.getToolTipText().split(" ")[0];
-					if (idDescr[0].equals(targetId)) {
-						// No drop on the same MITT
+				transMitt = Editor16.getStore16().getElement(MessageInTransactionTypeType.class, idDescr[0]);
+				if (transMitt != null) {
+					if (info.getComponent().equals(transactionsPC.canvas2Panel)) {
+						// No background drop
 						return false;
 					}
-					MessageInTransactionTypeType targetMitt = Editor16.getStore16()
-							.getElement(MessageInTransactionTypeType.class, targetId);
-					MessageInTransactionTypeType transferMitt = Editor16.getStore16()
-							.getElement(MessageInTransactionTypeType.class, idDescr[0]);
-					if (transferMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
-						// Not the same direction
+					if (info.getComponent().equals(transactionsPC.canvas16Plane.initiator.getActiveLabel())) {
+						// No initiator drop
 						return false;
 					}
-					System.out.println("incoming mitt: " + transferMitt.getId());
-					return true;
+					if (info.getComponent().equals(transactionsPC.canvas16Plane.executor.getActiveLabel())) {
+						// No executor drop
+						return false;
+					}
+					if (info.getComponent() instanceof RotatingButton) {
+						RotatingButton target = (RotatingButton) info.getComponent();
+						String targetId = target.getToolTipText().split(" ")[0];
+						if (transMitt.getId().equals(targetId)) {
+							// No drop on the same MITT
+							return false;
+						}
+						MessageInTransactionTypeType targetMitt = Editor16.getStore16()
+								.getElement(MessageInTransactionTypeType.class, targetId);
+						if (transMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
+							// Not the same direction
+							return false;
+						}
+						List<MessageInTransactionTypeType> previous = Control16.getPrevious(transMitt);
+						if (previous != null && previous.contains(targetMitt)) {
+							// transfer mitt should not contain target mitt as a previous mitt
+							return false;
+						}
+//					System.out.println("put " + transferMitt.getId() + " after " + targetMitt.getId());
+						return true;
+					}
 				}
 			}
 			return false;
@@ -212,16 +220,28 @@ public class Msg2MittTransferHandler extends TransferHandler {
 	}
 
 	void dropBeforeOrAfter(MessageInTransactionTypeType selectedMitt) {
-		MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
-		newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
-		if (dropAction == MOVE) {
-			Control16.addPrevious(newMitt, selectedMitt);
-			transactionsPC.fillMessageTable();
-			transactionsPC.canvas16Plane.selectMessage(selectedMitt);
+		if (transMitt == null) {
+			MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
+			newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
+			if (dropAction == MOVE) {
+				Control16.addPrevious(newMitt, selectedMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas16Plane.selectMessage(selectedMitt);
+			} else {
+				Control16.addPrevious(selectedMitt, newMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas16Plane.selectMessage(newMitt);
+			}
 		} else {
-			Control16.addPrevious(selectedMitt, newMitt);
-			transactionsPC.fillMessageTable();
-			transactionsPC.canvas16Plane.selectMessage(newMitt);
+			if (dropAction == MOVE) {
+				Control16.addPrevious(transMitt, selectedMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas16Plane.selectMessage(selectedMitt);
+			} else {
+				Control16.addPrevious(selectedMitt, transMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas16Plane.selectMessage(transMitt);
+			}			
 		}
 		// Next two statements prevent a reset of the dynamic sequence diagram
 		// if this window wasn't shown earlier.
