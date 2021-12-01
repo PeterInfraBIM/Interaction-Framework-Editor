@@ -171,13 +171,22 @@ public class Msg2MittTransferHandler extends TransferHandler {
 							// Not the same direction
 							return false;
 						}
-						List<MessageInTransactionTypeType> previous = Control16.getPrevious(transMitt);
-						if (previous != null && previous.contains(targetMitt)) {
-							// transfer mitt should not contain target mitt as a previous mitt
-							return false;
+
+						if (dropAction == MOVE) {
+							List<MessageInTransactionTypeType> previous = Control16.getPrevious(transMitt);
+							if (previous != null && previous.contains(targetMitt)) {
+								// transfer mitt should not contain target mitt as a previous mitt
+								return false;
+							}
+							return true;
+						} else {
+							List<MessageInTransactionTypeType> previous = Control16.getPrevious(targetMitt);
+							if (previous != null && previous.contains(transMitt)) {
+								// target mitt should not contain transfer mitt as a previous mitt
+								return false;
+							}
+							return true;
 						}
-//					System.out.println("put " + transferMitt.getId() + " after " + targetMitt.getId());
-						return true;
 					}
 				}
 			}
@@ -241,7 +250,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 				Control16.addPrevious(selectedMitt, transMitt);
 				transactionsPC.fillMessageTable();
 				transactionsPC.canvas16Plane.selectMessage(transMitt);
-			}			
+			}
 		}
 		// Next two statements prevent a reset of the dynamic sequence diagram
 		// if this window wasn't shown earlier.
