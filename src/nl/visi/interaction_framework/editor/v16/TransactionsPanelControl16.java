@@ -90,8 +90,7 @@ import nl.visi.schemas._20160331.TransactionTypeTypeRef;
 public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel,
-			elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel, elementsTreePanel;
 	JPanel canvas2Panel;
 	JTabbedPane transactionTabs;
 	JTable tbl_Messages;
@@ -1700,7 +1699,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 //				}
 			}
 		});
-		
+
 		transactionTabs.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -2379,6 +2378,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 					trnsType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
 				}
 				if (trnsType != null && trnsType.equals(transactionType)) {
+					// this mitt belongs to the selected transaction for deletion
 					toBeDeleted.add(mitt);
 					List<ElementConditionType> elementConditions = store.getElements(ElementConditionType.class);
 					for (ElementConditionType ect : elementConditions) {
@@ -2393,6 +2393,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						}
 					}
 				} else {
+					// this mitt does not belong to the selected transaction but may reference a
+					// previous mitt in the selected transaction
 					Previous previous = mitt.getPrevious();
 					if (previous != null) {
 						List<Object> previousList = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
@@ -2409,8 +2411,8 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 									previousList.remove(object);
 									if (previousList.size() == 0) {
 										mitt.setPrevious(null);
-										updateLaMu(mitt, user);
 									}
+									updateLaMu(mitt, user);
 									break;
 								}
 							}

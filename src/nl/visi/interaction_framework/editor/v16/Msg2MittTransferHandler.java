@@ -104,6 +104,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 
 			// Check for existing message type
 			idDescr = getMessageIdPlusDescr(t);
+			transMitt = null;
 			MessageTypeType messageType = Editor16.getStore16().getElement(MessageTypeType.class, idDescr[0]);
 			if (messageType != null) {
 				if (info.getComponent() instanceof JTable) {
@@ -256,6 +257,8 @@ public class Msg2MittTransferHandler extends TransferHandler {
 		// if this window wasn't shown earlier.
 		transactionsPC.canvas16Plane.selectedTransaction = transactionsPC.selectedElement;
 		transactionsPC.canvas16Plane.currentTransaction = transactionsPC.selectedElement;
+		// Update static sequence diagram
+		transactionsPC.reset();
 	}
 
 	private MessageInTransactionTypeType addMsg2Mitt(String[] idDescr, boolean resetDiagrams) {
