@@ -14,6 +14,7 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
+import javax.swing.table.TableModel;
 
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.interaction_framework.editor.v16.Control16.ElementsTableModel;
@@ -70,17 +71,25 @@ public class Msg2MittTransferHandler extends TransferHandler {
 
 		if (c instanceof JTable) {
 			JTable table = (JTable) c;
-			@SuppressWarnings("unchecked")
-			ElementsTableModel<MessageTypeType> model = (ElementsTableModel<MessageTypeType>) table.getModel();
-			int selectedRow = table.getRowSorter().convertRowIndexToModel(table.getSelectedRow());
-			MessageTypeType selectedElement = (MessageTypeType) model.get(selectedRow);
-			return new StringSelection(selectedElement.getId() + '\t' + selectedElement.getDescription());
+			if (c.equals(tbl_Messages)) {
+				@SuppressWarnings("unchecked")
+				ElementsTableModel<MessageTypeType> model = (ElementsTableModel<MessageTypeType>) table.getModel();
+				int selectedRow = table.getRowSorter().convertRowIndexToModel(table.getSelectedRow());
+				MessageTypeType selectedElement = (MessageTypeType) model.get(selectedRow);
+				return new StringSelection(selectedElement.getId() + '\t' + selectedElement.getDescription());
+			} else if (c.equals(tbl_TransMessages)) {
+				MessagesTableModel model = (MessagesTableModel) tbl_TransMessages.getModel();
+				int selectedRow = table.getSelectedRow();
+				MessageInTransactionTypeType selectedMitt = (MessageInTransactionTypeType) model.get(selectedRow);
+				return new StringSelection(selectedMitt.getId());
+			}
 		} else {
 			RotatingButton btn = (RotatingButton) c;
 			String[] words = btn.getToolTipText().split(" ");
 			System.out.println("create transferable for MITT: " + words[0]);
 			return new StringSelection(words[0]);
 		}
+		return null;
 	}
 
 	@Override
@@ -147,46 +156,51 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			} else {
 				transMitt = Editor16.getStore16().getElement(MessageInTransactionTypeType.class, idDescr[0]);
 				if (transMitt != null) {
-					if (info.getComponent().equals(transactionsPC.canvas2Panel)) {
-						// No background drop
-						return false;
-					}
-					if (info.getComponent().equals(transactionsPC.canvas16Plane.initiator.getActiveLabel())) {
-						// No initiator drop
-						return false;
-					}
-					if (info.getComponent().equals(transactionsPC.canvas16Plane.executor.getActiveLabel())) {
-						// No executor drop
-						return false;
-					}
-					if (info.getComponent() instanceof RotatingButton) {
-						RotatingButton target = (RotatingButton) info.getComponent();
-						String targetId = target.getToolTipText().split(" ")[0];
-						if (transMitt.getId().equals(targetId)) {
-							// No drop on the same MITT
+					if (info.getComponent().equals(tbl_TransMessages)) {
+						dropLocation = (javax.swing.JTable.DropLocation) info.getDropLocation();
+						return !dropLocation.isInsertRow();
+					} else {
+						if (info.getComponent().equals(transactionsPC.canvas2Panel)) {
+							// No background drop
 							return false;
 						}
-						MessageInTransactionTypeType targetMitt = Editor16.getStore16()
-								.getElement(MessageInTransactionTypeType.class, targetId);
-						if (transMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
-							// Not the same direction
+						if (info.getComponent().equals(transactionsPC.canvas16Plane.initiator.getActiveLabel())) {
+							// No initiator drop
 							return false;
 						}
+						if (info.getComponent().equals(transactionsPC.canvas16Plane.executor.getActiveLabel())) {
+							// No executor drop
+							return false;
+						}
+						if (info.getComponent() instanceof RotatingButton) {
+							RotatingButton target = (RotatingButton) info.getComponent();
+							String targetId = target.getToolTipText().split(" ")[0];
+							if (transMitt.getId().equals(targetId)) {
+								// No drop on the same MITT
+								return false;
+							}
+							MessageInTransactionTypeType targetMitt = Editor16.getStore16()
+									.getElement(MessageInTransactionTypeType.class, targetId);
+							if (transMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
+								// Not the same direction
+								return false;
+							}
 
-						if (dropAction == MOVE) {
-							List<MessageInTransactionTypeType> previous = Control16.getPrevious(transMitt);
-							if (previous != null && previous.contains(targetMitt)) {
-								// transfer mitt should not contain target mitt as a previous mitt
-								return false;
+							if (dropAction == MOVE) {
+								List<MessageInTransactionTypeType> previous = Control16.getPrevious(transMitt);
+								if (previous != null && previous.contains(targetMitt)) {
+									// transfer mitt should not contain target mitt as a previous mitt
+									return false;
+								}
+								return true;
+							} else {
+								List<MessageInTransactionTypeType> previous = Control16.getPrevious(targetMitt);
+								if (previous != null && previous.contains(transMitt)) {
+									// target mitt should not contain transfer mitt as a previous mitt
+									return false;
+								}
+								return true;
 							}
-							return true;
-						} else {
-							List<MessageInTransactionTypeType> previous = Control16.getPrevious(targetMitt);
-							if (previous != null && previous.contains(transMitt)) {
-								// target mitt should not contain transfer mitt as a previous mitt
-								return false;
-							}
-							return true;
 						}
 					}
 				}

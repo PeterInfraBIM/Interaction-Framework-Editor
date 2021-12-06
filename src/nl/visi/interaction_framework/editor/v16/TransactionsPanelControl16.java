@@ -1958,6 +1958,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		});
 		cbx_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
 		tbl_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
+		tbl_Messages.setDragEnabled(true);
 
 		tbl_Messages.getSelectionModel().addListSelectionListener(messageTableSelectionListener);
 	}
