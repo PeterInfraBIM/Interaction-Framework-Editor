@@ -158,7 +158,13 @@ public class Msg2MittTransferHandler extends TransferHandler {
 				if (transMitt != null) {
 					if (info.getComponent().equals(tbl_TransMessages)) {
 						dropLocation = (javax.swing.JTable.DropLocation) info.getDropLocation();
-						return !dropLocation.isInsertRow();
+						if (dropLocation.isInsertRow()) {
+							// No line insert drop
+							return false;
+						}
+						int row = dropLocation.getRow();
+						String targetId = model.get(row).getId();
+						return isDropAllowed(targetId);
 					} else {
 						if (info.getComponent().equals(transactionsPC.canvas2Panel)) {
 							// No background drop
@@ -175,32 +181,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 						if (info.getComponent() instanceof RotatingButton) {
 							RotatingButton target = (RotatingButton) info.getComponent();
 							String targetId = target.getToolTipText().split(" ")[0];
-							if (transMitt.getId().equals(targetId)) {
-								// No drop on the same MITT
-								return false;
-							}
-							MessageInTransactionTypeType targetMitt = Editor16.getStore16()
-									.getElement(MessageInTransactionTypeType.class, targetId);
-							if (transMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
-								// Not the same direction
-								return false;
-							}
-
-							if (dropAction == MOVE) {
-								List<MessageInTransactionTypeType> previous = Control16.getPrevious(transMitt);
-								if (previous != null && previous.contains(targetMitt)) {
-									// transfer mitt should not contain target mitt as a previous mitt
-									return false;
-								}
-								return true;
-							} else {
-								List<MessageInTransactionTypeType> previous = Control16.getPrevious(targetMitt);
-								if (previous != null && previous.contains(transMitt)) {
-									// target mitt should not contain transfer mitt as a previous mitt
-									return false;
-								}
-								return true;
-							}
+							return isDropAllowed(targetId);
 						}
 					}
 				}
@@ -208,6 +189,35 @@ public class Msg2MittTransferHandler extends TransferHandler {
 			return false;
 		}
 
+	}
+
+	boolean isDropAllowed(String targetId) {
+		if (transMitt.getId().equals(targetId)) {
+			// No drop on the same MITT
+			return false;
+		}
+		MessageInTransactionTypeType targetMitt = Editor16.getStore16()
+				.getElement(MessageInTransactionTypeType.class, targetId);
+		if (transMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
+			// Not the same direction
+			return false;
+		}
+
+		if (dropAction == MOVE) {
+			List<MessageInTransactionTypeType> previous = Control16.getPrevious(transMitt);
+			if (previous != null && previous.contains(targetMitt)) {
+				// transfer mitt should not contain target mitt as a previous mitt
+				return false;
+			}
+			return true;
+		} else {
+			List<MessageInTransactionTypeType> previous = Control16.getPrevious(targetMitt);
+			if (previous != null && previous.contains(transMitt)) {
+				// target mitt should not contain transfer mitt as a previous mitt
+				return false;
+			}
+			return true;
+		}
 	}
 
 	@Override
