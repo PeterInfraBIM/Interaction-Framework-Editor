@@ -14,7 +14,6 @@ import javax.swing.JPanel;
 import javax.swing.JRootPane;
 import javax.swing.JTable;
 import javax.swing.TransferHandler;
-import javax.swing.table.TableModel;
 
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.interaction_framework.editor.v16.Control16.ElementsTableModel;

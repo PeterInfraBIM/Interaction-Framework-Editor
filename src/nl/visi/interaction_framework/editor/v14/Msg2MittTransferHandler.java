@@ -6,6 +6,7 @@ import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.IOException;
+import java.util.List;
 
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -28,6 +29,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 	private static JTable.DropLocation dropLocation;
 	private static String[] idDescr;
 	private static RotatingButton selectedMessage;
+	private static MessageInTransactionTypeType transMitt;
 	private static Color saveSelectedBackground;
 	private boolean initialized = false;
 	private TransactionsPanelControl14 transactionsPC;
@@ -66,12 +68,27 @@ public class Msg2MittTransferHandler extends TransferHandler {
 	protected Transferable createTransferable(JComponent c) {
 		init();
 
-		JTable table = (JTable) c;
-		@SuppressWarnings("unchecked")
-		ElementsTableModel<MessageTypeType> model = (ElementsTableModel<MessageTypeType>) table.getModel();
-		int selectedRow = table.getRowSorter().convertRowIndexToModel(table.getSelectedRow());
-		MessageTypeType selectedElement = (MessageTypeType) model.get(selectedRow);
-		return new StringSelection(selectedElement.getId() + '\t' + selectedElement.getDescription());
+		if (c instanceof JTable) {
+			JTable table = (JTable) c;
+			if (c.equals(tbl_Messages)) {
+				@SuppressWarnings("unchecked")
+				ElementsTableModel<MessageTypeType> model = (ElementsTableModel<MessageTypeType>) table.getModel();
+				int selectedRow = table.getRowSorter().convertRowIndexToModel(table.getSelectedRow());
+				MessageTypeType selectedElement = (MessageTypeType) model.get(selectedRow);
+				return new StringSelection(selectedElement.getId() + '\t' + selectedElement.getDescription());
+			} else if (c.equals(tbl_TransMessages)) {
+				MessagesTableModel model = (MessagesTableModel) tbl_TransMessages.getModel();
+				int selectedRow = table.getSelectedRow();
+				MessageInTransactionTypeType selectedMitt = (MessageInTransactionTypeType) model.get(selectedRow);
+				return new StringSelection(selectedMitt.getId());
+			}
+		} else {
+			RotatingButton btn = (RotatingButton) c;
+			String[] words = btn.getToolTipText().split(" ");
+			System.out.println("create transferable for MITT: " + words[0]);
+			return new StringSelection(words[0]);
+		}
+		return null;
 	}
 
 	@Override
@@ -95,6 +112,7 @@ public class Msg2MittTransferHandler extends TransferHandler {
 
 			// Check for existing message type
 			idDescr = getMessageIdPlusDescr(t);
+			transMitt = null;
 			MessageTypeType messageType = Editor14.getStore14().getElement(MessageTypeType.class, idDescr[0]);
 			if (messageType != null) {
 				if (info.getComponent() instanceof JTable) {
@@ -134,10 +152,71 @@ public class Msg2MittTransferHandler extends TransferHandler {
 					}
 					return true;
 				}
+			} else {
+				transMitt = Editor14.getStore14().getElement(MessageInTransactionTypeType.class, idDescr[0]);
+				if (transMitt != null) {
+					if (info.getComponent().equals(tbl_TransMessages)) {
+						dropLocation = (javax.swing.JTable.DropLocation) info.getDropLocation();
+						if (dropLocation.isInsertRow()) {
+							// No line insert drop
+							return false;
+						}
+						int row = dropLocation.getRow();
+						String targetId = model.get(row).getId();
+						return isDropAllowed(targetId);
+					} else {
+						if (info.getComponent().equals(transactionsPC.canvas2Panel)) {
+							// No background drop
+							return false;
+						}
+						if (info.getComponent().equals(transactionsPC.canvas14Plane.initiator.getActiveLabel())) {
+							// No initiator drop
+							return false;
+						}
+						if (info.getComponent().equals(transactionsPC.canvas14Plane.executor.getActiveLabel())) {
+							// No executor drop
+							return false;
+						}
+						if (info.getComponent() instanceof RotatingButton) {
+							RotatingButton target = (RotatingButton) info.getComponent();
+							String targetId = target.getToolTipText().split(" ")[0];
+							return isDropAllowed(targetId);
+						}
+					}
+				}
 			}
 			return false;
 		}
 
+	}
+	
+	boolean isDropAllowed(String targetId) {
+		if (transMitt.getId().equals(targetId)) {
+			// No drop on the same MITT
+			return false;
+		}
+		MessageInTransactionTypeType targetMitt = Editor14.getStore14()
+				.getElement(MessageInTransactionTypeType.class, targetId);
+		if (transMitt.isInitiatorToExecutor() == targetMitt.isInitiatorToExecutor()) {
+			// Not the same direction
+			return false;
+		}
+
+		if (dropAction == MOVE) {
+			List<MessageInTransactionTypeType> previous = Control14.getPrevious(transMitt);
+			if (previous != null && previous.contains(targetMitt)) {
+				// transfer mitt should not contain target mitt as a previous mitt
+				return false;
+			}
+			return true;
+		} else {
+			List<MessageInTransactionTypeType> previous = Control14.getPrevious(targetMitt);
+			if (previous != null && previous.contains(transMitt)) {
+				// target mitt should not contain transfer mitt as a previous mitt
+				return false;
+			}
+			return true;
+		}
 	}
 
 	@Override
@@ -174,21 +253,35 @@ public class Msg2MittTransferHandler extends TransferHandler {
 	}
 
 	void dropBeforeOrAfter(MessageInTransactionTypeType selectedMitt) {
-		MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
-		newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
-		if (dropAction == MOVE) {
-			Control14.addPrevious(newMitt, selectedMitt);
-			transactionsPC.fillMessageTable();
-			transactionsPC.canvas14Plane.selectMessage(selectedMitt);
+		if (transMitt == null) {
+			MessageInTransactionTypeType newMitt = addMsg2Mitt(idDescr, false);
+			newMitt.setInitiatorToExecutor(!selectedMitt.isInitiatorToExecutor());
+			if (dropAction == MOVE) {
+				Control14.addPrevious(newMitt, selectedMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas14Plane.selectMessage(selectedMitt);
+			} else {
+				Control14.addPrevious(selectedMitt, newMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas14Plane.selectMessage(newMitt);
+			}
 		} else {
-			Control14.addPrevious(selectedMitt, newMitt);
-			transactionsPC.fillMessageTable();
-			transactionsPC.canvas14Plane.selectMessage(newMitt);
+			if (dropAction == MOVE) {
+				Control14.addPrevious(transMitt, selectedMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas14Plane.selectMessage(selectedMitt);
+			} else {
+				Control14.addPrevious(selectedMitt, transMitt);
+				transactionsPC.fillMessageTable();
+				transactionsPC.canvas14Plane.selectMessage(transMitt);
+			}
 		}
-		// Next two statements prevent a reset of the dynamic sequence diagram 
+		// Next two statements prevent a reset of the dynamic sequence diagram
 		// if this window wasn't shown earlier.
 		transactionsPC.canvas14Plane.selectedTransaction = transactionsPC.selectedElement;
 		transactionsPC.canvas14Plane.currentTransaction = transactionsPC.selectedElement;
+		// Update static sequence diagram
+		transactionsPC.reset();
 	}
 
 	private MessageInTransactionTypeType addMsg2Mitt(String[] idDescr, boolean resetDiagrams) {

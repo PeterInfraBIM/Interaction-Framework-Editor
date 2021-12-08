@@ -104,7 +104,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	private JComboBox<String> cbx_TransactionPhases;
 
 	private JComboBox<String> cbx_Groups;
-	private MessagesTableModel messagesTableModel;
+	MessagesTableModel messagesTableModel;
 	private SequenceTable sequenceTable;
 	ElementConditionTable elementConditionTable;
 	private MessageInTransactionDialogControl16 messageInTransactionDialogControl;

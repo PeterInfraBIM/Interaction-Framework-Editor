@@ -62,8 +62,7 @@ public class Canvas16 extends JPanel {
 	private final TransactionsPanelControl16 transactionPanel;
 	TransactionTypeType selectedTransaction;
 	TransactionTypeType currentTransaction;
-	Role executor;
-	Role initiator;
+	Role executor, initiator;
 	private List<Message> historyBefore, historyAfter, selectedNext, selectedPrev, selectedRequest, selectedResponse;
 	Message selectedMessage;
 	private Dimension preferredSize;
@@ -1091,7 +1090,6 @@ public class Canvas16 extends JPanel {
 					msgItem.setIcon(redCircleIcon);
 				if (isStartMessage(mitt))
 					msgItem.setIcon(greenCircleIcon);
-
 			}
 		}
 	}

@@ -90,8 +90,8 @@ import nl.visi.schemas._20140331.TransactionTypeTypeRef;
 public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeType> {
 	private static final String TRANSACTIONS_PANEL = "nl/visi/interaction_framework/editor/swixml/TransactionsPanel16.xml";
 
-	private JPanel startDatePanel, endDatePanel, canvasPanel, canvas2Panel, sequencePanel, elementConditionPanel,
-			elementsTreePanel;
+	private JPanel startDatePanel, endDatePanel, canvasPanel, sequencePanel, elementConditionPanel, elementsTreePanel;
+	JPanel canvas2Panel;
 	JTabbedPane transactionTabs;
 	JTable tbl_Messages;
 
@@ -939,7 +939,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			if (height != preferredSize.height || width != preferredSize.width
 					|| previousMiddleMargin != middleMargin) {
 				previousMiddleMargin = middleMargin;
-				// System.out.println("width=" + width + " preferredSize.width=" + 
+				// System.out.println("width=" + width + " preferredSize.width=" +
 				// preferredSize.width);
 				removeAll();
 				tcMap.clear();
@@ -1179,7 +1179,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	}
 
 	private enum MessagesTableColumns {
-		Id_Mitt, Id_Message, Message, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed, Start, Navigate;
+		Id_Mitt, Id_Message, Message, TransactionPhase, Group, InitiatorToExecutor, OpenSecondaryTransactionsAllowed,
+		Start, Navigate;
 
 		@Override
 		public String toString() {
@@ -1957,6 +1958,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 		});
 		cbx_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
 		tbl_Messages.setTransferHandler(Msg2MittTransferHandler.getInstance());
+		tbl_Messages.setDragEnabled(true);
 
 		tbl_Messages.getSelectionModel().addListSelectionListener(messageTableSelectionListener);
 	}
@@ -2308,7 +2310,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 		}
 	}
-	
+
 	private void copySubtransactions(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
 		TransactionTypeType.SubTransactions subtransactions = transactionType.getSubTransactions();
 		if (subtransactions != null) {
@@ -2324,7 +2326,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 		}
 	}
-	
+
 	private void copyExecutor(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
 		TransactionTypeType.Executor executor = transactionType.getExecutor();
 		if (executor != null) {
@@ -2354,7 +2356,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 			}
 		}
 	}
-	
+
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
@@ -2377,6 +2379,7 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 					trnsType = (TransactionTypeType) transaction.getTransactionTypeRef().getIdref();
 				}
 				if (trnsType != null && trnsType.equals(transactionType)) {
+					// this mitt belongs to the selected transaction for deletion
 					toBeDeleted.add(mitt);
 					List<ElementConditionType> elementConditions = store.getElements(ElementConditionType.class);
 					for (ElementConditionType ect : elementConditions) {
@@ -2391,6 +2394,8 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 						}
 					}
 				} else {
+					// this mitt does not belong to the selected transaction but may reference a
+					// previous mitt in the selected transaction
 					Previous previous = mitt.getPrevious();
 					if (previous != null) {
 						List<Object> previousList = previous.getMessageInTransactionTypeOrMessageInTransactionTypeRef();
@@ -2554,34 +2559,40 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 					public void propertyChange(PropertyChangeEvent evt) {
 						switch (evt.getPropertyName()) {
 						case "Previous removed":
-							// MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							// MessageInTransactionTypeType removedPrev = (MessageInTransactionTypeType)
+							// evt.getNewValue();
 							// System.out.println("Previous removed: " + removedPrev.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Next removed":
-							// MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							// MessageInTransactionTypeType removedNext = (MessageInTransactionTypeType)
+							// evt.getOldValue();
 							// System.out.println("Next removed: " + removedNext.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Previous added":
-							// MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType) evt.getNewValue();
+							// MessageInTransactionTypeType addedPrev = (MessageInTransactionTypeType)
+							// evt.getNewValue();
 							// System.out.println("Previous added: " + addedPrev.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Next added":
-							// MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType) evt.getOldValue();
+							// MessageInTransactionTypeType addedNext = (MessageInTransactionTypeType)
+							// evt.getOldValue();
 							// System.out.println("Next added: " + addedNext.getId());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;
 						case "Direction changed":
-							// MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType) evt.getOldValue();
+							// MessageInTransactionTypeType currentMitt = (MessageInTransactionTypeType)
+							// evt.getOldValue();
 							// Boolean direction = (Boolean) evt.getNewValue();
 							// System.out.println(
-							//		"Direction changed: " + currentMitt.getId() + "=" + direction.booleanValue());
+							// "Direction changed: " + currentMitt.getId() + "=" +
+							// direction.booleanValue());
 							drawingPlane.setCurrentTransaction(null);
 							drawingPlane.repaint();
 							break;

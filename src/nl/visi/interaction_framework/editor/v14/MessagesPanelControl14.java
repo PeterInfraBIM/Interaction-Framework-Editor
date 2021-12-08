@@ -310,6 +310,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 	private void initMessagesTable() {
 		elementsTableModel = new MessagesTableModel();
 		tbl_Elements.setModel(elementsTableModel);
+		tbl_Elements.setTransferHandler(Msg2MittTransferHandler.getInstance());
 		tbl_Elements.setFillsViewportHeight(true);
 		tbl_Elements.setAutoCreateRowSorter(true);
 		TableRowSorter<ElementsTableModel<MessageTypeType>> tableRowSorter = new TableRowSorter<>(elementsTableModel);
