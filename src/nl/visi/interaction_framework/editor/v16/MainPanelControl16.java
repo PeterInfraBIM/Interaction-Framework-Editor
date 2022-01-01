@@ -33,6 +33,7 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import nl.visi.interaction_framework.editor.NewFrameworkDialogControl;
+import nl.visi.interaction_framework.editor.v14.SimpleElementsPanelControl14;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ProjectTypeType;
 
@@ -322,6 +323,10 @@ public class MainPanelControl16 extends Control16 {
 
 	public static ComplexElementsPanelControl16 getComplexElementsPC() {
 		return complexElementsPC;
+	}
+	
+	public static SimpleElementsPanelControl16 getSimpleElementsPC() {
+		return simpleElementsPC;
 	}
 
 	public static MiscellaneousPanelControl16 getMiscellaneousPC() {

@@ -162,6 +162,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		super(SIMPLE_ELEMENTS_PANEL);
 		elementsTableModel = new SimpleElementsTableModel();
 		tbl_Elements.setModel(elementsTableModel);
+		tbl_Elements.setTransferHandler(Simple2ComplexTransferHandler.getInstance());
 		tbl_Elements.setAutoCreateRowSorter(true);
 		tbl_Elements.setFillsViewportHeight(true);
 		TableRowSorter<ElementsTableModel<SimpleElementTypeType>> tableRowSorter = new TableRowSorter<>(

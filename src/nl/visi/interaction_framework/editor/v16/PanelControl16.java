@@ -341,95 +341,221 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 		return newId;
 	}
 
-	@SuppressWarnings("serial")
 	public <T extends ElementType> TransferHandler getTransferHandler(final JTable table,
 			final ElementsTableModel<T> tablemodel, final boolean complex) {
-		return new TransferHandler() {
-			int sourceRow = -1;
+		return new TableTransferHandler<T>(table, tablemodel, complex);
 
-			@Override
-			public int getSourceActions(JComponent component) {
-				return MOVE;
+//		return new TransferHandler() {
+//			int sourceRow = -1;
+//
+//			@Override
+//			public int getSourceActions(JComponent component) {
+//				return MOVE;
+//			}
+//
+//			@Override
+//			protected Transferable createTransferable(JComponent c) {
+//				sourceRow = table.getSelectedRow();
+//				ElementType et = tablemodel.get(sourceRow);
+//				Transferable transferable = new StringSelection(et.getId());
+//				return transferable;
+//			}
+//
+//			@Override
+//			public boolean canImport(TransferSupport transferSupport) {
+//				if (!transferSupport.isDrop()) {
+//					// No drop support
+//					return false;
+//				}
+//
+//				return true;
+//			}
+//
+//			@SuppressWarnings("unchecked")
+//			@Override
+//			public boolean importData(TransferSupport support) {
+//				try {
+//					String transferData = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
+//					ElementType element = Editor16.getStore16().getElement(ElementType.class, transferData);
+//					JTable.DropLocation loc = (JTable.DropLocation) support.getDropLocation();
+//					int targetRow = loc.getRow();
+//					tablemodel.remove(sourceRow);
+//					tablemodel.elements.add(targetRow > sourceRow ? targetRow - 1 : targetRow, (T) element);
+//
+//					if (complex) {
+//						Method getComplexElements = selectedElement.getClass().getMethod("getComplexElements",
+//								(Class<?>[]) null);
+//						Object ceObject = getComplexElements.invoke(selectedElement, (Object[]) null);
+//						if (ceObject != null) {
+//							Method getComplexElementTypeOrComplexElementTypeRef = ceObject.getClass()
+//									.getMethod("getComplexElementTypeOrComplexElementTypeRef", (Class<?>[]) null);
+//							List<Object> list = (List<Object>) getComplexElementTypeOrComplexElementTypeRef
+//									.invoke(ceObject, (Object[]) null);
+//							Object object = list.remove(sourceRow);
+//							list.add(targetRow > sourceRow ? targetRow - 1 : targetRow, object);
+//						}
+//					} else {
+//						Method getSimpleElements = selectedElement.getClass().getMethod("getSimpleElements",
+//								(Class<?>[]) null);
+//						Object seObject = getSimpleElements.invoke(selectedElement, (Object[]) null);
+//						if (seObject != null) {
+//							Method getSimpleElementTypeOrSimpleElementTypeRef = seObject.getClass()
+//									.getMethod("getSimpleElementTypeOrSimpleElementTypeRef", (Class<?>[]) null);
+//							List<Object> list = (List<Object>) getSimpleElementTypeOrSimpleElementTypeRef
+//									.invoke(seObject, (Object[]) null);
+//							Object object = list.remove(sourceRow);
+//							list.add(targetRow > sourceRow ? targetRow - 1 : targetRow, object);
+//						}
+//					}
+//				} catch (UnsupportedFlavorException e) {
+//					e.printStackTrace();
+//					return false;
+//				} catch (IOException e) {
+//					e.printStackTrace();
+//					return false;
+//				} catch (SecurityException e) {
+//					e.printStackTrace();
+//					return false;
+//				} catch (NoSuchMethodException e) {
+//					e.printStackTrace();
+//					return false;
+//				} catch (IllegalArgumentException e) {
+//					e.printStackTrace();
+//					return false;
+//				} catch (IllegalAccessException e) {
+//					e.printStackTrace();
+//					return false;
+//				} catch (InvocationTargetException e) {
+//					e.printStackTrace();
+//					return false;
+//				}
+//				return true;
+//			}
+//		};
+	}
+
+	private static int tableTransferSourceRow = -1;
+
+	@SuppressWarnings("serial")
+	public class TableTransferHandler<T extends ElementType> extends TransferHandler {
+		JTable table;
+		ElementsTableModel<T> tablemodel;
+		boolean complex;
+//		int sourceRow = -1;
+
+		@SuppressWarnings("unchecked")
+		public <U extends ElementType> TableTransferHandler(JTable table, ElementsTableModel<U> tablemodel,
+				boolean complex) {
+			this.table = table;
+			this.tablemodel = (ElementsTableModel<T>) tablemodel;
+			this.complex = complex;
+		}
+
+		@Override
+		public int getSourceActions(JComponent component) {
+			return MOVE;
+		}
+
+		@Override
+		protected Transferable createTransferable(JComponent c) {
+			tableTransferSourceRow = table.getSelectedRow();
+//			sourceRow = table.getSelectedRow();
+			ElementType et = tablemodel.get(tableTransferSourceRow);
+			Transferable transferable = new StringSelection(et.getId());
+			return transferable;
+		}
+
+		@Override
+		public boolean canImport(TransferSupport transferSupport) {
+			if (!transferSupport.isDrop()) {
+				// No drop support
+				return false;
 			}
 
-			@Override
-			protected Transferable createTransferable(JComponent c) {
-				sourceRow = table.getSelectedRow();
-				ElementType et = tablemodel.get(sourceRow);
-				Transferable transferable = new StringSelection(et.getId());
-				return transferable;
-			}
+			return true;
+		}
 
-			@Override
-			public boolean canImport(TransferSupport transferSupport) {
-				if (!transferSupport.isDrop()) {
-					// No drop support
-					return false;
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean importData(TransferSupport support) {
+			try {
+				String transferData = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
+				if (transferData != null) {
+					int index = transferData.indexOf('\t');
+					transferData = transferData.substring(0, index != -1 ? index : transferData.length());
+				}
+				ElementType element = Editor16.getStore16().getElement(ElementType.class, transferData);
+				JTable.DropLocation loc = (JTable.DropLocation) support.getDropLocation();
+				int targetRow = loc.getRow();
+				if (tableTransferSourceRow >= 0) {
+					tablemodel.remove(tableTransferSourceRow);
+					tablemodel.elements.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow,
+							(T) element);
+				} else {
+					tablemodel.elements.add(targetRow, (T) element);
 				}
 
-				return true;
-			}
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public boolean importData(TransferSupport support) {
-				try {
-					String transferData = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
-					ElementType element = Editor16.getStore16().getElement(ElementType.class, transferData);
-					JTable.DropLocation loc = (JTable.DropLocation) support.getDropLocation();
-					int targetRow = loc.getRow();
-					tablemodel.remove(sourceRow);
-					tablemodel.elements.add(targetRow > sourceRow ? targetRow - 1 : targetRow, (T) element);
-
-					if (complex) {
-						Method getComplexElements = selectedElement.getClass().getMethod("getComplexElements",
-								(Class<?>[]) null);
-						Object ceObject = getComplexElements.invoke(selectedElement, (Object[]) null);
-						if (ceObject != null) {
-							Method getComplexElementTypeOrComplexElementTypeRef = ceObject.getClass()
-									.getMethod("getComplexElementTypeOrComplexElementTypeRef", (Class<?>[]) null);
-							List<Object> list = (List<Object>) getComplexElementTypeOrComplexElementTypeRef
-									.invoke(ceObject, (Object[]) null);
-							Object object = list.remove(sourceRow);
-							list.add(targetRow > sourceRow ? targetRow - 1 : targetRow, object);
-						}
-					} else {
-						Method getSimpleElements = selectedElement.getClass().getMethod("getSimpleElements",
-								(Class<?>[]) null);
-						Object seObject = getSimpleElements.invoke(selectedElement, (Object[]) null);
-						if (seObject != null) {
-							Method getSimpleElementTypeOrSimpleElementTypeRef = seObject.getClass()
-									.getMethod("getSimpleElementTypeOrSimpleElementTypeRef", (Class<?>[]) null);
-							List<Object> list = (List<Object>) getSimpleElementTypeOrSimpleElementTypeRef
-									.invoke(seObject, (Object[]) null);
-							Object object = list.remove(sourceRow);
-							list.add(targetRow > sourceRow ? targetRow - 1 : targetRow, object);
+				if (complex) {
+					Method getComplexElements = selectedElement.getClass().getMethod("getComplexElements",
+							(Class<?>[]) null);
+					Object ceObject = getComplexElements.invoke(selectedElement, (Object[]) null);
+					if (ceObject != null) {
+						Method getComplexElementTypeOrComplexElementTypeRef = ceObject.getClass()
+								.getMethod("getComplexElementTypeOrComplexElementTypeRef", (Class<?>[]) null);
+						List<Object> list = (List<Object>) getComplexElementTypeOrComplexElementTypeRef.invoke(ceObject,
+								(Object[]) null);
+						if (tableTransferSourceRow >= 0) {
+							Object object = list.remove(tableTransferSourceRow);
+							list.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow, object);
 						}
 					}
-				} catch (UnsupportedFlavorException e) {
-					e.printStackTrace();
-					return false;
-				} catch (IOException e) {
-					e.printStackTrace();
-					return false;
-				} catch (SecurityException e) {
-					e.printStackTrace();
-					return false;
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-					return false;
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-					return false;
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-					return false;
-				} catch (InvocationTargetException e) {
-					e.printStackTrace();
-					return false;
+				} else {
+					Method getSimpleElements = selectedElement.getClass().getMethod("getSimpleElements",
+							(Class<?>[]) null);
+					Object seObject = getSimpleElements.invoke(selectedElement, (Object[]) null);
+					if (seObject != null) {
+						Method getSimpleElementTypeOrSimpleElementTypeRef = seObject.getClass()
+								.getMethod("getSimpleElementTypeOrSimpleElementTypeRef", (Class<?>[]) null);
+						List<Object> list = (List<Object>) getSimpleElementTypeOrSimpleElementTypeRef.invoke(seObject,
+								(Object[]) null);
+						if (tableTransferSourceRow >= 0) {
+							Object object = list.remove(tableTransferSourceRow);
+							list.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow, object);
+						} else {
+							list.add(targetRow, element);
+							tablemodel.fireTableRowsInserted(targetRow, targetRow);
+						}
+					}
 				}
-				return true;
+			} catch (UnsupportedFlavorException e) {
+				e.printStackTrace();
+				return false;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return false;
+			} catch (SecurityException e) {
+				e.printStackTrace();
+				return false;
+			} catch (NoSuchMethodException e) {
+				e.printStackTrace();
+				return false;
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+				return false;
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				return false;
+			} catch (InvocationTargetException e) {
+				e.printStackTrace();
+				return false;
 			}
-		};
+			return true;
+		}
+
+		@Override
+		protected void exportDone(JComponent source, Transferable data, int action) {
+			tableTransferSourceRow = -1;
+		}
+
 	}
 }

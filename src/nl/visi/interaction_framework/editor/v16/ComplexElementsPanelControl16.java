@@ -1,5 +1,6 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
@@ -15,10 +16,12 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -880,7 +883,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			}
 		}
 	}
-	
+
 	private void copySimpleElements(ComplexElementTypeType origComplexType, ComplexElementTypeType copyComplexType) {
 		ComplexElementTypeType.SimpleElements simpleElements = origComplexType.getSimpleElements();
 		if (simpleElements != null) {
@@ -1088,4 +1091,28 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 	}
+
+	@SuppressWarnings("serial")
+	@Override
+	public <T extends ElementType> TransferHandler getTransferHandler(JTable table, ElementsTableModel<T> tablemodel,
+			boolean complex) {
+
+		@SuppressWarnings("unchecked")
+		final TableTransferHandler<T> transferHandler = (TableTransferHandler<T>) super.getTransferHandler(table,
+				tablemodel, complex);
+
+		return new TableTransferHandler<T>(table, tablemodel, complex) {
+
+			@Override
+			protected Transferable createTransferable(JComponent c) {
+				if (c == ComplexElementsPanelControl16.this.tbl_SimpleElements) {
+					return transferHandler.createTransferable(c);
+				}
+				return null;
+			}
+
+		};
+
+	}
+
 }
