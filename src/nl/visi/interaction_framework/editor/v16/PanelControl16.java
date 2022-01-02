@@ -344,94 +344,6 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 	public <T extends ElementType> TransferHandler getTransferHandler(final JTable table,
 			final ElementsTableModel<T> tablemodel, final boolean complex) {
 		return new TableTransferHandler<T>(table, tablemodel, complex);
-
-//		return new TransferHandler() {
-//			int sourceRow = -1;
-//
-//			@Override
-//			public int getSourceActions(JComponent component) {
-//				return MOVE;
-//			}
-//
-//			@Override
-//			protected Transferable createTransferable(JComponent c) {
-//				sourceRow = table.getSelectedRow();
-//				ElementType et = tablemodel.get(sourceRow);
-//				Transferable transferable = new StringSelection(et.getId());
-//				return transferable;
-//			}
-//
-//			@Override
-//			public boolean canImport(TransferSupport transferSupport) {
-//				if (!transferSupport.isDrop()) {
-//					// No drop support
-//					return false;
-//				}
-//
-//				return true;
-//			}
-//
-//			@SuppressWarnings("unchecked")
-//			@Override
-//			public boolean importData(TransferSupport support) {
-//				try {
-//					String transferData = (String) support.getTransferable().getTransferData(DataFlavor.stringFlavor);
-//					ElementType element = Editor16.getStore16().getElement(ElementType.class, transferData);
-//					JTable.DropLocation loc = (JTable.DropLocation) support.getDropLocation();
-//					int targetRow = loc.getRow();
-//					tablemodel.remove(sourceRow);
-//					tablemodel.elements.add(targetRow > sourceRow ? targetRow - 1 : targetRow, (T) element);
-//
-//					if (complex) {
-//						Method getComplexElements = selectedElement.getClass().getMethod("getComplexElements",
-//								(Class<?>[]) null);
-//						Object ceObject = getComplexElements.invoke(selectedElement, (Object[]) null);
-//						if (ceObject != null) {
-//							Method getComplexElementTypeOrComplexElementTypeRef = ceObject.getClass()
-//									.getMethod("getComplexElementTypeOrComplexElementTypeRef", (Class<?>[]) null);
-//							List<Object> list = (List<Object>) getComplexElementTypeOrComplexElementTypeRef
-//									.invoke(ceObject, (Object[]) null);
-//							Object object = list.remove(sourceRow);
-//							list.add(targetRow > sourceRow ? targetRow - 1 : targetRow, object);
-//						}
-//					} else {
-//						Method getSimpleElements = selectedElement.getClass().getMethod("getSimpleElements",
-//								(Class<?>[]) null);
-//						Object seObject = getSimpleElements.invoke(selectedElement, (Object[]) null);
-//						if (seObject != null) {
-//							Method getSimpleElementTypeOrSimpleElementTypeRef = seObject.getClass()
-//									.getMethod("getSimpleElementTypeOrSimpleElementTypeRef", (Class<?>[]) null);
-//							List<Object> list = (List<Object>) getSimpleElementTypeOrSimpleElementTypeRef
-//									.invoke(seObject, (Object[]) null);
-//							Object object = list.remove(sourceRow);
-//							list.add(targetRow > sourceRow ? targetRow - 1 : targetRow, object);
-//						}
-//					}
-//				} catch (UnsupportedFlavorException e) {
-//					e.printStackTrace();
-//					return false;
-//				} catch (IOException e) {
-//					e.printStackTrace();
-//					return false;
-//				} catch (SecurityException e) {
-//					e.printStackTrace();
-//					return false;
-//				} catch (NoSuchMethodException e) {
-//					e.printStackTrace();
-//					return false;
-//				} catch (IllegalArgumentException e) {
-//					e.printStackTrace();
-//					return false;
-//				} catch (IllegalAccessException e) {
-//					e.printStackTrace();
-//					return false;
-//				} catch (InvocationTargetException e) {
-//					e.printStackTrace();
-//					return false;
-//				}
-//				return true;
-//			}
-//		};
 	}
 
 	private static int tableTransferSourceRow = -1;
@@ -441,7 +353,6 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 		JTable table;
 		ElementsTableModel<T> tablemodel;
 		boolean complex;
-//		int sourceRow = -1;
 
 		@SuppressWarnings("unchecked")
 		public <U extends ElementType> TableTransferHandler(JTable table, ElementsTableModel<U> tablemodel,
@@ -459,7 +370,6 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 		@Override
 		protected Transferable createTransferable(JComponent c) {
 			tableTransferSourceRow = table.getSelectedRow();
-//			sourceRow = table.getSelectedRow();
 			ElementType et = tablemodel.get(tableTransferSourceRow);
 			Transferable transferable = new StringSelection(et.getId());
 			return transferable;
@@ -489,10 +399,13 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 				int targetRow = loc.getRow();
 				if (tableTransferSourceRow >= 0) {
 					tablemodel.remove(tableTransferSourceRow);
-					tablemodel.elements.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow,
-							(T) element);
+					tablemodel.fireTableRowsDeleted(tableTransferSourceRow, tableTransferSourceRow);
+					int row = targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow;
+					tablemodel.elements.add(row, (T) element);
+					tablemodel.fireTableRowsInserted(row, row);
 				} else {
 					tablemodel.elements.add(targetRow, (T) element);
+					tablemodel.fireTableRowsInserted(targetRow, targetRow);
 				}
 
 				if (complex) {
@@ -507,6 +420,8 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 						if (tableTransferSourceRow >= 0) {
 							Object object = list.remove(tableTransferSourceRow);
 							list.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow, object);
+						} else {
+							list.add(targetRow, element);
 						}
 					}
 				} else {
@@ -523,7 +438,6 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 							list.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow, object);
 						} else {
 							list.add(targetRow, element);
-							tablemodel.fireTableRowsInserted(targetRow, targetRow);
 						}
 					}
 				}
