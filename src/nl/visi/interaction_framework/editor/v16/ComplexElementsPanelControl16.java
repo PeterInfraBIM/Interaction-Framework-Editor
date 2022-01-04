@@ -1,5 +1,7 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.Component;
+import java.awt.Font;
 import java.awt.datatransfer.Transferable;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +19,7 @@ import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
@@ -25,6 +28,7 @@ import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -546,6 +550,34 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		tbl_SimpleElements.setFillsViewportHeight(true);
 		tbl_SimpleElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_SimpleElements.setTransferHandler(getTransferHandler(tbl_SimpleElements, simpleElementsTableModel, false));
+		tbl_SimpleElements.getColumnModel().getColumn(SimpleElementsTableColumns.Id.ordinal())
+				.setCellRenderer(new DefaultTableCellRenderer() {
+
+					@Override
+					public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+							boolean hasFocus, int row, int column) {
+						JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus,
+								row, column);
+						if (selectedElement != null) {
+							boolean found = false;
+							List<SimpleElementTypeType> simpleElements = Control16.getSimpleElements(selectedElement);
+							if (simpleElements != null) {
+								for (SimpleElementTypeType simpleElement : simpleElements) {
+									if (simpleElement.getId().equals(value.toString())) {
+										found = true;
+										break;
+									}
+								}
+							}
+							if (!found || found && !(row < simpleElements.size())) {
+								Font newLabelFont = new Font(label.getFont().getName(), Font.ITALIC,
+										label.getFont().getSize());
+								label.setFont(newLabelFont);
+							}
+						}
+						return label;
+					}
+				});
 		tbl_SimpleElements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
 			public void valueChanged(ListSelectionEvent e) {
@@ -1106,9 +1138,37 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			@Override
 			protected Transferable createTransferable(JComponent c) {
 				if (c == ComplexElementsPanelControl16.this.tbl_SimpleElements) {
-					return transferHandler.createTransferable(c);
+					List<SimpleElementTypeType> simpleElements = Control16.getSimpleElements(selectedElement);
+					if (simpleElements != null) {
+						JTable tbl = ComplexElementsPanelControl16.this.tbl_SimpleElements;
+						int selectedRow = tbl.getSelectedRow();
+						if (selectedRow < simpleElements.size()) {
+							return transferHandler.createTransferable(c);
+						}
+					}
 				}
 				return null;
+			}
+
+			@Override
+			public boolean canImport(TransferSupport transferSupport) {
+				boolean canImport = super.canImport(transferSupport);
+				if (canImport) {
+					List<SimpleElementTypeType> simpleElements = Control16.getSimpleElements(selectedElement);
+					DropLocation dropLocation = transferSupport.getDropLocation();
+					JTable.DropLocation tableDropLocation = dropLocation instanceof JTable.DropLocation
+							? (JTable.DropLocation) dropLocation
+							: null;
+					if (tableDropLocation != null) {
+						int dropRow = tableDropLocation.getRow();
+						if (simpleElements != null) {
+							if (dropRow <= simpleElements.size()) {
+								return true;
+							}
+						}
+					}
+				}
+				return false;
 			}
 
 		};
