@@ -2,11 +2,14 @@ package nl.visi.interaction_framework.editor.v16;
 
 import java.awt.Component;
 import java.awt.Font;
+import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
@@ -1146,6 +1149,11 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 							return transferHandler.createTransferable(c);
 						}
 					}
+				} else if (c == ComplexElementsPanelControl16.this.tbl_SubComplexElements) {
+					List<ComplexElementTypeType> complexElements = Control16.getComplexElements(selectedElement);
+					if (complexElements != null) {
+						return transferHandler.createTransferable(c);
+					}
 				}
 				return null;
 			}
@@ -1154,17 +1162,35 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			public boolean canImport(TransferSupport transferSupport) {
 				boolean canImport = super.canImport(transferSupport);
 				if (canImport) {
-					List<SimpleElementTypeType> simpleElements = Control16.getSimpleElements(selectedElement);
-					DropLocation dropLocation = transferSupport.getDropLocation();
-					JTable.DropLocation tableDropLocation = dropLocation instanceof JTable.DropLocation
-							? (JTable.DropLocation) dropLocation
-							: null;
-					if (tableDropLocation != null) {
-						int dropRow = tableDropLocation.getRow();
-						if (simpleElements != null) {
-							if (dropRow <= simpleElements.size()) {
+					if (transferSupport.getComponent().equals(ComplexElementsPanelControl16.this.tbl_SimpleElements)) {
+						List<SimpleElementTypeType> simpleElements = Control16.getSimpleElements(selectedElement);
+						DropLocation dropLocation = transferSupport.getDropLocation();
+						JTable.DropLocation tableDropLocation = dropLocation instanceof JTable.DropLocation
+								? (JTable.DropLocation) dropLocation
+								: null;
+						if (tableDropLocation != null) {
+							int dropRow = tableDropLocation.getRow();
+							if (simpleElements != null) {
+								if (dropRow <= simpleElements.size()) {
+									return true;
+								}
+							}
+						}
+
+					} else if (transferSupport.getComponent()
+							.equals(ComplexElementsPanelControl16.this.tbl_SubComplexElements)) {
+						try {
+							String transferData = (String) transferSupport.getTransferable()
+									.getTransferData(DataFlavor.stringFlavor);
+							ComplexElementTypeType element = Editor16.getStore16()
+									.getElement(ComplexElementTypeType.class, transferData);
+							if (element != null) {
 								return true;
 							}
+						} catch (UnsupportedFlavorException e) {
+							e.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
 						}
 					}
 				}

@@ -34,12 +34,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
-import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
 import nl.visi.schemas._20160331.ProjectTypeType;
-import nl.visi.schemas._20160331.SimpleElementTypeType;
 
 abstract class PanelControl16<E extends ElementType> extends Control16 {
 	enum Fields {
