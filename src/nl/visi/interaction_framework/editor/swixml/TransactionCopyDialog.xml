@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dialog id="transactionCopyDialog" Size="480,360"
+	Title="lbl_TransactionCopyDialog" Modal="true"
+	DefaultCloseOperation="JFrame.EXIT_ON_CLOSE"
+	bundle="nl.visi.interaction_framework.editor.locale.Editor"
+	plaf="com.jgoodies.looks.plastic.PlasticXPLookAndFeel">
+	<panel layout="GridBagLayout" border="EmptyBorder(8,8,8,8)">
+		<panel Layout="GridBagLayout" Border="TitledBorder(lbl_Copy)">
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="0" Weightx="1.0" />
+			<buttongroup id="copyAction">
+				<radiobutton id="rdb_ShallowCopy" text="lbl_ShallowCopy"
+					Selected="true" FocusPainted="false">
+					<gridbagconstraints
+						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="0"
+						Insets="4,4,4,4" Weightx="1.0" />
+				</radiobutton>
+				<radiobutton id="rdb_DeepInternalOnlyCopy"
+					text="lbl_DeepInternalOnlyCopy" Selected="false"
+					FocusPainted="false">
+					<gridbagconstraints
+						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="1"
+						Insets="4,4,4,4" Weightx="1.0" />
+				</radiobutton>
+				<radiobutton id="rdb_DeepCopy" text="lbl_DeepCopy"
+					Selected="false" FocusPainted="false">
+					<gridbagconstraints
+						Fill="GridBagConstraints.HORIZONTAL" Gridx="0" Gridy="2"
+						Insets="4,4,4,4" Weightx="1.0" />
+				</radiobutton>
+			</buttongroup>
+		</panel>
+<!-- 		<panel Layout="GridBagLayout" -->
+<!-- 			Border="TitledBorder(lbl_MandatoryAttributes)"> -->
+<!-- 			<gridbagconstraints Fill="GridBagConstraints.BOTH" -->
+<!-- 				Gridx="0" Gridy="1" Weightx="1.0" /> -->
+<!-- 			<label Text="lbl_Namespace"> -->
+<!-- 				<gridbagconstraints -->
+<!-- 					Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="0" -->
+<!-- 					Insets="4,4,4,4" /> -->
+<!-- 			</label> -->
+<!-- 			<textfield id="tfd_Namespace" enabled="true"> -->
+<!-- 				<gridbagconstraints -->
+<!-- 					Anchor="GridBagConstraints.WEST" -->
+<!-- 					Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="0" -->
+<!-- 					Insets="4,4,4,4" Weightx="1.0" /> -->
+<!-- 			</textfield> -->
+<!-- 			<label Text="lbl_Description"> -->
+<!-- 				<gridbagconstraints -->
+<!-- 					Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1" -->
+<!-- 					Insets="4,4,4,4" /> -->
+<!-- 			</label> -->
+<!-- 			<textfield id="tfd_Description" enabled="true"> -->
+<!-- 				<gridbagconstraints -->
+<!-- 					Anchor="GridBagConstraints.WEST" -->
+<!-- 					Fill="GridBagConstraints.HORIZONTAL" Gridx="1" Gridy="1" -->
+<!-- 					Insets="4,4,4,4" Weightx="1.0" /> -->
+<!-- 			</textfield> -->
+<!-- 		</panel> -->
+		<panel layout="BorderLayout">
+			<gridbagconstraints Fill="GridBagConstraints.BOTH"
+				Gridx="0" Gridy="2" Weightx="1.0" Weighty="1.0" />
+			<panel layout="BorderLayout" constraints="BorderLayout.SOUTH">
+				<button id="btn_Cancel" constraints="BorderLayout.WEST"
+					Text="lbl_Cancel"></button>
+				<button id="btn_Copy" constraints="BorderLayout.EAST"
+					Text="lbl_Copy"></button>
+			</panel>
+		</panel>
+	</panel>
+</dialog>

@@ -63,6 +63,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.interaction_framework.editor.NewFrameworkDialogControl;
 import nl.visi.interaction_framework.editor.ui.RotatingButton;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
@@ -2263,6 +2264,22 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 	}
 
 	public void copyElement() {
+		try {
+			final TransactionCopyDialogControl transactionCopyDialogControl = new TransactionCopyDialogControl();
+			transactionCopyDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
+
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					if (evt.getPropertyName().equals("btn_Copy")) {
+						System.out.println(evt.getNewValue());
+					}
+				}
+			});
+			transactionCopyDialogControl.setVisible(true);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+
 		Store16 store = Editor16.getStore16();
 		int row = tbl_Elements.getSelectedRow();
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
