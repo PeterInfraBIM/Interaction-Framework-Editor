@@ -14,6 +14,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.List;
 
 import javax.swing.DefaultCellEditor;
@@ -27,6 +28,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -34,6 +37,12 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -61,6 +70,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 
 	private JPanel startDatePanel, endDatePanel;
 	private JTable tbl_SubComplexElements, tbl_SimpleElements, tbl_UseElements;
+	private JTree tree_ElementStructure;
+	private DefaultMutableTreeNode elementStructureRoot;
 	private SubComplexElementsTableModel subComplexElementsTableModel;
 	private SimpleElementsTableModel simpleElementsTableModel;
 	private UseElementsTableModel useElementsTableModel;
@@ -399,6 +410,41 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		}
 	}
 
+	@SuppressWarnings("serial")
+	class ElementStructureTreeCellRenderer extends DefaultTreeCellRenderer {
+
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
+				boolean leaf, int row, boolean hasFocus) {
+			Component cell = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			if (cell instanceof JLabel) {
+				if (value instanceof DefaultMutableTreeNode) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+					Object userObject = node.getUserObject();
+					if (userObject instanceof ComplexElementTypeType) {
+						ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
+						((JLabel) cell).setText(ce.getDescription());
+						((JLabel) cell).setToolTipText(ce.getId());
+					} else if (userObject instanceof SimpleElementTypeType) {
+						SimpleElementTypeType se = (SimpleElementTypeType) userObject;
+						((JLabel) cell).setText(se.getDescription());
+						((JLabel) cell).setToolTipText(se.getId());
+					}
+				}
+			}
+			return cell;
+		}
+
+	}
+
+	@SuppressWarnings("serial")
+	public class ElementStructureTreeModel extends DefaultTreeModel {
+
+		public ElementStructureTreeModel(TreeNode root) {
+			super(root);
+		}
+	}
+
 	public ComplexElementsPanelControl16() throws Exception {
 		super(COMPLEX_ELEMENTS_PANEL);
 
@@ -406,6 +452,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		initSubComplexElementsTable();
 		initSimpleElementsTable();
 		initUseElementsTable();
+		initElementStructureTree();
 		initStartDateField();
 		initEndDateField();
 		initMinOccurs();
@@ -694,6 +741,15 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		});
 	}
 
+	private void initElementStructureTree() {
+		elementStructureRoot = new DefaultMutableTreeNode();
+		tree_ElementStructure.setModel(new ElementStructureTreeModel(elementStructureRoot));
+		tree_ElementStructure.setCellRenderer(new ElementStructureTreeCellRenderer());
+		tree_ElementStructure.setRootVisible(false);
+		tree_ElementStructure.setShowsRootHandles(false);
+		ToolTipManager.sharedInstance().registerComponent(tree_ElementStructure);
+	}
+
 	private void initComplexElementsTable() {
 		elementsTableModel = new ComplexElementsTableModel();
 		tbl_Elements.setModel(elementsTableModel);
@@ -807,6 +863,32 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			List<SimpleElementTypeType> seList = Editor16.getStore16().getElements(SimpleElementTypeType.class);
 			for (SimpleElementTypeType element : seList) {
 				cbx_SimpleElements.addItem("[" + element.getId() + "] " + element.getDescription());
+			}
+
+			ElementStructureTreeModel treeModel = (ElementStructureTreeModel) tree_ElementStructure.getModel();
+			elementStructureRoot.setUserObject(selectedElement.getDescription());
+			elementStructureRoot.removeAllChildren();
+			treeModel.nodeStructureChanged(elementStructureRoot);
+			List<ComplexElementTypeType> complexTreeElements = getComplexElements(selectedElement);
+			if (complexTreeElements != null) {
+				int parentIndex = 0;
+				for (ComplexElementTypeType complexElement : complexTreeElements) {
+					DefaultMutableTreeNode complexTreeElement = new DefaultMutableTreeNode(complexElement);
+					treeModel.insertNodeInto(complexTreeElement, elementStructureRoot, parentIndex);
+					tree_ElementStructure.expandPath(new TreePath(elementStructureRoot.getPath()));
+					parentIndex++;
+					int childIndex = 0;
+					List<SimpleElementTypeType> complexElementsimpleElements = getSimpleElements(complexElement);
+					if (complexElementsimpleElements != null) {
+						for (SimpleElementTypeType complexElementsimpleElement : complexElementsimpleElements) {
+							DefaultMutableTreeNode simpleTreeElement = new DefaultMutableTreeNode(
+									complexElementsimpleElement);
+							treeModel.insertNodeInto(simpleTreeElement, complexTreeElement, childIndex);
+							tree_ElementStructure.expandPath(new TreePath(complexTreeElement.getPath()));
+							childIndex++;
+						}
+					}
+				}
 			}
 
 			subComplexElementsTableModel.clear();

@@ -214,7 +214,7 @@
 		<scrollpane Border="TitledBorder(lbl_Relations)">
 			<tabbedpane id="relationsTabs"
 				Border="EmptyBorder(4,4,4,4)"
-				Titles="lbl_SimpleElements,lbl_ComplexElements,lbl_UseElements">
+				Titles="lbl_SimpleElements,lbl_ComplexElements,lbl_UseElements,lbl_ElementStructure">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<scrollpane>
 						<gridbagconstraints
@@ -288,6 +288,15 @@
 							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
 						<table id="tbl_UseElements"
 							SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+							PreferredScrollableViewportSize="200,50" />
+					</scrollpane>
+				</panel>
+				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+					<scrollpane>
+						<gridbagconstraints
+							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
+						<tree id="tree_ElementStructure"
 							PreferredScrollableViewportSize="200,50" />
 					</scrollpane>
 				</panel>
