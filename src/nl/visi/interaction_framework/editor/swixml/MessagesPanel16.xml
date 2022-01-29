@@ -18,7 +18,8 @@
 						Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Weightx="1.0"
 						Weighty="1.0" />
 					<table id="tbl_Elements"
-						SelectionMode="ListSelectionModel.SINGLE_SELECTION" DragEnabled="true" />
+						SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+						DragEnabled="true" />
 				</scrollpane>
 				<panel Layout="GridBagLayout">
 					<gridbagconstraints
@@ -204,7 +205,7 @@
 		<scrollpane Border="TitledBorder(lbl_Relations)">
 			<tabbedpane id="relationsTabs"
 				Border="EmptyBorder(4,4,4,4)"
-				Titles="lbl_Transactions,lbl_ComplexElements,lbl_Appendices">
+				Titles="lbl_Transactions,lbl_ComplexElements,lbl_ComplexElements,lbl_Appendices">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<scrollpane>
 						<gridbagconstraints
@@ -247,6 +248,15 @@
 								Insets="0,2,2,2" />
 						</button>
 					</panel>
+				</panel>
+				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
+					<scrollpane>
+						<gridbagconstraints
+							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
+							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
+						<tree id="tree_ComplexElements"
+							PreferredScrollableViewportSize="200,50" />
+					</scrollpane>
 				</panel>
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
 					<scrollpane>

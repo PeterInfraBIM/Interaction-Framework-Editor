@@ -1,5 +1,6 @@
 package nl.visi.interaction_framework.editor.v16;
 
+import java.awt.Component;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
@@ -9,14 +10,22 @@ import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTree;
+import javax.swing.ToolTipManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeNode;
+import javax.swing.tree.TreePath;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -24,6 +33,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTreeCellRenderer;
+import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTreeModel;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
@@ -35,7 +46,9 @@ import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
 import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.MessageTypeType.AppendixTypes;
 import nl.visi.schemas._20160331.RoleTypeType;
+import nl.visi.schemas._20160331.SimpleElementTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType;
+import nl.visi.schemas._20160331.UserDefinedTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType.Executor;
 import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
 
@@ -44,6 +57,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	private JPanel startDatePanel, endDatePanel;
 	private JTable tbl_ComplexElements, tbl_Transactions, tbl_Appendices;
+	private JTree tree_ComplexElements;
+	private DefaultMutableTreeNode complexElementsRoot;
 	private ComplexElementsTableModel complexElementsTableModel;
 	private AppendicesTableModel appendicesTableModel;
 	private TransactionsTableModel transactionsTableModel;
@@ -249,6 +264,42 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	}
 
+	@SuppressWarnings("serial")
+	class ComplexElementsTreeCellRenderer extends DefaultTreeCellRenderer {
+
+		@Override
+		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
+				boolean leaf, int row, boolean hasFocus) {
+			Component cell = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+			if (cell instanceof JLabel) {
+				if (value instanceof DefaultMutableTreeNode) {
+					DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+					Object userObject = node.getUserObject();
+					if (userObject instanceof ComplexElementTypeType) {
+						ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
+						((JLabel) cell).setText(ce.getDescription());
+						((JLabel) cell).setToolTipText(ce.getId());
+					} else if (userObject instanceof SimpleElementTypeType) {
+						SimpleElementTypeType se = (SimpleElementTypeType) userObject;
+						UserDefinedTypeType userDefinedType = Control16.getUserDefinedType(se);
+						((JLabel) cell).setText(se.getDescription() + " [" + userDefinedType.getId() + "]");
+						((JLabel) cell).setToolTipText(se.getId());
+					}
+				}
+			}
+			return cell;
+		}
+
+	}
+
+	@SuppressWarnings("serial")
+	public class ComplexElementsTreeModel extends DefaultTreeModel {
+
+		public ComplexElementsTreeModel(TreeNode root) {
+			super(root);
+		}
+	}
+
 	public TransactionsTableModel getTransactionsTableModel() {
 		return transactionsTableModel;
 	}
@@ -301,6 +352,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		super(MESSAGES_PANEL);
 
 		initMessagesTable();
+		initComplexElementsTree();
 		initComplexElementsTable();
 		initTransactionsTable();
 		initAppendicesTable();
@@ -410,6 +462,15 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				}
 			}
 		});
+	}
+
+	private void initComplexElementsTree() {
+		complexElementsRoot = new DefaultMutableTreeNode();
+		tree_ComplexElements.setModel(new ComplexElementsTreeModel(complexElementsRoot));
+		tree_ComplexElements.setCellRenderer(new ComplexElementsTreeCellRenderer());
+		tree_ComplexElements.setRootVisible(false);
+		tree_ComplexElements.setShowsRootHandles(false);
+		ToolTipManager.sharedInstance().registerComponent(tree_ComplexElements);
 	}
 
 	@SuppressWarnings("serial")
@@ -544,6 +605,34 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			chb_AppendixMandatory
 					.setSelected(appendixMandatory != null ? selectedElement.isAppendixMandatory() : false);
 
+			ComplexElementsTreeModel treeModel = (ComplexElementsTreeModel) tree_ComplexElements.getModel();
+			complexElementsRoot.setUserObject(selectedElement.getDescription());
+			complexElementsRoot.removeAllChildren();
+			treeModel.nodeStructureChanged(complexElementsRoot);
+			List<ComplexElementTypeType> complexTreeElements = getComplexElements(selectedElement);
+			if (complexTreeElements != null) {
+				int parentIndex = 0;
+				for (ComplexElementTypeType complexElement : complexTreeElements) {
+					DefaultMutableTreeNode complexTreeElement = new DefaultMutableTreeNode(complexElement);
+					treeModel.insertNodeInto(complexTreeElement, complexElementsRoot, parentIndex);
+					tree_ComplexElements.expandPath(new TreePath(complexElementsRoot.getPath()));
+					parentIndex++;
+					int childIndex = 0;
+					List<ComplexElementTypeType> complexElementcomplexElements = getComplexElements(complexElement);
+					if (complexElementcomplexElements != null) {
+						for (ComplexElementTypeType complexElementcomplexElement : complexElementcomplexElements) {
+							DefaultMutableTreeNode subComplexTreeElement = new DefaultMutableTreeNode(
+									complexElementcomplexElement);
+							treeModel.insertNodeInto(subComplexTreeElement, complexTreeElement, childIndex);
+							tree_ComplexElements.expandPath(new TreePath(complexTreeElement.getPath()));
+							childIndex++;
+							insertSimpleElements(treeModel, complexElementcomplexElement, subComplexTreeElement, 0);
+						}
+					}
+					insertSimpleElements(treeModel, complexElement, complexTreeElement, childIndex);
+				}
+			}
+
 			complexElementsTableModel.clear();
 			MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
 			if (complexElements != null) {
@@ -623,6 +712,20 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		inSelection = false;
 	}
 
+	void insertSimpleElements(ComplexElementsTreeModel treeModel, ComplexElementTypeType complexElement,
+			DefaultMutableTreeNode complexTreeElement, int childIndex) {
+		List<SimpleElementTypeType> complexElementsimpleElements = getSimpleElements(complexElement);
+		if (complexElementsimpleElements != null) {
+			for (SimpleElementTypeType complexElementsimpleElement : complexElementsimpleElements) {
+				DefaultMutableTreeNode simpleTreeElement = new DefaultMutableTreeNode(
+						complexElementsimpleElement);
+				treeModel.insertNodeInto(simpleTreeElement, complexTreeElement, childIndex);
+				tree_ComplexElements.expandPath(new TreePath(complexTreeElement.getPath()));
+				childIndex++;
+			}
+		}
+	}
+
 	public void newElement() {
 		try {
 			MessageTypeType newMessageType = objectFactory.createMessageTypeType();
@@ -687,7 +790,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		if (complexElements != null) {
 			List<Object> refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 			if (refs != null) {
-				MessageTypeType.ComplexElements copyComplexElements = objectFactory.createMessageTypeTypeComplexElements();
+				MessageTypeType.ComplexElements copyComplexElements = objectFactory
+						.createMessageTypeTypeComplexElements();
 				List<Object> copyRefs = copyComplexElements.getComplexElementTypeOrComplexElementTypeRef();
 				for (Object item : refs) {
 					copyRefs.add(item);

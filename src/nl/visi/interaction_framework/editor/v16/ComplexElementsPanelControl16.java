@@ -437,9 +437,9 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	}
 
 	@SuppressWarnings("serial")
-	public class ElementStructureTreeModel extends DefaultTreeModel {
+	public class SubComplexElementsTreeModel extends DefaultTreeModel {
 
-		public ElementStructureTreeModel(TreeNode root) {
+		public SubComplexElementsTreeModel(TreeNode root) {
 			super(root);
 		}
 	}
@@ -742,7 +742,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 
 	private void initSubComplexElementsTree() {
 		subComplexElementsRoot = new DefaultMutableTreeNode();
-		tree_SubComplexElements.setModel(new ElementStructureTreeModel(subComplexElementsRoot));
+		tree_SubComplexElements.setModel(new SubComplexElementsTreeModel(subComplexElementsRoot));
 		tree_SubComplexElements.setCellRenderer(new SubComplexElementsTreeCellRenderer());
 		tree_SubComplexElements.setRootVisible(false);
 		tree_SubComplexElements.setShowsRootHandles(false);
@@ -864,7 +864,7 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				cbx_SimpleElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
-			ElementStructureTreeModel treeModel = (ElementStructureTreeModel) tree_SubComplexElements.getModel();
+			SubComplexElementsTreeModel treeModel = (SubComplexElementsTreeModel) tree_SubComplexElements.getModel();
 			subComplexElementsRoot.setUserObject(selectedElement.getDescription());
 			subComplexElementsRoot.removeAllChildren();
 			treeModel.nodeStructureChanged(subComplexElementsRoot);
