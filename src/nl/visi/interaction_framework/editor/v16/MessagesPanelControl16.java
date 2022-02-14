@@ -1,12 +1,18 @@
 package nl.visi.interaction_framework.editor.v16;
 
 import java.awt.Component;
+import java.awt.Insets;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Date;
+import java.util.EventObject;
 import java.util.List;
 
 import javax.swing.DropMode;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -16,14 +22,18 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.event.CellEditorListener;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeCellEditor;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -35,6 +45,7 @@ import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTreeCellRenderer;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTreeModel;
+import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.ComplexElementsTreeCellRenderer;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
@@ -266,28 +277,152 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	@SuppressWarnings("serial")
 	class ComplexElementsTreeCellRenderer extends DefaultTreeCellRenderer {
+//		private JPanel panel;
+//		private JButton button, testBtn;
+
+		public ComplexElementsTreeCellRenderer() {
+//			this.panel = new JPanel();
+//			this.button = new JButton();
+//			button.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					System.out.println("Button CLICK!!!");
+//					tree_ComplexElements.cancelEditing();
+//				}
+//			});
+//			this.testBtn = new JButton();
+//			testBtn.addActionListener(new ActionListener() {
+//				@Override
+//				public void actionPerformed(ActionEvent e) {
+//					System.out.println("Test CLICK!!!");
+//					tree_ComplexElements.cancelEditing();		
+//				}});
+		}
 
 		@Override
-		public Component getTreeCellRendererComponent(JTree tree, Object value, boolean sel, boolean expanded,
-				boolean leaf, int row, boolean hasFocus) {
+		public Component getTreeCellRendererComponent(JTree tree, final Object value, boolean sel, boolean expanded,
+				boolean leaf, final int row, boolean hasFocus) {
 			Component cell = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+
+			JPanel panel = new JPanel();
+			JButton navigateBtn = new JButton();
+			JButton selectionBtn = new JButton();
+			selectionBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					System.out.println("Selection CLICK!!!");
+					tree_ComplexElements.cancelEditing();
+				}
+			});
+			panel.setBackground(null);
+			panel.add(selectionBtn);
+			panel.add(navigateBtn);
 			if (cell instanceof JLabel) {
 				if (value instanceof DefaultMutableTreeNode) {
+					ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit()
+							.getImage(getClass().getResource("/" + getBundle().getString("img_ForwardNav"))));
+					navigateBtn.setIcon(icon);
+					navigateBtn.setOpaque(false);
+					navigateBtn.setMargin(new Insets(0, 0, 0, 0));
+					navigateBtn.setBorder(null);
+					navigateBtn.setBorderPainted(false);
+
+					selectionBtn.setIcon(((JLabel) cell).getIcon());
+					selectionBtn.setOpaque(true);
+					selectionBtn.setMargin(new Insets(0, 0, 0, 0));
+					selectionBtn.setBorder(null);
+					selectionBtn.setBorderPainted(false);
+					selectionBtn.setBackground(sel ? backgroundSelectionColor : backgroundNonSelectionColor);
+					selectionBtn.setForeground(sel ? textSelectionColor : textNonSelectionColor);
 					DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
 					Object userObject = node.getUserObject();
 					if (userObject instanceof ComplexElementTypeType) {
-						ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
-						((JLabel) cell).setText(ce.getDescription());
-						((JLabel) cell).setToolTipText(ce.getId());
+						final ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
+						selectionBtn.setText(ce.getDescription());
+						panel.setToolTipText(ce.getId());
+						navigateBtn.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								tree_ComplexElements.cancelEditing();
+								InteractionFrameworkEditor.navigate(ce);
+							}
+						});
 					} else if (userObject instanceof SimpleElementTypeType) {
-						SimpleElementTypeType se = (SimpleElementTypeType) userObject;
+						final SimpleElementTypeType se = (SimpleElementTypeType) userObject;
 						UserDefinedTypeType userDefinedType = Control16.getUserDefinedType(se);
-						((JLabel) cell).setText(se.getDescription() + " [" + userDefinedType.getId() + "]");
-						((JLabel) cell).setToolTipText(se.getId());
+						selectionBtn.setText(se.getDescription() + " [" + userDefinedType.getId() + "]");
+						panel.setToolTipText(se.getId());
+						navigateBtn.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								tree_ComplexElements.cancelEditing();
+								InteractionFrameworkEditor.navigate(se);
+							}
+						});
+
+					} else {
+						System.err.println("Exception");
 					}
 				}
 			}
-			return cell;
+			return panel;
+		}
+
+	}
+
+	class ComplexElementsTreeCellEditor implements TreeCellEditor {
+		private ComplexElementsTreeCellRenderer treeCellRenderer;
+
+		public ComplexElementsTreeCellEditor(ComplexElementsTreeCellRenderer treeCellRenderer) {
+			this.treeCellRenderer = treeCellRenderer;
+		}
+
+		@Override
+		public Object getCellEditorValue() {
+			System.out.println("getCellEditorValue");
+			return null;
+		}
+
+		@Override
+		public boolean isCellEditable(EventObject anEvent) {
+			System.out.println("isCellEditable");
+			return true;
+		}
+
+		@Override
+		public boolean shouldSelectCell(EventObject anEvent) {
+			System.out.println("shouldSelectCell");
+			return true;
+		}
+
+		@Override
+		public boolean stopCellEditing() {
+			System.out.println("stopCellEditing");
+			return true;
+		}
+
+		@Override
+		public void cancelCellEditing() {
+			System.out.println("cancelCellEditing");
+		}
+
+		@Override
+		public void addCellEditorListener(CellEditorListener l) {
+			System.out.println("addCellEditorListener");
+		}
+
+		@Override
+		public void removeCellEditorListener(CellEditorListener l) {
+			System.out.println("removeCellEditorListener");
+		}
+
+		@Override
+		public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
+				boolean leaf, int row) {
+			System.out.println("getTreeCellEditorComponent");
+			Component treeCellRendererComponent = treeCellRenderer.getTreeCellRendererComponent(tree, value, isSelected,
+					expanded, leaf, row, isSelected);
+			return treeCellRendererComponent;
 		}
 
 	}
@@ -467,9 +602,13 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private void initComplexElementsTree() {
 		complexElementsRoot = new DefaultMutableTreeNode();
 		tree_ComplexElements.setModel(new ComplexElementsTreeModel(complexElementsRoot));
-		tree_ComplexElements.setCellRenderer(new ComplexElementsTreeCellRenderer());
+		ComplexElementsTreeCellRenderer treeCellRenderer = new ComplexElementsTreeCellRenderer();
+		tree_ComplexElements.setCellRenderer(treeCellRenderer);
+		tree_ComplexElements.setCellEditor(new ComplexElementsTreeCellEditor(treeCellRenderer));
+		tree_ComplexElements.setEditable(true);
 		tree_ComplexElements.setRootVisible(false);
 		tree_ComplexElements.setShowsRootHandles(false);
+		tree_ComplexElements.setRowHeight(20);
 		ToolTipManager.sharedInstance().registerComponent(tree_ComplexElements);
 	}
 
@@ -717,8 +856,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		List<SimpleElementTypeType> complexElementsimpleElements = getSimpleElements(complexElement);
 		if (complexElementsimpleElements != null) {
 			for (SimpleElementTypeType complexElementsimpleElement : complexElementsimpleElements) {
-				DefaultMutableTreeNode simpleTreeElement = new DefaultMutableTreeNode(
-						complexElementsimpleElement);
+				DefaultMutableTreeNode simpleTreeElement = new DefaultMutableTreeNode(complexElementsimpleElement);
 				treeModel.insertNodeInto(simpleTreeElement, complexTreeElement, childIndex);
 				tree_ComplexElements.expandPath(new TreePath(complexTreeElement.getPath()));
 				childIndex++;
