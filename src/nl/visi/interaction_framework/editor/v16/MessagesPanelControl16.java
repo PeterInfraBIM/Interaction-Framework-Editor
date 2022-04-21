@@ -3,10 +3,15 @@ package nl.visi.interaction_framework.editor.v16;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Toolkit;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.List;
@@ -16,21 +21,23 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.ToolTipManager;
+import javax.swing.TransferHandler;
+import javax.swing.TransferHandler.DropLocation;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.event.CellEditorListener;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.DefaultTreeCellEditor;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeCellEditor;
@@ -43,12 +50,10 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
-import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTreeCellRenderer;
-import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTreeModel;
-import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.ComplexElementsTreeCellRenderer;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
+import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
@@ -58,10 +63,11 @@ import nl.visi.schemas._20160331.MessageTypeType;
 import nl.visi.schemas._20160331.MessageTypeType.AppendixTypes;
 import nl.visi.schemas._20160331.RoleTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeType;
+import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
 import nl.visi.schemas._20160331.TransactionTypeType;
-import nl.visi.schemas._20160331.UserDefinedTypeType;
 import nl.visi.schemas._20160331.TransactionTypeType.Executor;
 import nl.visi.schemas._20160331.TransactionTypeType.Initiator;
+import nl.visi.schemas._20160331.UserDefinedTypeType;
 
 public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private static final String MESSAGES_PANEL = "nl/visi/interaction_framework/editor/swixml/MessagesPanel16.xml";
@@ -71,6 +77,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private JTree tree_ComplexElements;
 	private DefaultMutableTreeNode complexElementsRoot;
 	private ComplexElementsTableModel complexElementsTableModel;
+	private ComplexElementsTreeModel complexElementsTreeModel;
 	private AppendicesTableModel appendicesTableModel;
 	private TransactionsTableModel transactionsTableModel;
 	private JComboBox<String> cbx_ComplexElements, cbx_Appendices;
@@ -359,9 +366,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 								InteractionFrameworkEditor.navigate(se);
 							}
 						});
-
 					} else {
-						System.err.println("Exception");
+						System.err.println("Exception " + userObject != null ? userObject.toString() : null);
 					}
 				}
 			}
@@ -370,6 +376,75 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	}
 
+//	class ComplexElementsTreeCellEditor extends DefaultTreeCellEditor {
+//		private ComplexElementsTreeCellRenderer renderer;
+//
+//		public ComplexElementsTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
+//			super(tree, renderer);
+//			this.renderer = (ComplexElementsTreeCellRenderer) renderer;
+//		}
+//
+//		@Override
+//		public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
+//				boolean leaf, int row) {
+////			Component cell = super.getTreeCellEditorComponent(tree, value, isSelected, expanded, leaf, row);
+//			JPanel panel = (JPanel) renderer.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, leaf);
+//			JButton selectBtn = (JButton) panel.getComponent(0);
+//			//selectBtn.setText(((JLabel) cell).getText());
+//			JButton navigateBtn = (JButton) panel.getComponent(1);
+////			JPanel panel = new JPanel();
+////			panel.add(selectBtn);
+////			panel.add(navigateBtn);
+//
+////			ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit()
+////					.getImage(getClass().getResource("/" + getBundle().getString("img_ForwardNav"))));
+////			navigateBtn.setIcon(icon);
+////			navigateBtn.setOpaque(false);
+////			navigateBtn.setMargin(new Insets(0, 0, 0, 0));
+////			navigateBtn.setBorder(null);
+////			navigateBtn.setBorderPainted(false);
+////
+////			selectBtn.setIcon(((JLabel) cell).getIcon());
+////			selectBtn.setOpaque(true);
+////			selectBtn.setMargin(new Insets(0, 0, 0, 0));
+////			selectBtn.setBorder(null);
+////			selectBtn.setBorderPainted(false);
+////			selectBtn.setBackground(
+////					isSelected ? renderer.getBackgroundSelectionColor() : renderer.getBackgroundNonSelectionColor());
+////			selectBtn
+////					.setForeground(isSelected ? renderer.getTextSelectionColor() : renderer.getTextNonSelectionColor());
+//			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
+//			Object userObject = node.getUserObject();
+//			if (userObject instanceof ComplexElementTypeType) {
+//				final ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
+//				selectBtn.setText(ce.getDescription());
+//				panel.setToolTipText(ce.getId());
+//				navigateBtn.addActionListener(new ActionListener() {
+//					@Override
+//					public void actionPerformed(ActionEvent e) {
+//						tree_ComplexElements.cancelEditing();
+//						InteractionFrameworkEditor.navigate(ce);
+//					}
+//				});
+//			} else if (userObject instanceof SimpleElementTypeType) {
+//				final SimpleElementTypeType se = (SimpleElementTypeType) userObject;
+//				UserDefinedTypeType userDefinedType = Control16.getUserDefinedType(se);
+//				selectBtn.setText(se.getDescription() + " [" + userDefinedType.getId() + "]");
+//				panel.setToolTipText(se.getId());
+//				navigateBtn.addActionListener(new ActionListener() {
+//					@Override
+//					public void actionPerformed(ActionEvent e) {
+//						tree_ComplexElements.cancelEditing();
+//						InteractionFrameworkEditor.navigate(se);
+//					}
+//				});
+//			} else {
+//				System.err.println("Exception " + userObject.toString());
+//			}
+//			return panel;
+//		}
+//
+//	}
 	class ComplexElementsTreeCellEditor implements TreeCellEditor {
 		private ComplexElementsTreeCellRenderer treeCellRenderer;
 
@@ -599,13 +674,148 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		});
 	}
 
+	@SuppressWarnings("serial")
 	private void initComplexElementsTree() {
 		complexElementsRoot = new DefaultMutableTreeNode();
-		tree_ComplexElements.setModel(new ComplexElementsTreeModel(complexElementsRoot));
+		complexElementsTreeModel = new ComplexElementsTreeModel(complexElementsRoot);
+		tree_ComplexElements.setModel(complexElementsTreeModel);
 		ComplexElementsTreeCellRenderer treeCellRenderer = new ComplexElementsTreeCellRenderer();
 		tree_ComplexElements.setCellRenderer(treeCellRenderer);
 		tree_ComplexElements.setCellEditor(new ComplexElementsTreeCellEditor(treeCellRenderer));
 		tree_ComplexElements.setEditable(true);
+		tree_ComplexElements.setDropMode(DropMode.INSERT);
+		tree_ComplexElements.setTransferHandler(new TransferHandler() {
+			private JTree.DropLocation dropLocation;
+			private SimpleElementTypeType simpleElement;
+			private ComplexElementTypeType complexElement;
+			private ComplexElementTypeType dropElement;
+
+			@Override
+			public boolean canImport(TransferSupport support) {
+				if (support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+					try {
+						String transferData = (String) support.getTransferable()
+								.getTransferData(DataFlavor.stringFlavor);
+//						System.out.println(transferData);
+						String id = transferData.split("\t")[0];
+						simpleElement = Editor16.getStore16().getElement(SimpleElementTypeType.class, id);
+						if (simpleElement != null) {
+//							System.out.println(simpleElement.getDescription());
+							return canImport(support, simpleElement);
+						} else {
+							complexElement = Editor16.getStore16().getElement(ComplexElementTypeType.class, id);
+							if (complexElement != null) {
+								return canImport(support, complexElement);
+							}
+						}
+					} catch (UnsupportedFlavorException | IOException e) {
+						e.printStackTrace();
+					}
+				}
+				return false;
+			}
+
+			private boolean canImport(TransferSupport support, ComplexElementTypeType complexElement) {
+				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
+				DefaultMutableTreeNode dropNode = (DefaultMutableTreeNode) dropLocation.getPath()
+						.getLastPathComponent();
+				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
+					System.out.println(((ComplexElementTypeType) dropNode.getUserObject()).getDescription() + " "
+							+ dropLocation.getChildIndex());
+				} else {
+					System.out.println(dropNode.getUserObject() + " " + dropLocation.getChildIndex());
+				}
+				if (!(dropNode.getUserObject() instanceof ComplexElementTypeType)) {
+					return true;
+				}
+				return false;
+			}
+
+			private boolean canImport(TransferSupport support, SimpleElementTypeType simpleElement) {
+				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
+				DefaultMutableTreeNode dropNode = (DefaultMutableTreeNode) dropLocation.getPath()
+						.getLastPathComponent();
+				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
+//					dropElement = (ComplexElementTypeType) dropNode.getUserObject();
+//					System.out.println("Drop element: " + dropElement.getDescription() + " index: "
+//							+ dropLocation.getChildIndex());
+					if (dropLocation.getChildIndex() >= -1) {
+						return true;
+					}
+				}
+				return false;
+			}
+
+			@Override
+			public boolean importData(TransferSupport support) {
+				DefaultMutableTreeNode dropNode = (DefaultMutableTreeNode) dropLocation.getPath()
+						.getLastPathComponent();
+				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
+					dropElement = (ComplexElementTypeType) dropNode.getUserObject();
+					System.out.println("Drop element: " + dropElement.getDescription() + " index: "
+							+ dropLocation.getChildIndex());
+					if (dropLocation.getChildIndex() >= -1) {
+						SimpleElementTypeTypeRef ref = objectFactory.createSimpleElementTypeTypeRef();
+						ref.setIdref(simpleElement);
+						ComplexElementTypeType.SimpleElements simpleElements = dropElement.getSimpleElements();
+						if (simpleElements == null) {
+							simpleElements = objectFactory.createComplexElementTypeTypeSimpleElements();
+							dropElement.setSimpleElements(simpleElements);
+						}
+						List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+						list.add(dropLocation.getChildIndex(), ref);
+						updateLaMu(dropElement, user);
+						complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(simpleElement), dropNode,
+								dropLocation.getChildIndex());
+						return true;
+					}
+				} else {
+					ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
+					ref.setIdref(complexElement);
+					MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
+					if (complexElements == null) {
+						complexElements = objectFactory.createMessageTypeTypeComplexElements();
+						selectedElement.setComplexElements(complexElements);
+					}
+					List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+					list.add(dropLocation.getChildIndex(), ref);
+					updateLaMu(selectedElement, user);
+					DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
+					complexElementsTreeModel.insertNodeInto(complexNode, complexElementsRoot,
+							dropLocation.getChildIndex());
+					int index = 0;
+					List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
+					if (simpleList != null) {
+						for (SimpleElementTypeType se : simpleList) {
+							complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexNode,
+									index++);
+						}
+						tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
+					}
+					List<ComplexElementTypeType> complexList = Control16.getComplexElements(complexElement);
+					if (complexList != null) {
+						for (ComplexElementTypeType ce : complexList) {
+							DefaultMutableTreeNode complexSubNode = new DefaultMutableTreeNode(ce);
+							complexElementsTreeModel.insertNodeInto(complexSubNode, complexNode, index++);
+							List<SimpleElementTypeType> seList = Control16.getSimpleElements(ce);
+							if (seList != null) {
+								int index2 = 0;
+								for (SimpleElementTypeType se : seList) {
+									complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se),
+											complexSubNode, index2++);
+								}
+							}
+							tree_ComplexElements.expandPath(new TreePath(complexSubNode.getPath()));
+						}
+						tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
+					}
+				}
+
+				return false;
+			}
+
+		});
+
 		tree_ComplexElements.setRootVisible(false);
 		tree_ComplexElements.setShowsRootHandles(false);
 		tree_ComplexElements.setRowHeight(20);
@@ -847,6 +1057,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			chb_AppendixMandatory.setSelected(false);
 			transactionsTableModel.clear();
 			complexElementsTableModel.clear();
+			complexElementsRoot.removeAllChildren();
+			complexElementsTreeModel.nodeStructureChanged(complexElementsRoot);
 		}
 		inSelection = false;
 	}

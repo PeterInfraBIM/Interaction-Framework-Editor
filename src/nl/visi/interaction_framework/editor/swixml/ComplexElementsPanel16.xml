@@ -18,7 +18,8 @@
 						Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0" Weightx="1.0"
 						Weighty="1.0" />
 					<table id="tbl_Elements"
-						SelectionMode="ListSelectionModel.SINGLE_SELECTION" />
+						SelectionMode="ListSelectionModel.SINGLE_SELECTION"
+						DragEnabled="true" />
 				</scrollpane>
 				<panel Layout="GridBagLayout">
 					<gridbagconstraints
