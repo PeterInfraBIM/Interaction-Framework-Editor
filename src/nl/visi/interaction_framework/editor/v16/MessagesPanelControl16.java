@@ -53,6 +53,7 @@ import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
 import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
+import nl.visi.schemas._20160331.ComplexElementTypeType.ComplexElements;
 import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
@@ -689,6 +690,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			private SimpleElementTypeType simpleElement;
 			private ComplexElementTypeType complexElement;
 			private ComplexElementTypeType dropElement;
+			private DefaultMutableTreeNode dropNode;
 
 			@Override
 			public boolean canImport(TransferSupport support) {
@@ -696,11 +698,9 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					try {
 						String transferData = (String) support.getTransferable()
 								.getTransferData(DataFlavor.stringFlavor);
-//						System.out.println(transferData);
 						String id = transferData.split("\t")[0];
 						simpleElement = Editor16.getStore16().getElement(SimpleElementTypeType.class, id);
 						if (simpleElement != null) {
-//							System.out.println(simpleElement.getDescription());
 							return canImport(support, simpleElement);
 						} else {
 							complexElement = Editor16.getStore16().getElement(ComplexElementTypeType.class, id);
@@ -716,29 +716,29 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			}
 
 			private boolean canImport(TransferSupport support, ComplexElementTypeType complexElement) {
-				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
-				DefaultMutableTreeNode dropNode = (DefaultMutableTreeNode) dropLocation.getPath()
-						.getLastPathComponent();
-				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
-					System.out.println(((ComplexElementTypeType) dropNode.getUserObject()).getDescription() + " "
-							+ dropLocation.getChildIndex());
-				} else {
-					System.out.println(dropNode.getUserObject() + " " + dropLocation.getChildIndex());
+				if (dropNode != null) {
+					tree_ComplexElements.removeSelectionPath(new TreePath(dropNode.getPath()));
 				}
+				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
+				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
+				System.out.println("dropLocation.getChildIndex(): "
+						+ ((javax.swing.JTree.DropLocation) dropLocation).getChildIndex());
+				System.out.println("dropNode: " + dropNode.getUserObject());
 				if (!(dropNode.getUserObject() instanceof ComplexElementTypeType)) {
 					return true;
+				} else {
+					if (dropLocation.getChildIndex() == -1) {
+						tree_ComplexElements.setSelectionPath(new TreePath(dropNode.getPath()));
+						return true;
+					}
 				}
 				return false;
 			}
 
 			private boolean canImport(TransferSupport support, SimpleElementTypeType simpleElement) {
 				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
-				DefaultMutableTreeNode dropNode = (DefaultMutableTreeNode) dropLocation.getPath()
-						.getLastPathComponent();
+				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
 				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
-//					dropElement = (ComplexElementTypeType) dropNode.getUserObject();
-//					System.out.println("Drop element: " + dropElement.getDescription() + " index: "
-//							+ dropLocation.getChildIndex());
 					if (dropLocation.getChildIndex() >= -1) {
 						return true;
 					}
@@ -748,13 +748,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 			@Override
 			public boolean importData(TransferSupport support) {
-				DefaultMutableTreeNode dropNode = (DefaultMutableTreeNode) dropLocation.getPath()
-						.getLastPathComponent();
+				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
 				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
 					dropElement = (ComplexElementTypeType) dropNode.getUserObject();
 					System.out.println("Drop element: " + dropElement.getDescription() + " index: "
 							+ dropLocation.getChildIndex());
-					if (dropLocation.getChildIndex() >= -1) {
+					if (dropLocation.getChildIndex() > -1) {
 						SimpleElementTypeTypeRef ref = objectFactory.createSimpleElementTypeTypeRef();
 						ref.setIdref(simpleElement);
 						ComplexElementTypeType.SimpleElements simpleElements = dropElement.getSimpleElements();
@@ -767,6 +766,32 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 						updateLaMu(dropElement, user);
 						complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(simpleElement), dropNode,
 								dropLocation.getChildIndex());
+						return true;
+					} else {
+						System.out.println("1Target found!");
+						ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
+						ref.setIdref(complexElement);
+						ComplexElements complexElements = dropElement.getComplexElements();
+						if (complexElements == null) {
+							complexElements = objectFactory.createComplexElementTypeTypeComplexElements();
+							dropElement.setComplexElements(complexElements);
+						}
+						List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+						list.add(ref);
+						updateLaMu(dropElement, user);
+						DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
+						complexElementsTreeModel.insertNodeInto(complexNode, dropNode, 0);
+						tree_ComplexElements.expandPath(new TreePath(dropNode.getPath()));
+						List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
+						if (simpleList != null) {
+							int index = 0;
+							for (SimpleElementTypeType se : simpleList) {
+								DefaultMutableTreeNode simpleSubNode = new DefaultMutableTreeNode(se);
+								complexElementsTreeModel.insertNodeInto(simpleSubNode, complexNode, index++);
+								tree_ComplexElements.expandPath(new TreePath(simpleSubNode.getPath()));
+							}
+							tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
+						}
 						return true;
 					}
 				} else {
@@ -809,8 +834,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 						}
 						tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
 					}
-				}
 
+				}
 				return false;
 			}
 
