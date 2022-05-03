@@ -4,14 +4,14 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.EventObject;
 import java.util.List;
@@ -21,16 +21,16 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTree;
+import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
 import javax.swing.TransferHandler;
-import javax.swing.TransferHandler.DropLocation;
-import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.event.CellEditorListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
@@ -54,7 +54,6 @@ import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.ComplexElements;
-import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
@@ -79,11 +78,14 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private DefaultMutableTreeNode complexElementsRoot;
 	private ComplexElementsTableModel complexElementsTableModel;
 	private ComplexElementsTreeModel complexElementsTreeModel;
+	private DefaultMutableTreeNode selectedNode;
 	private AppendicesTableModel appendicesTableModel;
 	private TransactionsTableModel transactionsTableModel;
 	private JComboBox<String> cbx_ComplexElements, cbx_Appendices;
 	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddAppendix, btn_RemoveAppendix;
 	private JCheckBox chb_AppendixMandatory;
+	private JPopupMenu popupMenu;
+	private JMenuItem mit_Remove;
 
 	private enum MessagesTableColumns {
 		Id, Description;
@@ -684,6 +686,19 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		tree_ComplexElements.setCellRenderer(treeCellRenderer);
 		tree_ComplexElements.setCellEditor(new ComplexElementsTreeCellEditor(treeCellRenderer));
 		tree_ComplexElements.setEditable(true);
+		tree_ComplexElements.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				int row = tree_ComplexElements.getClosestRowForLocation(e.getX(), e.getY());
+				tree_ComplexElements.setSelectionRow(row);
+				if (SwingUtilities.isRightMouseButton(e)) {
+					selectedNode = (DefaultMutableTreeNode) tree_ComplexElements.getSelectionPath()
+							.getLastPathComponent();
+					Object userObject = selectedNode.getUserObject();
+					System.out.println(userObject);
+					popupMenu.show(e.getComponent(), e.getX(), e.getY());
+				}
+			}
+		});
 		tree_ComplexElements.setDropMode(DropMode.INSERT);
 		tree_ComplexElements.setTransferHandler(new TransferHandler() {
 			private JTree.DropLocation dropLocation;
@@ -1251,6 +1266,63 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		updateLaMu(selectedElement, user);
 		elementsTableModel.update(selectedRow);
 		cbx_ComplexElements.setSelectedItem(null);
+	}
+
+	public void removeElement() {
+		System.out.println("removeElement");
+		Object userObject = selectedNode.getUserObject();
+		if (userObject instanceof SimpleElementTypeType) {
+			SimpleElementTypeType se = (SimpleElementTypeType) userObject;
+			System.out.println("Child: " + se.getDescription());
+			Object parentUserObject = ((DefaultMutableTreeNode)(selectedNode.getParent())).getUserObject();
+			ComplexElementTypeType parentCe = (ComplexElementTypeType)parentUserObject;
+			System.out.println("Parent: " + parentCe.getDescription());
+			ComplexElementTypeType.SimpleElements simpleElements = parentCe.getSimpleElements();
+			List<Object> refs = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+			Object removeRef = null;
+			for (Object ref : refs) {
+				SimpleElementTypeType simpleElement = null;
+				if (ref instanceof SimpleElementTypeType) {
+					simpleElement = (SimpleElementTypeType) ref;
+				} else if (ref instanceof SimpleElementTypeTypeRef) {
+					simpleElement = (SimpleElementTypeType) ((SimpleElementTypeTypeRef) ref).getIdref();
+				}
+				if (simpleElement.getId().equals(se.getId())) {
+					removeRef = ref;
+					break;
+				}
+			}
+			refs.remove(removeRef);
+			updateLaMu(parentCe, user);
+			Store16 store = Editor16.getStore16();
+			store.put(parentCe.getId(), parentCe);
+			
+			complexElementsTreeModel.removeNodeFromParent(selectedNode);
+			} else {
+			ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
+			System.out.println(ce.getDescription());
+			MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
+			List<Object> refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			Object removeRef = null;
+			for (Object ref : refs) {
+				ComplexElementTypeType complexElement = null;
+				if (ref instanceof ComplexElementTypeType) {
+					complexElement = (ComplexElementTypeType) ref;
+				} else if (ref instanceof ComplexElementTypeTypeRef) {
+					complexElement = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) ref).getIdref();
+				}
+				if (complexElement.getId().equals(ce.getId())) {
+					removeRef = ref;
+					break;
+				}
+			}
+			refs.remove(removeRef);
+			updateLaMu(selectedElement, user);
+			Store16 store = Editor16.getStore16();
+			store.put(selectedElement.getId(), selectedElement);
+			
+			complexElementsTreeModel.removeNodeFromParent(selectedNode);
+		}
 	}
 
 	public void removeComplexElement() {
