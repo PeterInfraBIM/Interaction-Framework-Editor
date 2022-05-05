@@ -691,11 +691,13 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				int row = tree_ComplexElements.getClosestRowForLocation(e.getX(), e.getY());
 				tree_ComplexElements.setSelectionRow(row);
 				if (SwingUtilities.isRightMouseButton(e)) {
-					selectedNode = (DefaultMutableTreeNode) tree_ComplexElements.getSelectionPath()
-							.getLastPathComponent();
-					Object userObject = selectedNode.getUserObject();
-					System.out.println(userObject);
-					popupMenu.show(e.getComponent(), e.getX(), e.getY());
+					TreePath selectionPath = tree_ComplexElements.getSelectionPath();
+					if (selectionPath != null) {
+						selectedNode = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+						Object userObject = selectedNode.getUserObject();
+						System.out.println(userObject);
+						popupMenu.show(e.getComponent(), e.getX(), e.getY());
+					}
 				}
 			}
 		});
@@ -735,6 +737,9 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					tree_ComplexElements.removeSelectionPath(new TreePath(dropNode.getPath()));
 				}
 				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
+				if (selectedElement.getComplexElements().getComplexElementTypeOrComplexElementTypeRef().isEmpty()) {
+					return true;
+				}
 				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
 				System.out.println("dropLocation.getChildIndex(): "
 						+ ((javax.swing.JTree.DropLocation) dropLocation).getChildIndex());
@@ -763,53 +768,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 			@Override
 			public boolean importData(TransferSupport support) {
-				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
-				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
-					dropElement = (ComplexElementTypeType) dropNode.getUserObject();
-					System.out.println("Drop element: " + dropElement.getDescription() + " index: "
-							+ dropLocation.getChildIndex());
-					if (dropLocation.getChildIndex() > -1) {
-						SimpleElementTypeTypeRef ref = objectFactory.createSimpleElementTypeTypeRef();
-						ref.setIdref(simpleElement);
-						ComplexElementTypeType.SimpleElements simpleElements = dropElement.getSimpleElements();
-						if (simpleElements == null) {
-							simpleElements = objectFactory.createComplexElementTypeTypeSimpleElements();
-							dropElement.setSimpleElements(simpleElements);
-						}
-						List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
-						list.add(dropLocation.getChildIndex(), ref);
-						updateLaMu(dropElement, user);
-						complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(simpleElement), dropNode,
-								dropLocation.getChildIndex());
-						return true;
-					} else {
-						System.out.println("1Target found!");
-						ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
-						ref.setIdref(complexElement);
-						ComplexElements complexElements = dropElement.getComplexElements();
-						if (complexElements == null) {
-							complexElements = objectFactory.createComplexElementTypeTypeComplexElements();
-							dropElement.setComplexElements(complexElements);
-						}
-						List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-						list.add(ref);
-						updateLaMu(dropElement, user);
-						DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
-						complexElementsTreeModel.insertNodeInto(complexNode, dropNode, 0);
-						tree_ComplexElements.expandPath(new TreePath(dropNode.getPath()));
-						List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
-						if (simpleList != null) {
-							int index = 0;
-							for (SimpleElementTypeType se : simpleList) {
-								DefaultMutableTreeNode simpleSubNode = new DefaultMutableTreeNode(se);
-								complexElementsTreeModel.insertNodeInto(simpleSubNode, complexNode, index++);
-								tree_ComplexElements.expandPath(new TreePath(simpleSubNode.getPath()));
-							}
-							tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
-						}
-						return true;
-					}
-				} else {
+				if (dropLocation.getPath() == null) {
 					ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
 					ref.setIdref(complexElement);
 					MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
@@ -818,40 +777,107 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 						selectedElement.setComplexElements(complexElements);
 					}
 					List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-					list.add(dropLocation.getChildIndex(), ref);
+					list.add(0, ref);
 					updateLaMu(selectedElement, user);
 					DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
-					complexElementsTreeModel.insertNodeInto(complexNode, complexElementsRoot,
-							dropLocation.getChildIndex());
-					int index = 0;
-					List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
-					if (simpleList != null) {
-						for (SimpleElementTypeType se : simpleList) {
-							complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexNode,
-									index++);
-						}
-						tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
-					}
-					List<ComplexElementTypeType> complexList = Control16.getComplexElements(complexElement);
-					if (complexList != null) {
-						for (ComplexElementTypeType ce : complexList) {
-							DefaultMutableTreeNode complexSubNode = new DefaultMutableTreeNode(ce);
-							complexElementsTreeModel.insertNodeInto(complexSubNode, complexNode, index++);
-							List<SimpleElementTypeType> seList = Control16.getSimpleElements(ce);
-							if (seList != null) {
-								int index2 = 0;
-								for (SimpleElementTypeType se : seList) {
-									complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se),
-											complexSubNode, index2++);
-								}
+					complexElementsTreeModel.insertNodeInto(complexNode, complexElementsRoot, 0);
+					tree_ComplexElements.expandPath(new TreePath(complexElementsRoot.getPath()));
+					showComplexNode(complexNode);
+					return true;
+				} else {
+					dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
+					if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
+						dropElement = (ComplexElementTypeType) dropNode.getUserObject();
+						System.out.println("Drop element: " + dropElement.getDescription() + " index: "
+								+ dropLocation.getChildIndex());
+						if (dropLocation.getChildIndex() > -1) {
+							SimpleElementTypeTypeRef ref = objectFactory.createSimpleElementTypeTypeRef();
+							ref.setIdref(simpleElement);
+							ComplexElementTypeType.SimpleElements simpleElements = dropElement.getSimpleElements();
+							if (simpleElements == null) {
+								simpleElements = objectFactory.createComplexElementTypeTypeSimpleElements();
+								dropElement.setSimpleElements(simpleElements);
 							}
-							tree_ComplexElements.expandPath(new TreePath(complexSubNode.getPath()));
+							List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+							list.add(dropLocation.getChildIndex(), ref);
+							updateLaMu(dropElement, user);
+							complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(simpleElement), dropNode,
+									dropLocation.getChildIndex());
+							return true;
+						} else {
+							System.out.println("1Target found!");
+							ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
+							ref.setIdref(complexElement);
+							ComplexElements complexElements = dropElement.getComplexElements();
+							if (complexElements == null) {
+								complexElements = objectFactory.createComplexElementTypeTypeComplexElements();
+								dropElement.setComplexElements(complexElements);
+							}
+							List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+							list.add(ref);
+							updateLaMu(dropElement, user);
+							DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
+							complexElementsTreeModel.insertNodeInto(complexNode, dropNode, 0);
+							tree_ComplexElements.expandPath(new TreePath(dropNode.getPath()));
+							List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
+							if (simpleList != null) {
+								int index = 0;
+								for (SimpleElementTypeType se : simpleList) {
+									DefaultMutableTreeNode simpleSubNode = new DefaultMutableTreeNode(se);
+									complexElementsTreeModel.insertNodeInto(simpleSubNode, complexNode, index++);
+									tree_ComplexElements.expandPath(new TreePath(simpleSubNode.getPath()));
+								}
+								tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
+							}
+							return true;
 						}
-						tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
+					} else {
+						ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
+						ref.setIdref(complexElement);
+						MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
+						if (complexElements == null) {
+							complexElements = objectFactory.createMessageTypeTypeComplexElements();
+							selectedElement.setComplexElements(complexElements);
+						}
+						List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+						list.add(dropLocation.getChildIndex(), ref);
+						updateLaMu(selectedElement, user);
+						DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
+						complexElementsTreeModel.insertNodeInto(complexNode, complexElementsRoot,
+								dropLocation.getChildIndex());
+						showComplexNode(complexNode);
 					}
-
 				}
 				return false;
+			}
+
+			void showComplexNode(DefaultMutableTreeNode complexNode) {
+				int index = 0;
+				List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
+				if (simpleList != null) {
+					for (SimpleElementTypeType se : simpleList) {
+						complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexNode,
+								index++);
+					}
+					tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
+				}
+				List<ComplexElementTypeType> complexList = Control16.getComplexElements(complexElement);
+				if (complexList != null) {
+					for (ComplexElementTypeType ce : complexList) {
+						DefaultMutableTreeNode complexSubNode = new DefaultMutableTreeNode(ce);
+						complexElementsTreeModel.insertNodeInto(complexSubNode, complexNode, index++);
+						List<SimpleElementTypeType> seList = Control16.getSimpleElements(ce);
+						if (seList != null) {
+							int index2 = 0;
+							for (SimpleElementTypeType se : seList) {
+								complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se),
+										complexSubNode, index2++);
+							}
+						}
+						tree_ComplexElements.expandPath(new TreePath(complexSubNode.getPath()));
+					}
+					tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
+				}
 			}
 
 		});
@@ -1269,13 +1295,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	}
 
 	public void removeElement() {
-		System.out.println("removeElement");
 		Object userObject = selectedNode.getUserObject();
+		Object parentUserObject = ((DefaultMutableTreeNode) (selectedNode.getParent())).getUserObject();
 		if (userObject instanceof SimpleElementTypeType) {
 			SimpleElementTypeType se = (SimpleElementTypeType) userObject;
 			System.out.println("Child: " + se.getDescription());
-			Object parentUserObject = ((DefaultMutableTreeNode)(selectedNode.getParent())).getUserObject();
-			ComplexElementTypeType parentCe = (ComplexElementTypeType)parentUserObject;
+			ComplexElementTypeType parentCe = (ComplexElementTypeType) parentUserObject;
 			System.out.println("Parent: " + parentCe.getDescription());
 			ComplexElementTypeType.SimpleElements simpleElements = parentCe.getSimpleElements();
 			List<Object> refs = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
@@ -1296,13 +1321,20 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			updateLaMu(parentCe, user);
 			Store16 store = Editor16.getStore16();
 			store.put(parentCe.getId(), parentCe);
-			
+
 			complexElementsTreeModel.removeNodeFromParent(selectedNode);
-			} else {
+		} else {
 			ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
 			System.out.println(ce.getDescription());
-			MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-			List<Object> refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			List<Object> refs = null;
+			if (parentUserObject instanceof ComplexElementTypeType) {
+				ComplexElementTypeType parent = (ComplexElementTypeType) parentUserObject;
+				ComplexElementTypeType.ComplexElements complexElements = parent.getComplexElements();
+				refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			} else {
+				MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
+				refs = complexElements.getComplexElementTypeOrComplexElementTypeRef();
+			}
 			Object removeRef = null;
 			for (Object ref : refs) {
 				ComplexElementTypeType complexElement = null;
@@ -1320,7 +1352,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			updateLaMu(selectedElement, user);
 			Store16 store = Editor16.getStore16();
 			store.put(selectedElement.getId(), selectedElement);
-			
+
 			complexElementsTreeModel.removeNodeFromParent(selectedNode);
 		}
 	}
