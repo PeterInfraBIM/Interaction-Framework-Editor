@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -321,6 +324,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					System.out.println("Selection CLICK!!!");
+					tree_ComplexElements.setSelectionPath(new TreePath(((DefaultMutableTreeNode) value).getPath()));
 					tree_ComplexElements.cancelEditing();
 				}
 			});
@@ -690,10 +694,10 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			public void mouseClicked(MouseEvent e) {
 				int row = tree_ComplexElements.getClosestRowForLocation(e.getX(), e.getY());
 				tree_ComplexElements.setSelectionRow(row);
-				if (SwingUtilities.isRightMouseButton(e)) {
-					TreePath selectionPath = tree_ComplexElements.getSelectionPath();
-					if (selectionPath != null) {
-						selectedNode = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+				TreePath selectionPath = tree_ComplexElements.getSelectionPath();
+				if (selectionPath != null) {
+					selectedNode = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
+					if (SwingUtilities.isRightMouseButton(e)) {
 						Object userObject = selectedNode.getUserObject();
 						System.out.println(userObject);
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
@@ -708,6 +712,65 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			private ComplexElementTypeType complexElement;
 			private ComplexElementTypeType dropElement;
 			private DefaultMutableTreeNode dropNode;
+			private DefaultMutableTreeNode movedNode;
+
+			@Override
+			public int getSourceActions(JComponent c) {
+				return MOVE;
+			}
+
+			@Override
+			protected Transferable createTransferable(JComponent c) {
+				TreePath[] paths = tree_ComplexElements.getSelectionPaths();
+				if (paths != null && paths.length == 1) {
+					movedNode = (DefaultMutableTreeNode) paths[0].getLastPathComponent();
+					Object userObject = movedNode.getUserObject();
+					if (userObject instanceof SimpleElementTypeType) {
+						return new StringSelection(((SimpleElementTypeType) userObject).getId());
+					} else {
+						return new StringSelection(((ComplexElementTypeType) userObject).getId());
+					}
+				}
+				return null;
+			}
+
+			@Override
+			protected void exportDone(JComponent source, Transferable data, int action) {
+				Object parentObject = ((DefaultMutableTreeNode) movedNode.getParent()).getUserObject();
+				if (parentObject instanceof ComplexElementTypeType) {
+					ComplexElementTypeType parentCe = (ComplexElementTypeType) parentObject;
+					int index = 0;
+					int foundIndex = -1;
+					boolean found = false;
+					List<Object> refs = parentCe.getSimpleElements().getSimpleElementTypeOrSimpleElementTypeRef();
+					for (Object ref : refs) {
+						if (index == dropLocation.getChildIndex()) {
+							index++;
+							continue;
+						}
+						SimpleElementTypeType se = null;
+						if (ref instanceof SimpleElementTypeType) {
+							se = (SimpleElementTypeType) ref;
+						} else {
+							se = (SimpleElementTypeType) (((SimpleElementTypeTypeRef) ref).getIdref());
+
+						}
+						if (se != null) {
+							if (se.getId().equals(simpleElement.getId())) {
+								found = true;
+								foundIndex = index;
+								break;
+							}
+						}
+						index++;
+					}
+					if (found) {
+						refs.remove(foundIndex);
+					}
+				}
+				complexElementsTreeModel.removeNodeFromParent(movedNode);
+				movedNode = null;
+			}
 
 			@Override
 			public boolean canImport(TransferSupport support) {
@@ -737,7 +800,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					tree_ComplexElements.removeSelectionPath(new TreePath(dropNode.getPath()));
 				}
 				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
-				if (selectedElement.getComplexElements().getComplexElementTypeOrComplexElementTypeRef().isEmpty()) {
+				if (selectedElement.getComplexElements() == null || selectedElement.getComplexElements()
+						.getComplexElementTypeOrComplexElementTypeRef().isEmpty()) {
 					return true;
 				}
 				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
@@ -856,8 +920,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
 				if (simpleList != null) {
 					for (SimpleElementTypeType se : simpleList) {
-						complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexNode,
-								index++);
+						complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexNode, index++);
 					}
 					tree_ComplexElements.expandPath(new TreePath(complexNode.getPath()));
 				}
@@ -870,8 +933,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 						if (seList != null) {
 							int index2 = 0;
 							for (SimpleElementTypeType se : seList) {
-								complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se),
-										complexSubNode, index2++);
+								complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexSubNode,
+										index2++);
 							}
 						}
 						tree_ComplexElements.expandPath(new TreePath(complexSubNode.getPath()));

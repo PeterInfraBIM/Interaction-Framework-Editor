@@ -255,7 +255,7 @@
 							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
 							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
 						<tree id="tree_ComplexElements"
-							PreferredScrollableViewportSize="200,50">
+							PreferredScrollableViewportSize="200,50" DragEnabled="true">
 							<popupmenu id="popupMenu">
 								<menuitem id="mit_Remove" action="removeElement"
 									text="lbl_Remove" />
