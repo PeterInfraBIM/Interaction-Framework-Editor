@@ -736,39 +736,71 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 			@Override
 			protected void exportDone(JComponent source, Transferable data, int action) {
-				Object parentObject = ((DefaultMutableTreeNode) movedNode.getParent()).getUserObject();
-				if (parentObject instanceof ComplexElementTypeType) {
-					ComplexElementTypeType parentCe = (ComplexElementTypeType) parentObject;
-					int index = 0;
-					int foundIndex = -1;
-					boolean found = false;
-					List<Object> refs = parentCe.getSimpleElements().getSimpleElementTypeOrSimpleElementTypeRef();
-					for (Object ref : refs) {
-						if (index == dropLocation.getChildIndex()) {
-							index++;
-							continue;
-						}
-						SimpleElementTypeType se = null;
-						if (ref instanceof SimpleElementTypeType) {
-							se = (SimpleElementTypeType) ref;
-						} else {
-							se = (SimpleElementTypeType) (((SimpleElementTypeTypeRef) ref).getIdref());
-
-						}
-						if (se != null) {
-							if (se.getId().equals(simpleElement.getId())) {
-								found = true;
-								foundIndex = index;
-								break;
+				if (action == MOVE) {
+					Object parentObject = ((DefaultMutableTreeNode) movedNode.getParent()).getUserObject();
+					if (parentObject instanceof ComplexElementTypeType) {
+						ComplexElementTypeType parentCe = (ComplexElementTypeType) parentObject;
+						int index = 0;
+						int foundIndex = -1;
+						boolean found = false;
+						List<Object> refs = parentCe.getSimpleElements().getSimpleElementTypeOrSimpleElementTypeRef();
+						for (Object ref : refs) {
+							if (index == dropLocation.getChildIndex()) {
+								index++;
+								continue;
 							}
+							SimpleElementTypeType se = null;
+							if (ref instanceof SimpleElementTypeType) {
+								se = (SimpleElementTypeType) ref;
+							} else {
+								se = (SimpleElementTypeType) (((SimpleElementTypeTypeRef) ref).getIdref());
+
+							}
+							if (se != null) {
+								if (se.getId().equals(simpleElement.getId())) {
+									found = true;
+									foundIndex = index;
+									break;
+								}
+							}
+							index++;
 						}
-						index++;
+						if (found) {
+							refs.remove(foundIndex);
+						}
+					} else {
+						int index = 0;
+						int foundIndex = -1;
+						boolean found = false;
+						List<Object> refs = selectedElement.getComplexElements()
+								.getComplexElementTypeOrComplexElementTypeRef();
+						for (Object ref : refs) {
+							if (index == dropLocation.getChildIndex()) {
+								index++;
+								continue;
+							}
+							ComplexElementTypeType ce = null;
+							if (ref instanceof ComplexElementTypeType) {
+								ce = (ComplexElementTypeType) ref;
+							} else {
+								ce = (ComplexElementTypeType) (((ComplexElementTypeTypeRef) ref).getIdref());
+
+							}
+							if (ce != null) {
+								if (ce.getId().equals(complexElement.getId())) {
+									found = true;
+									foundIndex = index;
+									break;
+								}
+							}
+							index++;
+						}
+						if (found) {
+							refs.remove(foundIndex);
+						}
 					}
-					if (found) {
-						refs.remove(foundIndex);
-					}
+					complexElementsTreeModel.removeNodeFromParent(movedNode);
 				}
-				complexElementsTreeModel.removeNodeFromParent(movedNode);
 				movedNode = null;
 			}
 
@@ -823,7 +855,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
 				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
 				if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
-					if (dropLocation.getChildIndex() >= -1) {
+					if (dropLocation.getChildIndex() >= 0) {
 						return true;
 					}
 				}
@@ -910,9 +942,9 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 						complexElementsTreeModel.insertNodeInto(complexNode, complexElementsRoot,
 								dropLocation.getChildIndex());
 						showComplexNode(complexNode);
+						return true;
 					}
 				}
-				return false;
 			}
 
 			void showComplexNode(DefaultMutableTreeNode complexNode) {
