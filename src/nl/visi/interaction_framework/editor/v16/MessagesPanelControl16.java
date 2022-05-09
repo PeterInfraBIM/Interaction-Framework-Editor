@@ -57,6 +57,7 @@ import nl.visi.schemas._20160331.AppendixTypeType;
 import nl.visi.schemas._20160331.AppendixTypeTypeRef;
 import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.ComplexElements;
+import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType;
 import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
@@ -364,7 +365,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					} else if (userObject instanceof SimpleElementTypeType) {
 						final SimpleElementTypeType se = (SimpleElementTypeType) userObject;
 						UserDefinedTypeType userDefinedType = Control16.getUserDefinedType(se);
-						selectionBtn.setText(se.getDescription() + " [" + userDefinedType.getId() + "]");
+						selectionBtn.setText(se.getDescription() + " [" + userDefinedType.getDescription() + "]");
 						panel.setToolTipText(se.getId());
 						navigateBtn.addActionListener(new ActionListener() {
 							@Override
@@ -738,42 +739,49 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			protected void exportDone(JComponent source, Transferable data, int action) {
 				if (action == MOVE) {
 					Object parentObject = ((DefaultMutableTreeNode) movedNode.getParent()).getUserObject();
-					if (parentObject instanceof ComplexElementTypeType) {
+					Object dropObject = ((DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent())
+							.getUserObject();
+					if (parentObject instanceof ComplexElementTypeType && simpleElement != null) {
 						ComplexElementTypeType parentCe = (ComplexElementTypeType) parentObject;
 						int index = 0;
 						int foundIndex = -1;
 						boolean found = false;
-						List<Object> refs = parentCe.getSimpleElements().getSimpleElementTypeOrSimpleElementTypeRef();
-						for (Object ref : refs) {
-							if (index == dropLocation.getChildIndex()) {
-								index++;
-								continue;
-							}
-							SimpleElementTypeType se = null;
-							if (ref instanceof SimpleElementTypeType) {
-								se = (SimpleElementTypeType) ref;
-							} else {
-								se = (SimpleElementTypeType) (((SimpleElementTypeTypeRef) ref).getIdref());
-
-							}
-							if (se != null) {
-								if (se.getId().equals(simpleElement.getId())) {
-									found = true;
-									foundIndex = index;
-									break;
+						SimpleElements simpleElements = parentCe.getSimpleElements();
+						if (simpleElements != null) {
+							List<Object> refs = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
+							for (Object ref : refs) {
+								if (index == dropLocation.getChildIndex() && dropObject.equals(parentObject)) {
+									index++;
+									continue;
 								}
+								SimpleElementTypeType se = null;
+								if (ref instanceof SimpleElementTypeType) {
+									se = (SimpleElementTypeType) ref;
+								} else {
+									se = (SimpleElementTypeType) (((SimpleElementTypeTypeRef) ref).getIdref());
+
+								}
+								if (se != null) {
+									if (se.getId().equals(simpleElement.getId())) {
+										found = true;
+										foundIndex = index;
+										break;
+									}
+								}
+								index++;
 							}
-							index++;
-						}
-						if (found) {
-							refs.remove(foundIndex);
+							if (found) {
+								refs.remove(foundIndex);
+							}
 						}
 					} else {
 						int index = 0;
 						int foundIndex = -1;
 						boolean found = false;
-						List<Object> refs = selectedElement.getComplexElements()
-								.getComplexElementTypeOrComplexElementTypeRef();
+						List<Object> refs = parentObject instanceof String
+								? selectedElement.getComplexElements().getComplexElementTypeOrComplexElementTypeRef()
+								: ((ComplexElementTypeType) parentObject).getComplexElements()
+										.getComplexElementTypeOrComplexElementTypeRef();
 						for (Object ref : refs) {
 							if (index == dropLocation.getChildIndex()) {
 								index++;
@@ -834,6 +842,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
 				if (selectedElement.getComplexElements() == null || selectedElement.getComplexElements()
 						.getComplexElementTypeOrComplexElementTypeRef().isEmpty()) {
+					// Add complex type to empty message type
 					return true;
 				}
 				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
@@ -841,9 +850,11 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 						+ ((javax.swing.JTree.DropLocation) dropLocation).getChildIndex());
 				System.out.println("dropNode: " + dropNode.getUserObject());
 				if (!(dropNode.getUserObject() instanceof ComplexElementTypeType)) {
+					// Add complex type to message type
 					return true;
 				} else {
 					if (dropLocation.getChildIndex() == -1) {
+						// Add complex type to complex type (as table)
 						tree_ComplexElements.setSelectionPath(new TreePath(dropNode.getPath()));
 						return true;
 					}
