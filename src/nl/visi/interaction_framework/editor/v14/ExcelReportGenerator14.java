@@ -19,11 +19,9 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-import nl.visi.interaction_framework.editor.v14.Control14;
-import nl.visi.interaction_framework.editor.v14.MainPanelControl14.Tabs;
 import nl.visi.interaction_framework.editor.v14.ComplexElementsPanelControl14.SimpleElementsTableModel;
 import nl.visi.interaction_framework.editor.v14.ComplexElementsPanelControl14.SubComplexElementsTableModel;
-import nl.visi.interaction_framework.editor.v14.MessagesPanelControl14.ComplexElementsTableModel;
+import nl.visi.interaction_framework.editor.v14.MainPanelControl14.Tabs;
 import nl.visi.interaction_framework.editor.v14.MessagesPanelControl14.TransactionsTableModel;
 import nl.visi.interaction_framework.editor.v14.TransactionsPanelControl14.MessagesTableModel;
 import nl.visi.schemas._20140331.AppendixTypeType;
@@ -380,13 +378,13 @@ class ExcelReportGenerator14 extends Control14 {
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_ComplexElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
-			ComplexElementsTableModel complexElementsTableModel = messagesPC.getComplexElementsTableModel();
-			for (int cmpeIndex = 0; cmpeIndex < complexElementsTableModel.getRowCount(); cmpeIndex++) {
-				ComplexElementTypeType complexElementTypeType = complexElementsTableModel.get(cmpeIndex);
-				row++;
-				sheet.addCell(new Label(col, row, "", getDataFormat()));
-				sheet.addCell(new Label(col + 1, row, complexElementTypeType.getId(), getDataFormat()));
-			}
+//			ComplexElementsTableModel complexElementsTableModel = messagesPC.getComplexElementsTableModel();
+//			for (int cmpeIndex = 0; cmpeIndex < complexElementsTableModel.getRowCount(); cmpeIndex++) {
+//				ComplexElementTypeType complexElementTypeType = complexElementsTableModel.get(cmpeIndex);
+//				row++;
+//				sheet.addCell(new Label(col, row, "", getDataFormat()));
+//				sheet.addCell(new Label(col + 1, row, complexElementTypeType.getId(), getDataFormat()));
+//			}
 			row++;
 
 		}

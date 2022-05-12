@@ -23,7 +23,7 @@ import nl.visi.interaction_framework.editor.v16.Control16;
 import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SimpleElementsTableModel;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTableModel;
-import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.ComplexElementsTableModel;
+//import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.ComplexElementsTableModel;
 import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.TransactionsTableModel;
 import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.MessagesTableModel;
 import nl.visi.schemas._20160331.AppendixTypeType;
@@ -380,13 +380,13 @@ class ExcelReportGenerator16 extends Control16 {
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_ComplexElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
-			ComplexElementsTableModel complexElementsTableModel = messagesPC.getComplexElementsTableModel();
-			for (int cmpeIndex = 0; cmpeIndex < complexElementsTableModel.getRowCount(); cmpeIndex++) {
-				ComplexElementTypeType complexElementTypeType = complexElementsTableModel.get(cmpeIndex);
-				row++;
-				sheet.addCell(new Label(col, row, "", getDataFormat()));
-				sheet.addCell(new Label(col + 1, row, complexElementTypeType.getId(), getDataFormat()));
-			}
+//			ComplexElementsTableModel complexElementsTableModel = messagesPC.getComplexElementsTableModel();
+//			for (int cmpeIndex = 0; cmpeIndex < complexElementsTableModel.getRowCount(); cmpeIndex++) {
+//				ComplexElementTypeType complexElementTypeType = complexElementsTableModel.get(cmpeIndex);
+//				row++;
+//				sheet.addCell(new Label(col, row, "", getDataFormat()));
+//				sheet.addCell(new Label(col + 1, row, complexElementTypeType.getId(), getDataFormat()));
+//			}
 			row++;
 
 		}

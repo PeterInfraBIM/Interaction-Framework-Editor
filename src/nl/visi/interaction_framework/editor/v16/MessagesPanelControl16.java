@@ -25,7 +25,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -77,19 +76,17 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	private static final String MESSAGES_PANEL = "nl/visi/interaction_framework/editor/swixml/MessagesPanel16.xml";
 
 	private JPanel startDatePanel, endDatePanel;
-	private JTable tbl_ComplexElements, tbl_Transactions, tbl_Appendices;
+	private JTable tbl_Transactions, tbl_Appendices;
 	private JTree tree_ComplexElements;
 	private DefaultMutableTreeNode complexElementsRoot;
-	private ComplexElementsTableModel complexElementsTableModel;
 	private ComplexElementsTreeModel complexElementsTreeModel;
 	private DefaultMutableTreeNode selectedNode;
 	private AppendicesTableModel appendicesTableModel;
 	private TransactionsTableModel transactionsTableModel;
-	private JComboBox<String> cbx_ComplexElements, cbx_Appendices;
-	private JButton btn_AddComplexElement, btn_RemoveComplexElement, btn_AddAppendix, btn_RemoveAppendix;
+	private JComboBox<String> cbx_Appendices;
+	private JButton btn_AddAppendix, btn_RemoveAppendix;
 	private JCheckBox chb_AppendixMandatory;
 	private JPopupMenu popupMenu;
-	private JMenuItem mit_Remove;
 
 	private enum MessagesTableColumns {
 		Id, Description;
@@ -132,54 +129,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			return String.class;
 		}
 
-	}
-
-	private enum ComplexElementsTableColumns {
-		Id, Description, Navigate;
-
-		@Override
-		public String toString() {
-			return getBundle().getString("lbl_" + name());
-		}
-
-	}
-
-	@SuppressWarnings("serial")
-	public class ComplexElementsTableModel extends ElementsTableModel<ComplexElementTypeType> {
-
-		@Override
-		public int getColumnCount() {
-			return ComplexElementsTableColumns.values().length;
-		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			return ComplexElementsTableColumns.values()[columnIndex].toString();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			ComplexElementTypeType complexElement = get(rowIndex);
-			switch (ComplexElementsTableColumns.values()[columnIndex]) {
-			case Id:
-				return complexElement.getId();
-			case Description:
-				return complexElement.getDescription();
-			default:
-				break;
-			}
-			return null;
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == ComplexElementsTableColumns.Navigate.ordinal();
-		}
-
-	}
-
-	public ComplexElementsTableModel getComplexElementsTableModel() {
-		return complexElementsTableModel;
 	}
 
 	private enum TransactionsTableColumns {
@@ -291,27 +240,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	@SuppressWarnings("serial")
 	class ComplexElementsTreeCellRenderer extends DefaultTreeCellRenderer {
-//		private JPanel panel;
-//		private JButton button, testBtn;
-
-		public ComplexElementsTreeCellRenderer() {
-//			this.panel = new JPanel();
-//			this.button = new JButton();
-//			button.addActionListener(new ActionListener() {
-//				@Override
-//				public void actionPerformed(ActionEvent e) {
-//					System.out.println("Button CLICK!!!");
-//					tree_ComplexElements.cancelEditing();
-//				}
-//			});
-//			this.testBtn = new JButton();
-//			testBtn.addActionListener(new ActionListener() {
-//				@Override
-//				public void actionPerformed(ActionEvent e) {
-//					System.out.println("Test CLICK!!!");
-//					tree_ComplexElements.cancelEditing();		
-//				}});
-		}
 
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, final Object value, boolean sel, boolean expanded,
@@ -324,7 +252,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			selectionBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
-					System.out.println("Selection CLICK!!!");
 					tree_ComplexElements.setSelectionPath(new TreePath(((DefaultMutableTreeNode) value).getPath()));
 					tree_ComplexElements.cancelEditing();
 				}
@@ -344,7 +271,7 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 					selectionBtn.setIcon(((JLabel) cell).getIcon());
 					selectionBtn.setOpaque(true);
-					selectionBtn.setMargin(new Insets(0, 0, 0, 0));
+					selectionBtn.setMargin(new Insets(0, 2, 0, 2));
 					selectionBtn.setBorder(null);
 					selectionBtn.setBorderPainted(false);
 					selectionBtn.setBackground(sel ? backgroundSelectionColor : backgroundNonSelectionColor);
@@ -365,7 +292,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					} else if (userObject instanceof SimpleElementTypeType) {
 						final SimpleElementTypeType se = (SimpleElementTypeType) userObject;
 						UserDefinedTypeType userDefinedType = Control16.getUserDefinedType(se);
-						selectionBtn.setText(se.getDescription() + " [" + userDefinedType.getDescription() + "]");
+						if (se.getDescription().length() > 40) {
+							selectionBtn.setText(se.getDescription().substring(0, 37) + "..." + " ["
+									+ userDefinedType.getDescription() + "]");
+						} else {
+							selectionBtn.setText(se.getDescription() + " [" + userDefinedType.getDescription() + "]");
+						}
 						panel.setToolTipText(se.getId());
 						navigateBtn.addActionListener(new ActionListener() {
 							@Override
@@ -374,8 +306,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 								InteractionFrameworkEditor.navigate(se);
 							}
 						});
-					} else {
-						System.err.println("Exception " + userObject != null ? userObject.toString() : null);
 					}
 				}
 			}
@@ -384,75 +314,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 	}
 
-//	class ComplexElementsTreeCellEditor extends DefaultTreeCellEditor {
-//		private ComplexElementsTreeCellRenderer renderer;
-//
-//		public ComplexElementsTreeCellEditor(JTree tree, DefaultTreeCellRenderer renderer) {
-//			super(tree, renderer);
-//			this.renderer = (ComplexElementsTreeCellRenderer) renderer;
-//		}
-//
-//		@Override
-//		public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
-//				boolean leaf, int row) {
-////			Component cell = super.getTreeCellEditorComponent(tree, value, isSelected, expanded, leaf, row);
-//			JPanel panel = (JPanel) renderer.getTreeCellRendererComponent(tree, value, isSelected, expanded, leaf, row, leaf);
-//			JButton selectBtn = (JButton) panel.getComponent(0);
-//			//selectBtn.setText(((JLabel) cell).getText());
-//			JButton navigateBtn = (JButton) panel.getComponent(1);
-////			JPanel panel = new JPanel();
-////			panel.add(selectBtn);
-////			panel.add(navigateBtn);
-//
-////			ImageIcon icon = new ImageIcon(Toolkit.getDefaultToolkit()
-////					.getImage(getClass().getResource("/" + getBundle().getString("img_ForwardNav"))));
-////			navigateBtn.setIcon(icon);
-////			navigateBtn.setOpaque(false);
-////			navigateBtn.setMargin(new Insets(0, 0, 0, 0));
-////			navigateBtn.setBorder(null);
-////			navigateBtn.setBorderPainted(false);
-////
-////			selectBtn.setIcon(((JLabel) cell).getIcon());
-////			selectBtn.setOpaque(true);
-////			selectBtn.setMargin(new Insets(0, 0, 0, 0));
-////			selectBtn.setBorder(null);
-////			selectBtn.setBorderPainted(false);
-////			selectBtn.setBackground(
-////					isSelected ? renderer.getBackgroundSelectionColor() : renderer.getBackgroundNonSelectionColor());
-////			selectBtn
-////					.setForeground(isSelected ? renderer.getTextSelectionColor() : renderer.getTextNonSelectionColor());
-//			DefaultMutableTreeNode node = (DefaultMutableTreeNode) value;
-//			Object userObject = node.getUserObject();
-//			if (userObject instanceof ComplexElementTypeType) {
-//				final ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
-//				selectBtn.setText(ce.getDescription());
-//				panel.setToolTipText(ce.getId());
-//				navigateBtn.addActionListener(new ActionListener() {
-//					@Override
-//					public void actionPerformed(ActionEvent e) {
-//						tree_ComplexElements.cancelEditing();
-//						InteractionFrameworkEditor.navigate(ce);
-//					}
-//				});
-//			} else if (userObject instanceof SimpleElementTypeType) {
-//				final SimpleElementTypeType se = (SimpleElementTypeType) userObject;
-//				UserDefinedTypeType userDefinedType = Control16.getUserDefinedType(se);
-//				selectBtn.setText(se.getDescription() + " [" + userDefinedType.getId() + "]");
-//				panel.setToolTipText(se.getId());
-//				navigateBtn.addActionListener(new ActionListener() {
-//					@Override
-//					public void actionPerformed(ActionEvent e) {
-//						tree_ComplexElements.cancelEditing();
-//						InteractionFrameworkEditor.navigate(se);
-//					}
-//				});
-//			} else {
-//				System.err.println("Exception " + userObject.toString());
-//			}
-//			return panel;
-//		}
-//
-//	}
 	class ComplexElementsTreeCellEditor implements TreeCellEditor {
 		private ComplexElementsTreeCellRenderer treeCellRenderer;
 
@@ -462,47 +323,39 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 		@Override
 		public Object getCellEditorValue() {
-			System.out.println("getCellEditorValue");
 			return null;
 		}
 
 		@Override
 		public boolean isCellEditable(EventObject anEvent) {
-			System.out.println("isCellEditable");
 			return true;
 		}
 
 		@Override
 		public boolean shouldSelectCell(EventObject anEvent) {
-			System.out.println("shouldSelectCell");
 			return true;
 		}
 
 		@Override
 		public boolean stopCellEditing() {
-			System.out.println("stopCellEditing");
 			return true;
 		}
 
 		@Override
 		public void cancelCellEditing() {
-			System.out.println("cancelCellEditing");
 		}
 
 		@Override
 		public void addCellEditorListener(CellEditorListener l) {
-			System.out.println("addCellEditorListener");
 		}
 
 		@Override
 		public void removeCellEditorListener(CellEditorListener l) {
-			System.out.println("removeCellEditorListener");
 		}
 
 		@Override
 		public Component getTreeCellEditorComponent(JTree tree, Object value, boolean isSelected, boolean expanded,
 				boolean leaf, int row) {
-			System.out.println("getTreeCellEditorComponent");
 			Component treeCellRendererComponent = treeCellRenderer.getTreeCellRendererComponent(tree, value, isSelected,
 					expanded, leaf, row, isSelected);
 			return treeCellRendererComponent;
@@ -571,7 +424,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 		initMessagesTable();
 		initComplexElementsTree();
-		initComplexElementsTable();
 		initTransactionsTable();
 		initAppendicesTable();
 		initStartDateField();
@@ -699,8 +551,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 				if (selectionPath != null) {
 					selectedNode = (DefaultMutableTreeNode) selectionPath.getLastPathComponent();
 					if (SwingUtilities.isRightMouseButton(e)) {
-						Object userObject = selectedNode.getUserObject();
-						System.out.println(userObject);
 						popupMenu.show(e.getComponent(), e.getX(), e.getY());
 					}
 				}
@@ -846,9 +696,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					return true;
 				}
 				dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
-				System.out.println("dropLocation.getChildIndex(): "
-						+ ((javax.swing.JTree.DropLocation) dropLocation).getChildIndex());
-				System.out.println("dropNode: " + dropNode.getUserObject());
 				if (!(dropNode.getUserObject() instanceof ComplexElementTypeType)) {
 					// Add complex type to message type
 					return true;
@@ -895,8 +742,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
 					if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
 						dropElement = (ComplexElementTypeType) dropNode.getUserObject();
-						System.out.println("Drop element: " + dropElement.getDescription() + " index: "
-								+ dropLocation.getChildIndex());
 						if (dropLocation.getChildIndex() > -1) {
 							SimpleElementTypeTypeRef ref = objectFactory.createSimpleElementTypeTypeRef();
 							ref.setIdref(simpleElement);
@@ -912,7 +757,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 									dropLocation.getChildIndex());
 							return true;
 						} else {
-							System.out.println("1Target found!");
 							ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
 							ref.setIdref(complexElement);
 							ComplexElements complexElements = dropElement.getComplexElements();
@@ -995,38 +839,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 	}
 
 	@SuppressWarnings("serial")
-	private void initComplexElementsTable() {
-		complexElementsTableModel = new ComplexElementsTableModel();
-		complexElementsTableModel.setSorted(false);
-		tbl_ComplexElements.setModel(complexElementsTableModel);
-		tbl_ComplexElements.setFillsViewportHeight(true);
-		tbl_ComplexElements.setDropMode(DropMode.INSERT_ROWS);
-		tbl_ComplexElements
-				.setTransferHandler(getTransferHandler(tbl_ComplexElements, complexElementsTableModel, true));
-		tbl_ComplexElements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				int selectedRow = tbl_ComplexElements.getSelectedRow();
-				btn_RemoveComplexElement.setEnabled(selectedRow >= 0);
-			}
-		});
-		TableColumn navigateColumn = tbl_ComplexElements.getColumnModel()
-				.getColumn(ComplexElementsTableColumns.Navigate.ordinal());
-		navigateColumn.setMaxWidth(50);
-		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
-		navigateColumn.setCellEditor(new NavigatorEditor() {
-			@Override
-			protected void navigate() {
-				int row = tbl_ComplexElements.getSelectedRow();
-				ComplexElementTypeType complexElementTypeType = complexElementsTableModel.get(row);
-				if (complexElementTypeType != null) {
-					InteractionFrameworkEditor.navigate(complexElementTypeType);
-				}
-			}
-		});
-	}
-
-	@SuppressWarnings("serial")
 	private void initAppendicesTable() {
 		appendicesTableModel = new AppendicesTableModel();
 		appendicesTableModel.setSorted(false);
@@ -1096,10 +908,8 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		tfd_HelpInfo.setEnabled(rowSelected);
 		tfd_Code.setEnabled(rowSelected);
 		chb_AppendixMandatory.setEnabled(rowSelected);
-		tbl_ComplexElements.setEnabled(rowSelected);
 		tbl_Transactions.setEnabled(rowSelected);
 		tbl_Appendices.setEnabled(rowSelected);
-		cbx_ComplexElements.setEnabled(rowSelected);
 		cbx_Appendices.setEnabled(rowSelected);
 		if (rowSelected) {
 			selectedElement = elementsTableModel.get(selectedRow);
@@ -1152,27 +962,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 					}
 					insertSimpleElements(treeModel, complexElement, complexTreeElement, childIndex);
 				}
-			}
-
-			complexElementsTableModel.clear();
-			MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-			if (complexElements != null) {
-				List<Object> ceList = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-				for (Object object : ceList) {
-					ComplexElementTypeType element = null;
-					if (object instanceof ComplexElementTypeTypeRef) {
-						element = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object).getIdref();
-					} else {
-						element = (ComplexElementTypeType) object;
-					}
-					complexElementsTableModel.add(element);
-				}
-			}
-			cbx_ComplexElements.removeAllItems();
-			cbx_ComplexElements.addItem(null);
-			List<ComplexElementTypeType> ceElements = Editor16.getStore16().getElements(ComplexElementTypeType.class);
-			for (ComplexElementTypeType element : ceElements) {
-				cbx_ComplexElements.addItem("[" + element.getId() + "] " + element.getDescription());
 			}
 
 			appendicesTableModel.clear();
@@ -1228,7 +1017,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			tfd_Code.setText("");
 			chb_AppendixMandatory.setSelected(false);
 			transactionsTableModel.clear();
-			complexElementsTableModel.clear();
 			complexElementsRoot.removeAllChildren();
 			complexElementsTreeModel.nodeStructureChanged(complexElementsRoot);
 		}
@@ -1367,11 +1155,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		elementsTableModel.remove(row);
 	}
 
-	public void selectComplexElement() {
-		int selectedIndex = cbx_ComplexElements.getSelectedIndex();
-		btn_AddComplexElement.setEnabled(selectedIndex > 0);
-	}
-
 	public void selectAppendix() {
 		int selectedIndex = cbx_Appendices.getSelectedIndex();
 		btn_AddAppendix.setEnabled(selectedIndex > 0);
@@ -1381,33 +1164,12 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 		selectedElement.setAppendixMandatory(chb_AppendixMandatory.isSelected());
 	}
 
-	public void addComplexElement() {
-		String content = (String) cbx_ComplexElements.getSelectedItem();
-		String ceId = content.substring(1, content.indexOf("]"));
-		ComplexElementTypeType element = Editor16.getStore16().getElement(ComplexElementTypeType.class, ceId);
-		ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
-		ref.setIdref(element);
-		MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-		if (complexElements == null) {
-			complexElements = objectFactory.createMessageTypeTypeComplexElements();
-			selectedElement.setComplexElements(complexElements);
-		}
-		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-		list.add(ref);
-		complexElementsTableModel.add(element);
-		updateLaMu(selectedElement, user);
-		elementsTableModel.update(selectedRow);
-		cbx_ComplexElements.setSelectedItem(null);
-	}
-
 	public void removeElement() {
 		Object userObject = selectedNode.getUserObject();
 		Object parentUserObject = ((DefaultMutableTreeNode) (selectedNode.getParent())).getUserObject();
 		if (userObject instanceof SimpleElementTypeType) {
 			SimpleElementTypeType se = (SimpleElementTypeType) userObject;
-			System.out.println("Child: " + se.getDescription());
 			ComplexElementTypeType parentCe = (ComplexElementTypeType) parentUserObject;
-			System.out.println("Parent: " + parentCe.getDescription());
 			ComplexElementTypeType.SimpleElements simpleElements = parentCe.getSimpleElements();
 			List<Object> refs = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
 			Object removeRef = null;
@@ -1431,7 +1193,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 			complexElementsTreeModel.removeNodeFromParent(selectedNode);
 		} else {
 			ComplexElementTypeType ce = (ComplexElementTypeType) userObject;
-			System.out.println(ce.getDescription());
 			List<Object> refs = null;
 			if (parentUserObject instanceof ComplexElementTypeType) {
 				ComplexElementTypeType parent = (ComplexElementTypeType) parentUserObject;
@@ -1461,40 +1222,6 @@ public class MessagesPanelControl16 extends PanelControl16<MessageTypeType> {
 
 			complexElementsTreeModel.removeNodeFromParent(selectedNode);
 		}
-	}
-
-	public void removeComplexElement() {
-		int selectedRow = tbl_ComplexElements.getSelectedRow();
-
-		ComplexElementTypeType complexElement = complexElementsTableModel.remove(selectedRow);
-
-		int response = JOptionPane.showConfirmDialog(getPanel(),
-				getBundle().getString("lbl_Remove") + ": " + complexElement.getId(),
-				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-		if (response == JOptionPane.CANCEL_OPTION)
-			return;
-
-		MessageTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-		for (Object object : list) {
-			ComplexElementTypeType element = null;
-			if (object instanceof ComplexElementTypeTypeRef) {
-				element = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object).getIdref();
-			} else if (object instanceof ComplexElementTypeType) {
-				element = (ComplexElementTypeType) object;
-			}
-			if (element != null) {
-				if (complexElement.equals(element)) {
-					list.remove(object);
-					break;
-				}
-			}
-		}
-		if (list.isEmpty()) {
-			selectedElement.setComplexElements(null);
-		}
-		updateLaMu(selectedElement, user);
-		elementsTableModel.update(selectedRow);
 	}
 
 	public void addAppendix() {
