@@ -298,7 +298,7 @@
 							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
 							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
 						<tree id="tree_SubComplexElements"
-							PreferredScrollableViewportSize="200,50" />
+							PreferredScrollableViewportSize="200,50" DragEnabled="true" />
 					</scrollpane>
 				</panel>
 			</tabbedpane>

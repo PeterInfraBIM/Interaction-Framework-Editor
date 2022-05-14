@@ -2,6 +2,7 @@ package nl.visi.interaction_framework.editor.v16;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -98,7 +99,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 
 			return null;
 		}
-		
+
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			switch (UseElementsTableColumns.values()[columnIndex]) {
@@ -110,7 +111,6 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		}
 	}
 
-	
 	private enum SimpleElementsTableColumns {
 //		Id, Description, InterfaceType, State, DateLamu, UserLamu;
 		Id, Description;
@@ -198,7 +198,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				fillTable();
 			}
 		});
-		
+
 		tfd_InterfaceType.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
@@ -252,8 +252,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				}
 			}
 		});
-		
-		
+
 		cbx_UserDefinedType.addActionListener(new ActionListener() {
 
 			@Override
@@ -282,7 +281,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				}
 			}
 		});
-		
+
 		useElementsTableModel = new UseElementsTableModel();
 		tbl_UseElements.setModel(useElementsTableModel);
 		tbl_UseElements.setFillsViewportHeight(true);
@@ -311,8 +310,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 		if (filterString.isEmpty()) {
 			fillTable(SimpleElementTypeType.class);
 		} else {
-			List<SimpleElementTypeType> elements = Editor16.getStore16()
-					.getElements(SimpleElementTypeType.class);
+			List<SimpleElementTypeType> elements = Editor16.getStore16().getElements(SimpleElementTypeType.class);
 			elementsTableModel.clear();
 			for (SimpleElementTypeType element : elements) {
 				if (element.getDescription().toUpperCase().contains(filterString)
@@ -365,8 +363,15 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			cbx_UserDefinedType.removeAllItems();
 			cbx_UserDefinedType.addItem(null);
 			List<UserDefinedTypeType> elements = Editor16.getStore16().getElements(UserDefinedTypeType.class);
+			elements.sort(new Comparator<UserDefinedTypeType>() {
+				@Override
+				public int compare(UserDefinedTypeType o1, UserDefinedTypeType o2) {
+					return o1.getDescription().compareTo(o2.getDescription());
+				}
+			});
 			for (UserDefinedTypeType element : elements) {
-				cbx_UserDefinedType.addItem(element.getId());
+//				cbx_UserDefinedType.addItem(element.getId());
+				cbx_UserDefinedType.addItem(element.getDescription() + " [" + element.getId() + "]");
 			}
 			UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
 			btn_NavigateUserDefinedType.setEnabled(userDefinedType != null);
@@ -375,7 +380,8 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				if (userDefined == null) {
 					userDefined = (UserDefinedTypeType) userDefinedType.getUserDefinedTypeRef().getIdref();
 				}
-				cbx_UserDefinedType.setSelectedItem(userDefined.getId());
+//				cbx_UserDefinedType.setSelectedItem(userDefined.getId());
+				cbx_UserDefinedType.setSelectedItem(userDefined.getDescription() + " [" + userDefined.getId() + "]");
 			}
 			useElementsTableModel.clear();
 			List<ElementType> useElements = getUseElements(selectedElement);
@@ -455,7 +461,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
 		if (response == JOptionPane.CANCEL_OPTION)
 			return;
-		
+
 		List<ComplexElementTypeType> elements = store.getElements(ComplexElementTypeType.class);
 		for (ComplexElementTypeType ceType : elements) {
 			ComplexElementTypeType.SimpleElements simpleElements = ceType.getSimpleElements();
@@ -476,7 +482,10 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 	}
 
 	public void navigateUserDefinedType() {
-		String idref = (String) cbx_UserDefinedType.getSelectedItem();
+//		String idref = (String) cbx_UserDefinedType.getSelectedItem();
+		String label = (String) cbx_UserDefinedType.getSelectedItem();
+		int lastIndex = label.lastIndexOf('[');
+		String idref = label.substring(lastIndex + 1, label.length() - 1);
 		UserDefinedTypeType element = Editor16.getStore16().getElement(UserDefinedTypeType.class, idref);
 		InteractionFrameworkEditor.navigate(element);
 	}
