@@ -341,7 +341,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 						selectedElement.setEndDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -366,7 +366,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 						selectedElement.setStartDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -395,7 +395,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 					} else {
 						Editor14.getStore14().remove(elementConditionType);
 					}
-					updateLaMu(selectedElement, user);
+					updateLaMu(selectedElement, getUser());
 				} else {
 					if (condition != null) {
 						String newId = Editor14.getStore14().getNewId("ec_");
@@ -405,7 +405,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 						newElementConditionType.setDescription("Decription of " + newId);
 						newElementConditionType.setCondition(condition);
 						setElementConditionTypeComplexElement(newElementConditionType, selectedElement);
-						updateLaMu(selectedElement, user);
+						updateLaMu(selectedElement, getUser());
 					}
 				}
 			}
@@ -843,7 +843,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 		list.add(ref);
 		subComplexElementsTableModel.add(element);
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
 
@@ -877,7 +877,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		if (list.isEmpty()) {
 			selectedElement.setComplexElements(null);
 		}
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
 
@@ -900,7 +900,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
 		list.add(ref);
 		simpleElementsTableModel.add(element);
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
 
@@ -934,7 +934,7 @@ public class ComplexElementsPanelControl14 extends PanelControl14<ComplexElement
 		if (list.isEmpty()) {
 			selectedElement.setSimpleElements(null);
 		}
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
 }

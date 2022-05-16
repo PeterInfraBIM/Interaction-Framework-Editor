@@ -243,12 +243,14 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 				Method setState = selectedElement.getClass().getMethod("setState", new Class<?>[] { String.class });
 				setState.invoke(selectedElement, tfd_State.getText());
 				break;
+			default:
+				break;
 			}
 		} catch (Exception e) {
 		}
 
 		try {
-			updateLaMu(selectedElement, user);
+			updateLaMu(selectedElement, getUser());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -337,7 +339,7 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 			}
 		}
 		Editor16.getStore16().put(newId, newElement);
-		updateLaMu(newElement, InteractionFrameworkEditor.user);
+		updateLaMu(newElement, getUser());
 		return newId;
 	}
 

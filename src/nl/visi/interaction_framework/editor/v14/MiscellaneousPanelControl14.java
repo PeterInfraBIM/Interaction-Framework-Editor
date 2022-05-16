@@ -237,7 +237,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 							((TransactionPhaseTypeType) selectedElement).setEndDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -273,7 +273,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 							((TransactionPhaseTypeType) selectedElement).setStartDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -1302,7 +1302,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		}
 		list.add(ref);
 		complexElementsTableModel.add(element);
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 		cbx_ComplexElements.setSelectedItem(null);
 	}
@@ -1360,7 +1360,7 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 				((ProjectTypeType) selectedElement).setComplexElements(null);
 			}
 		}
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
 

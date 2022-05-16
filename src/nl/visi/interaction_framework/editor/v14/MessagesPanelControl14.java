@@ -389,7 +389,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 						selectedElement.setEndDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -414,7 +414,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 						selectedElement.setStartDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -677,7 +677,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 					}
 					List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 					list.add(0, ref);
-					updateLaMu(selectedElement, user);
+					updateLaMu(selectedElement, getUser());
 					DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
 					complexElementsTreeModel.insertNodeInto(complexNode, complexElementsRoot, 0);
 					tree_ComplexElements.expandPath(new TreePath(complexElementsRoot.getPath()));
@@ -697,7 +697,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 							}
 							List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
 							list.add(dropLocation.getChildIndex(), ref);
-							updateLaMu(dropElement, user);
+							updateLaMu(dropElement, getUser());
 							complexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(simpleElement), dropNode,
 									dropLocation.getChildIndex());
 							return true;
@@ -711,7 +711,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 							}
 							List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 							list.add(ref);
-							updateLaMu(dropElement, user);
+							updateLaMu(dropElement, getUser());
 							DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
 							complexElementsTreeModel.insertNodeInto(complexNode, dropNode, 0);
 							tree_ComplexElements.expandPath(new TreePath(dropNode.getPath()));
@@ -737,7 +737,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 						}
 						List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 						list.add(dropLocation.getChildIndex(), ref);
-						updateLaMu(selectedElement, user);
+						updateLaMu(selectedElement, getUser());
 						DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
 						complexElementsTreeModel.insertNodeInto(complexNode, complexElementsRoot,
 								dropLocation.getChildIndex());
@@ -1061,7 +1061,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 				}
 			}
 			refs.remove(removeRef);
-			updateLaMu(parentCe, user);
+			updateLaMu(parentCe, getUser());
 			Store14 store = Editor14.getStore14();
 			store.put(parentCe.getId(), parentCe);
 
@@ -1091,7 +1091,7 @@ public class MessagesPanelControl14 extends PanelControl14<MessageTypeType> {
 				}
 			}
 			refs.remove(removeRef);
-			updateLaMu(selectedElement, user);
+			updateLaMu(selectedElement, getUser());
 			Store14 store = Editor14.getStore14();
 			store.put(selectedElement.getId(), selectedElement);
 

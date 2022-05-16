@@ -205,7 +205,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				if (inSelection)
 					return;
 				selectedElement.setInterfaceType(tfd_InterfaceType.getText());
-				updateLaMu(selectedElement, user);
+				updateLaMu(selectedElement, getUser());
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 			}
 		});
@@ -216,7 +216,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 				if (inSelection)
 					return;
 				selectedElement.setValueList(tfd_ValueList.getText());
-				updateLaMu(selectedElement, user);
+				updateLaMu(selectedElement, getUser());
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 			}
 		});
@@ -237,7 +237,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 					} else {
 						Editor16.getStore16().remove(elementConditionType);
 					}
-					updateLaMu(selectedElement, user);
+					updateLaMu(selectedElement, getUser());
 				} else {
 					if (condition != null) {
 						String newId = Editor16.getStore16().getNewId("ec_");
@@ -247,7 +247,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 						newElementConditionType.setDescription("Decription of " + newId);
 						newElementConditionType.setCondition(condition);
 						setElementConditionTypeSimpleElement(newElementConditionType, selectedElement);
-						updateLaMu(selectedElement, user);
+						updateLaMu(selectedElement, getUser());
 					}
 				}
 			}
@@ -269,7 +269,7 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 					userDefinedTypeTypeRef.setIdref(definedType);
 					value.setUserDefinedTypeRef(userDefinedTypeTypeRef);
 					selectedElement.setUserDefinedType(value);
-					updateLaMu(selectedElement, user);
+					updateLaMu(selectedElement, getUser());
 					elementsTableModel.update(selectedRow);
 				} else {
 					if (selectedElement != null) {

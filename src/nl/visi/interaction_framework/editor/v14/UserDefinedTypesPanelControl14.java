@@ -506,7 +506,7 @@ public class UserDefinedTypesPanelControl14 extends PanelControl14<UserDefinedTy
 				if (inSelection)
 					return;
 				selectedElement.setXsdRestriction(tfd_XsdRestriction.getText());
-				updateLaMu(selectedElement, user);
+				updateLaMu(selectedElement, getUser());
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 			}
 		});

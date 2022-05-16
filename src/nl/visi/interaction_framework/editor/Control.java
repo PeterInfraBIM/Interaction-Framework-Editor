@@ -58,4 +58,8 @@ public class Control {
 	protected static ResourceBundle getBundle() {
 		return bundle;
 	}
+
+	public String getUser() {
+		return user;
+	}
 }

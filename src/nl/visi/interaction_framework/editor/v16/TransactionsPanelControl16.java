@@ -1811,7 +1811,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						selectedElement.setStartDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -1836,7 +1836,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						selectedElement.setEndDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -2474,7 +2474,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 									if (previousList.size() == 0) {
 										mitt.setPrevious(null);
 									}
-									updateLaMu(mitt, user);
+									updateLaMu(mitt, getUser());
 									break;
 								}
 							}
@@ -2500,7 +2500,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 						list.remove(object);
 						if (list.size() == 0) {
 							transactionElement.setSubTransactions(null);
-							updateLaMu(transactionElement, user);
+							updateLaMu(transactionElement, getUser());
 						}
 						break;
 					}
@@ -2549,7 +2549,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			group.setGroupTypeRef(groupRef);
 			mitt.setGroup(group);
 		}
-		updateLaMu(mitt, user);
+		updateLaMu(mitt, getUser());
 
 		TransactionTypeTypeRef transactionRef = objectFactory.createTransactionTypeTypeRef();
 		transactionRef.setIdref(selectedElement);
@@ -2560,7 +2560,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		store.put(mitt.getId(), mitt);
 
 		int row = messagesTableModel.add(mitt);
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 		tbl_Messages.getSelectionModel().setSelectionInterval(row, row);
 
@@ -2682,7 +2682,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 		mitt.setInitiatorToExecutor(!direction);
 		messagesTableModel.fireTableRowsUpdated(row, row);
 		messageTableSelectionListener.valueChanged(new ListSelectionEvent(tbl_Messages, row, row, false));
-		updateLaMu(selectedElement, user);
+		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
 
@@ -2698,7 +2698,7 @@ public class TransactionsPanelControl16 extends PanelControl16<TransactionTypeTy
 			updateAllMittsWithThisMittAsPrevious(mitt);
 			store.remove(mitt);
 			fillMessageTable();
-			updateLaMu(selectedElement, user);
+			updateLaMu(selectedElement, getUser());
 			elementsTableModel.update(selectedRow);
 			if (canvas16Plane.selectedMessage != null) {
 				canvas16Plane.selectedMessage.removeFromDiagrams();

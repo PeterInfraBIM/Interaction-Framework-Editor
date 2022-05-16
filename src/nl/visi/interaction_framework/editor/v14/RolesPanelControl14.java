@@ -784,7 +784,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 					return;
 
 				selectedElement.setResponsibilityFeedback(tfd_ResponsibilityFeedback.getText());
-				updateLaMu(selectedElement, user);
+				updateLaMu(selectedElement, getUser());
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 			}
 		});
@@ -798,7 +798,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 					return;
 
 				selectedElement.setResponsibilitySupportTask(tfd_ResponsibilitySupportTask.getText());
-				updateLaMu(selectedElement, user);
+				updateLaMu(selectedElement, getUser());
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 			}
 		});
@@ -812,7 +812,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 					return;
 
 				selectedElement.setResponsibilityTask(tfd_ResponsibilityTask.getText());
-				updateLaMu(selectedElement, user);
+				updateLaMu(selectedElement, getUser());
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 			}
 		});
@@ -826,7 +826,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 					return;
 
 				selectedElement.setResponsibilityScope(tfd_ResponsibilityScope.getText());
-				updateLaMu(selectedElement, user);
+				updateLaMu(selectedElement, getUser());
 				elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 			}
 		});
@@ -845,7 +845,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 						selectedElement.setEndDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}
@@ -870,7 +870,7 @@ public class RolesPanelControl14 extends PanelControl14<RoleTypeType> {
 						selectedElement.setStartDate(xgcal);
 						elementsTableModel.fireTableRowsUpdated(selectedRow, selectedRow);
 						if (!inSelection) {
-							updateLaMu(selectedElement, user);
+							updateLaMu(selectedElement, getUser());
 							elementsTableModel.update(selectedRow);
 						}
 					}

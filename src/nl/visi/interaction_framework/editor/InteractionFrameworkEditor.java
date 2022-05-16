@@ -173,12 +173,12 @@ public class InteractionFrameworkEditor extends Control {
 		}
 
 		user = userPrefs.get("User", "???");
-		tfd_User.setText(user);
+		tfd_User.setText(getUser());
 		tfd_User.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
 			protected void update(DocumentEvent e) {
 				user = tfd_User.getText();
-				userPrefs.put("User", user);
+				userPrefs.put("User", getUser());
 			}
 		});
 	}

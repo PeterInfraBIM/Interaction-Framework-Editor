@@ -254,7 +254,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 		}
 
 		try {
-			updateLaMu(selectedElement, user);
+			updateLaMu(selectedElement, getUser());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -343,7 +343,7 @@ abstract class PanelControl14<E extends ElementType> extends Control14 {
 			}
 		}
 		Editor14.getStore14().put(newId, newElement);
-		updateLaMu(newElement, InteractionFrameworkEditor.user);
+		updateLaMu(newElement, getUser());
 		return newId;
 	}
 
