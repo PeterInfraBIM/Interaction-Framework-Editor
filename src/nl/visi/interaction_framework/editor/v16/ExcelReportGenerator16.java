@@ -444,14 +444,14 @@ class ExcelReportGenerator16 extends Control16 {
 			ComplexElementsPanelControl16 complexElementsPC = MainPanelControl16.getComplexElementsPC();
 			complexElementsPC.tbl_Elements.getSelectionModel().setSelectionInterval(complexElementIndex,
 					complexElementIndex);
-			SubComplexElementsTableModel subComplexElementsTableModel = complexElementsPC
-					.getSubComplexElementsTableModel();
-			for (int cpleIndex = 0; cpleIndex < subComplexElementsTableModel.getRowCount(); cpleIndex++) {
-				ComplexElementTypeType subComplexElementType = subComplexElementsTableModel.get(cpleIndex);
-				row++;
-				sheet.addCell(new Label(col, row, "", getDataFormat()));
-				sheet.addCell(new Label(col + 1, row, subComplexElementType.getId(), getDataFormat()));
-			}
+//			SubComplexElementsTableModel subComplexElementsTableModel = complexElementsPC
+//					.getSubComplexElementsTableModel();
+//			for (int cpleIndex = 0; cpleIndex < subComplexElementsTableModel.getRowCount(); cpleIndex++) {
+//				ComplexElementTypeType subComplexElementType = subComplexElementsTableModel.get(cpleIndex);
+//				row++;
+//				sheet.addCell(new Label(col, row, "", getDataFormat()));
+//				sheet.addCell(new Label(col + 1, row, subComplexElementType.getId(), getDataFormat()));
+//			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_SimpleElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
