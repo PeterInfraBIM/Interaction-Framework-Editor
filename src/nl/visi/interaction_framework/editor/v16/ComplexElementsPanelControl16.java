@@ -76,8 +76,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 	private DefaultMutableTreeNode subComplexElementsRoot;
 	private SimpleElementsTableModel simpleElementsTableModel;
 	private UseElementsTableModel useElementsTableModel;
-	private JComboBox<String> cbx_GlobalElementCondition, cbx_SimpleElementConditions, cbx_ComplexElementConditions,
-			cbx_ComplexElements, cbx_SimpleElements;
+	private JComboBox<String> cbx_GlobalElementCondition, cbx_SimpleElementConditions, cbx_ComplexElements,
+			cbx_SimpleElements;
 	private JButton btn_AddComplexElement, btn_RemoveTreeElement, btn_AddSimpleElement, btn_RemoveSimpleElement;
 	private JTextField tfd_MinOccurs, tfd_MaxOccurs;
 	private JPopupMenu popupMenu;
@@ -113,105 +113,8 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				return complexElement.getId();
 			case Description:
 				return complexElement.getDescription();
-//			case StartDate:
-//				return getDate(complexElement.getStartDate());
-//			case EndDate:
-//				return getDate(complexElement.getEndDate());
-//			case State:
-//				return complexElement.getState();
-//			case DateLamu:
-//				return getDateTime(complexElement.getDateLaMu());
-//			case UserLamu:
-//				return complexElement.getUserLaMu();
 			default:
 				return null;
-			}
-		}
-	}
-
-//	SubComplexElementsTableModel getSubComplexElementsTableModel() {
-//		return subComplexElementsTableModel;
-//	}
-
-	private enum SubComplexElementsTableColumns {
-		Id, Description, Condition, Navigate;
-
-		@Override
-		public String toString() {
-			return getBundle().getString("lbl_" + name());
-		}
-
-	}
-
-	@SuppressWarnings("serial")
-	public class SubComplexElementsTableModel extends ElementsTableModel<ComplexElementTypeType> {
-
-		@Override
-		public int getColumnCount() {
-			return SubComplexElementsTableColumns.values().length;
-		}
-
-		@Override
-		public String getColumnName(int columnIndex) {
-			return SubComplexElementsTableColumns.values()[columnIndex].toString();
-		}
-
-		@Override
-		public Object getValueAt(int rowIndex, int columnIndex) {
-			ComplexElementTypeType complexElement = get(rowIndex);
-			switch (SubComplexElementsTableColumns.values()[columnIndex]) {
-			case Id:
-				return complexElement != null ? complexElement.getId() : null;
-			case Description:
-				return complexElement != null ? complexElement.getDescription() : null;
-			case Condition:
-				ElementConditionType ec = getElementConditionType(null, selectedElement, complexElement, null);
-				return ec != null ? ec.getCondition() : "";
-			default:
-				break;
-			}
-			return null;
-		}
-
-		@Override
-		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			switch (SubComplexElementsTableColumns.values()[columnIndex]) {
-			case Condition:
-				return true;
-			case Navigate:
-				return true;
-			default:
-				return false;
-			}
-		}
-
-		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			ComplexElementTypeType complexElement = get(rowIndex);
-
-			switch (SubComplexElementsTableColumns.values()[columnIndex]) {
-			case Condition:
-				ElementConditionType ec = getElementConditionType(null, selectedElement, complexElement, null);
-				if (ec != null) {
-					if (aValue != null) {
-						ec.setCondition((String) aValue);
-					} else {
-						Editor16.getStore16().remove(ec);
-					}
-				} else {
-					if (aValue != null) {
-						String newId = Editor16.getStore16().getNewId("ec_");
-						ElementConditionType newElementConditionType = objectFactory.createElementConditionType();
-						Editor16.getStore16().put(newId, newElementConditionType);
-						newElementConditionType.setId(newId);
-						newElementConditionType.setDescription("Decription of " + newId);
-						newElementConditionType.setCondition((String) aValue);
-						setElementConditionTypeComplexElement1(newElementConditionType, selectedElement);
-						setElementConditionTypeComplexElement2(newElementConditionType, complexElement);
-					}
-				}
-				break;
-			default:
-				break;
 			}
 		}
 	}
@@ -528,7 +431,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		super(COMPLEX_ELEMENTS_PANEL);
 
 		initComplexElementsTable();
-//		initSubComplexElementsTable();
 		initSimpleElementsTable();
 		initUseElementsTable();
 		initSubComplexElementsTree();
@@ -675,7 +577,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		simpleElementsTableModel = new SimpleElementsTableModel();
 		simpleElementsTableModel.setSorted(false);
 		tbl_SimpleElements.setModel(simpleElementsTableModel);
-//		tbl_SimpleElements.setAutoCreateRowSorter(true);
 		tbl_SimpleElements.setFillsViewportHeight(true);
 		tbl_SimpleElements.setDropMode(DropMode.INSERT_ROWS);
 		tbl_SimpleElements.setTransferHandler(getTransferHandler(tbl_SimpleElements, simpleElementsTableModel, false));
@@ -747,56 +648,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		});
 	}
 
-//	@SuppressWarnings("serial")
-//	private void initSubComplexElementsTable() {
-//		subComplexElementsTableModel = new SubComplexElementsTableModel();
-//		subComplexElementsTableModel.setSorted(false);
-//		tbl_SubComplexElements.setModel(subComplexElementsTableModel);
-////		tbl_SubComplexElements.setAutoCreateRowSorter(true);
-//		tbl_SubComplexElements.setFillsViewportHeight(true);
-//		tbl_SubComplexElements.setDropMode(DropMode.INSERT_ROWS);
-//		tbl_SubComplexElements
-//				.setTransferHandler(getTransferHandler(tbl_SubComplexElements, subComplexElementsTableModel, true));
-//		tbl_SubComplexElements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-//			@Override
-//			public void valueChanged(ListSelectionEvent e) {
-//				int selectedRow = tbl_SubComplexElements.getSelectedRow();
-//				if (selectedRow >= 0) {
-//					List<ComplexElementTypeType> complexElements = getComplexElements(selectedElement);
-//					ComplexElementTypeType ce = subComplexElementsTableModel.elements.get(selectedRow);
-//					btn_RemoveComplexElement.setEnabled(complexElements != null && complexElements.contains(ce));
-//					Object conditionValue = tbl_SubComplexElements.getValueAt(selectedRow,
-//							SubComplexElementsTableColumns.Condition.ordinal());
-//					cbx_ComplexElementConditions.setSelectedItem(conditionValue == "" ? null : conditionValue);
-//				} else {
-//					btn_RemoveComplexElement.setEnabled(false);
-//				}
-//			}
-//		});
-//		cbx_ComplexElementConditions = new JComboBox<>(new DefaultComboBoxModel<String>());
-//		for (String conditionValue : CONDITION_VALUES) {
-//			cbx_ComplexElementConditions.addItem(conditionValue);
-//		}
-//		TableColumn conditionColumn = tbl_SubComplexElements.getColumnModel()
-//				.getColumn(SubComplexElementsTableColumns.Condition.ordinal());
-//		conditionColumn.setCellEditor(new DefaultCellEditor(cbx_ComplexElementConditions));
-//
-//		TableColumn navigateColumn = tbl_SubComplexElements.getColumnModel()
-//				.getColumn(SubComplexElementsTableColumns.Navigate.ordinal());
-//		navigateColumn.setMaxWidth(50);
-//		navigateColumn.setCellRenderer(getButtonTableCellRenderer());
-//		navigateColumn.setCellEditor(new NavigatorEditor() {
-//			@Override
-//			protected void navigate() {
-//				int row = tbl_SubComplexElements.getSelectedRow();
-//				ComplexElementTypeType complexElementTypeType = subComplexElementsTableModel.get(row);
-//				if (complexElementTypeType != null) {
-//					InteractionFrameworkEditor.navigate(complexElementTypeType);
-//				}
-//			}
-//		});
-//	}
-
 	@SuppressWarnings("serial")
 	private void initUseElementsTable() {
 		useElementsTableModel = new UseElementsTableModel();
@@ -849,274 +700,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				}
 			}
 		});
-
-//		tree_SubComplexElements.setTransferHandler(new TransferHandler() {
-//			private DefaultMutableTreeNode movedNode;
-//			private SimpleElementTypeType simpleElement;
-//			private ComplexElementTypeType complexElement;
-//			private JTree.DropLocation dropLocation;
-//			private DefaultMutableTreeNode dropNode;
-//			private ComplexElementTypeType dropElement;
-//
-//			@Override
-//			public int getSourceActions(JComponent c) {
-//				return MOVE;
-//			}
-//			
-//			@Override
-//			protected Transferable createTransferable(JComponent c) {
-//				TreePath[] paths = tree_SubComplexElements.getSelectionPaths();
-//				if (paths != null && paths.length == 1) {
-//					movedNode = (DefaultMutableTreeNode) paths[0].getLastPathComponent();
-//					Object userObject = movedNode.getUserObject();
-//					if (userObject instanceof SimpleElementTypeType) {
-//						return new StringSelection(((SimpleElementTypeType) userObject).getId());
-//					} else {
-//						return new StringSelection(((ComplexElementTypeType) userObject).getId());
-//					}
-//				}
-//				return null;
-//			}
-//			
-//			@Override
-//			protected void exportDone(JComponent source, Transferable data, int action) {
-//				if (action == MOVE) {
-//					Object parentObject = ((DefaultMutableTreeNode) movedNode.getParent()).getUserObject();
-//					Object dropObject = ((DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent())
-//							.getUserObject();
-//					if (parentObject instanceof ComplexElementTypeType && simpleElement != null) {
-//						ComplexElementTypeType parentCe = (ComplexElementTypeType) parentObject;
-//						int index = 0;
-//						int foundIndex = -1;
-//						boolean found = false;
-//						SimpleElements simpleElements = parentCe.getSimpleElements();
-//						if (simpleElements != null) {
-//							List<Object> refs = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
-//							for (Object ref : refs) {
-//								if (index == dropLocation.getChildIndex() && dropObject.equals(parentObject)) {
-//									index++;
-//									continue;
-//								}
-//								SimpleElementTypeType se = null;
-//								if (ref instanceof SimpleElementTypeType) {
-//									se = (SimpleElementTypeType) ref;
-//								} else {
-//									se = (SimpleElementTypeType) (((SimpleElementTypeTypeRef) ref).getIdref());
-//
-//								}
-//								if (se != null) {
-//									if (se.getId().equals(simpleElement.getId())) {
-//										found = true;
-//										foundIndex = index;
-//										break;
-//									}
-//								}
-//								index++;
-//							}
-//							if (found) {
-//								refs.remove(foundIndex);
-//							}
-//						}
-//					} else {
-//						int index = 0;
-//						int foundIndex = -1;
-//						boolean found = false;
-//						List<Object> refs = parentObject instanceof String
-//								? selectedElement.getComplexElements().getComplexElementTypeOrComplexElementTypeRef()
-//								: ((ComplexElementTypeType) parentObject).getComplexElements()
-//										.getComplexElementTypeOrComplexElementTypeRef();
-//						for (Object ref : refs) {
-//							if (index == dropLocation.getChildIndex()) {
-//								index++;
-//								continue;
-//							}
-//							ComplexElementTypeType ce = null;
-//							if (ref instanceof ComplexElementTypeType) {
-//								ce = (ComplexElementTypeType) ref;
-//							} else {
-//								ce = (ComplexElementTypeType) (((ComplexElementTypeTypeRef) ref).getIdref());
-//
-//							}
-//							if (ce != null) {
-//								if (ce.getId().equals(complexElement.getId())) {
-//									found = true;
-//									foundIndex = index;
-//									break;
-//								}
-//							}
-//							index++;
-//						}
-//						if (found) {
-//							refs.remove(foundIndex);
-//						}
-//					}
-//					subComplexElementsTreeModel.removeNodeFromParent(movedNode);
-//				}
-//				movedNode = null;
-//			}
-//
-//			@Override
-//			public boolean canImport(TransferSupport support) {
-//				if (support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
-//					try {
-//						String transferData = (String) support.getTransferable()
-//								.getTransferData(DataFlavor.stringFlavor);
-//						String id = transferData.split("\t")[0];
-//						simpleElement = Editor16.getStore16().getElement(SimpleElementTypeType.class, id);
-//						if (simpleElement != null) {
-//							dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
-//							dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
-//							System.out.println(dropNode.getUserObject());
-//							if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
-//								System.out.println(dropLocation.getChildIndex());
-//								if (dropLocation.getChildIndex() >= 0) {
-//									return true;
-//								}
-//							}
-//							return false;
-//						} else {
-//							complexElement = Editor16.getStore16().getElement(ComplexElementTypeType.class, id);
-//							if (complexElement != null) {
-//								if (dropNode != null) {
-//									tree_SubComplexElements.removeSelectionPath(new TreePath(dropNode.getPath()));
-//								}
-//								dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
-//								if (selectedElement.getComplexElements() == null || selectedElement.getComplexElements()
-//										.getComplexElementTypeOrComplexElementTypeRef().isEmpty()) {
-//									// Add complex type to empty message type
-//									return true;
-//								}
-//								dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
-//								if (!(dropNode.getUserObject() instanceof ComplexElementTypeType)) {
-//									// Add complex type to message type
-//									return true;
-//								} else {
-//									if (dropLocation.getChildIndex() == -1) {
-//										// Add complex type to complex type (as table)
-//										tree_SubComplexElements.setSelectionPath(new TreePath(dropNode.getPath()));
-//										return true;
-//									}
-//								}
-//								return false;
-//							}
-//						}
-//					} catch (UnsupportedFlavorException | IOException e) {
-//						e.printStackTrace();
-//					}
-//				}
-//				return false;
-//			}
-//			
-//			@Override
-//			public boolean importData(TransferSupport support) {
-//				if (dropLocation.getPath() == null) {
-//					ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
-//					ref.setIdref(complexElement);
-//					ComplexElementTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-//					if (complexElements == null) {
-//						complexElements = objectFactory.createComplexElementTypeTypeComplexElements();
-//						selectedElement.setComplexElements(complexElements);
-//					}
-//					List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-//					list.add(0, ref);
-//					updateLaMu(selectedElement, getUser());
-//					DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
-//					subComplexElementsTreeModel.insertNodeInto(complexNode, subComplexElementsRoot, 0);
-//					tree_SubComplexElements.expandPath(new TreePath(subComplexElementsRoot.getPath()));
-//					showComplexNode(complexNode);
-//					return true;
-//				} else {
-//					dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
-//					if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
-//						dropElement = (ComplexElementTypeType) dropNode.getUserObject();
-//						if (dropLocation.getChildIndex() > -1) {
-//							SimpleElementTypeTypeRef ref = objectFactory.createSimpleElementTypeTypeRef();
-//							ref.setIdref(simpleElement);
-//							ComplexElementTypeType.SimpleElements simpleElements = dropElement.getSimpleElements();
-//							if (simpleElements == null) {
-//								simpleElements = objectFactory.createComplexElementTypeTypeSimpleElements();
-//								dropElement.setSimpleElements(simpleElements);
-//							}
-//							List<Object> list = simpleElements.getSimpleElementTypeOrSimpleElementTypeRef();
-//							list.add(dropLocation.getChildIndex(), ref);
-//							updateLaMu(dropElement, getUser());
-//							subComplexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(simpleElement), dropNode,
-//									dropLocation.getChildIndex());
-//							return true;
-//						} else {
-//							ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
-//							ref.setIdref(complexElement);
-//							ComplexElements complexElements = dropElement.getComplexElements();
-//							if (complexElements == null) {
-//								complexElements = objectFactory.createComplexElementTypeTypeComplexElements();
-//								dropElement.setComplexElements(complexElements);
-//							}
-//							List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-//							list.add(ref);
-//							updateLaMu(dropElement, getUser());
-//							DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
-//							subComplexElementsTreeModel.insertNodeInto(complexNode, dropNode, 0);
-//							tree_SubComplexElements.expandPath(new TreePath(dropNode.getPath()));
-//							List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
-//							if (simpleList != null) {
-//								int index = 0;
-//								for (SimpleElementTypeType se : simpleList) {
-//									DefaultMutableTreeNode simpleSubNode = new DefaultMutableTreeNode(se);
-//									subComplexElementsTreeModel.insertNodeInto(simpleSubNode, complexNode, index++);
-//									tree_SubComplexElements.expandPath(new TreePath(simpleSubNode.getPath()));
-//								}
-//								tree_SubComplexElements.expandPath(new TreePath(complexNode.getPath()));
-//							}
-//							return true;
-//						}
-//					} else {
-//						ComplexElementTypeTypeRef ref = objectFactory.createComplexElementTypeTypeRef();
-//						ref.setIdref(complexElement);
-//						ComplexElementTypeType.ComplexElements complexElements = selectedElement.getComplexElements();
-//						if (complexElements == null) {
-//							complexElements = objectFactory.createComplexElementTypeTypeComplexElements();
-//							selectedElement.setComplexElements(complexElements);
-//						}
-//						List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-//						list.add(dropLocation.getChildIndex(), ref);
-//						updateLaMu(selectedElement, getUser());
-//						DefaultMutableTreeNode complexNode = new DefaultMutableTreeNode(complexElement);
-//						subComplexElementsTreeModel.insertNodeInto(complexNode, subComplexElementsRoot,
-//								dropLocation.getChildIndex());
-//						showComplexNode(complexNode);
-//						return true;
-//					}
-//				}
-//			}
-//			
-//			void showComplexNode(DefaultMutableTreeNode complexNode) {
-//				int index = 0;
-//				List<SimpleElementTypeType> simpleList = Control16.getSimpleElements(complexElement);
-//				if (simpleList != null) {
-//					for (SimpleElementTypeType se : simpleList) {
-//						subComplexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexNode, index++);
-//					}
-//					tree_SubComplexElements.expandPath(new TreePath(complexNode.getPath()));
-//				}
-//				List<ComplexElementTypeType> complexList = Control16.getComplexElements(complexElement);
-//				if (complexList != null) {
-//					for (ComplexElementTypeType ce : complexList) {
-//						DefaultMutableTreeNode complexSubNode = new DefaultMutableTreeNode(ce);
-//						subComplexElementsTreeModel.insertNodeInto(complexSubNode, complexNode, index++);
-//						List<SimpleElementTypeType> seList = Control16.getSimpleElements(ce);
-//						if (seList != null) {
-//							int index2 = 0;
-//							for (SimpleElementTypeType se : seList) {
-//								subComplexElementsTreeModel.insertNodeInto(new DefaultMutableTreeNode(se), complexSubNode,
-//										index2++);
-//							}
-//						}
-//						tree_SubComplexElements.expandPath(new TreePath(complexSubNode.getPath()));
-//					}
-//					tree_SubComplexElements.expandPath(new TreePath(complexNode.getPath()));
-//				}
-//			}
-//		});
 		tree_SubComplexElements.setRowHeight(20);
 		ToolTipManager.sharedInstance().registerComponent(tree_SubComplexElements);
 	}
@@ -1128,9 +711,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		tbl_Elements.setFillsViewportHeight(true);
 		TableRowSorter<ElementsTableModel<ComplexElementTypeType>> tableRowSorter = new TableRowSorter<>(
 				elementsTableModel);
-//		tableRowSorter.setComparator(ComplexElementsTableColumns.StartDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(ComplexElementsTableColumns.EndDate.ordinal(), dateComparator);
-//		tableRowSorter.setComparator(ComplexElementsTableColumns.DateLamu.ordinal(), dateTimeComparator);
 		tbl_Elements.setRowSorter(tableRowSorter);
 		tbl_Elements.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -1191,7 +771,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		tfd_MinOccurs.setEnabled(rowSelected);
 		cbx_GlobalElementCondition.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
-//		tbl_SubComplexElements.setEnabled(rowSelected);
 		cbx_ComplexElements.setEnabled(rowSelected);
 		tbl_SimpleElements.setEnabled(rowSelected);
 		cbx_SimpleElements.setEnabled(rowSelected);
@@ -1262,19 +841,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 				}
 			}
 
-//			subComplexElementsTableModel.clear();
-//			List<ComplexElementTypeType> complexElements = getComplexElements(selectedElement);
-//			if (complexElements != null) {
-//				for (ComplexElementTypeType complexElement : complexElements) {
-//					subComplexElementsTableModel.add(complexElement);
-//					List<SimpleElementTypeType> subSimpleElements = getSimpleElements(complexElement);
-//					if (subSimpleElements != null) {
-//						for (SimpleElementTypeType subSimpleElement : subSimpleElements) {
-//							simpleElementsTableModel.add(subSimpleElement);
-//						}
-//					}
-//				}
-//			}
 			useElementsTableModel.clear();
 			List<ElementType> useElements = getUseElements(selectedElement);
 			if (useElements != null) {
@@ -1311,7 +877,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 			tfd_MinOccurs.setText("");
 			cbx_GlobalElementCondition.setSelectedIndex(0);
 			cbx_ComplexElements.removeAllItems();
-//			subComplexElementsTableModel.clear();
 			simpleElementsTableModel.clear();
 			useElementsTableModel.clear();
 			cbx_SimpleElements.removeAllItems();
@@ -1490,7 +1055,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		}
 		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
 		list.add(ref);
-//		subComplexElementsTableModel.add(element);
 		DefaultMutableTreeNode elementNode = new DefaultMutableTreeNode(element);
 		subComplexElementsTreeModel.insertNodeInto(elementNode, subComplexElementsRoot,
 				subComplexElementsRoot.getChildCount());
@@ -1505,40 +1069,6 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
-
-//	public void removeComplexElement() {
-//		int selectedSubComplexElementsRow = tbl_SubComplexElements.getSelectedRow();
-//
-//		int response = JOptionPane.showConfirmDialog(getPanel(),
-//				getBundle().getString("lbl_Remove") + ": "
-//						+ subComplexElementsTableModel.elements.get(selectedSubComplexElementsRow).getId(),
-//				getBundle().getString("lbl_Remove"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE);
-//		if (response == JOptionPane.CANCEL_OPTION)
-//			return;
-//
-//		ComplexElementTypeType complexElement = subComplexElementsTableModel.remove(selectedSubComplexElementsRow);
-//		ComplexElements complexElements = selectedElement.getComplexElements();
-//		List<Object> list = complexElements.getComplexElementTypeOrComplexElementTypeRef();
-//		for (Object object : list) {
-//			ComplexElementTypeType element = null;
-//			if (object instanceof ComplexElementTypeTypeRef) {
-//				element = (ComplexElementTypeType) ((ComplexElementTypeTypeRef) object).getIdref();
-//			} else if (object instanceof ComplexElementTypeType) {
-//				element = (ComplexElementTypeType) object;
-//			}
-//			if (element != null) {
-//				if (complexElement.equals(element)) {
-//					list.remove(object);
-//					break;
-//				}
-//			}
-//		}
-//		if (list.isEmpty()) {
-//			selectedElement.setComplexElements(null);
-//		}
-//		updateLaMu(selectedElement, getUser());
-//		elementsTableModel.update(selectedRow);
-//	}
 
 	public void selectSimpleElement() {
 		int selectedIndex = cbx_SimpleElements.getSelectedIndex();
@@ -1656,5 +1186,4 @@ public class ComplexElementsPanelControl16 extends PanelControl16<ComplexElement
 		updateLaMu(selectedElement, getUser());
 		elementsTableModel.update(selectedRow);
 	}
-
 }

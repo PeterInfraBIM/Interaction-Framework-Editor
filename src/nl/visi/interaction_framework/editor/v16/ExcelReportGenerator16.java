@@ -22,7 +22,7 @@ import jxl.write.WriteException;
 import nl.visi.interaction_framework.editor.v16.Control16;
 import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SimpleElementsTableModel;
-import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTableModel;
+//import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTableModel;
 //import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.ComplexElementsTableModel;
 import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.TransactionsTableModel;
 import nl.visi.interaction_framework.editor.v16.TransactionsPanelControl16.MessagesTableModel;

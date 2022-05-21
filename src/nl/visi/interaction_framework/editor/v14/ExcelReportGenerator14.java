@@ -20,7 +20,7 @@ import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import nl.visi.interaction_framework.editor.v14.ComplexElementsPanelControl14.SimpleElementsTableModel;
-import nl.visi.interaction_framework.editor.v14.ComplexElementsPanelControl14.SubComplexElementsTableModel;
+//import nl.visi.interaction_framework.editor.v14.ComplexElementsPanelControl14.SubComplexElementsTableModel;
 import nl.visi.interaction_framework.editor.v14.MainPanelControl14.Tabs;
 import nl.visi.interaction_framework.editor.v14.MessagesPanelControl14.TransactionsTableModel;
 import nl.visi.interaction_framework.editor.v14.TransactionsPanelControl14.MessagesTableModel;
@@ -442,14 +442,14 @@ class ExcelReportGenerator14 extends Control14 {
 			ComplexElementsPanelControl14 complexElementsPC = MainPanelControl14.getComplexElementsPC();
 			complexElementsPC.tbl_Elements.getSelectionModel().setSelectionInterval(complexElementIndex,
 					complexElementIndex);
-			SubComplexElementsTableModel subComplexElementsTableModel = complexElementsPC
-					.getSubComplexElementsTableModel();
-			for (int cpleIndex = 0; cpleIndex < subComplexElementsTableModel.getRowCount(); cpleIndex++) {
-				ComplexElementTypeType subComplexElementType = subComplexElementsTableModel.get(cpleIndex);
-				row++;
-				sheet.addCell(new Label(col, row, "", getDataFormat()));
-				sheet.addCell(new Label(col + 1, row, subComplexElementType.getId(), getDataFormat()));
-			}
+//			SubComplexElementsTableModel subComplexElementsTableModel = complexElementsPC
+//					.getSubComplexElementsTableModel();
+//			for (int cpleIndex = 0; cpleIndex < subComplexElementsTableModel.getRowCount(); cpleIndex++) {
+//				ComplexElementTypeType subComplexElementType = subComplexElementsTableModel.get(cpleIndex);
+//				row++;
+//				sheet.addCell(new Label(col, row, "", getDataFormat()));
+//				sheet.addCell(new Label(col + 1, row, subComplexElementType.getId(), getDataFormat()));
+//			}
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_SimpleElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));

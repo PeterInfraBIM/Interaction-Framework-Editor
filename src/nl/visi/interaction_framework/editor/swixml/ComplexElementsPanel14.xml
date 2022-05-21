@@ -232,9 +232,13 @@
 						<gridbagconstraints
 							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
 							Insets="2,2,1,2" Weightx="1.0" Weighty="1.0" />
-						<table id="tbl_SubComplexElements" DragEnabled="true"
-							SelectionMode="ListSelectionModel.SINGLE_SELECTION"
-							PreferredScrollableViewportSize="200,50" />
+						<tree id="tree_SubComplexElements"
+							PreferredScrollableViewportSize="200,50" DragEnabled="true">
+							<popupmenu id="popupMenu">
+								<menuitem id="mit_Remove" action="removeTreeElement"
+									text="lbl_Remove" />
+							</popupmenu>
+						</tree>
 					</scrollpane>
 					<panel Layout="GridBagLayout">
 						<gridbagconstraints
@@ -252,8 +256,8 @@
 								Anchor="GridBagConstraints.WEST" Gridx="1" Gridy="0"
 								Insets="0,2,2,2" />
 						</button>
-						<button id="btn_RemoveComplexElement"
-							Action="removeComplexElement" Enabled="false" Text="lbl_Remove">
+						<button id="btn_RemoveTreeElement"
+							Action="removeTreeElement" Enabled="false" Text="lbl_Remove">
 							<gridbagconstraints
 								Anchor="GridBagConstraints.WEST" Gridx="2" Gridy="0"
 								Insets="0,2,2,2" />
