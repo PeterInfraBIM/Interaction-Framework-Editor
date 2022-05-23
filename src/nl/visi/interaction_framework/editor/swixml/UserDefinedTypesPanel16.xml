@@ -21,6 +21,9 @@
 			Icon="img_Upward" Text="lbl_MoveUpward" Action="itemUp"></menuitem>
 		<menuitem id="moveDownMenuItem" Enabled="false"
 			Icon="img_Downward" Text="lbl_MoveDownward" Action="itemDown"></menuitem>
+		<separator></separator>
+		<menuitem id="removeAllMenuItem" Enabled="true"
+			Text="lbl_RemoveAll" Action="removeAllItems"></menuitem>
 	</popupmenu>
 	<splitpane constraints="BorderLayout.CENTER"
 		ContinuousLayout="true" DividerLocation="220"
@@ -191,18 +194,13 @@
 				Border="EmptyBorder(4,4,4,4)"
 				Titles="lbl_Enumeration,lbl_UseElements">
 				<panel Border="EmptyBorder(4,4,4,4)" Layout="GridBagLayout">
-					<!-- <label Text="lbl_Enumeration"> -->
-					<!-- <gridbagconstraints -->
-					<!-- Anchor="GridBagConstraints.WEST" Gridx="0" Gridy="1" -->
-					<!-- Insets="2,2,2,2" /> -->
-					<!-- </label> -->
 					<scrollpane>
 						<gridbagconstraints
 							Fill="GridBagConstraints.BOTH" Gridx="0" Gridy="0"
 							Insets="2,2,2,2" Weightx="1.0" Weighty="1.0" />
 						<table id="tbl_XsdEnumerations"
 							SelectionMode="ListSelectionModel.SINGLE_SELECTION"
-							PreferredScrollableViewportSize="200,50" />
+							PreferredScrollableViewportSize="200,50" DragEnabled="true" />
 					</scrollpane>
 					<panel Border="EmptyBorder(4,0,4,0)" Layout="GridBagLayout">
 						<gridbagconstraints

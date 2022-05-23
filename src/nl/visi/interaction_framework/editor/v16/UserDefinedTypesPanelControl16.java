@@ -3,6 +3,7 @@ package nl.visi.interaction_framework.editor.v16;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
@@ -17,14 +18,17 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.ActionMap;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.TransferHandler;
+import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -161,13 +165,19 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			return items.size();
 		}
 
+		@Override
+		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+			replaceEnumerationElement(rowIndex, (String) aValue);
+			items.set(rowIndex, (String) aValue);
+		}
+
 		public void clear() {
 			items.clear();
 			fireTableDataChanged();
 		}
 
 		public void addItem(int index, String item) {
-			items.add(0, item);
+			items.add(index, item);
 		}
 
 		public void removeItem(int index) {
@@ -175,7 +185,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		}
 
 	}
-	
+
 	private enum UseElementsTableColumns {
 		Id, Description, Type, Navigate;
 
@@ -184,7 +194,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 			return getBundle().getString("lbl_" + name());
 		}
 	}
-	
+
 	@SuppressWarnings("serial")
 	public class UseElementsTableModel extends ElementsTableModel<ElementType> {
 
@@ -221,7 +231,7 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 
 			return null;
 		}
-		
+
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
 			switch (UseElementsTableColumns.values()[columnIndex]) {
@@ -242,10 +252,12 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		initUseElementsTable();
 	}
 
+	@SuppressWarnings("serial")
 	private void initXsdEnumerationTable() {
 		xsdEnumerationsTableModel = new XsdEnumerationsTableModel();
 		tbl_XsdEnumerations.setModel(xsdEnumerationsTableModel);
 		tbl_XsdEnumerations.setFillsViewportHeight(true);
+		tbl_XsdEnumerations.setDropMode(DropMode.INSERT_ROWS);
 		ActionMap map = tbl_XsdEnumerations.getActionMap();
 		map.put(TransferHandler.getPasteAction().getValue(Action.NAME), TransferHandler.getPasteAction());
 		tbl_XsdEnumerations.add(popupMenu);
@@ -276,6 +288,50 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 					return;
 				updateEnumerationButtons();
 			}
+		});
+		tbl_XsdEnumerations.setTransferHandler(new TransferHandler() {
+			private int startRow = -1;
+			private int endRow = -1;
+
+			@Override
+			public int getSourceActions(JComponent c) {
+				return MOVE;
+			}
+
+			@Override
+			protected Transferable createTransferable(JComponent c) {
+				startRow = ((JTable) c).getSelectedRow();
+				System.out.println((String) xsdEnumerationsTableModel.getValueAt(startRow, 0));
+				return new StringSelection((String) xsdEnumerationsTableModel.getValueAt(startRow, 0));
+			}
+
+			@Override
+			public boolean canImport(TransferSupport support) {
+				return true;
+			}
+
+			@Override
+			public boolean importData(TransferSupport support) {
+				JTable.DropLocation dropLocation = (JTable.DropLocation) support.getDropLocation();
+				endRow = dropLocation.getRow();
+				xsdEnumerationsTableModel.addItem(endRow,
+						(String) ((JTable) support.getComponent()).getModel().getValueAt(startRow, 0));
+				xsdEnumerationsTableModel.fireTableRowsInserted(endRow, endRow);
+				tbl_XsdEnumerations.getSelectionModel().setSelectionInterval(endRow, endRow);
+				generateEnumerationFromTable();
+				return true;
+			}
+
+			@Override
+			protected void exportDone(JComponent source, Transferable data, int action) {
+				if (action == MOVE) {
+					int row = endRow > startRow ? startRow : startRow + 1;
+					xsdEnumerationsTableModel.removeItem(row);
+					xsdEnumerationsTableModel.fireTableRowsDeleted(row, row);
+					generateEnumerationFromTable();
+				}
+			}
+
 		});
 		tfd_ItemText.getDocument().addDocumentListener(new DocumentAdapter() {
 			@Override
@@ -339,6 +395,22 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		} catch (BadLocationException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void replaceEnumerationElement(int rowIndex, String value) {
+		UserDefinedTypeType udt = selectedElement;
+		String xsdRestriction = udt.getXsdRestriction();
+		StringBuffer buf = new StringBuffer(xsdRestriction);
+
+		int beginIndex = 0;
+		int endIndex = 0;
+		for (int index = 0; index <= rowIndex; index++, beginIndex++, endIndex++) {
+			beginIndex = buf.indexOf("<xs:enumeration value=\"", beginIndex);
+			endIndex = buf.indexOf("\"/>", endIndex);
+		}
+		String before = buf.substring(0, beginIndex + 22);
+		String end = buf.substring(endIndex - 1);
+		udt.setXsdRestriction(before + value + end);
 	}
 
 	public void alphabetizeAction() {
@@ -446,6 +518,18 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		}
 	}
 
+	public void removeAllItems() {
+		int response = JOptionPane.showConfirmDialog(getPanel(), getBundle().getString("lbl_RemoveAll"),
+				getBundle().getString("lbl_RemoveAll") + "?", JOptionPane.OK_CANCEL_OPTION,
+				JOptionPane.WARNING_MESSAGE);
+		if (response == JOptionPane.OK_OPTION) {
+			selectedElement.setXsdRestriction(null);
+			updateLaMu(selectedElement, user);
+			xsdEnumerationsTableModel.clear();
+			xsdEnumerationsTableModel.fireTableDataChanged();
+		}
+	}
+
 	private String removeEnumerationElement(int removeIndex, boolean warning) throws BadLocationException {
 		Document document = tfd_XsdRestriction.getDocument();
 		String text = document.getText(0, document.getLength());
@@ -467,6 +551,15 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 		document.remove(beginIndex, endIndex + 3 - beginIndex);
 		tfd_XsdRestriction.setDocument(document);
 		return removedItem;
+	}
+
+	private void generateEnumerationFromTable() {
+		StringBuffer buf = new StringBuffer("");
+		for (int row = 0; row < tbl_XsdEnumerations.getRowCount(); row++) {
+			buf.append("<xs:enumeration value=\"" + xsdEnumerationsTableModel.getValueAt(row, 0) + "\"/>");
+		}
+		selectedElement.setXsdRestriction(buf.toString());
+		updateLaMu(selectedElement, user);
 	}
 
 	private boolean insertEnumerationElement(int insertIndex, String insertItem) throws BadLocationException {
