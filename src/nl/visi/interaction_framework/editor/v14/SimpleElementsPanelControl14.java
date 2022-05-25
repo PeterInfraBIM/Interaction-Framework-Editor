@@ -2,6 +2,7 @@ package nl.visi.interaction_framework.editor.v14;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -256,8 +257,9 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 			public void actionPerformed(ActionEvent e) {
 				if (inSelection)
 					return;
-				String idref = (String) cbx_UserDefinedType.getSelectedItem();
-				if (idref != null) {
+				String label = (String) cbx_UserDefinedType.getSelectedItem();
+				if (label != null) {
+					String idref = label.substring(label.lastIndexOf('[') + 1, label.lastIndexOf(']'));
 					UserDefinedTypeType definedType = Editor14.getStore14().getElement(UserDefinedTypeType.class,
 							idref);
 					SimpleElementTypeType.UserDefinedType value = objectFactory
@@ -361,8 +363,15 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 			cbx_UserDefinedType.removeAllItems();
 			cbx_UserDefinedType.addItem(null);
 			List<UserDefinedTypeType> elements = Editor14.getStore14().getElements(UserDefinedTypeType.class);
+			elements.sort(new Comparator<UserDefinedTypeType>() {
+				@Override
+				public int compare(UserDefinedTypeType o1, UserDefinedTypeType o2) {
+					return o1.getDescription().compareTo(o2.getDescription());
+				}
+			});
 			for (UserDefinedTypeType element : elements) {
-				cbx_UserDefinedType.addItem(element.getId());
+//				cbx_UserDefinedType.addItem(element.getId());
+				cbx_UserDefinedType.addItem(element.getDescription() + " [" + element.getId() + "]");
 			}
 			UserDefinedType userDefinedType = selectedElement.getUserDefinedType();
 			btn_NavigateUserDefinedType.setEnabled(userDefinedType != null);
@@ -371,7 +380,8 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 				if (userDefined == null) {
 					userDefined = (UserDefinedTypeType) userDefinedType.getUserDefinedTypeRef().getIdref();
 				}
-				cbx_UserDefinedType.setSelectedItem(userDefined.getId());
+//				cbx_UserDefinedType.setSelectedItem(userDefined.getId());
+				cbx_UserDefinedType.setSelectedItem(userDefined.getDescription() + " [" + userDefined.getId() + "]");
 			}
 			useElementsTableModel.clear();
 			List<ElementType> useElements = getUseElements(selectedElement);
@@ -473,7 +483,10 @@ public class SimpleElementsPanelControl14 extends PanelControl14<SimpleElementTy
 	}
 
 	public void navigateUserDefinedType() {
-		String idref = (String) cbx_UserDefinedType.getSelectedItem();
+//		String idref = (String) cbx_UserDefinedType.getSelectedItem();
+		String label = (String) cbx_UserDefinedType.getSelectedItem();
+		int lastIndex = label.lastIndexOf('[');
+		String idref = label.substring(lastIndex + 1, label.length() - 1);
 		UserDefinedTypeType element = Editor14.getStore14().getElement(UserDefinedTypeType.class, idref);
 		InteractionFrameworkEditor.navigate(element);
 	}

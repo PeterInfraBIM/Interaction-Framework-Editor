@@ -1,4 +1,4 @@
-package nl.visi.interaction_framework.editor.v16;
+package nl.visi.interaction_framework.editor.v14;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +12,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JRootPane;
 import javax.swing.SwingUtilities;
 
-public class TransactionCopyDialogControl extends Control16 {
+public class TransactionCopyDialogControl extends Control14 {
 	private static final String TRANSACTION_COPY_DIALOG = "nl/visi/interaction_framework/editor/swixml/TransactionCopyDialog.xml";
 
 	private JDialog dialog;

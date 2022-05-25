@@ -2263,99 +2263,36 @@ public class TransactionsPanelControl14 extends PanelControl14<TransactionTypeTy
 	}
 
 	public void copyElement() {
-		Store14 store = Editor14.getStore14();
 		int row = tbl_Elements.getSelectedRow();
 		row = tbl_Elements.getRowSorter().convertRowIndexToModel(row);
-		TransactionTypeType origTransactionType = elementsTableModel.get(row);
-
+		final TransactionTypeType origTransactionType = elementsTableModel.get(row);
 		try {
-			TransactionTypeType copyTransactionType = objectFactory.createTransactionTypeType();
-			newElement(copyTransactionType, "Transaction_");
-			store.generateCopyId(copyTransactionType, origTransactionType);
-			copyAppendices(origTransactionType, copyTransactionType);
-			copyTransactionType.setCategory(origTransactionType.getCategory());
-			copyTransactionType.setCode(origTransactionType.getCode());
-			copyTransactionType.setDescription(origTransactionType.getDescription());
-			copyTransactionType.setEndDate(origTransactionType.getEndDate());
-			copyExecutor(origTransactionType, copyTransactionType);
-			copyTransactionType.setHelpInfo(origTransactionType.getHelpInfo());
-			copyInitiator(origTransactionType, copyTransactionType);
-			copyTransactionType.setLanguage(origTransactionType.getLanguage());
-			copyTransactionType.setResult(origTransactionType.getResult());
-			copyTransactionType.setStartDate(origTransactionType.getStartDate());
-			copyTransactionType.setState(origTransactionType.getState());
-			copySubtransactions(origTransactionType, copyTransactionType);
-			store.put(copyTransactionType.getId(), copyTransactionType);
-			int copyrow = elementsTableModel.add(copyTransactionType);
-			copyrow = tbl_Elements.convertRowIndexToView(copyrow);
-			tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+			final TransactionCopyDialogControl transactionCopyDialogControl = new TransactionCopyDialogControl();
+			transactionCopyDialogControl.addPropertyChangeListener(new PropertyChangeListener() {
 
-	}
-
-	private void copyAppendices(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
-		TransactionTypeType.AppendixTypes appendixTypes = transactionType.getAppendixTypes();
-		if (appendixTypes != null) {
-			List<Object> refs = appendixTypes.getAppendixTypeOrAppendixTypeRef();
-			if (refs != null) {
-				TransactionTypeType.AppendixTypes copyAppendixTypes = objectFactory
-						.createTransactionTypeTypeAppendixTypes();
-				List<Object> copyRefs = copyAppendixTypes.getAppendixTypeOrAppendixTypeRef();
-				for (Object item : refs) {
-					copyRefs.add(item);
+				@Override
+				public void propertyChange(PropertyChangeEvent evt) {
+					System.out.println(evt.getNewValue());
+					TransactionTypeType copyTransactionType = null;
+					CopyTransaction ct = new CopyTransaction();
+					if (evt.getNewValue().equals("shallow_copy")) {
+						copyTransactionType = ct.copyAttributes(origTransactionType);
+					} else if (evt.getNewValue().equals("deep_internal_only_copy")) {
+						copyTransactionType = ct.copyAttributes(origTransactionType);
+						ct.copyInternalRelations(origTransactionType, copyTransactionType, (Boolean) evt.getOldValue());
+					}
+					int copyrow = elementsTableModel.add(copyTransactionType);
+					copyrow = tbl_Elements.convertRowIndexToView(copyrow);
+					tbl_Elements.getSelectionModel().setSelectionInterval(copyrow, copyrow);
 				}
-				copyTransactionType.setAppendixTypes(copyAppendixTypes);
-			}
+			});
+			transactionCopyDialogControl.setVisible(true);
+		} catch (Exception e1) {
+			e1.printStackTrace();
 		}
 	}
 
-	private void copySubtransactions(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
-		TransactionTypeType.SubTransactions subtransactions = transactionType.getSubTransactions();
-		if (subtransactions != null) {
-			List<Object> refs = subtransactions.getTransactionTypeOrTransactionTypeRef();
-			if (refs != null) {
-				TransactionTypeType.SubTransactions copySubtransactions = objectFactory
-						.createTransactionTypeTypeSubTransactions();
-				List<Object> copyRefs = copySubtransactions.getTransactionTypeOrTransactionTypeRef();
-				for (Object item : refs) {
-					copyRefs.add(item);
-				}
-				copyTransactionType.setSubTransactions(copySubtransactions);
-			}
-		}
-	}
 
-	private void copyExecutor(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
-		TransactionTypeType.Executor executor = transactionType.getExecutor();
-		if (executor != null) {
-			RoleTypeType roleType = executor.getRoleType();
-			if (roleType == null) {
-				roleType = (RoleTypeType) executor.getRoleTypeRef().getIdref();
-			}
-			if (roleType != null) {
-				TransactionTypeType.Executor copyExecutor = objectFactory.createTransactionTypeTypeExecutor();
-				copyExecutor.setRoleType(roleType);
-				copyTransactionType.setExecutor(copyExecutor);
-			}
-		}
-	}
-
-	private void copyInitiator(TransactionTypeType transactionType, TransactionTypeType copyTransactionType) {
-		TransactionTypeType.Initiator initiator = transactionType.getInitiator();
-		if (initiator != null) {
-			RoleTypeType roleType = initiator.getRoleType();
-			if (roleType == null) {
-				roleType = (RoleTypeType) initiator.getRoleTypeRef().getIdref();
-			}
-			if (roleType != null) {
-				TransactionTypeType.Initiator copyInitiator = objectFactory.createTransactionTypeTypeInitiator();
-				copyInitiator.setRoleType(roleType);
-				copyTransactionType.setInitiator(copyInitiator);
-			}
-		}
-	}
 
 	public void deleteElement() {
 		Store14 store = Editor14.getStore14();

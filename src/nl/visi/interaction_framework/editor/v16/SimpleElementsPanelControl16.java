@@ -259,8 +259,9 @@ public class SimpleElementsPanelControl16 extends PanelControl16<SimpleElementTy
 			public void actionPerformed(ActionEvent e) {
 				if (inSelection)
 					return;
-				String idref = (String) cbx_UserDefinedType.getSelectedItem();
-				if (idref != null) {
+				String label = (String) cbx_UserDefinedType.getSelectedItem();
+				if (label != null) {
+					String idref = label.substring(label.lastIndexOf('[') + 1, label.lastIndexOf(']'));
 					UserDefinedTypeType definedType = Editor16.getStore16().getElement(UserDefinedTypeType.class,
 							idref);
 					SimpleElementTypeType.UserDefinedType value = objectFactory

@@ -1,4 +1,4 @@
-package nl.visi.interaction_framework.editor.v16;
+package nl.visi.interaction_framework.editor.v14;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,29 +9,30 @@ import java.util.prefs.Preferences;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.visi.interaction_framework.editor.Control;
-import nl.visi.schemas._20160331.ElementConditionType;
-import nl.visi.schemas._20160331.ElementConditionType.MessageInTransaction;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Message;
-import nl.visi.schemas._20160331.MessageInTransactionTypeType.Transaction;
-import nl.visi.schemas._20160331.MessageInTransactionTypeTypeRef;
-import nl.visi.schemas._20160331.MessageTypeTypeRef;
-import nl.visi.schemas._20160331.ObjectFactory;
-import nl.visi.schemas._20160331.RoleTypeType;
-import nl.visi.schemas._20160331.TransactionTypeType;
-import nl.visi.schemas._20160331.TransactionTypeTypeRef;
+import nl.visi.schemas._20140331.ElementConditionType;
+import nl.visi.schemas._20140331.ElementConditionType.MessageInTransaction;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.Message;
+import nl.visi.schemas._20140331.MessageInTransactionTypeType.Transaction;
+import nl.visi.schemas._20140331.MessageInTransactionTypeTypeRef;
+import nl.visi.schemas._20140331.MessageTypeTypeRef;
+import nl.visi.schemas._20140331.ObjectFactory;
+import nl.visi.schemas._20140331.RoleTypeType;
+import nl.visi.schemas._20140331.TransactionTypeType;
+import nl.visi.schemas._20140331.TransactionTypeTypeRef;
+
 
 public class CopyTransaction {
 	private ObjectFactory objectFactory;
-	private TransactionsPanelControl16 transactionsPC;
-	private Store16 store;
+	private TransactionsPanelControl14 transactionsPC;
+	private Store14 store;
 	private GregorianCalendar gcal;
 	private Preferences userPrefs;
 
 	public CopyTransaction() {
 		objectFactory = new ObjectFactory();
-		transactionsPC = MainPanelControl16.getTransactionsPC();
-		store = Editor16.getStore16();
+		transactionsPC = MainPanelControl14.getTransactionsPC();
+		store = Editor14.getStore14();
 		gcal = new GregorianCalendar();
 		userPrefs = Preferences.userNodeForPackage(Control.class);
 	}
@@ -108,7 +109,7 @@ public class CopyTransaction {
 							}
 							if (ecMitt.getId().equals(origMitt.getId())) {
 								ElementConditionType copyEC = objectFactory.createElementConditionType();
-								copyEC.setComplexElements(origEC.getComplexElements());
+								copyEC.setComplexElement(origEC.getComplexElement());
 								copyEC.setCondition(origEC.getCondition());
 								copyEC.setDescription(origEC.getDescription());
 								copyEC.setHelpInfo(origEC.getHelpInfo());
@@ -130,13 +131,13 @@ public class CopyTransaction {
 			// Second pass
 			int index = 0;
 			for (MessageInTransactionTypeType origMitt : transactionsPC.messagesTableModel.elements) {
-				List<MessageInTransactionTypeType> previousList = Control16.getPrevious(origMitt);
+				List<MessageInTransactionTypeType> previousList = Control14.getPrevious(origMitt);
 				if (previousList != null) {
 					for (MessageInTransactionTypeType prevMitt : previousList) {
-						TransactionTypeType transaction = Control16.getTransaction(prevMitt);
+						TransactionTypeType transaction = Control14.getTransaction(prevMitt);
 						if (transaction.getId().equals(origTransactionType.getId())) {
 							int prefIndex = transactionsPC.messagesTableModel.elements.indexOf(prevMitt);
-							Control16.addPrevious(copyMitts.get(index), copyMitts.get(prefIndex));
+							Control14.addPrevious(copyMitts.get(index), copyMitts.get(prefIndex));
 						}
 					}
 				}

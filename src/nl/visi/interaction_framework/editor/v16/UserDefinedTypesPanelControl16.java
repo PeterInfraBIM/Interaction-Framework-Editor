@@ -28,7 +28,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.TransferHandler;
-import javax.swing.TransferHandler.TransferSupport;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -90,14 +89,8 @@ public class UserDefinedTypesPanelControl16 extends PanelControl16<UserDefinedTy
 				return userDefinedType.getId();
 			case Description:
 				return userDefinedType.getDescription();
-//			case State:
-//				return userDefinedType.getState();
 			case BaseType:
 				return userDefinedType.getBaseType();
-//			case DateLamu:
-//				return getDateTime(userDefinedType.getDateLaMu());
-//			case UserLamu:
-//				return userDefinedType.getUserLaMu();
 			default:
 				return null;
 			}
