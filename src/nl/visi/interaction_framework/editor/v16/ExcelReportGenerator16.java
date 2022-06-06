@@ -19,9 +19,8 @@ import jxl.write.WritableFont;
 import jxl.write.WritableSheet;
 import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
-import nl.visi.interaction_framework.editor.v16.Control16;
-import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SimpleElementsTableModel;
+import nl.visi.interaction_framework.editor.v16.MainPanelControl16.Tabs;
 //import nl.visi.interaction_framework.editor.v16.ComplexElementsPanelControl16.SubComplexElementsTableModel;
 //import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.ComplexElementsTableModel;
 import nl.visi.interaction_framework.editor.v16.MessagesPanelControl16.TransactionsTableModel;
@@ -264,8 +263,6 @@ class ExcelReportGenerator16 extends Control16 {
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_Result"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, transactionType.getResult(), getDataFormat()));
 			row++;
-//			sheet.addCell(new Label(col, row, getBundle().getString("lbl_BasePoint"), getDataFormat()));
-//			sheet.addCell(new Label(col + 1, row, transactionType.getBasePoint(), getDataFormat()));
 
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_Initiator"), getDataFormat()));
@@ -380,13 +377,12 @@ class ExcelReportGenerator16 extends Control16 {
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_ComplexElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
-//			ComplexElementsTableModel complexElementsTableModel = messagesPC.getComplexElementsTableModel();
-//			for (int cmpeIndex = 0; cmpeIndex < complexElementsTableModel.getRowCount(); cmpeIndex++) {
-//				ComplexElementTypeType complexElementTypeType = complexElementsTableModel.get(cmpeIndex);
-//				row++;
-//				sheet.addCell(new Label(col, row, "", getDataFormat()));
-//				sheet.addCell(new Label(col + 1, row, complexElementTypeType.getId(), getDataFormat()));
-//			}
+			List<ComplexElementTypeType> complexElements = Control16.getComplexElements(messageType);
+			for (ComplexElementTypeType complexElementTypeType : complexElements) {
+				row++;
+				sheet.addCell(new Label(col, row, "", getDataFormat()));
+				sheet.addCell(new Label(col + 1, row, complexElementTypeType.getId(), getDataFormat()));
+			}
 			row++;
 
 		}
@@ -444,14 +440,15 @@ class ExcelReportGenerator16 extends Control16 {
 			ComplexElementsPanelControl16 complexElementsPC = MainPanelControl16.getComplexElementsPC();
 			complexElementsPC.tbl_Elements.getSelectionModel().setSelectionInterval(complexElementIndex,
 					complexElementIndex);
-//			SubComplexElementsTableModel subComplexElementsTableModel = complexElementsPC
-//					.getSubComplexElementsTableModel();
-//			for (int cpleIndex = 0; cpleIndex < subComplexElementsTableModel.getRowCount(); cpleIndex++) {
-//				ComplexElementTypeType subComplexElementType = subComplexElementsTableModel.get(cpleIndex);
-//				row++;
-//				sheet.addCell(new Label(col, row, "", getDataFormat()));
-//				sheet.addCell(new Label(col + 1, row, subComplexElementType.getId(), getDataFormat()));
-//			}
+			List<ComplexElementTypeType> complexElements = Control16.getComplexElements(complexElementType);
+			if (complexElements != null) {
+				for (ComplexElementTypeType subComplexElementType : complexElements) {
+					row++;
+					sheet.addCell(new Label(col, row, "", getDataFormat()));
+					sheet.addCell(new Label(col + 1, row, subComplexElementType.getId(), getDataFormat()));
+				}
+			}
+
 			row++;
 			sheet.addCell(new Label(col, row, getBundle().getString("lbl_SimpleElements"), getDataFormat()));
 			sheet.addCell(new Label(col + 1, row, "", getDataFormat()));
