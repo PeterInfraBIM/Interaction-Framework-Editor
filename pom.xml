@@ -39,6 +39,7 @@
 		<!-- <artifactId>jaxb-api</artifactId> -->
 		<!-- <version>2.2.1</version> -->
 		<!-- </dependency> -->
+
 		<!-- API, java.xml.bind module -->
 		<dependency>
 			<groupId>jakarta.xml.bind</groupId>
@@ -52,5 +53,6 @@
 			<artifactId>jaxb-runtime</artifactId>
 			<version>2.3.2</version>
 		</dependency>
+
 	</dependencies>
 </project>
