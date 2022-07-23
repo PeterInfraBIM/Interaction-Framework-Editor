@@ -34,10 +34,15 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
+import nl.visi.schemas._20160331.ComplexElementTypeType;
+import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
+import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
+import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
 import nl.visi.schemas._20160331.ProjectTypeType;
+import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
 
 abstract class PanelControl16<E extends ElementType> extends Control16 {
 	enum Fields {
@@ -423,13 +428,21 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 							Object object = list.remove(tableTransferSourceRow);
 							list.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow, object);
 						} else {
-							list.add(targetRow, element);
+							ComplexElementTypeTypeRef seTypeRef = new ObjectFactory().createComplexElementTypeTypeRef();
+							seTypeRef.setIdref(element);
+							list.add(targetRow, seTypeRef);
 						}
 					}
 				} else {
 					Method getSimpleElements = selectedElement.getClass().getMethod("getSimpleElements",
 							(Class<?>[]) null);
 					Object seObject = getSimpleElements.invoke(selectedElement, (Object[]) null);
+					if (seObject == null) {
+						seObject = new ObjectFactory().createComplexElementTypeTypeSimpleElements();
+						Method setSimpleElements = selectedElement.getClass().getMethod("setSimpleElements",
+								SimpleElements.class);
+						setSimpleElements.invoke(selectedElement, seObject);
+					}
 					if (seObject != null) {
 						Method getSimpleElementTypeOrSimpleElementTypeRef = seObject.getClass()
 								.getMethod("getSimpleElementTypeOrSimpleElementTypeRef", (Class<?>[]) null);
@@ -439,7 +452,10 @@ abstract class PanelControl16<E extends ElementType> extends Control16 {
 							Object object = list.remove(tableTransferSourceRow);
 							list.add(targetRow > tableTransferSourceRow ? targetRow - 1 : targetRow, object);
 						} else {
-							list.add(targetRow, element);
+							SimpleElementTypeTypeRef seTypeRef = new ObjectFactory().createSimpleElementTypeTypeRef();
+							seTypeRef.setIdref(element);
+							list.add(targetRow, seTypeRef);
+							
 						}
 					}
 				}
