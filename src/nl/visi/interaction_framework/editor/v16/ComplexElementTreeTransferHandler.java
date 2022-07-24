@@ -221,11 +221,7 @@ public class ComplexElementTreeTransferHandler<E extends ElementType> extends Tr
 					if (parentNode.getUserObject() instanceof ComplexElementTypeType && dropNode.equals(parentNode)
 							&& dropLocation.getChildIndex() >= 0
 							&& dropLocation.getChildIndex() <= dropNode.getChildCount()) {
-						System.out.println("parentNode: "
-								+ ((ComplexElementTypeType) parentNode.getUserObject()).getDescription());
-						System.out.println(
-								"dropNode: " + ((ComplexElementTypeType) dropNode.getUserObject()).getDescription());
-						System.out.println("childIndex" + dropLocation.getChildIndex());
+
 						List<ComplexElementTypeType> complexElements = Control16
 								.getComplexElements((ComplexElementTypeType) parentNode.getUserObject());
 						if (complexElements == null || complexElements.isEmpty()) {
@@ -252,14 +248,26 @@ public class ComplexElementTreeTransferHandler<E extends ElementType> extends Tr
 
 	private boolean canImport(TransferSupport support, SimpleElementTypeType simpleElement) {
 		dropLocation = (javax.swing.JTree.DropLocation) support.getDropLocation();
-		dropNode = (DefaultMutableTreeNode) dropLocation.getPath().getLastPathComponent();
-		if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
-			ComplexElementTypeType ce = (ComplexElementTypeType) dropNode.getUserObject();
-			List<ComplexElementTypeType> complexElements = Control16.getComplexElements(ce);
-			List<SimpleElementTypeType> simpleElements = Control16.getSimpleElements(ce);
-			if (simpleElements != null && simpleElements.contains(simpleElement)) {
-				System.out.println(dropLocation.getChildIndex());
-				if (dropLocation.getChildIndex() >= 0 && dropLocation.getChildIndex() <= dropNode.getChildCount()) {
+		TreePath path = dropLocation.getPath();
+		if (path != null) {
+			dropNode = (DefaultMutableTreeNode) path.getLastPathComponent();
+			if (dropNode.getUserObject() instanceof ComplexElementTypeType) {
+				ComplexElementTypeType ce = (ComplexElementTypeType) dropNode.getUserObject();
+				List<ComplexElementTypeType> complexElements = Control16.getComplexElements(ce);
+				List<SimpleElementTypeType> simpleElements = Control16.getSimpleElements(ce);
+				if (simpleElements != null && simpleElements.contains(simpleElement)) {
+					if (dropLocation.getChildIndex() >= 0 && dropLocation.getChildIndex() <= dropNode.getChildCount()) {
+						if (complexElements == null || complexElements.isEmpty()) {
+							if (dropLocation.getChildIndex() >= 0) {
+								return true;
+							}
+						} else {
+							if (dropLocation.getChildIndex() >= complexElements.size()) {
+								return true;
+							}
+						}
+					}
+				} else if (movedNode == null) {
 					if (complexElements == null || complexElements.isEmpty()) {
 						if (dropLocation.getChildIndex() >= 0) {
 							return true;
@@ -268,17 +276,6 @@ public class ComplexElementTreeTransferHandler<E extends ElementType> extends Tr
 						if (dropLocation.getChildIndex() >= complexElements.size()) {
 							return true;
 						}
-					}
-				}
-			} else if (movedNode == null) {
-				System.out.println(dropLocation.getChildIndex());
-				if (complexElements == null || complexElements.isEmpty()) {
-					if (dropLocation.getChildIndex() >= 0) {
-						return true;
-					}
-				} else {
-					if (dropLocation.getChildIndex() >= complexElements.size()) {
-						return true;
 					}
 				}
 			}

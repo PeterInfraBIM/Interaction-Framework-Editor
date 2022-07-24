@@ -34,13 +34,12 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import nl.visi.interaction_framework.editor.DateField;
 import nl.visi.interaction_framework.editor.DocumentAdapter;
 import nl.visi.interaction_framework.editor.InteractionFrameworkEditor;
-import nl.visi.schemas._20160331.ComplexElementTypeType;
 import nl.visi.schemas._20160331.ComplexElementTypeType.SimpleElements;
 import nl.visi.schemas._20160331.ComplexElementTypeTypeRef;
-import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.ElementConditionType;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ElementTypeRef;
+import nl.visi.schemas._20160331.ObjectFactory;
 import nl.visi.schemas._20160331.ProjectTypeType;
 import nl.visi.schemas._20160331.SimpleElementTypeTypeRef;
 
