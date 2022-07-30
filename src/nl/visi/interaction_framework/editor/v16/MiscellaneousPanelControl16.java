@@ -55,7 +55,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 	private JPanel startDatePanel, endDatePanel, cards, relationsPanel, elementConditionPanel, emptyPanel;
 	private CardLayout cl;
 	private JLabel lbl_StartDate, lbl_EndDate, lbl_State, lbl_DateLamu, lbl_UserLamu, lbl_Language, lbl_Category,
-			lbl_Code, lbl_Namespace, lbl_ComplexElement2;
+			lbl_Code, lbl_Namespace;
 	private JComboBox<MiscellaneousTypes> cbx_ElementType;
 	private JComboBox<String> cbx_ComplexElements, cbx_Condition;
 	private ComplexElementsTableModel complexElementsTableModel;
@@ -187,6 +187,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 
 	public MiscellaneousPanelControl16() throws Exception {
 		super(MISCELLANEOUS_PANEL);
+
 		initMiscellaneousTable();
 		initComplexElementsTable();
 
@@ -206,6 +207,8 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		cbx_Condition.addItem("EMPTY");
 		cbx_Condition.addItem("FIXED");
 		cbx_Condition.addItem("FREE");
+		
+		initNamespaceField();
 	}
 
 	private void initEndDateField() {
@@ -278,6 +281,19 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 			}
 		});
 		startDateField.setEnabled(false);
+	}
+
+	private void initNamespaceField() {
+		tfd_Namespace.setEditable(true);
+		tfd_Namespace.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected synchronized void update(DocumentEvent e) {
+				if (inSelection)
+					return;
+				((ProjectTypeType) selectedElement).setNamespace(tfd_Namespace.getText());
+				updateLaMu(selectedElement, getUser());
+			}
+		});
 	}
 
 	@SuppressWarnings("serial")
@@ -1305,7 +1321,7 @@ public class MiscellaneousPanelControl16 extends PanelControl16<ElementType> {
 		if (selectedItem != null)
 			elementConditionType.setCondition(selectedItem);
 	}
-	
+
 	public void selectComplexElement() {
 		int selectedIndex = cbx_ComplexElements.getSelectedIndex();
 		btn_AddComplexElement.setEnabled(selectedIndex > 0);

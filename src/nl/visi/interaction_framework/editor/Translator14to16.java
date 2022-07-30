@@ -888,6 +888,7 @@ public class Translator14to16 extends Control14 {
 		for (ProjectTypeType project14Type : project14Types) {
 			nl.visi.schemas._20160331.ProjectTypeType project16Type = Editor16.getStore16()
 					.getElement(nl.visi.schemas._20160331.ProjectTypeType.class, project14Type.getId());
+			project16Type.setNamespace(project14Type.getNamespace().replace("20140331", "20160331"));
 			List<ComplexElementTypeType> complexElements = getComplexElements(project14Type);
 			if (complexElements != null) {
 				nl.visi.schemas._20160331.ProjectTypeType.ComplexElements messageTypeComplexElements = object16Factory

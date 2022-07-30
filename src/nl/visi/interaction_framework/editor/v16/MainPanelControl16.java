@@ -33,7 +33,6 @@ import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import nl.visi.interaction_framework.editor.NewFrameworkDialogControl;
-import nl.visi.interaction_framework.editor.v14.SimpleElementsPanelControl14;
 import nl.visi.schemas._20160331.ElementType;
 import nl.visi.schemas._20160331.ProjectTypeType;
 

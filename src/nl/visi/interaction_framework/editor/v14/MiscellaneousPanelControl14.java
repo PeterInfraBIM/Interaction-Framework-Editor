@@ -211,6 +211,8 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		tfd_ComplexElement2.setEnabled(false);
 		btn_SetComplexElementType2.setEnabled(false);
 		btn_RemoveComplexElementType2.setEnabled(false);
+		
+		initNamespaceField();
 	}
 
 	private void initEndDateField() {
@@ -284,7 +286,20 @@ public class MiscellaneousPanelControl14 extends PanelControl14<ElementType> {
 		});
 		startDateField.setEnabled(false);
 	}
-
+	
+	private void initNamespaceField() {
+		tfd_Namespace.setEditable(true);
+		tfd_Namespace.getDocument().addDocumentListener(new DocumentAdapter() {
+			@Override
+			protected synchronized void update(DocumentEvent e) {
+				if (inSelection)
+					return;
+				((ProjectTypeType) selectedElement).setNamespace(tfd_Namespace.getText());
+				updateLaMu(selectedElement, getUser());
+			}
+		});
+	}
+	
 	@SuppressWarnings("serial")
 	private void initComplexElementsTable() {
 		complexElementsTableModel = new ComplexElementsTableModel();
