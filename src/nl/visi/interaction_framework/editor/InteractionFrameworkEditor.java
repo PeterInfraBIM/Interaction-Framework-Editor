@@ -94,7 +94,8 @@ public class InteractionFrameworkEditor extends Control {
 //		final String version = "Release: 2.0.1 - release date: 2021-01-31";
 //		final String version = "Release: 2.0.2 - release date: 2021-08-17";
 //		final String version = "Release: 2.0.3 - release date: 2021-08-24";
-		final String version = "Release: 2.1.1 - release date: 2022-07-31";
+//		final String version = "Release: 2.1.1 - release date: 2022-07-31";
+		final String version = "Release: 2.1.2 - release date: 2023-09-27";
 		g.setComposite(AlphaComposite.Clear);
 		g.fillRect(120, 140, 200, 40);
 		g.setPaintMode();
@@ -271,6 +272,7 @@ public class InteractionFrameworkEditor extends Control {
 		fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 		FileNameExtensionFilter filter = new FileNameExtensionFilter("XML", "xml");
 		fileChooser.setFileFilter(filter);
+		fileChooser.setMultiSelectionEnabled(true);
 		String defaultFilePath = userPrefs.get("FrameworkFile", "");
 		if (!defaultFilePath.equals("")) {
 			fileChooser.setSelectedFile(new File(defaultFilePath));
